@@ -156,7 +156,7 @@ details.guide .mono{overflow-wrap:anywhere}
 .lvl-alto .why li::before{background:var(--alto)} .lvl-medio .why li::before{background:var(--medio)}
 .why li.ok::before{background:var(--bajo)}
 .why li.warn{color:var(--muted)}
-.links{display:flex;gap:16px;margin-top:12px;font-size:.88rem}
+.links{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:12px;font-size:.88rem}
 .nm-group{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 16px}
 .nm-group .eyebrow{padding:12px 0 6px}
 .nm-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
@@ -1070,10 +1070,12 @@ function ringHtml(r){
   if(warn) parts.push(warn+(warn===1?" warning":" warnings"));
   if(na) parts.push(na+" not checked");
   var C=2*Math.PI*54;
+  // Dentro del aro caben unos 72 px de ancho: las etiquetas largas («MEDIUM» en inglés) bajan de tamaño para no tocarlo
+  var lbl=LEVELS[r.lvl].short.toUpperCase(), fs=lbl.length>5?Math.floor(22*5/lbl.length):22;
   return "<div class='ringbox'><svg class='ring' viewBox='0 0 130 130' role='img' aria-label='Risk level "+esc(LEVELS[r.lvl].short)+"'>"+
     "<circle cx='65' cy='65' r='54' fill='none' stroke='var(--nm-bg)' stroke-width='14'/>"+
     "<circle cx='65' cy='65' r='54' fill='none' stroke='"+col+"' stroke-width='14' stroke-linecap='round' stroke-dasharray='"+(C*fr).toFixed(1)+" "+C.toFixed(1)+"' transform='rotate(-90 65 65)'/>"+
-    "<text x='65' y='68' text-anchor='middle' font-size='22' font-weight='800' fill='"+col+"'>"+esc(LEVELS[r.lvl].short.toUpperCase())+"</text>"+
+    "<text x='65' y='68' text-anchor='middle' font-size='"+fs+"' font-weight='800' fill='"+col+"'>"+esc(lbl)+"</text>"+
     "<text x='65' y='86' text-anchor='middle' font-size='10' fill='var(--muted)'>risk</text></svg>"+
     "<div class='ringtxt'>"+esc(parts.join(" · ")||"No alerts")+"</div></div>";
 }
