@@ -664,7 +664,8 @@ export const TEXT = {
   // ---------- launch buys (bundles) ----------
   "<div class='lights' style='margin-top:10px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>": "<div class='lights' style='margin-top:10px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Launch buys</b><span>Checking who bought in the first second…</span></div></div></div>",
   "<i class='ld'></i><div style='min-width:0;flex:1'><b>Compras en el lanzamiento</b><span>": "<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>",
-  "No se puede revisar: tiene más de 4.000 operaciones y el lanzamiento queda demasiado atrás.": "Cannot be checked: it has more than 4,000 trades and the launch is too far back.",
+  "No se puede revisar: tiene más de 25.000 operaciones y el lanzamiento queda demasiado atrás.": "Cannot be checked: it has more than 25,000 trades and the launch is too far back.",
+  "No se puede revisar: tiene más de 4.000 operaciones y el lanzamiento queda demasiado atrás. Con tu propia URL de Helius en Ajustes se llega hasta 25.000.": "Cannot be checked: it has more than 4,000 trades and the launch is too far back. With your own Helius URL in Settings it reaches 25,000.",
   "Todavía no tiene operaciones que revisar.": "It has no trades to check yet.",
   " El creador, otro ": " The creator, another ",
   " El creador compró el ": " The creator bought ",

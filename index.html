@@ -1458,13 +1458,16 @@ document.addEventListener("pointermove",function(ev){
 // concentración y luego venden a la vez. Se lee del historial del propio mint, así que solo llega a tokens con
 // menos de 4.000 operaciones
 var bundles={};
+// Páginas de 1.000 operaciones que se leen para llegar al lanzamiento: con tu propia URL de RPC (Helius) van
+// rápidas y se llega mucho más atrás; con los RPC gratuitos, 4
+function launchPages(){ return ownRpc()?25:4; }
 async function launchBuys(mint){
-  var before=null, all=[], pages=0;
+  var before=null, all=[], pages=0, maxP=launchPages();
   for(;;){
     var sigs=await rpc("getSignaturesForAddress",[mint,before?{limit:1000,before:before}:{limit:1000}]);
     all=all.concat(sigs||[]); pages++;
     if(!sigs||sigs.length<1000) break;
-    if(pages>=4) return {tooOld:true};
+    if(pages>=maxP) return {tooOld:true,pages:maxP};
     before=sigs[sigs.length-1].signature;
   }
   var ok=all.filter(function(s){ return !s.err; });
@@ -1507,7 +1510,9 @@ function serialOthers(b,mint){
   return b&&b.serial?b.serial.mints.filter(function(m){ return m!==mint; }).length:0;
 }
 function bundleVerdict(b){
-  if(b.tooOld) return {s:"na",t:"No se puede revisar: tiene más de 4.000 operaciones y el lanzamiento queda demasiado atrás."};
+  if(b.tooOld) return b.pages>4
+    ?{s:"na",t:"No se puede revisar: tiene más de 25.000 operaciones y el lanzamiento queda demasiado atrás."}
+    :{s:"na",t:"No se puede revisar: tiene más de 4.000 operaciones y el lanzamiento queda demasiado atrás. Con tu propia URL de Helius en Ajustes se llega hasta 25.000."};
   if(b.none) return {s:"na",t:"Todavía no tiene operaciones que revisar."};
   var oth=b.ws.filter(function(x){ return !x.creator; }), cr=b.ws.filter(function(x){ return x.creator; })[0];
   var po=oth.reduce(function(s,x){ return s+x.pct; },0), tot=po+(cr?cr.pct:0);
