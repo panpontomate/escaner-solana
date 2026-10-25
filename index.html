@@ -58,6 +58,12 @@ a:hover{text-decoration:underline}
 .mark svg{width:20px;height:20px;stroke:var(--bg);fill:none;stroke-width:2;stroke-linecap:round}
 .brand h1{font:700 1.5rem/1.1 var(--f-display);margin:0;letter-spacing:-.02em}
 .brand p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.brand .by{margin-left:auto;display:flex;align-items:center;gap:7px;color:var(--muted);font-size:.86rem;text-decoration:none;white-space:nowrap;padding:6px 10px;border:1px solid var(--line);border-radius:999px}
+.brand .by:hover{color:var(--fg);border-color:var(--muted)}
+.brand .by svg{width:14px;height:14px;fill:currentColor}
+@media (max-width:620px){.brand{flex-wrap:wrap}.brand .by{margin-left:0}}
+.credits{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px}
+.credits a{color:var(--muted)}
 
 /* tarjetas */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
@@ -279,6 +285,10 @@ a{color:#a99fff}
       <h1>Escáner de Wallets</h1>
       <p>Revisa un token o todos los tokens de una wallet de Solana y detecta señales de estafa.</p>
     </div>
+    <a class="by" href="https://x.com/elgatotradebtc" target="_blank" rel="noopener" title="Sígueme en X">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/></svg>
+      por El Gato Trade
+    </a>
   </header>
 
   <section class="card">
@@ -355,6 +365,11 @@ a{color:#a99fff}
   </section>
 
   <p class="foot">Es una ayuda para detectar señales de alerta, no una garantía ni consejo financiero. Un token con riesgo bajo puede seguir siendo una estafa. La concentración se calcula con wallets individuales (se excluyen pools y programas), pero un exchange o un fondo puede contar como persona.</p>
+  <p class="foot credits">
+    <a href="https://x.com/elgatotradebtc" target="_blank" rel="noopener">Hecho por @elgatotradebtc en X</a>
+    <a href="https://t.me/panpontomate_escaner_bot" target="_blank" rel="noopener">Avisos en Telegram</a>
+    <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
+  </p>
 </div>
 
 <script>
