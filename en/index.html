@@ -1,0 +1,1966 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wallet Scanner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Concepto: una sola columna, tipo "informe de inspección".
+   Arriba el formulario, después un veredicto con barra de riesgo y la lista de tokens ordenada de peor a mejor. */
+:root{
+  --bg:#f2f4f7; --surface:#ffffff; --surface-2:#eaeef3; --line:#d9e0e8;
+  --fg:#131a23; --muted:#5a6676; --accent:#2c6bdc; --accent-fg:#ffffff;
+  --alto:#bf3128; --alto-bg:#fdeae8;
+  --medio:#a96a14; --medio-bg:#fbf0db;
+  --bajo:#1b7f50; --bajo-bg:#e0f4e9;
+  --nm:#66727f; --nm-bg:#e6eaf0;
+  --f-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --f-body:'Figtree','Segoe UI',system-ui,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1218; --surface:#141b23; --surface-2:#1a232d; --line:#252f3b;
+    --fg:#e8edf3; --muted:#92a0b1; --accent:#6ea4ff; --accent-fg:#0a1220;
+    --alto:#ff7b70; --alto-bg:#3a1c1b;
+    --medio:#f0b25a; --medio-bg:#392a10;
+    --bajo:#5ad39b; --bajo-bg:#12301f;
+    --nm:#9aa7b6; --nm-bg:#212b36;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1218; --surface:#141b23; --surface-2:#1a232d; --line:#252f3b;
+  --fg:#e8edf3; --muted:#92a0b1; --accent:#6ea4ff; --accent-fg:#0a1220;
+  --alto:#ff7b70; --alto-bg:#3a1c1b;
+  --medio:#f0b25a; --medio-bg:#392a10;
+  --bajo:#5ad39b; --bajo-bg:#12301f;
+  --nm:#9aa7b6; --nm-bg:#212b36;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 var(--f-body);padding-inline:16px;padding-block:28px 56px}
+.wrap{max-width:860px;margin-inline:auto;display:flex;flex-direction:column;gap:20px}
+button,input{font:inherit;color:inherit}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.mono{font-family:var(--f-mono);font-size:.88em;letter-spacing:-.01em}
+
+/* cabecera */
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:34px;height:34px;border-radius:9px;background:var(--fg);display:grid;place-items:center;flex:none}
+.mark svg{width:20px;height:20px;stroke:var(--bg);fill:none;stroke-width:2;stroke-linecap:round}
+.brand h1{font:700 1.5rem/1.1 var(--f-display);margin:0;letter-spacing:-.02em}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.brand .by{margin-left:auto;display:flex;align-items:center;gap:7px;color:var(--muted);font-size:.86rem;text-decoration:none;white-space:nowrap;padding:6px 10px;border:1px solid var(--line);border-radius:999px}
+.brand .by:hover{color:var(--fg);border-color:var(--muted)}
+.brand .by svg{width:14px;height:14px;fill:currentColor}
+.brand .lang{color:var(--muted);font-size:.8rem;font-weight:700;text-decoration:none;padding:6px 9px;border:1px solid var(--line);border-radius:999px;letter-spacing:.04em}
+.brand .lang:hover{color:var(--fg);border-color:var(--muted)}
+@media (max-width:620px){.brand{flex-wrap:wrap}.brand .by{margin-left:0}}
+a.btn.tg{text-decoration:none;display:inline-flex;align-items:center;background:#229ed9;color:#fff;border-color:#229ed9}
+a.btn.tg:hover{filter:brightness(1.08)}
+.credits{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px}
+.credits a{color:var(--muted)}
+
+/* tarjetas */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.eyebrow{font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+label.eyebrow{display:block;margin-bottom:8px}
+
+/* formulario */
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row input{flex:1 1 280px;min-width:0}
+input[type=text],input[type=number],input[type=url],textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;width:100%}
+textarea{font:inherit;color:inherit;resize:vertical}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:.8}
+.btn{background:var(--accent);color:var(--accent-fg);border:0;border-radius:10px;padding:12px 22px;font-weight:600;cursor:pointer;min-height:46px}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn.small{padding:8px 14px;min-height:0;font-size:.9rem}
+details.adv{margin-top:14px}
+details.adv summary{cursor:pointer;color:var(--muted);font-size:.9rem;width:fit-content}
+.adv-body{display:grid;gap:14px;margin-top:12px}
+.adv-body small{display:block;color:var(--muted);margin-top:6px}
+details.guide{background:var(--surface-2);border-radius:10px;padding:10px 14px;font-size:.9rem;color:var(--muted)}
+details.guide summary{cursor:pointer;color:var(--fg)}
+details.guide ol{margin:10px 0 0;padding-left:20px;display:grid;gap:6px}
+details.guide p{margin:10px 0 0}
+details.guide .mono{overflow-wrap:anywhere}
+.check{display:flex;gap:10px;align-items:center;font-size:.92rem}
+.check input{width:18px;height:18px;accent-color:var(--accent)}
+.notice{margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--surface-2);font-size:.9rem;color:var(--muted)}
+.notice b{color:var(--fg)}
+.notice.err{background:var(--alto-bg);color:var(--fg)}
+
+/* progreso */
+.prog .top{display:flex;justify-content:space-between;gap:12px;font-size:.92rem;margin-bottom:10px}
+.track{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .25s}
+
+/* resumen */
+.sum-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.stats{display:flex;gap:22px;flex-wrap:wrap}
+.stat .v{font:700 1.25rem/1.2 var(--f-display);font-variant-numeric:tabular-nums}
+.verdict{font:700 1.7rem/1.15 var(--f-display);letter-spacing:-.02em;margin:18px 0 6px;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 16px;max-width:62ch}
+.bar{display:flex;height:12px;border-radius:99px;overflow:hidden;background:var(--surface-2);gap:2px}
+.bar i{display:block;min-width:4px}
+.legend{display:flex;gap:8px 18px;flex-wrap:wrap;margin-top:12px;font-size:.9rem}
+.legend span{display:flex;align-items:center;gap:7px;color:var(--muted)}
+.legend b{color:var(--fg);font-variant-numeric:tabular-nums}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.c-spam{background:var(--alto);opacity:.4} .c-alto{background:var(--alto)} .c-medio{background:var(--medio)} .c-bajo{background:var(--bajo)} .c-nm{background:var(--nm)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+
+/* filtros */
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:7px 14px;cursor:pointer;font-size:.9rem;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip b{font-variant-numeric:tabular-nums;margin-left:4px}
+
+/* lista de tokens */
+.list{display:flex;flex-direction:column;gap:10px}
+.tok{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.av{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font:700 .95rem var(--f-display);overflow:hidden;flex:none}
+.av img{width:100%;height:100%;object-fit:cover}
+.lvl-alto .av{background:var(--alto-bg);color:var(--alto)}
+.lvl-medio .av{background:var(--medio-bg);color:var(--medio)}
+.lvl-bajo .av{background:var(--bajo-bg);color:var(--bajo)}
+.lvl-nm .av{background:var(--nm-bg);color:var(--nm)}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.head h3{margin:0;font:700 1.05rem/1.3 var(--f-display);min-width:0;overflow-wrap:anywhere}
+.head h3 span{font:400 .88rem var(--f-body);color:var(--muted);margin-left:6px}
+.pill{font-size:.76rem;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap}
+.lvl-alto .pill{background:var(--alto-bg);color:var(--alto)}
+.lvl-medio .pill{background:var(--medio-bg);color:var(--medio)}
+.lvl-bajo .pill{background:var(--bajo-bg);color:var(--bajo)}
+.lvl-nm .pill{background:var(--nm-bg);color:var(--nm)}
+.meta{display:flex;gap:4px 14px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:.88rem;margin-top:4px}
+.meta .v{color:var(--fg);font-variant-numeric:tabular-nums}
+.copy{background:none;border:0;color:var(--muted);cursor:pointer;padding:0 2px;font-size:.84rem}
+.copy:hover{color:var(--fg)}
+.meter{height:5px;border-radius:99px;background:var(--surface-2);margin-top:12px;overflow:hidden}
+.meter i{display:block;height:100%;border-radius:99px}
+.lvl-alto .meter i{background:var(--alto)} .lvl-medio .meter i{background:var(--medio)} .lvl-bajo .meter i{background:var(--bajo)}
+.why{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.why li{display:flex;gap:9px}
+.why li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--nm);margin-top:.55em;flex:none}
+.lvl-alto .why li::before{background:var(--alto)} .lvl-medio .why li::before{background:var(--medio)}
+.why li.ok::before{background:var(--bajo)}
+.why li.warn{color:var(--muted)}
+.links{display:flex;gap:16px;margin-top:12px;font-size:.88rem}
+.nm-group{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 16px}
+.nm-group .eyebrow{padding:12px 0 6px}
+.nm-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.nm-row .mono{font-size:.8rem;overflow-wrap:anywhere;min-width:0}
+.nm-row .links{margin:0;flex:none}
+.more{text-align:center;color:var(--muted);font-size:.9rem;padding:8px}
+.tabs{display:flex;gap:4px;padding:4px;background:var(--surface-2);border-radius:12px;margin-bottom:18px}
+.tab{flex:1;border:0;background:transparent;border-radius:9px;padding:10px 8px;cursor:pointer;color:var(--muted);font-weight:600;font-size:.92rem}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgb(0 0 0 / .14)}
+.hint{color:var(--muted);font-size:.88rem;margin:10px 0 0}
+.hrow{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.hrow.prog{opacity:.7}
+.rk{width:32px;height:32px;border-radius:9px;background:var(--surface-2);display:grid;place-items:center;font:700 .9rem var(--f-display);font-variant-numeric:tabular-nums}
+.hl1{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.hl1 .mono{overflow-wrap:anywhere}
+.tag{font-size:.74rem;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap;background:var(--bajo-bg);color:var(--bajo)}
+.tag.p{background:var(--nm-bg);color:var(--nm)}
+.hbar{height:5px;border-radius:99px;background:var(--surface-2);margin:10px 0 8px;overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.hrow.prog .hbar i{background:var(--nm)}
+.hside{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.pc{font:700 1.2rem/1 var(--f-display);font-variant-numeric:tabular-nums}
+@media (max-width:520px){
+  .hrow{grid-template-columns:28px minmax(0,1fr);padding:14px}
+  .rk{width:28px;height:28px}
+  .hside{grid-column:1 / -1;flex-direction:row;justify-content:space-between;align-items:center}
+  /* 4 pestañas en fila no caben: los nombres se partían en 3-4 líneas */
+  .tabs{display:grid;grid-template-columns:1fr 1fr}
+  .tab{font-size:.88rem;padding:10px 6px}
+  .card{padding:16px}
+  .row .btn{flex:1 1 100%}
+  /* filas de las redes: dirección y enlaces arriba, saldo y botones debajo */
+  .nm-row{flex-wrap:wrap;gap:6px 12px}
+  .nm-row .hp{margin-left:auto}
+  .nm-row .v{white-space:nowrap}
+  .tab .tl-lg{display:none}
+  .tab .tl-sm{display:inline}
+}
+.tl-sm{display:none}
+.lvl-spam .pill{background:var(--alto-bg);color:var(--alto);opacity:.75}
+.star{background:none;border:0;cursor:pointer;font-size:1.2rem;line-height:1;color:var(--muted);padding:2px 4px;border-radius:6px}
+.star:hover{color:var(--medio)} .star[aria-pressed="true"]{color:var(--medio)}
+.hp{display:flex;align-items:center;gap:6px}
+.tag.seen{background:var(--surface-2);color:var(--muted)}
+.tag.cluster{background:var(--medio-bg);color:var(--medio)}
+.lsec{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 16px}
+.lsec>.eyebrow{padding:12px 0 6px}
+.lrow{display:flex;justify-content:space-between;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--line)}
+.lrow .main{min-width:0;flex:1 1 260px}
+.lrow .acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lrow .nm{font-weight:600;overflow-wrap:anywhere}
+.lempty{color:var(--muted);font-size:.9rem;padding:4px 0 14px}
+.tag.typ{background:var(--surface-2);color:var(--muted);cursor:help}
+.lights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 22px;margin-top:14px}
+.lt{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;min-width:0}
+.lt .ld{width:10px;height:10px;border-radius:50%;margin-top:.45em;flex:none;background:var(--nm)}
+.lt b{display:block;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.lt span{color:var(--fg);overflow-wrap:anywhere}
+.lt-ok .ld{background:var(--bajo)} .lt-warn .ld{background:var(--medio)} .lt-bad .ld{background:var(--alto)}
+.tnote{color:var(--muted);font-size:.85rem;margin:14px 0 0;max-width:64ch}
+@media (max-width:620px){.lights{grid-template-columns:1fr}}
+.star.plus{font-size:1.15rem}
+.star.plus:hover,.star.plus[aria-pressed="true"]{color:var(--accent)}
+.cdet{margin-top:12px;border-top:1px solid var(--line);padding-top:4px}
+.cdet summary{cursor:pointer;color:var(--muted);font-size:.9rem;padding:8px 0;width:fit-content}
+.tag.win{background:var(--bajo-bg);color:var(--bajo)}
+.tag.lose{background:var(--alto-bg);color:var(--alto)}
+.tag.flat,.tag.unk{background:var(--nm-bg);color:var(--nm)}
+select{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--fg)}
+.foot{color:var(--muted);font-size:.84rem;max-width:70ch}
+@media (max-width:520px){
+  .verdict{font-size:1.4rem}
+  .tok{grid-template-columns:38px minmax(0,1fr);gap:12px;padding:14px}
+  .av{width:38px;height:38px}
+}
+@media (prefers-reduced-motion:reduce){.track i{transition:none}}
+
+/* ===== Tema violeta (aspecto elegido) ===== */
+html:root:root:root{
+  --bg:#0e1020; --surface:#171a3a; --surface-2:#1b1f45; --line:#2a2f63;
+  --fg:#eef0ff; --muted:#9097dc; --accent:#7c6cff; --accent-fg:#ffffff;
+  --alto:#ff7b7b; --alto-bg:#3a1b33;
+  --medio:#ffc247; --medio-bg:#3b2f14;
+  --bajo:#3ddc97; --bajo-bg:#10362d;
+  --nm:#a3a9e0; --nm-bg:#23275a;
+  color-scheme:dark;
+}
+body{background:radial-gradient(900px 520px at 88% -8%,rgba(124,108,255,.24),transparent 62%),linear-gradient(160deg,#1b1740 0%,#0c0f1d 58%) fixed;background-color:var(--bg)}
+.mark{background:var(--accent)}.mark svg{stroke:#fff}
+.card,.tok,.lsec{border-radius:22px;box-shadow:0 14px 40px rgba(5,6,20,.35)}
+.btn{border-radius:16px}
+.btn.ghost{background:var(--surface-2);border-color:transparent}
+input[type=text],input[type=number],input[type=url],textarea,select{background:var(--surface-2);border-color:transparent;border-radius:16px}
+input:focus,textarea:focus{border-color:var(--accent)}
+.tabs{background:var(--surface-2);border-radius:18px}
+.tab{border-radius:14px}
+.tab[aria-selected="true"]{background:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(124,108,255,.4)}
+.chip{background:var(--surface-2);border-color:transparent}
+.chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.notice{border-radius:16px}
+.lt-bad .ld{box-shadow:0 0 10px var(--alto)}.lt-warn .ld{box-shadow:0 0 10px var(--medio)}.lt-ok .ld{box-shadow:0 0 10px var(--bajo)}
+.lt .ld{width:12px;height:12px}
+.hbar i{background:linear-gradient(90deg,#5b4bd6,#8f82ff)}
+.track,.meter,.hbar,.bar{background:#262a58}
+a{color:#a99fff}
+@media (max-width:700px){
+  body{padding-bottom:120px}
+  /* navegación abajo, como en una app */
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;margin:0;border-radius:0;gap:2px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line)}
+  .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+  .tab{font-size:.68rem;padding:8px 2px;line-height:1.15;border-radius:12px;min-height:46px;display:flex;align-items:center;justify-content:center;text-align:center}
+}
+
+.ringbox{display:flex;flex-direction:column;align-items:center;margin:14px 0 4px}
+.ring{width:170px;height:170px}
+.ringtxt{color:var(--muted);font-size:.9rem;margin-top:6px}
+.tok .lights{grid-template-columns:1fr;gap:10px}
+.tok .lt{background:var(--surface-2);border:1px solid var(--line);border-radius:18px;padding:12px 16px;align-items:center}
+.tok .lt b{font-size:.95rem;letter-spacing:0;text-transform:none;color:var(--fg);font-weight:700}
+.tok .lt span{color:var(--muted);font-size:.9rem}
+@media (min-width:1000px){#summary .ringbox{margin-top:6px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="brand">
+    <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg></div>
+    <div>
+      <h1>Wallet Scanner</h1>
+      <p>Check one token, or every token in a Solana wallet, and spot the signs of a scam.</p>
+    </div>
+    <a class="by" href="https://x.com/elgatotradebtc" target="_blank" rel="noopener" title="Follow me on X">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/></svg>
+      by El Gato Trade
+    </a>
+    <a class="lang" href="https://panpontomate.github.io/escaner-solana/" hreflang="es" title="Versión en español">ES</a>
+  </header>
+
+  <section class="card">
+    <div class="tabs" role="tablist" aria-label="Mode">
+      <button type="button" class="tab" id="tabW" role="tab" aria-selected="true"><span class="tl-lg">Analyse a wallet or token</span><span class="tl-sm">Analyse</span></button>
+      <button type="button" class="tab" id="tabH" role="tab" aria-selected="false"><span class="tl-lg">Find a token’s whales</span><span class="tl-sm">Whales</span></button>
+      <button type="button" class="tab" id="tabL" role="tab" aria-selected="false">My list <span id="lcount"></span></button>
+      <button type="button" class="tab" id="tabC" role="tab" aria-selected="false">Confluence <span id="ccount"></span></button>
+    </div>
+    <form id="form" autocomplete="off">
+      <label class="eyebrow" for="wallet">Wallet or token</label>
+      <div class="row">
+        <input id="wallet" type="text" spellcheck="false" placeholder="Paste a wallet or a token address">
+        <button class="btn" id="go" type="submit">Analyse</button>
+      </div>
+      <p class="hint" id="whint" hidden></p>
+    </form>
+    <form id="hform" autocomplete="off" hidden>
+      <label class="eyebrow" for="mint">Token address</label>
+      <div class="row">
+        <input id="mint" type="text" spellcheck="false" placeholder="Paste the token address (mint) here">
+        <button class="btn" id="hgo" type="submit">Search</button>
+      </div>
+      <p class="hint">Shows the largest accounts and keeps only the ones that look like people: it drops pools, programs and very active accounts (bots, exchanges, market makers). Then you can analyse each wallet.</p>
+    </form>
+    <details class="adv" id="adv">
+      <summary>Settings</summary>
+      <div class="adv-body">
+        <div>
+          <label class="eyebrow" for="rpc">Your Helius URL (optional)</label>
+          <input id="rpc" type="url" spellcheck="false" placeholder="https://mainnet.helius-rpc.com/?api-key=TU_CLAVE">
+          <small>It is stored only in this browser and only sent to Helius. If you leave it empty, free public services are used: everything works except “Estimate result”, but it is slower.</small>
+        </div>
+        <details class="guide">
+          <summary>How to get a Helius URL (free, 2 minutes)</summary>
+          <ol>
+            <li>Go to <a href="https://www.helius.dev" target="_blank" rel="noopener">helius.dev</a> and create a free account. If you care about privacy, use a secondary email.</li>
+            <li>In the dashboard, find your <b>Mainnet</b>URL. It starts with <span class="mono">https://mainnet.helius-rpc.com/?api-key=</span> and ends with your key.</li>
+            <li>Copy all of it and paste it in the field above. Nothing else to click: it is saved when you analyse.</li>
+          </ol>
+          <p>With it, searches are several times faster and you can estimate whether a wallet wins or loses. Do not share it: it contains your key.</p>
+        </details>
+        <label class="check"><input id="dust" type="checkbox" checked> Hide priced tokens worth under $1 (wallet mode)</label>
+      </div>
+    </details>
+    <div class="notice" id="setup">
+      <b>No setup needed:</b> paste a wallet or a token and press Analyse. Free public services are used, so finding whales or analysing wallets with many tokens can take a while. To go faster, add your free Helius URL in <a href="#" id="openAdv">Settings</a>.
+    </div>
+    <div class="notice err" id="error" hidden></div>
+  </section>
+
+  <section class="card prog" id="progress" hidden aria-live="polite">
+    <div class="top"><span id="ptext">Getting ready…</span><button class="btn ghost small" id="cancel" type="button">Cancel</button></div>
+    <div class="track"><i id="pbar"></i></div>
+  </section>
+
+  <section id="results" hidden>
+    <div class="card" id="summary"></div>
+    <div class="filters" id="filters" role="group" aria-label="Filter by risk" style="margin-top:20px"></div>
+    <div class="list" id="list" style="margin-top:14px"></div>
+  </section>
+
+  <section id="cresults" hidden>
+    <div class="list" id="clist"></div>
+  </section>
+
+  <section id="lresults" hidden>
+    <div class="list" id="llist"></div>
+  </section>
+
+  <section id="hresults" hidden>
+    <div class="card" id="hsummary"></div>
+    <div class="list" id="hlist" style="margin-top:14px"></div>
+  </section>
+
+  <p class="foot">This helps you spot warning signs. It is not a guarantee or financial advice: a low-risk token can still be a scam. Concentration is computed from individual wallets (pools and programs are excluded), but an exchange or a fund can count as a person.</p>
+  <p class="foot credits">
+    <a href="https://x.com/elgatotradebtc" target="_blank" rel="noopener">Made by @elgatotradebtc on X</a>
+    <a href="https://t.me/panpontomate_escaner_bot" target="_blank" rel="noopener">Telegram alerts</a>
+    <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Open source</a>
+  </p>
+</div>
+
+<script>
+// Si el motor (librería solana-risk-engine) no carga desde el CDN, se avisa en vez de dejar la página muerta
+setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById("error"); if(!e) return;
+  e.innerHTML="The scanner engine could not load from cdn.jsdelivr.net. Check your internet connection and reload the page."; e.hidden=false; },10000);
+</script>
+<script type="module">
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.2.0/src/index.js";
+window.__escOk=true;
+(function(){
+"use strict";
+
+// api.mainnet-beta.solana.com responde 403 a todo lo que sale de un navegador. PublicNode sí atiende
+// casi todo (cuentas, firmas, transacciones) y rápido, pero bloquea las consultas de tokens por dueño
+// y de mayores holders. Esas van a Solana Vibe Station, que las acepta sin clave pero solo a ~1 por
+// segundo: por eso pasan por una cola (vibeSlot). Con una URL propia en Ajustes todo va a esa URL.
+var PUBLIC_RPC = "https://solana-rpc.publicnode.com";
+var VIBE_RPC = "https://public.rpc.solanavibestation.com";
+var DEX = "https://api.dexscreener.com/tokens/v1/solana/";
+var TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+var TOKEN_2022 = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
+var KNOWN = {
+  "So11111111111111111111111111111111111111112":"SOL (wrapped)",
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v":"USDC",
+  "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB":"USDT"
+};
+var EXT = {
+  permanentDelegate:[25,"The issuer can move or burn your tokens (permanent delegate). Normal for tokenized stocks, but you have to trust the issuer"],
+  transferHook:[15,"Has a transfer hook: runs external code on every transfer"],
+  transferFeeConfig:[10,"Charges a fee on every transfer"],
+  nonTransferable:[10,"Cannot be transferred"],
+  defaultAccountState:[10,"New accounts can be created frozen"]
+};
+var LEVELS = {
+  ALTO:{cls:"alto",bar:"c-alto",label:"High risk",short:"High"},
+  MEDIO:{cls:"medio",bar:"c-medio",label:"Medium risk",short:"Medium"},
+  BAJO:{cls:"bajo",bar:"c-bajo",label:"Low risk",short:"Low"},
+  SPAM:{cls:"spam",bar:"c-spam",label:"Likely spam",short:"Spam"},
+  "SIN DATOS":{cls:"nm",bar:"c-nm",label:"Not checked",short:"No data"},
+  "SIN MERCADO":{cls:"nm",bar:"c-nm",label:"No market",short:"No market"}
+};
+var ORDER = ["ALTO","MEDIO","BAJO","SPAM","SIN DATOS","SIN MERCADO"];
+
+var $ = function(s){ return document.querySelector(s); };
+var state = { mode:"W", shown:{W:false,H:false}, hold:null, cancel:false, rpc:PUBLIC_RPC, minUsd:1, results:[], filter:"TODOS", wallet:"", sol:0, hidden:0, total:0 };
+
+/* ---------- mi lista (se guarda solo en este navegador) ---------- */
+var LKEY="esc.lista";
+var lista=(function(){ try{ var d=JSON.parse(store(LKEY)||"null"); if(d&&d.w&&d.t) return d; }catch(e){} return {w:{},t:{}}; })();
+function saveList(){ store(LKEY,JSON.stringify(lista)); updateCount(); }
+function updateCount(){
+  var n=0; Object.keys(lista.w).forEach(function(k){ if(lista.w[k].fav) n++; }); n+=Object.keys(lista.t).length;
+  var el=document.getElementById("lcount"); if(el) el.textContent=n?"("+n+")":"";
+  var ce=document.getElementById("ccount"); if(ce) ce.textContent=(typeof conf!=="undefined"&&conf.cart.length)?"("+conf.cart.length+")":"";
+}
+function starOn(b,on){
+  b.setAttribute("aria-pressed",String(on));
+  b.textContent=b.hasAttribute("data-long")?(on?"★ Following":"☆ Follow "+(b.getAttribute("data-long")||"wallet")):(on?"★":"☆");
+}
+function toggleWallet(addr){
+  var e=lista.w[addr]||(lista.w[addr]={fav:false,name:""});
+  e.fav=!e.fav;
+  if(!e.fav&&!e.ts&&!e.name) delete lista.w[addr];
+  saveList(); return !!e.fav;
+}
+function toggleToken(mint){
+  if(lista.t[mint]){ delete lista.t[mint]; saveList(); return false; }
+  var r=state.results.filter(function(x){return x.mint===mint;})[0];
+  if(!r) return false;
+  lista.t[mint]=snap(r); saveList(); return true;
+}
+function snap(r){
+  return {sym:r.sym,name:r.name,lvl:r.lvl,pts:r.pts,type:r.type||"",why:r.why.slice(0,3),
+    price:Number((r.par&&r.par.priceUsd)||0),liq:(r.par&&r.par.liquidity&&r.par.liquidity.usd)||0,
+    pair:(r.par&&r.par.pairAddress)||"",ts:Date.now()};
+}
+function recordWallet(){
+  var c=counts(), total=state.results.reduce(function(s,r){return s+r.valor;},0);
+  var e=lista.w[state.wallet]||(lista.w[state.wallet]={fav:false,name:""});
+  e.ts=Date.now(); e.n=state.results.length; e.total=total; e.alto=c.ALTO; e.spam=c.SPAM; e.sol=state.sol;
+  state.results.forEach(function(r){ if(lista.t[r.mint]) lista.t[r.mint]=snap(r); });
+  var old=Object.keys(lista.w).filter(function(k){return !lista.w[k].fav&&!lista.w[k].name;})
+    .sort(function(a,b){return (lista.w[b].ts||0)-(lista.w[a].ts||0);});
+  old.slice(60).forEach(function(k){ delete lista.w[k]; });
+  saveList();
+}
+function seenTag(addr){
+  var e=lista.w[addr]; if(!e||!e.ts) return "";
+  return "<span class='tag seen' title='You analysed it before'>Analysed "+esc(hace(e.ts))+(e.alto?" · "+e.alto+" high":"")+"</span>";
+}
+function walletRow(addr,e){
+  var meta=e.ts?["Analysed "+hace(e.ts),e.n+(e.n===1?" token":" tokens"),usd(e.total||0)+" in tokens",
+     (e.alto?e.alto+" high risk":"no high risk")+(e.spam?" · "+e.spam+" spam":"")]:["Not analysed yet"];
+  return "<div class='lrow'><div class='main'><div class='hl1'>"+
+      (e.name?"<span class='nm'>"+esc(e.name)+"</span>":"")+
+      "<span class='mono'>"+esc(short(addr))+"</span><button class='copy' type='button' data-copy='"+esc(addr)+"' title='Copy address'>copy</button>"+
+      "<a href='https://solscan.io/account/"+esc(addr)+"' target='_blank' rel='noopener' style='font-size:.88rem'>Solscan</a></div>"+
+      "<div class='meta'>"+meta.map(function(m){return "<span>"+esc(m)+"</span>";}).join("")+(e.pnl?pnlTag(e.pnl):"")+"</div></div>"+
+    "<div class='acts'><button class='btn small ghost' type='button' data-analyze='"+esc(addr)+"'>"+(e.ts?"Analyse again":"Analyse")+"</button>"+
+    "<button class='star' type='button' data-favw='"+esc(addr)+"' aria-pressed='"+(!!e.fav)+"' title='Follow / unfollow' aria-label='Follow this wallet'>"+(e.fav?"★":"☆")+"</button>"+plusBtn(addr)+
+    "<button class='copy' type='button' data-name='"+esc(addr)+"'>"+(e.name?"rename":"name it")+"</button>"+
+    (!e.fav?"<button class='copy' type='button' data-del='"+esc(addr)+"'>remove</button>":"")+
+    "</div></div>";
+}
+function renderLista(){
+  var ws=Object.keys(lista.w).map(function(k){ var e=lista.w[k]; e.addr=k; return e; });
+  function byTs(a,b){ return (b.ts||0)-(a.ts||0); }
+  var favs=ws.filter(function(e){return e.fav;}).sort(byTs);
+  var hist=ws.filter(function(e){return !e.fav&&(e.ts||e.name);}).sort(byTs);
+  var toks=Object.keys(lista.t).map(function(k){ var t=lista.t[k]; t.mint=k; return t; })
+    .sort(function(a,b){ return ORDER.indexOf(a.lvl)-ORDER.indexOf(b.lvl)||(a.sym>b.sym?1:-1); });
+  var h=storageWarningHtml();
+  h+="<div class='lsec'><div class='eyebrow'>Wallets I follow · "+favs.length+"</div>"+
+    (favs.length?favs.map(function(e){return walletRow(e.addr,e);}).join("")+"<div class='actions' style='margin-top:12px'><button class='btn small' type='button' id='chgBtnL'>Check what they changed</button></div>":"<div class='lempty'>You do not follow any yet. Analyse a wallet and press “Follow wallet”, or use the star in the whale list.</div>")+"</div>";
+  if(state.chg&&state.chg.target==="L") h+=chgHtml(state.chg);
+  h+="<div class='lsec'><div class='eyebrow'>Tokens I follow · "+toks.length+"</div>"+
+    (toks.length?toks.map(function(t){
+      var L=LEVELS[t.lvl]||LEVELS["SIN MERCADO"];
+      return "<div class='lrow lvl-"+L.cls+"'><div class='main'><div class='hl1'><span class='nm'>"+esc(t.sym)+"</span>"+
+        (t.name?"<span style='color:var(--muted);font-size:.88rem'>"+esc(t.name)+"</span>":"")+"<span class='pill'>"+L.label+"</span></div>"+
+        "<div class='meta'>"+(t.type&&TYPES[t.type]?"<span class='tag typ' title='"+esc(TYPES[t.type].note)+"'>"+esc(TYPES[t.type].label)+"</span>":"")+"<span class='mono'>"+esc(short(t.mint))+"</span><button class='copy' type='button' data-copy='"+esc(t.mint)+"'>copy</button>"+
+        (t.price?"<span>Price <span class='v'>"+esc(priceUsd(t.price))+"</span></span>":"")+
+        "<span>Liquidity <span class='v'>"+usd(t.liq||0)+"</span></span><span>Checked "+esc(hace(t.ts))+"</span></div>"+
+        (t.why&&t.why.length?"<div class='meta' style='margin-top:6px'>"+esc(t.why[0])+"</div>":"")+"</div>"+
+        "<div class='acts'><a href='https://solscan.io/token/"+esc(t.mint)+"' target='_blank' rel='noopener' style='font-size:.88rem'>Solscan</a>"+
+        (t.pair?"<a href='https://dexscreener.com/solana/"+esc(t.pair)+"' target='_blank' rel='noopener' style='font-size:.88rem'>DexScreener</a>":"")+
+        "<button class='btn small ghost' type='button' data-hold='"+esc(t.mint)+"'>See whales</button>"+
+        "<button class='star' type='button' data-favt='"+esc(t.mint)+"' aria-pressed='true' title='Unfollow' aria-label='Unfollow this token'>★</button></div></div>";
+    }).join(""):"<div class='lempty'>You do not follow any token yet. Press the star on a token card after analysing a wallet. It updates every time the token shows up in an analysis again.</div>")+"</div>";
+  if(hist.length) h+="<div class='lsec'><div class='eyebrow'>Analysed wallets · "+hist.length+"</div>"+hist.map(function(e){return walletRow(e.addr,e);}).join("")+"</div>";
+  h+=backupHtml();
+  $("#llist").innerHTML=h;
+}
+function walletHint(){
+  var v=$("#wallet").value.trim(), e=lista.w[v], el=$("#whint");
+  if(e&&e.ts){ el.hidden=false; el.textContent="You analysed this wallet "+hace(e.ts)+(e.fav?" (you follow it)":"")+"."; }
+  else el.hidden=true;
+}
+
+/* ---------- resultado estimado de una wallet (compras y ventas por swap) ---------- */
+var USDC="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", USDT="Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", WSOL="So11111111111111111111111111111111111111112";
+// heliusKey, fetchSwaps, solHistory, parseTrades, pnlFromTrades y pnlStatus: en el bloque del motor (librería)
+// de-DE: como en usd(), para que "6.204" lleve punto de miles igual que el resto de cifras
+function sgn(n,d){ return (n>0?"+":(n<0?"−":""))+Math.abs(n).toLocaleString("en-US",{maximumFractionDigits:d===undefined?0:d}); }
+function pnlTag(p){
+  if(!p||!p.st) return "";
+  // "Gana 142%", no "Gana +142%": el verbo ya dice el signo
+  var pc=Math.abs(p.ret*100).toLocaleString("en-US",{maximumFractionDigits:0});
+  var t={win:["win","Up "+pc+"% (est.)"],lose:["lose","Down "+pc+"% (est.)"],flat:["flat","Flat (est.)"],unk:["unk","Too little data"]}[p.st];
+  return "<span class='tag "+t[0]+"' title='Estimate from its latest swap buys and sells'>"+t[1]+"</span>";
+}
+async function runPnl(addrs,balances,onStep){
+  if(!heliusKey()) throw new Error("helius");
+  var sol=await solHistory();
+  if(sol.approx&&!(sol.now>0)) throw new Error("sol");
+  var tb={}, done=0, down=false;
+  await pool(addrs,3,async function(a){
+    if(down){ tb[a]=null; return; }
+    try{ tb[a]=parseTrades(a,await fetchSwaps(a,300),sol); }
+    catch(e){ if(e.message==="cancelado") throw e; tb[a]=null; if(/Failed to fetch|NetworkError|Load failed|HTTP 40[13]/i.test(e.message)) down=true; }
+    done++; if(onStep) onStep(done,addrs.length);
+  });
+  var set={}; addrs.forEach(function(a){ (tb[a]||[]).forEach(function(t){ set[t.mint]=1; }); });
+  var ms=Object.keys(set), mkr=ms.length?await getMarkets(ms,function(){}):{data:{},failed:[]}, mk=mkr.data, price={}, sym={};
+  Object.keys(mk).forEach(function(m){ price[m]=Number(mk[m].priceUsd||0); sym[m]=(mk[m].baseToken&&mk[m].baseToken.symbol)||short(m); });
+  var out={};
+  addrs.forEach(function(a){
+    out[a]=tb[a]?pnlFromTrades(tb[a],balances[a]||{},price,sym,sol.approx):null;
+    if(out[a]){ var e=lista.w[a]||(lista.w[a]={fav:false,name:""}); e.pnl={st:out[a].st,ret:out[a].ret,total:out[a].total,n:out[a].n,ts:out[a].ts}; }
+  });
+  saveList();
+  return {pnl:out,down:down,approx:sol.approx};
+}
+function pnlBoxHtml(p,res){
+  if(!p) return "<div class='notice' style='margin-top:14px'>This wallet’s history could not be read. Check that your Helius URL in Settings is correct.</div>";
+  var h="<div class='notice' style='margin-top:14px'><div class='hl1' style='margin-bottom:8px'><b style='color:var(--fg)'>Estimated result</b> "+pnlTag(p)+"</div>";
+  if(!p.n){ return h+"No swap buys or sells were found in the recent history.</div>"; }
+  if(res&&res.approx) h+="<p style='margin:0 0 10px;color:var(--alto)'><b>Warning:</b> SOL price history was not available, so today’s price was used to value every trade. If this wallet trades mostly against SOL (not USDC/USDT), the amounts and the result below can be far from reality, especially for older trades. Try again in a while.</p>";
+  h+="Based on "+p.n+" trades since "+new Date(p.since*1000).toLocaleDateString("en-US")+". "+
+    (p.ret===null?"":"Result "+sgn(p.total)+" USD ("+sgn(p.ret*100)+"%) on "+usd(p.base)+" invested: ")+
+    "realized "+sgn(p.realized)+" USD · unrealized "+sgn(p.unreal)+" USD."+
+    (p.noPrice?" "+p.noPrice+(p.noPrice===1?" token without a price counts as a total loss.":" tokens without a price count as a total loss."):"");
+  if(p.open.length){
+    h+="<div style='margin-top:10px'>"+p.open.map(function(o){
+      return "<div class='nm-row' style='padding:6px 0'><span><b style='color:var(--fg)'>"+esc(o.sym)+"</b> average entry "+priceUsd(o.entry)+" → now "+(o.price?priceUsd(o.price):"no price")+
+        (o.ret===null?"":" ("+sgn(o.ret*100)+"%)")+"</span><span style='font-variant-numeric:tabular-nums;color:var(--fg);white-space:nowrap'>worth "+usd(o.value)+"</span></div>";
+    }).join("")+"</div>";
+  }
+  return h+"<div style='margin-top:10px;font-size:.84rem'>This is an estimate: it only counts swap buys and sells from the last ~300 trades. It does not include tokens received by transfer or airdrops, and anything bought before that period is left out.</div></div>";
+}
+async function estimateOne(){
+  var btn=$("#estPnl"), box=$("#pnlbox"), addr=state.wallet;
+  state.rpc=$("#rpc").value.trim()||PUBLIC_RPC; state.cancel=false;
+  btn.disabled=true; btn.textContent="Calculating…"; box.innerHTML="";
+  try{
+    var bal={}; bal[addr]=state.bal||{};
+    var r=await runPnl([addr],bal);
+    box.innerHTML=pnlBoxHtml(r.pnl[addr],r);
+  }catch(e){
+    box.innerHTML="<div class='notice err' style='margin-top:14px'>"+friendlyError(e)+"</div>";
+  }finally{ btn.disabled=false; btn.textContent="Estimate result"; }
+}
+
+/* ---------- Confluencia: tokens que tienen en común varias wallets ---------- */
+var CKEY="esc.conf", CMAX=30;
+var conf=(function(){ try{ var d=JSON.parse(store(CKEY)||"null"); if(d&&d.cart&&d.saved) return d; }catch(e){} return {cart:[],saved:{},pct:30,showAll:false,cur:null}; })();
+if(conf.pnl===undefined) conf.pnl=true;
+if(!conf.pf) conf.pf="all";
+function saveConf(){ store(CKEY,JSON.stringify(conf)); updateCount(); }
+function inCart(a){ return conf.cart.indexOf(a)>=0; }
+function toggleCart(a){
+  var i=conf.cart.indexOf(a);
+  if(i>=0) conf.cart.splice(i,1);
+  else{ if(conf.cart.length>=CMAX) return null; conf.cart.push(a); }
+  saveConf(); return inCart(a);
+}
+function plusOn(b,on){
+  b.setAttribute("aria-pressed",String(on));
+  if(b.hasAttribute("data-long")) b.textContent=on?"✓ In Confluence":"⊕ To Confluence"; else b.textContent="⊕";
+  b.title=on?"It is in Confluence: press to remove it":"Add to Confluence";
+}
+function plusBtn(addr){
+  var on=inCart(addr);
+  return "<button class='star plus' type='button' data-addc='"+esc(addr)+"' aria-pressed='"+on+"' title='"+(on?"It is in Confluence: press to remove it":"Add to Confluence")+"' aria-label='Add to Confluence'>⊕</button>";
+}
+function wlink(a,cls){ return "<a href='#' class='"+(cls||'')+"' data-analyze='"+esc(a)+"' title='Open this wallet’s analysis' style='text-decoration:underline dotted;text-underline-offset:3px;color:inherit'>"+esc(walletLabel(a))+"</a>"; }
+function walletLabel(a){ var e=lista.w[a]; return (e&&e.name)?e.name:short(a); }
+function addAddrs(text){
+  var parts=String(text||"").split(/[\s,;]+/).filter(Boolean), added=0, bad=0, full=0;
+  parts.forEach(function(x){
+    if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(x)){ bad++; return; }
+    if(inCart(x)) return;
+    if(conf.cart.length>=CMAX){ full++; return; }
+    conf.cart.push(x); added++;
+  });
+  if(added) saveConf();
+  return {added:added,bad:bad,full:full};
+}
+function confPct(n){ return Math.round(n)+"%"; }
+function renderConf(){
+  var n=conf.cart.length;
+  var minN=Math.max(2,Math.ceil(conf.pct/100*n));
+  var h=storageWarningHtml()+"<div class='card'>"+
+    "<div class='eyebrow'>Current group · "+n+(n===1?" wallet":" wallets")+" (up to "+CMAX+")</div>"+
+    (n?"<div style='margin-top:6px'>"+conf.cart.map(function(a){
+      return "<div class='lrow' style='padding:8px 0'><div class='main'><div class='hl1'>"+
+        (lista.w[a]&&lista.w[a].name?"<span class='nm'>"+esc(lista.w[a].name)+"</span>":"")+
+        (lista.w[a]&&lista.w[a].name?"":wlink(a,'mono'))+(lista.w[a]&&lista.w[a].name?"<a href='#' data-analyze='"+esc(a)+"' class='mono' style='text-decoration:underline dotted;color:inherit'>"+esc(short(a))+"</a>":"")+"<a href='https://solscan.io/account/"+esc(a)+"' target='_blank' rel='noopener' style='font-size:.88rem'>Solscan</a>"+
+        (lista.w[a]&&lista.w[a].pnl?pnlTag(lista.w[a].pnl):"")+"</div></div>"+
+        "<div class='acts'><button class='copy' type='button' data-delc='"+esc(a)+"'>remove</button></div></div>";
+    }).join("")+"</div>":"<p class='lempty'>The group is empty. Use the ⊕ button next to each wallet, paste addresses below or add the ones you follow.</p>")+
+    "<form id='cform' autocomplete='off' style='margin-top:12px'><div class='row'>"+
+      "<input id='cadd' type='text' spellcheck='false' placeholder='Paste one or more addresses (separated by spaces or commas)'>"+
+      "<button class='btn ghost' type='submit'>Add</button></div></form>"+
+    "<div class='actions' style='margin-top:12px'><button class='btn small ghost' type='button' id='caddfav'>Add the wallets I follow</button>"+
+      (n?"<button class='btn small ghost' type='button' id='cchg'>Check what the group changed</button><button class='btn small ghost' type='button' id='cclear'>Empty group</button>":"")+"</div>"+
+    "<div style='display:grid;gap:12px;margin-top:18px'>"+
+      "<label class='check' style='flex-wrap:wrap'>Show tokens held by at least "+
+        "<input id='cpct' type='number' min='5' max='100' step='5' value='"+conf.pct+"' style='width:76px;padding:8px 10px'> % of the wallets"+
+        "<span style='color:var(--muted)'>"+(n>=2?"(with "+n+" wallets, at least "+minN+(conf.pnl&&conf.pf!=="all"?" if all are compared; fewer if the result filter leaves some out":"")+")":"(at least 2 wallets)")+"</span></label>"+
+      "<label class='check'><input id='cshow' type='checkbox'"+(conf.showAll?" checked":"")+"> Also show SOL, stablecoins and well-known tokens</label>"+
+      "<label class='check' style='flex-wrap:wrap'><input id='cpnl' type='checkbox'"+(conf.pnl?" checked":"")+"> Estimate whether each wallet wins or loses (uses Helius history; slower)</label>"+
+      "<label class='check' style='flex-wrap:wrap'>Wallets to compare: "+
+        "<select id='cpf'"+(conf.pnl?"":" disabled")+"><option value='all'"+(conf.pf==="all"?" selected":"")+">All</option><option value='win'"+(conf.pf==="win"?" selected":"")+">Only winners</option><option value='lose'"+(conf.pf==="lose"?" selected":"")+">Only losers</option></select></label>"+
+    "</div>"+
+    "<div class='row' style='margin-top:16px'>"+
+      "<input id='cname' type='text' placeholder='Name to save this group (for example: TAO whales)' value='"+esc(state.cname||"")+"'>"+
+      "<button class='btn ghost' type='button' id='csave'>Save group</button>"+
+      "<button class='btn' type='button' id='cgo'"+(n<2?" disabled":"")+">Compare</button></div>"+
+    "<p class='hint' id='cmsg'>"+esc(state.cmsg||"")+"</p></div>";
+  var ids=Object.keys(conf.saved).sort(function(a,b){ return (conf.saved[b].ts||0)-(conf.saved[a].ts||0); });
+  h+="<div class='lsec'><div class='eyebrow'>Saved confluences · "+ids.length+"</div>"+
+    (ids.length?ids.map(function(id){
+      var c=conf.saved[id];
+      return "<div class='lrow'><div class='main'><div class='nm'>"+esc(c.name)+(conf.cur===id?" <span class='tag seen'>open</span>":"")+"</div>"+
+        "<div class='meta'><span>"+c.wallets.length+" wallets</span><span>saved "+hace(c.ts)+"</span>"+
+        (c.res?"<span>"+c.res.rows.length+" tokens in common</span>":"<span>not compared yet</span>")+"</div></div>"+
+        "<div class='acts'><button class='btn small ghost' type='button' data-copen='"+esc(id)+"'>Open</button>"+
+        "<button class='copy' type='button' data-cdel='"+esc(id)+"'>delete</button></div></div>";
+    }).join(""):"<div class='lempty'>You have not saved any group yet. Name it and press “Save group” to repeat the comparison later.</div>")+"</div>";
+  if(state.chg&&state.chg.target==="conf") h+=chgHtml(state.chg);
+  h+="<div class='lsec'><details id='ddet'"+(state.dopen?" open":"")+"><summary class='eyebrow' style='cursor:pointer'>Discover wallets shared by several tokens</summary>"+
+    "<p class='hint' style='margin:8px 0'>Paste 2 to 6 Solana token addresses. I look for people among the top holders of several of them at once. Only the 20 largest accounts of each token are visible, so matches are rare and therefore valuable.</p>"+
+    "<textarea id='dmints' rows='3' spellcheck='false' placeholder='One token address per line'>"+esc(state.dmints||"")+"</textarea>"+
+    "<div class='actions' style='margin:10px 0'><label class='check'>Shared by at least <input id='dmin' type='number' min='2' max='6' value='"+(state.dmin||2)+"' style='width:64px;padding:8px 10px'> tokens</label>"+
+    "<button class='btn small' type='button' id='dgo'>Find matches</button></div>"+
+    (state.disc?discHtml(state.disc):"")+"</details></div>";
+  h+="<div id='cres'>"+(state.cres?confResultHtml(state.cres):"")+"</div>";
+  $("#clist").innerHTML=h;
+}
+function confResultHtml(res){
+  var rows=res.rows.filter(function(r){ return conf.showAll||!(r.known||r.type==="STABLE"); });
+  var hid=res.rows.length-rows.length;
+  var c={ALTO:0,MEDIO:0,BAJO:0}; rows.forEach(function(r){ if(c[r.lvl]!==undefined) c[r.lvl]++; });
+  var h="<div class='card' style='margin-top:20px'><div class='eyebrow'>Result · "+hace(res.ts)+"</div>"+
+    "<h2 class='verdict'>"+(rows.length?rows.length+(rows.length===1?" token in common":" tokens in common"):"No token in common")+"</h2>"+
+    "<p class='sub'>Tokens with a market held by at least "+res.minN+" of the "+res.wallets+" wallets "+(res.pf==="win"?"that win":(res.pf==="lose"?"that lose":"read"))+" ("+confPct(res.pct)+" or more). "+
+      (res.pf&&res.pf!=="all"?"Left out "+(res.allWallets-res.wallets)+" of the "+res.allWallets+" wallets that did not pass the result filter. ":"")+(res.pnlNote||"")+
+      (rows.length?"High "+c.ALTO+" · Medium "+c.MEDIO+" · Low "+c.BAJO+". ":"")+
+      (hid?hid+(hid===1?" well-known token or stablecoin hidden. ":" well-known tokens or stablecoins hidden. "):"")+
+      (res.noMkt?res.noMkt+(res.noMkt===1?" token without a market skipped. ":" tokens without a market skipped. "):"")+
+      (res.mktFailed?res.mktFailed+(res.mktFailed===1?" token could not be checked on DexScreener because of a network error (compare again to include it). ":" tokens could not be checked on DexScreener because of a network error (compare again to include them). "):"")+
+      (res.failed?res.failed+(res.failed===1?" wallet could not be read.":" wallets could not be read."):"")+"</p>"+
+    "<div class='actions'><button class='btn small' type='button' id='ccopy'>Copy top 5 for a post</button></div>"+
+    "<p class='hint'>Sharing a token is not a recommendation: it can be an airdrop, wallets with the same owner, or bots and exchanges that were not filtered out.</p></div>";
+  h+="<div class='list' style='margin-top:14px'>"+rows.map(function(r){
+    var L=LEVELS[r.lvl]||LEVELS["SIN MERCADO"];
+    var av=r.img?"<img src='"+esc(r.img)+"' alt='' loading='lazy' referrerpolicy='no-referrer' onerror=\"this.remove()\">":"";
+    var meta=[].concat(r.type&&TYPES[r.type]?["<span class='tag typ' title='"+esc(TYPES[r.type].note)+"'>"+esc(TYPES[r.type].label)+"</span>"]:[],[
+      "<span>In <span class='v'>"+r.n+" of "+res.wallets+"</span> wallets ("+confPct(r.n/res.wallets*100)+")</span>",
+      "<span>Total value <span class='v'>"+usd(r.total)+"</span></span>",
+      "<span>Liquidity <span class='v'>"+usd(r.liq||0)+"</span></span>",
+      "<span class='mono'>"+esc(short(r.mint))+"</span><button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copy token address'>copy</button>"]);
+    return "<article class='tok lvl-"+L.cls+"'><div class='av' aria-hidden='true'>"+(av||esc(r.sym.slice(0,2).toUpperCase()))+"</div><div style='min-width:0'>"+
+      "<div class='head'><h3>"+esc(r.sym)+(r.name?"<span>"+esc(r.name)+"</span>":"")+"</h3><span class='pill'>"+L.label+"</span></div>"+
+      "<div class='meta'>"+meta.join("")+"</div>"+
+      (r.lights?"<div class='lights'>"+r.lights.map(function(l){
+        return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div><b>"+LKEYS[l.k]+"</b><span>"+esc(l.t)+"</span></div></div>";
+      }).join("")+"</div>":"<ul class='why'><li class='ok'>Well-known token</li></ul>")+
+      "<details class='cdet'><summary>See the "+r.n+" wallets that hold it</summary>"+r.hs.map(function(x){
+        return "<div class='lrow' style='padding:8px 0'><div class='main'>"+wlink(x.a,'mono')+" "+(res.pnl&&res.pnl[x.a]?pnlTag(res.pnl[x.a]):"")+" "+
+          "<a href='https://solscan.io/account/"+esc(x.a)+"' target='_blank' rel='noopener' style='font-size:.88rem;margin-left:8px'>Solscan</a></div>"+
+          "<div class='acts'><span class='v' style='font-variant-numeric:tabular-nums'>"+usd(x.v)+"</span>"+
+          "<button class='btn small ghost' type='button' data-analyze='"+esc(x.a)+"'>Analyse</button></div></div>";
+      }).join("")+"</details>"+
+      "<div class='links'><a href='https://solscan.io/token/"+esc(r.mint)+"' target='_blank' rel='noopener'>Solscan</a>"+
+      (r.pair?"<a href='https://dexscreener.com/solana/"+esc(r.pair)+"' target='_blank' rel='noopener'>DexScreener</a>":"")+"</div>"+
+      "</div></article>";
+  }).join("")+"</div>";
+  return h;
+}
+function confText(res){
+  var rows=res.rows.filter(function(r){ return conf.showAll||!(r.known||r.type==="STABLE"); }).slice(0,5);
+  return "Tokens in common among "+res.wallets+" wallets\n"+rows.map(function(r,i){
+    return (i+1)+". $"+r.sym+" — "+r.n+" of "+res.wallets+" wallets ("+confPct(r.n/res.wallets*100)+") · "+(LEVELS[r.lvl]?LEVELS[r.lvl].label.toLowerCase():"");
+  }).join("\n");
+}
+async function compare(){
+  if(conf.cart.length<2){ showError("Add at least 2 wallets to the group to compare them."); return; }
+  $("#error").hidden=true;
+  state.rpc=$("#rpc").value.trim()||PUBLIC_RPC; state.cancel=false;
+  store("esc.rpc",$("#rpc").value.trim());
+  $("#cgo").disabled=true; $("#progress").hidden=false;
+  try{
+    var wallets=conf.cart.slice(), data={}, failed=0, d=0;
+    await pool(wallets,3,async function(a){
+      try{ data[a]=(await getTokens(a)).tokens; }catch(e){ if(e.message==="cancelado") throw e; failed++; }
+      d++; setProgress("Reading wallets… "+d+"/"+wallets.length,0.05+0.3*d/wallets.length);
+    });
+    var ok=wallets.filter(function(a){ return data[a]; });
+    if(ok.length<2) throw new Error("could not read at least 2 wallets");
+    var okAll=ok, pnlSnap=null, pnlNote="";
+    if(conf.pnl&&!heliusKey()){
+      if(conf.pf!=="all") throw new Error("helius");
+      pnlNote="Wallet results were not estimated because your Helius URL is missing in Settings. ";
+    }else if(conf.pnl){
+      setProgress("Estimating each wallet’s result…",0.3);
+      var pr=await runPnl(ok,data,function(dn,n){ setProgress("Estimating each wallet’s result… "+dn+"/"+n,0.3+0.1*dn/n); });
+      pnlSnap={}; ok.forEach(function(a){ if(pr.pnl[a]) pnlSnap[a]={st:pr.pnl[a].st,ret:pr.pnl[a].ret,total:pr.pnl[a].total,n:pr.pnl[a].n}; });
+      if(pr.down) pnlNote="Some wallets’ history could not be read. ";
+      if(conf.pf!=="all"){
+        ok=ok.filter(function(a){ return pr.pnl[a]&&pr.pnl[a].st===conf.pf; });
+        if(ok.length<2) throw new Error("only "+ok.length+(ok.length===1?" wallet passes":" wallets pass")+" the result filter (of "+okAll.length+" read). Try “All” or add more wallets");
+      }
+    }
+    var minN=Math.max(2,Math.ceil(conf.pct/100*ok.length));
+    var count={};
+    ok.forEach(function(a){ Object.keys(data[a]).forEach(function(m){ count[m]=(count[m]||0)+1; }); });
+    var cand=Object.keys(count).filter(function(m){ return count[m]>=minN; });
+    setProgress("Fetching prices…",0.4);
+    var mkr=cand.length?await getMarkets(cand,function(dn,n){ setProgress("Fetching prices… "+dn+"/"+n,0.4+0.15*dn/n); }):{data:{},failed:[]};
+    var mk=mkr.data, mktFailed=mkr.failed.length;
+    var rows=[], noMkt=0;
+    cand.forEach(function(m){
+      var par=mk[m], price=Number((par&&par.priceUsd)||0);
+      if(!par||!(price>0)){ noMkt++; return; }
+      var hs=[];
+      ok.forEach(function(a){ var q=data[a][m]; if(q&&q*price>=1) hs.push({a:a,v:q*price}); });   // se ignora el polvo (< 1 $)
+      if(hs.length<minN) return;
+      hs.sort(function(x,y){ return y.v-x.v; });
+      rows.push({mint:m,par:par,hs:hs,n:hs.length,total:hs.reduce(function(s,x){return s+x.v;},0)});
+    });
+    var done=0, todo=rows.filter(function(r){ return !KNOWN[r.mint]; });
+    await pool(todo,3,async function(r){
+      var a=null; try{ a=await assess(r.mint,r.par,0); }catch(e){ if(e.message==="cancelado") throw e; }
+      r.a=a; done++; setProgress("Checking the risk of the tokens in common… "+done+"/"+todo.length,0.55+0.45*done/Math.max(1,todo.length));
+    });
+    var out=[];
+    rows.forEach(function(r){
+      var base=(r.par&&r.par.baseToken)||{}, a=r.a;
+      if(KNOWN[r.mint]) out.push({mint:r.mint,sym:KNOWN[r.mint],name:"",lvl:"BAJO",sev:0,type:null,lights:null,known:true,n:r.n,total:r.total,liq:(r.par.liquidity&&r.par.liquidity.usd)||0,pair:r.par.pairAddress||"",img:null,hs:r.hs});
+      else if(a) out.push({mint:r.mint,sym:a.sym,name:a.name,lvl:a.lvl,sev:a.sev,type:a.type,lights:a.lights,known:false,n:r.n,total:r.total,liq:(r.par.liquidity&&r.par.liquidity.usd)||0,pair:r.par.pairAddress||"",img:a.img,hs:r.hs});
+    });
+    out.sort(function(x,y){ return y.n-x.n||y.total-x.total; });
+    state.cres={ts:Date.now(),wallets:ok.length,failed:failed,minN:minN,pct:conf.pct,noMkt:noMkt,mktFailed:mktFailed,rows:out,allWallets:okAll.length,pf:conf.pf,pnl:pnlSnap,pnlNote:pnlNote};
+    if(conf.cur&&conf.saved[conf.cur]){ conf.saved[conf.cur].res=state.cres; conf.saved[conf.cur].ts=Date.now(); conf.saved[conf.cur].wallets=conf.cart.slice(); conf.saved[conf.cur].pct=conf.pct; }
+    saveConf();
+    renderConf();
+    var el=document.getElementById("cres"); if(el) el.scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(e){
+    if(e.message!=="cancelado") showError(friendlyError(e));
+  }finally{
+    var g=$("#cgo"); if(g) g.disabled=conf.cart.length<2;
+    $("#progress").hidden=true;
+  }
+}
+function saveGroup(){
+  var name=(state.cname||"").trim();
+  if(conf.cart.length<2){ state.cmsg="Add at least 2 wallets before saving the group."; renderConf(); return; }
+  var id=conf.cur&&conf.saved[conf.cur]&&(!name||conf.saved[conf.cur].name===name)?conf.cur:("c"+Date.now().toString(36));
+  if(!name) name=(conf.saved[id]&&conf.saved[id].name)||("Confluence "+(Object.keys(conf.saved).length+1));
+  conf.saved[id]={name:name,wallets:conf.cart.slice(),pct:conf.pct,ts:Date.now(),res:state.cres||null};
+  conf.cur=id; state.cname=name; state.cmsg="Group saved as “"+name+"».";
+  saveConf(); renderConf();
+}
+
+/* ---------- utilidades ---------- */
+var STORE_FAIL=false;
+function store(k,v){
+  try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); return true; }
+  catch(e){ if(v!==undefined) STORE_FAIL=true; return null; }
+}
+function storageWarningHtml(){
+  return STORE_FAIL?"<div class='notice err' style='margin-bottom:16px'><b>Changes could not be saved in this browser</b> (storage full or blocked). What you see on screen may not be saved. Download a backup before closing the tab.</div>":"";
+}
+function esc(s){
+  return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
+function usd(n){
+  if(!n) return "$0";
+  if(n<0.01) return "<$0.01";
+  // de-DE en vez de es-ES: mismo formato (punto de miles, coma decimal), pero es-ES no agrupa
+  // los números de 4 cifras y salía "6494 $" al lado de "22.505 $"
+  return "$"+n.toLocaleString("en-US",{minimumFractionDigits:n<1000?2:0,maximumFractionDigits:n<1000?2:0});
+}
+// Las memecoins valen fracciones de céntimo: con usd() saldría "<0,01 $" para casi todas
+function priceUsd(n){
+  if(!n||n>=0.01) return usd(n);
+  return "$"+n.toLocaleString("en-US",{maximumSignificantDigits:4});
+}
+function short(a){ return a.slice(0,4)+"…"+a.slice(-4); }
+function pct(n){ return Math.round(n)+"%"; }
+
+/* ---------- motor: librería solana-risk-engine ----------
+   Toda la lógica de riesgo, holders, PnL y cambios vive en la librería (npm: solana-risk-engine,
+   github.com/panpontomate/solana-risk-engine). Estas funciones conservan los nombres y la forma de
+   datos que usa el resto de la página y traducen lo que devuelve la librería, para que cualquier
+   arreglo del motor llegue aquí sin tocar la interfaz. */
+var SRE_LV={HIGH:"ALTO",MEDIUM:"MEDIO",LOW:"BAJO",SPAM:"SPAM",NO_DATA:"SIN DATOS",NO_MARKET:"SIN MERCADO"};
+var SRE_TY={STABLE:"STABLE",TOKENIZED:"TOKENIZADO",BRIDGED:"PUENTEADO",CREATOR:"CREADOR",OPEN:"ABIERTO"};
+var SRE_LK={control:"ctl",concentration:"con",market:"mkt",dependency:"dep"};
+var SRE_KIND={program:"programa",active:"activa"};
+// Un cliente por análisis: guarda la cola de Vibe Station y los métodos que PublicNode rechaza.
+// «Cancelar» aborta su señal; un análisis nuevo pone state.cancel=false y estrena otra
+var eng={c:null,rpc:null,ac:null};
+function client(){
+  if(!eng.ac||(eng.ac.signal.aborted&&!state.cancel)){ eng.ac=new AbortController(); eng.c=null; }
+  if(!eng.c||eng.rpc!==state.rpc){ eng.c=SRE.createClient({rpcUrl:state.rpc,signal:eng.ac.signal}); eng.rpc=state.rpc; }
+  return eng.c;
+}
+function cancelEngine(){ if(eng.ac) eng.ac.abort(); }
+// La página reconoce los errores por su texto («cancelado», «helius», «HTTP 403»...): se traducen los códigos
+function legacyErr(e){
+  if(!e||!e.code) return e;
+  var m={CANCELLED:"cancelado",HELIUS_REQUIRED:"helius",SOL_PRICE:"sol",DEX_UNREACHABLE:"dex",NETWORK:"Failed to fetch",
+    NOT_A_TOKEN:"that address is not a token",NO_HOLDERS:"the RPC returned no holder data"}[e.code];
+  if(e.code==="HTTP") m="HTTP "+e.data.status;
+  var out=new Error(m||e.message); out.code=e.code; return out;
+}
+function call(p){ return p.catch(function(e){ throw legacyErr(e); }); }
+function kinds(map){ Object.keys(map).forEach(function(k){ map[k]=SRE_KIND[map[k]]||map[k]; }); return map; }
+
+function jfetch(url,opts,tries){ return call(client().jfetch(url,opts,tries)); }
+function rpc(method,params){ return call(client().rpc(method,params)); }
+function heliusKey(){ return client().heliusKey(); }
+function getTokens(wallet){ return call(SRE.getTokens(client(),wallet)); }
+function getMarkets(mints,onStep){ return call(SRE.getMarkets(client(),mints,onStep)); }
+function getMint(mint){ return call(SRE.getMint(client(),mint)); }
+function isMint(addr){ return call(SRE.isMint(client(),addr)); }
+
+function rugcheckSummary(mint){ return call(SRE.rugcheckSummary(client(),mint)); }
+function rugcheckReport(mint){ return call(SRE.rugcheckReport(client(),mint)); }
+function rugcheckGraph(mint){ return call(SRE.rugcheckGraph(client(),mint)); }
+async function netBalances(mint,graph){
+  await call(SRE.netBalances(client(),mint,graph));
+  graph.forEach(function(n){ n.nodes.forEach(function(x){ if(x.kind) x.kind=SRE_KIND[x.kind]||x.kind; }); });
+}
+
+// Riesgo de un token con la forma de siempre: lvl ALTO/MEDIO..., semáforos {k:ctl|con|mkt|dep, s, t} y why en texto
+async function assess(mint,par,valor,unchecked,noConc){
+  var r=await call(SRE.assess(client(),mint,par,{value:valor,marketUnknown:unchecked,skipConcentration:noConc}));
+  if(!r) return null;   // NFT
+  var lights=r.lights?r.lights.map(function(l){ return {k:SRE_LK[l.k],s:l.s,t:SRE.explainLight(l,"en")}; }):null;
+  return {
+    mint:r.mint, sym:r.sym, name:r.name, pts:r.pts, sev:r.sev, lvl:SRE_LV[r.lvl]||r.lvl,
+    why:lights?lightsWhy(lights):r.reasons.map(function(x){ return SRE.describe(x,"en"); }),
+    warn:[], lights:lights, type:SRE_TY[r.type]||null, valor:valor, par:r.pair, imp:r.impostor, img:r.img
+  };
+}
+
+async function holderBase(mint,step){
+  var b=await call(SRE.holderBase(client(),mint,function(p,f){ if(step) step(SRE.describeStep(p,"en"),f); }));
+  kinds(b.kind);
+  return b;
+}
+async function markBusy(kind,wallets,step){
+  var busy=await call(SRE.markBusy(client(),kind,wallets,step));
+  kinds(kind);
+  return busy;
+}
+function findFunders(wallets,step){ return call(SRE.findFunders(client(),wallets,step)); }
+function clusterByFunder(funders,hot){ return SRE.clusterByFunder(funders,hot); }
+function holderRows(b,busy){
+  var r=SRE.holderRows(b,busy);
+  r.rows.forEach(function(x){ x.kind=SRE_KIND[x.kind]||x.kind; });
+  return r;
+}
+
+function fetchSwaps(addr,max){ return call(SRE.fetchSwaps(client(),addr,max)); }
+function solHistory(){ return call(SRE.solHistory(client())); }
+function parseTrades(addr,txs,sol){ return SRE.parseTrades(addr,txs,sol); }
+function pnlFromTrades(trades,bal,price,sym,approx){ return SRE.pnlFromTrades(trades,bal,price,sym,approx); }
+function pnlStatus(p,approx){ return SRE.pnlStatus(p,approx); }
+
+function capSnap(h){ return SRE.capSnap(h); }
+function chgDiff(prev,now){ return SRE.chgDiff(prev,now); }
+function chgAgg(rows){ return SRE.chgAgg(rows); }
+
+// Lo usa la página para repartir trabajo en paralelo (no es parte del motor)
+async function pool(items,n,fn){
+  var i=0;
+  var workers=[];
+  for(var w=0;w<Math.min(n,items.length);w++){
+    workers.push((async function(){
+      while(i<items.length){ var k=i++; await fn(items[k],k); }
+    })());
+  }
+  await Promise.all(workers);
+}
+
+
+/* ---------- tipo de token y cuatro semáforos ---------- */
+var TYPES={
+  STABLE:{label:"Stablecoin",note:"Judged by its liquidity and trust in the issuer; concentration matters less."},
+  TOKENIZADO:{label:"Tokenized or regulated",note:"The issuer normally keeps control (permanent delegate). The real risk is trusting the issuer and having liquidity to exit."},
+  PUENTEADO:{label:"Bridged or protocol",note:"A program normally controls the mint. The real risk is trusting that bridge, and its Solana market being small because the main one may be on another chain."},
+  CREADOR:{label:"Creator-controlled",note:"A wallet can mint more tokens or freeze accounts: the typical scam pattern, so it is judged more strictly."},
+  ABIERTO:{label:"Open token",note:"No creator authorities, typical of memecoins and new projects. Concentration in people and liquidity matter most."}
+};
+var LKEYS={ctl:"Creator control",con:"Concentration",mkt:"Market and exit",dep:"Dependency"};
+var RANKS={ok:0,na:0,warn:1,bad:2};
+// "Medio" sin ninguna señal concreta: solo porque algún chequeo no se pudo hacer (p. ej. holders sin Helius).
+// Se dice expresamente para que no parezca que el escáner marca todo igual
+function dataOnly(r){
+  return r.lvl==="MEDIO"&&!!r.lights&&!r.lights.some(function(l){ return l.s==="bad"||l.s==="warn"; })&&r.lights.some(function(l){ return l.s==="na"; });
+}
+var MISSING={ctl:"who controls the token",con:"holder concentration",mkt:"the market",dep:"issuer dependency"};
+function missingText(r){
+  return r.lights.filter(function(l){ return l.s==="na"; }).map(function(l){ return MISSING[l.k]; }).join(" and ");
+}
+function lvlLabel(r){ return dataOnly(r)?"Medium due to missing data":LEVELS[r.lvl].label; }
+function lightsWhy(lights){
+  var w=lights.filter(function(l){ return l.s==="bad"||l.s==="warn"||l.s==="na"; }).map(function(l){ return l.t; });
+  return w;
+}
+
+/* ---------- análisis ---------- */
+function setProgress(text,frac){
+  $("#ptext").textContent=text;
+  $("#pbar").style.width=Math.round(Math.max(0,Math.min(1,frac))*100)+"%";
+}
+function showError(html){
+  var e=$("#error"); e.innerHTML=html; e.hidden=false;
+}
+function friendlyError(e){
+  var m=e&&e.message||"";
+  if(/^(only |could not read)/.test(m)) return esc(m.charAt(0).toUpperCase()+m.slice(1))+".";
+  if(m==="helius") return "Estimating results needs your Helius URL in Settings (the one with your key).";
+  if(m==="sol") return "The SOL price was not available to compute the result. Try again in a while.";
+  if(m==="dex") return "Could not connect to DexScreener. Check your internet connection and try again.";
+  if(/Failed to fetch|NetworkError|Load failed|HTTP 4\d\d|HTTP 5\d\d|sin respuesta/i.test(m)){
+    if(!ownRpc()) return "The free Solana services the scanner uses did not answer (they get busy sometimes). Wait a minute and try again. "+
+           "If it happens often, get your own free URL: see “How to get a Helius URL” in Settings.";
+    return "Could not connect to your RPC URL. Check in Settings that it was copied correctly (with the key at the end), or delete it to use the free services.";
+  }
+  return "Something failed: "+esc(m)+". Try again or use another RPC in Settings.";
+}
+
+// RugCheck, netBalances y assess: en el bloque del motor (librería)
+
+async function analyze(){
+  var wallet=$("#wallet").value.trim();
+  $("#error").hidden=true;
+  if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(wallet)){
+    showError("That does not look like a Solana address. They are 32 to 44 letters and digits and do not start with 0x.");
+    return;
+  }
+  state.rpc=$("#rpc").value.trim()||PUBLIC_RPC;
+  state.minUsd=$("#dust").checked?1:0;
+  state.cancel=false; state.wallet=wallet; state.filter="TODOS";
+  store("esc.rpc",$("#rpc").value.trim()); store("esc.dust",$("#dust").checked?"1":"0"); store("esc.wallet",wallet);
+
+  $("#go").disabled=true; $("#results").hidden=true; state.shown.W=false; $("#progress").hidden=false;
+  try{
+    setProgress("Checking the address…",0.01);
+    if(await isMint(wallet)){ await checkToken(wallet); return; }
+    setUrl(""); state.token=null;
+    setProgress("Reading the wallet…",0.02);
+    var w=await getTokens(wallet);
+    var mints=Object.keys(w.tokens);
+    state.sol=w.sol; state.bal=w.tokens;
+    if(!mints.length){
+      state.results=[]; state.hidden=0; state.total=0;
+      render(); return;
+    }
+    setProgress("Fetching prices and liquidity…",0.08);
+    var mkr=await getMarkets(mints,function(d,n){ setProgress("Fetching prices and liquidity… "+d+"/"+n,0.08+0.12*d/n); });
+    var mk=mkr.data, failedMk={}; mkr.failed.forEach(function(m){ failedMk[m]=1; });
+
+    var out=[], todo=[], hidden=0;
+    mints.forEach(function(m){
+      var par=mk[m], precio=Number((par&&par.priceUsd)||0), valor=w.tokens[m]*precio;
+      if(par&&par.liqRaw) valor=Math.min(valor,par.liquidity.usd);   // con la liquidez inflada, el precio también es de mentira
+      if(KNOWN[m]){ out.push({mint:m,sym:KNOWN[m],name:"",pts:0,lvl:"BAJO",why:["Well-known token"],warn:[],valor:valor,par:par,img:null}); return; }
+      if(precio>0&&valor<state.minUsd){ hidden++; return; }
+      todo.push({mint:m,par:par,valor:valor,unchecked:!!failedMk[m]});
+    });
+
+    var done=0;
+    await pool(todo,3,async function(t){
+      var r=await assess(t.mint,t.par,t.valor,t.unchecked);
+      if(r) out.push(r);
+      done++;
+      setProgress("Reviewing tokens… "+done+"/"+todo.length,0.2+0.8*done/Math.max(1,todo.length));
+    });
+
+    out.sort(function(a,b){
+      return ORDER.indexOf(a.lvl)-ORDER.indexOf(b.lvl)||(b.sev||0)-(a.sev||0)||b.pts-a.pts||b.valor-a.valor;
+    });
+    state.results=out; state.hidden=hidden; state.total=mints.length;
+    render();
+  }catch(e){
+    if(e.message!=="cancelado") showError(friendlyError(e));
+  }finally{
+    $("#go").disabled=false; $("#progress").hidden=true;
+  }
+}
+
+/* ---------- revisar un token suelto ---------- */
+function ownRpc(){ return state.rpc!==PUBLIC_RPC; }
+// Deja en la barra de direcciones un enlace que abre directamente este token
+function setUrl(mint){
+  try{ history.replaceState(null,"",location.pathname+(mint?"?token="+mint:"")); }catch(e){}
+}
+function tokenLink(mint){ return location.origin+location.pathname+"?token="+mint; }
+// Abre el bot de Telegram y empieza a vigilar esa dirección: el bot recibe "/start <dirección>"
+var TG_BOT="panpontomate_escaner_bot";
+function tgLink(addr){ return "https://t.me/"+TG_BOT+"?start="+encodeURIComponent(addr); }
+function tgBtn(addr,title){
+  return "<a class='btn small tg' target='_blank' rel='noopener' href='"+esc(tgLink(addr))+"' title='"+esc(title)+"'>🔔 Watch on Telegram</a>";
+}
+async function checkToken(mint){
+  setProgress("Fetching price and liquidity…",0.15);
+  var mkr=await getMarkets([mint],function(){});
+  setProgress("Reviewing the token…",0.45);
+  var r=await assess(mint,mkr.data[mint]||null,0,mkr.failed.length>0);
+  if(!r){ showError("That address is an NFT, not a token. The scanner does not review NFTs."); return; }
+  setProgress("Done",1);
+  state.results=[r]; state.token=r; state.filter="TODOS";
+  setUrl(mint);
+  renderToken();
+}
+var TOKEN_TIP={
+  ALTO:"It has strong warning signs. Read the lights before buying.",
+  MEDIO:"No serious alerts, but some points to watch.",
+  BAJO:"The checks found no warning signs. That does not guarantee it is not a scam.",
+  SPAM:"No market and the creator keeps control: it looks like spam. Do not sell it or visit websites that appear under its name.",
+  "SIN MERCADO":"It has no market on DexScreener, so it cannot be bought or sold normally.",
+  "SIN DATOS":"Its market could not be checked because of a network error. Analyse it again."
+};
+function ringHtml(r){
+  var fr={ALTO:.85,MEDIO:.55,BAJO:.25}[r.lvl];
+  if(fr===undefined||!r.lights) return "";
+  var col={ALTO:"var(--alto)",MEDIO:"var(--medio)",BAJO:"var(--bajo)"}[r.lvl];
+  var bad=r.lights.filter(function(l){return l.s==="bad";}).length,
+      na=r.lights.filter(function(l){return l.s==="na";}).length,
+      warn=r.lights.filter(function(l){return l.s==="warn";}).length;
+  var parts=[]; if(bad) parts.push(bad+(bad===1?" strong alert":" strong alerts"));
+  if(warn) parts.push(warn+(warn===1?" warning":" warnings"));
+  if(na) parts.push(na+" not checked");
+  var C=2*Math.PI*54;
+  return "<div class='ringbox'><svg class='ring' viewBox='0 0 130 130' role='img' aria-label='Risk level "+esc(LEVELS[r.lvl].short)+"'>"+
+    "<circle cx='65' cy='65' r='54' fill='none' stroke='var(--nm-bg)' stroke-width='14'/>"+
+    "<circle cx='65' cy='65' r='54' fill='none' stroke='"+col+"' stroke-width='14' stroke-linecap='round' stroke-dasharray='"+(C*fr).toFixed(1)+" "+C.toFixed(1)+"' transform='rotate(-90 65 65)'/>"+
+    "<text x='65' y='68' text-anchor='middle' font-size='22' font-weight='800' fill='"+col+"'>"+esc(LEVELS[r.lvl].short.toUpperCase())+"</text>"+
+    "<text x='65' y='86' text-anchor='middle' font-size='10' fill='var(--muted)'>risk</text></svg>"+
+    "<div class='ringtxt'>"+esc(parts.join(" · ")||"No alerts")+"</div></div>";
+}
+function renderToken(){
+  var r=state.token, L=LEVELS[r.lvl], fav=!!lista.t[r.mint];
+  var tip=TOKEN_TIP[r.lvl]||"";
+  if(r.imp) tip="It is a copy of "+r.imp.sym+" with another address. Even if it shows a price, it is not worth that: do not buy it, and if you hold it, do not visit websites under its name to “swap” or “claim” it.";
+  else if(dataOnly(r)){
+    tip="There is no concrete warning sign: it is rated medium only because this is still unchecked: "+missingText(r)+". What was not checked is never assumed fine. Analyse it again in a while: the verdict may drop to low risk.";
+    if(!ownRpc()) tip+=" If it happens often, a free Helius URL in Settings makes it more reliable.";
+  }
+  $("#summary").innerHTML=
+    "<div class='eyebrow'>Token</div><div class='mono' style='margin-top:4px;overflow-wrap:anywhere'>"+esc(r.mint)+"</div>"+
+    ringHtml(r)+
+    "<h2 class='verdict'>"+esc(r.sym)+": "+esc((dataOnly(r)?"medium risk due to missing data":L.label).toLowerCase())+"</h2>"+
+    "<p class='sub'>"+esc(tip)+"</p>"+
+    "<div class='actions'>"+
+      (r.lights?"<button class='btn small' type='button' data-card='"+esc(r.mint)+"'>Image to share</button>":"")+
+      (r.par?tgBtn(r.mint,"Alerts you on Telegram if risk rises, liquidity drops or the creator sells"):"")+
+      "<button class='btn ghost small' type='button' data-copy='"+esc(tokenLink(r.mint))+"' title='Copy a link that opens this analysis directly'>Copy link</button>"+
+      (r.par?"<button class='btn ghost small' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+(fav?"★ Following":"☆ Follow token")+"</button>":"")+
+      "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'>Find whales</button>"+
+    "</div>";
+  $("#filters").style.display="none";
+  renderList();
+  state.shown.W=true;
+  if(state.mode==="W") $("#results").hidden=false;
+  $("#results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+/* ---------- pintado ---------- */
+function counts(){
+  var c={ALTO:0,MEDIO:0,BAJO:0,SPAM:0,"SIN DATOS":0,"SIN MERCADO":0};
+  state.results.forEach(function(r){ c[r.lvl]++; });
+  return c;
+}
+function verdict(c){
+  // Sin tokens no hay nada analizado: "sin alertas" sonaría a visto bueno (típico al abrir el creador
+  // de un token de Pump.fun, que suele haberlo vendido todo)
+  if(!state.results.length) return state.hidden?"It only holds tokens worth under $1":"This wallet holds no tokens right now";
+  if(c.ALTO>0) return c.ALTO+(c.ALTO===1?" token with strong warning signs":" tokens with strong warning signs");
+  if(c.MEDIO>0) return "No strong alerts, but "+c.MEDIO+(c.MEDIO===1?" token with medium risk":" tokens with medium risk");
+  return "No alerts found in the analysed tokens";
+}
+function valueSplit(){
+  var tot=0, v={ALTO:0,MEDIO:0,BAJO:0}, top=null;
+  state.results.forEach(function(r){
+    tot+=r.valor; if(v[r.lvl]!==undefined) v[r.lvl]+=r.valor;
+    if(!top||r.valor>top.valor) top=r;
+  });
+  return {tot:tot,v:v,top:top};
+}
+function splitText(){
+  var s=valueSplit();
+  if(!s.tot) return "";
+  var parts=["BAJO","MEDIO","ALTO"].filter(function(k){ return s.v[k]>0; }).map(function(k){
+    return LEVELS[k].short+" "+fmtPct(s.v[k]/s.tot*100);
+  });
+  var t="Value by risk: "+parts.join(" · ")+".";
+  if(s.top&&s.top.valor/s.tot>0.5) t+=" A single token, "+s.top.sym+", is "+fmtPct(s.top.valor/s.tot*100)+" of the value.";
+  return t;
+}
+function summaryText(){
+  var c=counts(), total=state.results.reduce(function(s,r){return s+r.valor;},0);
+  return "Wallet scan "+short(state.wallet)+"\n"+
+    state.results.length+" tokens analysed · "+usd(total)+" in tokens\n"+
+    "High: "+c.ALTO+" · Medium: "+c.MEDIO+" · Low: "+c.BAJO+" · Spam: "+c.SPAM+" · No market: "+c["SIN MERCADO"]+"\n"+splitText();
+}
+function render(){
+  var c=counts(), n=state.results.length;
+  var total=state.results.reduce(function(s,r){return s+r.valor;},0);
+  var segs=ORDER.filter(function(k){return c[k]>0;}).map(function(k){
+    return "<i class='"+LEVELS[k].bar+"' style='flex:"+c[k]+"' title='"+LEVELS[k].short+": "+c[k]+"'></i>";
+  }).join("");
+  var legend=ORDER.map(function(k){
+    return "<span><i class='dot "+LEVELS[k].bar+"'></i>"+LEVELS[k].short+" <b>"+c[k]+"</b></span>";
+  }).join("");
+  var tip = !n ? "There are no tokens to review, so this does not say whether the wallet can be trusted. If it is a token creator, what counts is what it did: press “Estimate result” to see its buys and sells, or check on Solscan where it moved the money." :
+            (c.ALTO>0 ? "Some tokens with a market have strong warning signs: review them below." : "No token with a market has strong warning signs.");
+  if(c.SPAM>0) tip+=" There are also "+c.SPAM+" tokens that look like spam (no market and active authorities): do not sell them or visit websites under their name.";
+  if(c["SIN DATOS"]>0) tip+=" "+c["SIN DATOS"]+(c["SIN DATOS"]===1?" token could not be checked because of a network error: analyse the wallet again to review it.":" tokens could not be checked because of a network error: analyse the wallet again to review them.");
+  var split=splitText();
+  $("#summary").innerHTML=
+    "<div class='sum-head'>"+
+      "<div><div class='eyebrow'>Wallet</div><div class='mono' style='margin-top:4px;overflow-wrap:anywhere'>"+esc(state.wallet)+"</div></div>"+
+      "<div class='stats'>"+
+        "<div class='stat'><div class='eyebrow'>SOL</div><div class='v'>"+state.sol.toLocaleString('en-US',{maximumFractionDigits:3})+"</div></div>"+
+        "<div class='stat'><div class='eyebrow'>Tokens</div><div class='v'>"+n+"</div></div>"+
+        "<div class='stat'><div class='eyebrow'>Value in tokens</div><div class='v'>"+usd(total)+"</div></div>"+
+      "</div>"+
+    "</div>"+
+    "<h2 class='verdict'>"+esc(verdict(c))+"</h2>"+
+    "<p class='sub'>"+esc(tip)+(split?" "+esc(split):"")+(state.hidden?(state.hidden===1?" 1 token worth under $1 is hidden.":" Hidden: "+state.hidden+" tokens worth under $1."):"")+"</p>"+
+    (n?"<div class='bar' role='img' aria-label='Tokens by risk level'>"+segs+"</div><div class='legend'>"+legend+"</div>":"")+
+    "<div class='actions'><button class='btn small' id='copySum' type='button'>Copy summary</button>"+
+    tgBtn(state.wallet,"Alerts you on Telegram about what this wallet buys or sells")+
+    "<button class='btn ghost small' type='button' data-long data-favw='"+esc(state.wallet)+"' aria-pressed='"+(!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"'>"+(lista.w[state.wallet]&&lista.w[state.wallet].fav?"★ Following":"☆ Follow wallet")+"</button>"+
+    "<button class='btn ghost small' type='button' id='estPnl'>Estimate result</button>"+
+    "<button class='btn ghost small' type='button' data-long data-addc='"+esc(state.wallet)+"' aria-pressed='"+inCart(state.wallet)+"'>"+(inCart(state.wallet)?"✓ In Confluence":"⊕ To Confluence")+"</button>"+
+    "<a class='btn ghost small' style='text-decoration:none;display:inline-flex;align-items:center' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(state.wallet)+"'>See on Solscan</a></div>"+
+    "<div id='pnlbox'>"+((lista.w[state.wallet]&&lista.w[state.wallet].pnl)?"<div class='hint'>Last estimated result: "+pnlTag(lista.w[state.wallet].pnl)+"</div>":"")+"</div>";
+
+  var chips=[["TODOS","All",n]].concat(ORDER.map(function(k){ return [k,LEVELS[k].short,c[k]]; }));
+  $("#filters").innerHTML=chips.filter(function(x){return x[0]==="TODOS"||x[2]>0;}).map(function(x){
+    return "<button class='chip' type='button' data-f='"+esc(x[0])+"' aria-pressed='"+(state.filter===x[0])+"'>"+esc(x[1])+"<b>"+x[2]+"</b></button>";
+  }).join("");
+  $("#filters").style.display=n?"flex":"none";
+  renderList();
+  recordWallet(); walletHint();
+  state.shown.W=true;
+  if(state.mode==="W") $("#results").hidden=false;
+  $("#results").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function hace(ts){ var t=ago(ts); return t==='today'?'today':t+' ago'; }
+function ago(ts){
+  var d=Math.floor((Date.now()-ts)/86400000);
+  if(d<1) return "today"; if(d<30) return d+(d===1?" day":" days");
+  if(d<365){ var mo=Math.floor(d/30); return mo+(mo===1?" month":" months"); }
+  return (d/365).toFixed(1)+" years";
+}
+function renderList(){
+  var f=state.filter;
+  var items=state.results.filter(function(r){ return f==="TODOS"||r.lvl===f; });
+  var html=items.map(function(r){
+    var L=LEVELS[r.lvl];
+    var links="<a href='https://solscan.io/token/"+esc(r.mint)+"' target='_blank' rel='noopener'>Solscan</a>"+
+              (r.par?"<a href='https://dexscreener.com/solana/"+esc(r.par.pairAddress||r.mint)+"' target='_blank' rel='noopener'>DexScreener</a>":"");
+    var copy="<button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copy token address'>copy</button>";
+    if(r.lvl==="SIN MERCADO"||r.lvl==="SPAM"||r.lvl==="SIN DATOS") return "";
+    var meta=[].concat(r.type?["<span class='tag typ' title='"+esc(TYPES[r.type].note)+"'>"+esc(TYPES[r.type].label)+"</span>"]:[],["<span class='mono'>"+esc(short(r.mint))+"</span> "+copy]);
+    // Revisando un token suelto no hay "valor en la wallet": se enseña el precio
+    if(state.token===r) meta.push("<span>"+(r.par?"Price <span class='v'>"+priceUsd(Number(r.par.priceUsd||0))+"</span>":"<span class='v'>No price</span>")+"</span>");
+    else meta.push("<span>"+(r.par?"Value <span class='v'>"+usd(r.valor)+"</span>":"<span class='v'>No price</span>")+"</span>");
+    if(r.par){
+      meta.push("<span>Liquidity <span class='v'>"+usd((r.par.liquidity&&r.par.liquidity.usd)||0)+"</span></span>");
+      if(r.par.pairCreatedAt) meta.push("<span>Age <span class='v'>"+ago(r.par.pairCreatedAt)+"</span></span>");
+    }
+    var why=(r.why.length?r.why:["No warning signs in the checks"]).map(function(w,i){
+      return "<li"+(r.why.length?"":" class='ok'")+">"+esc(w)+"</li>";
+    }).join("")+r.warn.map(function(w){ return "<li class='warn'>"+esc(w)+"</li>"; }).join("");
+    var av=r.img?"<img src='"+esc(r.img)+"' alt='' loading='lazy' referrerpolicy='no-referrer' onerror=\"this.remove()\">":"";
+    if(r.lights) links+="<a href='#' data-card='"+esc(r.mint)+"' title='Download an image with the verdict to share it'>Image to share</a>";
+    if(r.par&&!KNOWN[r.mint]) links+="<a href='"+esc(tgLink(r.mint))+"' target='_blank' rel='noopener' title='Alerts you on Telegram if risk rises, liquidity drops or the creator sells'>🔔 Watch on Telegram</a>";
+    return "<article class='tok lvl-"+L.cls+"'>"+
+      "<div class='av' aria-hidden='true'>"+(av||esc(r.sym.slice(0,2).toUpperCase()))+"</div>"+
+      "<div style='min-width:0'>"+
+        "<div class='head'><h3>"+esc(r.sym)+(r.name?"<span>"+esc(r.name)+"</span>":"")+"</h3><span class='hp'><span class='pill'>"+esc(lvlLabel(r))+"</span><button class='star' type='button' data-favt='"+esc(r.mint)+"' aria-pressed='"+(!!lista.t[r.mint])+"' title='Follow this token' aria-label='Follow this token'>"+(lista.t[r.mint]?"★":"☆")+"</button></span></div>"+
+        "<div class='meta'>"+meta.join("")+"</div>"+
+        (r.lights?
+          "<div class='lights'>"+r.lights.map(function(l){
+            return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div><b>"+LKEYS[l.k]+"</b><span>"+esc(l.t)+"</span></div></div>";
+          }).join("")+"</div>"+(r.type&&r.type!=="ABIERTO"?"<p class='tnote'>"+esc(TYPES[r.type].note)+"</p>":"")
+          :"<ul class='why'>"+why+"</ul>")+
+        "<div class='links'>"+links+"</div>"+
+      "</div></article>";
+  }).join("");
+  function group(list,sing,plur,note){
+    if(!list.length) return "";
+    return "<div class='nm-group'><div class='eyebrow'>"+list.length+(list.length===1?sing:plur)+" · "+note+"</div>"+
+      list.map(function(r){
+        return "<div class='nm-row'><span class='mono'>"+esc(r.mint)+" <button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copy token address'>copy</button></span>"+
+               "<span class='links'><a href='https://solscan.io/token/"+esc(r.mint)+"' target='_blank' rel='noopener'>Solscan</a></span></div>";
+      }).join("")+"</div>";
+  }
+  html+=group(items.filter(function(r){return r.lvl==="SPAM";})," token that looks like spam"," tokens that look like spam","no market, and the creator can mint more or freeze accounts. Do not interact with them.");
+  html+=group(items.filter(function(r){return r.lvl==="SIN DATOS";})," unchecked token"," unchecked tokens","their market could not be checked because of a network error with DexScreener. It does not mean they are bad, only that they could not be seen: analyse the wallet again.");
+  html+=group(items.filter(function(r){return r.lvl==="SIN MERCADO";})," token without a market"," tokens without a market","usually dead tokens or airdrops with no clear danger. Do not interact with them.");
+  $("#list").innerHTML=html||"<div class='more'>No tokens in this category.</div>";
+}
+
+/* ---------- tarjeta de riesgo compartible ---------- */
+// Si algún día la app tiene una URL pública, ponla aquí y saldrá en el pie de cada tarjeta
+var CARD_URL="";
+var CARD={bg:"#0e1020",surface:"#171a3a",line:"#2a2f63",fg:"#eef0ff",muted:"#9097dc",
+  lvl:{ALTO:["#ff7b7b","#3a1b33"],MEDIO:["#ffc247","#3b2f14"],BAJO:["#3ddc97","#10362d"]},
+  dot:{ok:"#3ddc97",warn:"#ffc247",bad:"#ff7b7b",na:"#a3a9e0"}};
+function cardLines(ctx,text,maxW,maxLines){
+  var words=String(text).split(/\s+/), lines=[], cur="";
+  words.forEach(function(w){
+    var t=cur?cur+" "+w:w;
+    if(ctx.measureText(t).width<=maxW||!cur) cur=t; else { lines.push(cur); cur=w; }
+  });
+  if(cur) lines.push(cur);
+  if(lines.length>maxLines){
+    lines=lines.slice(0,maxLines);
+    var last=lines[maxLines-1];
+    while(last.length&&ctx.measureText(last+"…").width>maxW) last=last.slice(0,-1);
+    lines[maxLines-1]=last.replace(/[\s.,:;]+$/,"")+"…";
+  }
+  return lines;
+}
+function usdShort(n){
+  if(n>=1e6) return "$"+(n/1e6).toLocaleString("en-US",{maximumFractionDigits:2})+"M";
+  if(n>=1e3) return "$"+(n/1e3).toLocaleString("en-US",{maximumFractionDigits:1})+"K";
+  return usd(n);
+}
+// Motivos cortos del veredicto: primero lo grave, luego los avisos; sin la coletilla tras los dos puntos
+function cardWhy(r){
+  var out=[];
+  ["bad","warn"].forEach(function(s){
+    r.lights.forEach(function(l){
+      if(l.s!==s) return;
+      l.t.split(/\.\s+/).forEach(function(t){
+        t=t.split(": ")[0].replace(/\.$/,"").trim();
+        if(t&&out.length<3) out.push(t.charAt(0).toLowerCase()+t.slice(1));
+      });
+    });
+  });
+  return out;
+}
+function cardFit(ctx,text,maxW){
+  if(ctx.measureText(text).width<=maxW) return text;
+  while(text.length&&ctx.measureText(text+"…").width>maxW) text=text.slice(0,-1);
+  return text+"…";
+}
+function cardRound(ctx,x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+async function drawCard(r){
+  // Las fuentes de Google tardan en llegar: sin esperar, el canvas pintaría con la del sistema
+  try{ await Promise.all(["700 80px 'Bricolage Grotesque'","600 32px Figtree","400 28px Figtree","400 22px 'IBM Plex Mono'"].map(function(f){ return document.fonts.load(f); })); }catch(e){}
+  var W=1080, P=72, IW=W-2*P, FD="'Bricolage Grotesque','Segoe UI',sans-serif", FB="Figtree,'Segoe UI',sans-serif", FM="'IBM Plex Mono',Consolas,monospace";
+  var c=document.createElement("canvas"); c.width=W; c.height=2400;
+  var x=c.getContext("2d"), col=CARD.lvl[r.lvl]||CARD.lvl.MEDIO;
+  x.fillStyle=CARD.bg; x.fillRect(0,0,W,c.height);
+  x.fillStyle=col[0]; x.fillRect(0,0,W,10);
+  x.textBaseline="alphabetic";
+  x.fillStyle=CARD.muted; x.font="600 24px "+FB;
+  x.fillText("WALLET SCANNER · SOLANA",P,P+28);
+  // La imagen del token viene de otro dominio y "ensuciaría" el canvas (no se podría exportar): van las iniciales
+  x.fillStyle=CARD.surface; x.beginPath(); x.arc(P+56,P+128,56,0,Math.PI*2); x.fill();
+  x.fillStyle=CARD.fg; x.font="700 40px "+FD; x.textAlign="center";
+  x.fillText(r.sym.slice(0,2).toUpperCase(),P+56,P+142); x.textAlign="left";
+  x.font="700 76px "+FD; x.fillText(cardFit(x,r.sym,IW-140),P+140,P+138);
+  if(r.name){ x.fillStyle=CARD.muted; x.font="400 30px "+FB; x.fillText(cardFit(x,r.name,IW-140),P+140,P+182); }
+  var y=P+240;
+  x.font="700 36px "+FD;
+  var lbl=LEVELS[r.lvl].label.toUpperCase(), pw=x.measureText(lbl).width+64;
+  x.fillStyle=col[1]; cardRound(x,P,y,pw,72,36); x.fill();
+  x.fillStyle=col[0]; x.fillText(lbl,P+32,y+49);
+  if(r.type&&TYPES[r.type]){ x.fillStyle=CARD.muted; x.font="500 28px "+FB; x.fillText(cardFit(x,TYPES[r.type].label,IW-pw-32),P+pw+28,y+47); }
+  // En una imagen que circula suelta es donde más importa que un "medio" sin señales no parezca una alerta
+  if(dataOnly(r)){ y+=112; x.fillStyle=col[0]; x.font="600 28px "+FB; x.fillText(cardFit(x,"Due to missing data: still to check "+missingText(r),IW),P,y); y+=60; }
+  else if(r.lvl==="ALTO"||r.lvl==="MEDIO"){
+    // Quien ve la imagen en X no tiene el contexto de la app: una línea dice qué pesa en el veredicto
+    var ws=cardWhy(r);
+    if(ws.length){
+      y+=112; x.fillStyle=col[0]; x.font="600 28px "+FB;
+      var wl=cardLines(x,"Rated "+(r.lvl==="ALTO"?"alto":"medio")+" because: "+ws.join(" · "),IW,2);
+      wl.forEach(function(t,i){ x.fillText(t,P,y+i*38); });
+      y+=60+(wl.length-1)*38;
+    }else y+=128;
+  }
+  else y+=128;
+  // Todas las cifras de la línea en el mismo estilo: completas si caben, si no todas abreviadas
+  var par=r.par||{}, lq=(par.liquidity&&par.liquidity.usd)||0, vl=(par.volume&&par.volume.h24)||0;
+  function metaLine(f){
+    var m=["Liquidity "+f(lq),"24h vol. "+f(vl)];
+    if(par.pairCreatedAt) m.push("Created "+hace(par.pairCreatedAt));
+    return m.join("  ·  ");
+  }
+  x.fillStyle=CARD.fg; x.font="500 30px "+FB;
+  var ml=metaLine(usd);
+  if(x.measureText(ml).width>IW) ml=metaLine(usdShort);
+  x.fillText(cardFit(x,ml,IW),P,y);
+  y+=40; x.fillStyle=CARD.line; x.fillRect(P,y,IW,2); y+=44;
+  r.lights.forEach(function(l){
+    x.fillStyle=CARD.dot[l.s]||CARD.dot.na; x.beginPath(); x.arc(P+12,y+20,12,0,Math.PI*2); x.fill();
+    x.fillStyle=CARD.fg; x.font="600 32px "+FB; x.fillText(LKEYS[l.k],P+44,y+32);
+    x.fillStyle=CARD.muted; x.font="400 28px "+FB;
+    var ls=cardLines(x,l.t,IW-44,3);
+    ls.forEach(function(t,i){ x.fillText(t,P+44,y+74+i*38); });
+    y+=74+(ls.length-1)*38+46;
+  });
+  // El pie va pegado abajo aunque haya poco texto arriba
+  y=Math.max(y,1350-(2+46+38+(CARD_URL?38:0)+P));
+  x.fillStyle=CARD.line; x.fillRect(P,y,IW,2); y+=46;
+  x.fillStyle=CARD.muted; x.font="400 22px "+FM; x.fillText(cardFit(x,r.mint,IW),P,y);
+  y+=38; x.font="400 22px "+FB;
+  x.fillText(cardFit(x,"Analysed on "+new Date().toLocaleDateString("en-US")+" · On-chain data, DexScreener and RugCheck · Not financial advice",IW),P,y);
+  if(CARD_URL){ y+=38; x.fillStyle=col[0]; x.font="600 24px "+FB; x.fillText(cardFit(x,CARD_URL,IW),P,y); }
+  y+=P;
+  // Recorte al alto real, sin bajar de 4:5 para que encaje en el móvil y en las redes
+  var H=Math.max(1350,y), out=document.createElement("canvas"); out.width=W; out.height=H;
+  var o=out.getContext("2d"); o.fillStyle=CARD.bg; o.fillRect(0,0,W,H); o.drawImage(c,0,0);
+  return out;
+}
+async function shareCard(mint,btn){
+  var r=state.results.filter(function(x){ return x.mint===mint; })[0];
+  if(!r||!r.lights) return;
+  var old=btn.textContent; btn.textContent="Generating…";
+  try{
+    var cv=await drawCard(r);
+    var blob=await new Promise(function(ok){ cv.toBlob(ok,"image/png"); });
+    var name="risk-"+r.sym.replace(/[^\w-]+/g,"").slice(0,20)+".png";
+    var file=null;
+    try{ file=new File([blob],name,{type:"image/png"}); }catch(e){}
+    // En el móvil se abre el menú de compartir del sistema; en el ordenador se descarga
+    if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&/Android|iPhone|iPad/i.test(navigator.userAgent)){
+      try{ await navigator.share({files:[file],title:r.sym+": "+LEVELS[r.lvl].label}); btn.textContent=old; return; }
+      catch(e){ if(e.name==="AbortError"){ btn.textContent=old; return; } }
+    }
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); },4000);
+    btn.textContent="Downloaded"; setTimeout(function(){ btn.textContent=old; },1600);
+  }catch(e){
+    btn.textContent="Could not generate"; setTimeout(function(){ btn.textContent=old; },2000);
+  }
+}
+
+/* ---------- buscar ballenas de un token ---------- */
+var SYSTEM_PROGRAM="11111111111111111111111111111111";
+function fmtPct(n){ return n.toLocaleString("en-US",{maximumFractionDigits:1})+"%"; }
+function fmtNum(n){ return n.toLocaleString("en-US",{notation:"compact",maximumFractionDigits:2}); }
+
+// holderBase, markBusy, findFunders, clusterByFunder y holderRows: en el bloque del motor (librería)
+async function holders(){
+  var mint=$("#mint").value.trim();
+  $("#error").hidden=true;
+  if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(mint)){
+    showError("That does not look like a Solana address. They are 32 to 44 letters and digits and do not start with 0x.");
+    return;
+  }
+  state.rpc=$("#rpc").value.trim()||PUBLIC_RPC;
+  state.cancel=false;
+  store("esc.rpc",$("#rpc").value.trim()); store("esc.mint",mint);
+  $("#hgo").disabled=true; $("#hresults").hidden=true; state.shown.H=false; $("#progress").hidden=false;
+  try{
+    var b=await holderBase(mint,setProgress);
+    var wal=b.uniq.filter(function(o){ return b.kind[o]==="wallet"; });
+    var busy=await markBusy(b.kind,wal,function(c,n){ setProgress("Separating people from bots and exchanges… "+c+"/"+n,0.65+0.15*c/Math.max(1,n)); });
+    var hr=holderRows(b,busy), par=b.par;
+    var personas=hr.rows.filter(function(r){ return r.kind==="wallet"; }).map(function(r){ return r.owner; });
+    var clusters={}, hotGroups=0;
+    if(personas.length>=2){
+      var funders=await findFunders(personas,function(c,n){ setProgress("Looking for wallets funded from the same source… "+c+"/"+n,0.8+0.08*c/Math.max(1,n)); });
+      clusters=clusterByFunder(funders);
+      var srcs=[], seenSrc={};
+      Object.keys(clusters).forEach(function(a){ var f=clusters[a].funder; if(!seenSrc[f]){ seenSrc[f]=1; srcs.push(f); } });
+      if(srcs.length){
+        var hot=await markBusy({},srcs,function(c,n){ setProgress("Checking whether each group’s source is an exchange… "+c+"/"+n,0.88+0.02*c/Math.max(1,n)); });
+        hotGroups=srcs.filter(function(f){ return hot[f]; }).length;
+        if(hotGroups) clusters=clusterByFunder(funders,hot);
+      }
+    }
+    setProgress("Looking up who created the token (RugCheck)…",0.9);
+    var creator=null;
+    try{
+      var rcs=await Promise.all([rugcheckReport(mint),rugcheckGraph(mint)]), rc=rcs[0];
+      if(rc&&rc.creator){
+        var others=(rc.creatorTokens||[]).filter(function(t){ return t.mint!==mint; })
+          .sort(function(a,b2){ return new Date(b2.createdAt||0)-new Date(a.createdAt||0); });
+        var toCheck=others.slice(0,10), riskMap={};
+        if(toCheck.length){
+          setProgress("Reviewing the creator’s other tokens…",0.94);
+          await pool(toCheck,3,async function(t){ riskMap[t.mint]=await rugcheckSummary(t.mint); });
+        }
+        creator={addr:rc.creator, balance:rc.creatorBalance||0, rugged:!!rc.rugged,
+          launchpad:(rc.launchpad&&rc.launchpad.name)||null, others:others, checked:toCheck.length,
+          riskMap:riskMap, insiderNetworks:rc.insiderNetworks||[], graph:rcs[1], supply:(rc.token&&rc.token.supply)||0};
+        if(creator.graph&&creator.graph.length){
+          setProgress("Checking what wallet networks hold today…",0.97);
+          await netBalances(mint,creator.graph);
+        }
+      }
+    }catch(e){ if(e.message==="cancelado") throw e; }   // igual que RugCheck en general: nunca bloquea el resultado principal
+    state.showAllH=false;
+    state.hold={mint:mint,sym:(par&&par.baseToken&&par.baseToken.symbol)||short(mint),
+      name:(par&&par.baseToken&&par.baseToken.name)||"",price:hr.price,rows:hr.rows,
+      mintAuth:!!b.info.mintAuth,freezeAuth:!!b.info.freezeAuth,clusters:clusters,hotGroups:hotGroups,creator:creator};
+    renderHolders();
+  }catch(e){
+    if(e.message!=="cancelado") showError(friendlyError(e));
+  }finally{
+    $("#hgo").disabled=false; $("#progress").hidden=true;
+  }
+}
+/* ---------- cambios desde la última revisión ---------- */
+var SKIPCH={}; SKIPCH[USDC]=1; SKIPCH[USDT]=1; SKIPCH[WSOL]=1;
+// capSnap, chgDiff y chgAgg: en el bloque del motor (librería)
+async function checkChanges(addrs,target){
+  state.rpc=$("#rpc").value.trim()||PUBLIC_RPC; state.cancel=false;
+  store("esc.rpc",$("#rpc").value.trim());
+  $("#error").hidden=true; $("#progress").hidden=false;
+  ["#chgBtnL","#cchg"].forEach(function(id){ var b=$(id); if(b) b.disabled=true; });
+  try{
+    var cur={}, failed=0, d=0;
+    await pool(addrs,3,async function(a){
+      try{ cur[a]=(await getTokens(a)).tokens; }catch(e){ if(e.message==="cancelado") throw e; failed++; }
+      d++; setProgress("Reading wallets… "+d+"/"+addrs.length,0.05+0.4*d/addrs.length);
+    });
+    var ok=addrs.filter(function(a){ return cur[a]; });
+    if(!ok.length) throw new Error("could not read any wallet");
+    var set={}; ok.forEach(function(a){ Object.keys(cur[a]).forEach(function(m){ if(!SKIPCH[m]) set[m]=1; }); });
+    setProgress("Fetching prices…",0.5);
+    var ms=Object.keys(set), mkr=ms.length?await getMarkets(ms,function(dn,n){ setProgress("Fetching prices… "+dn+"/"+n,0.5+0.45*dn/n); }):{data:{},failed:[]};
+    // Un fallo parcial al consultar precios no puede tratarse como "lo ha vendido todo": mejor abortar y pedir reintentar
+    if(mkr.failed.length) throw new Error("dex");
+    var mk=mkr.data;
+    var rows=[];
+    ok.forEach(function(a){
+      var now={};
+      Object.keys(cur[a]).forEach(function(m){
+        if(SKIPCH[m]) return;
+        var par=mk[m], price=Number((par&&par.priceUsd)||0), q=cur[a][m], v=q*price;
+        if(price>0&&v>=1) now[m]={q:q,v:Math.round(v*100)/100,s:(par.baseToken&&par.baseToken.symbol)||short(m)};
+      });
+      var e=lista.w[a]||(lista.w[a]={fav:false,name:""});
+      var prev=e.snap?e.snap.h:null;
+      rows.push({a:a,first:!prev,since:e.snap?e.snap.ts:0,ch:prev?chgDiff(prev,now):[]});
+      e.snap={ts:Date.now(),h:capSnap(now)};
+    });
+    saveList();
+    state.chg={ts:Date.now(),target:target,rows:rows,failed:failed};
+    if(target==="conf") renderConf(); else renderLista();
+  }catch(e){
+    if(e.message!=="cancelado") showError(friendlyError(e));
+  }finally{
+    $("#progress").hidden=true;
+    ["#chgBtnL","#cchg"].forEach(function(id){ var b=$(id); if(b) b.disabled=false; });
+  }
+}
+var CHL={new:"New",more:"Bought more",less:"Sold part",sold:"Sold all"};
+function chgText(c){
+  var wp=c.rows.filter(function(r){ return !r.first; });
+  if(!wp.length) return "";
+  var g=chgAgg(wp), n=wp.length;
+  function ln(o){ return "$"+o.s+": "+o.n+" of "+n+" wallets ("+usd(o.v)+")"; }
+  return "Changes in "+n+" wallets since the last check\n"+
+    (g.buy.length?"Buys or increases:\n"+g.buy.slice(0,5).map(ln).join("\n")+"\n":"")+
+    (g.sell.length?"Sells or decreases:\n"+g.sell.slice(0,5).map(ln).join("\n"):"");
+}
+function chgHtml(c){
+  var wp=c.rows.filter(function(r){ return !r.first; }), nFirst=c.rows.length-wp.length;
+  var tot=wp.reduce(function(s,r){ return s+r.ch.length; },0), mov=wp.filter(function(r){ return r.ch.length; }).length;
+  var h="<div class='card' style='margin-top:20px'><div class='eyebrow'>Changes since the last check · "+hace(c.ts)+"</div>";
+  if(!wp.length){
+    h+="<h2 class='verdict'>First check</h2><p class='sub'>I saved a snapshot of "+c.rows.length+(c.rows.length===1?" wallet":" wallets")+". Next time you will see what they bought or sold in between.</p></div>";
+    return h;
+  }
+  var g=chgAgg(wp);
+  h+="<h2 class='verdict'>"+(tot?tot+(tot===1?" move":" moves")+" in "+mov+" of "+wp.length+(wp.length===1?" wallet":" wallets"):"No relevant changes")+"</h2>"+
+    "<p class='sub'>Counts tokens with a market and at least $20 of value. A “new” token can be an airdrop: what tells most is several wallets matching."+
+    (nFirst?" "+nFirst+(nFirst===1?" wallet had no":" wallets had no")+" previous snapshot and one was saved now.":"")+(c.failed?" "+c.failed+" could not be read.":"")+"</p>";
+  function block(title,list){
+    if(!list.length) return "";
+    return "<div class='eyebrow' style='margin-top:12px'>"+title+"</div>"+list.slice(0,6).map(function(o){
+      return "<div class='nm-row' style='padding:6px 0'><span><b>$"+esc(o.s)+"</b> · "+o.n+" of "+wp.length+" wallets</span><span style='font-variant-numeric:tabular-nums'>"+usd(o.v)+"</span></div>";
+    }).join("");
+  }
+  h+=block("What they bought or increased most",g.buy)+block("What they sold or decreased most",g.sell);
+  if(tot) h+="<div class='actions'><button class='btn small' type='button' id='chgcopy'>Copy summary for a post</button></div>";
+  h+="</div>";
+  var detail=wp.filter(function(r){ return r.ch.length; });
+  if(detail.length){
+    h+="<div class='lsec' style='margin-top:14px'><div class='eyebrow'>Detail by wallet</div>"+detail.map(function(r){
+      var buys=r.ch.filter(function(x){ return x.k==="new"||x.k==="more"; }).length, sells=r.ch.length-buys;
+      return "<details class='cdet' style='border-top:1px solid var(--line);margin-top:0'><summary>"+esc(walletLabel(r.a))+" · "+
+        (buys?buys+(buys===1?" buy":" buys"):"")+(buys&&sells?" · ":"")+(sells?sells+(sells===1?" sell":" sells"):"")+"</summary>"+
+        "<div style='padding:6px 0'><button class='btn small ghost' type='button' data-analyze='"+esc(r.a)+"'>Open this wallet</button></div>"+r.ch.map(function(x){
+          return "<div class='nm-row' style='padding:6px 0'><span>"+CHL[x.k]+": <b>$"+esc(x.s)+"</b></span><span style='font-variant-numeric:tabular-nums'>"+usd(x.v)+"</span></div>";
+        }).join("")+"</details>";
+    }).join("")+"</div>";
+  }
+  return h;
+}
+
+/* ---------- descubrir wallets que coinciden en varios tokens ---------- */
+async function discover(){
+  var raw=String(state.dmints||"").split(/[\s,;]+/).filter(Boolean), mints=[], bad=0;
+  raw.forEach(function(x){
+    if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(x)){ bad++; return; }
+    if(mints.indexOf(x)<0) mints.push(x);
+  });
+  if(mints.length<2){ showError("Paste at least 2 Solana token addresses."+(bad?" Some did not look like a valid address.":"")); return; }
+  mints=mints.slice(0,6);
+  state.rpc=$("#rpc").value.trim()||PUBLIC_RPC; state.cancel=false;
+  store("esc.rpc",$("#rpc").value.trim());
+  $("#error").hidden=true; $("#progress").hidden=false;
+  var g=$("#dgo"); if(g) g.disabled=true;
+  try{
+    var map={}, toks=[];
+    for(var i=0;i<mints.length;i++){
+      var b=await holderBase(mints[i],function(t,f){ setProgress("Token "+(i+1)+"/"+mints.length+": "+t.toLowerCase(),(i+f*0.9)/mints.length*0.8); });
+      var hr=holderRows(b,{});
+      var sym=(b.par&&b.par.baseToken&&b.par.baseToken.symbol)||short(mints[i]);
+      toks.push({mint:mints[i],sym:sym});
+      hr.rows.forEach(function(r){
+        if(r.kind!=="wallet") return;
+        (map[r.owner]=map[r.owner]||[]).push({m:mints[i],s:sym,pct:r.pct});
+      });
+    }
+    var min=Math.min(Number(state.dmin)||2,mints.length);
+    var cands=Object.keys(map).filter(function(a){ return map[a].length>=min; });
+    var kind={}; cands.forEach(function(a){ kind[a]="wallet"; });
+    await markBusy(kind,cands,function(c,n){ setProgress("Separating people from bots and exchanges… "+c+"/"+n,0.8+0.2*c/Math.max(1,n)); });
+    var keep=cands.filter(function(a){ return kind[a]==="wallet"; });
+    var rows=keep.map(function(a){ return {a:a,hits:map[a],total:map[a].reduce(function(s,x){return s+x.pct;},0)}; })
+      .sort(function(x,y){ return y.hits.length-x.hits.length||y.total-x.total; });
+    state.disc={ts:Date.now(),tokens:toks,min:min,rows:rows,dropped:cands.length-keep.length};
+    state.dopen=true;
+    renderConf();
+  }catch(e){
+    if(e.message!=="cancelado") showError(friendlyError(e));
+  }finally{
+    $("#progress").hidden=true; var g2=$("#dgo"); if(g2) g2.disabled=false;
+  }
+}
+function discHtml(d){
+  var h="<div style='margin-top:16px'><div class='eyebrow'>Result · "+hace(d.ts)+"</div>";
+  if(!d.rows.length) return h+"<p class='sub' style='margin-top:8px'>No person’s wallet appears in "+d.min+" or more of those "+d.tokens.length+" tokens among their 20 largest accounts."+
+    (d.dropped?" Dismissed "+d.dropped+" that looked like bots or exchanges.":"")+" Try more tokens or “at least 2”.</p></div>";
+  h+="<h3 style='margin:8px 0 4px;font:700 1.15rem var(--f-display)'>"+d.rows.length+(d.rows.length===1?" wallet matches":" wallets match")+" in "+d.min+" or more tokens</h3>"+
+    (d.dropped?"<p class='hint' style='margin:0 0 6px'>Dismissed "+d.dropped+" that looked like bots or exchanges.</p>":"")+
+    "<div class='actions' style='margin:8px 0'><button class='btn small' type='button' id='dall'>⊕ Add the "+d.rows.length+" to the group</button></div>";
+  h+=d.rows.map(function(r){
+    return "<div class='lrow'><div class='main'><div class='hl1'>"+wlink(r.a,'mono')+
+      "<a href='https://solscan.io/account/"+esc(r.a)+"' target='_blank' rel='noopener' style='font-size:.88rem'>Solscan</a>"+
+      "<span class='tag seen'>in "+r.hits.length+" of "+d.tokens.length+" tokens</span></div>"+
+      "<div class='meta'>"+r.hits.map(function(x){ return "<span><b style='color:var(--fg)'>$"+esc(x.s)+"</b> "+fmtPct(x.pct)+" of the supply</span>"; }).join("")+"</div></div>"+
+      "<div class='acts'>"+plusBtn(r.a)+"<button class='star' type='button' data-favw='"+esc(r.a)+"' aria-pressed='"+(!!(lista.w[r.a]&&lista.w[r.a].fav))+"' title='Follow this wallet' aria-label='Follow this wallet'>"+((lista.w[r.a]&&lista.w[r.a].fav)?"★":"☆")+"</button></div></div>";
+  }).join("");
+  return h+"</div>";
+}
+
+/* ---------- copia de seguridad ---------- */
+function backupObj(){
+  return {app:"escaner-wallets",v:1,ts:Date.now(),lista:lista,
+    conf:{cart:conf.cart,saved:conf.saved,pct:conf.pct,showAll:conf.showAll,pnl:conf.pnl,pf:conf.pf}};
+}
+function mergeBackup(o){
+  if(!o||o.app!=="escaner-wallets"||!o.lista||!o.conf) throw new Error("formato");
+  var nw=0,nt=0,ng=0,L=o.lista;
+  Object.keys(L.w||{}).forEach(function(a){
+    var b=L.w[a], e=lista.w[a];
+    if(!e){ lista.w[a]=b; nw++; return; }
+    var newer=(b.ts||0)>(e.ts||0);
+    var m=newer?Object.assign({},e,b):Object.assign({},b,e);
+    m.fav=!!(e.fav||b.fav); m.name=e.name||b.name||"";
+    if(b.snap&&(!e.snap||b.snap.ts>e.snap.ts)) m.snap=b.snap;
+    if(b.pnl&&(!e.pnl||b.pnl.ts>e.pnl.ts)) m.pnl=b.pnl;
+    lista.w[a]=m;
+  });
+  Object.keys(L.t||{}).forEach(function(k){
+    if(!lista.t[k]){ lista.t[k]=L.t[k]; nt++; }
+    else if((L.t[k].ts||0)>(lista.t[k].ts||0)) lista.t[k]=L.t[k];
+  });
+  var C=o.conf;
+  Object.keys(C.saved||{}).forEach(function(id){
+    var b=C.saved[id], e=conf.saved[id];
+    if(!e){ conf.saved[id]=b; ng++; }
+    else if((b.ts||0)>(e.ts||0)) conf.saved[id]=b;
+  });
+  (C.cart||[]).forEach(function(a){ if(conf.cart.indexOf(a)<0&&conf.cart.length<CMAX) conf.cart.push(a); });
+  saveList(); saveConf();
+  return {nw:nw,nt:nt,ng:ng};
+}
+function importText(text){
+  var msg;
+  try{
+    var r=mergeBackup(JSON.parse(String(text).trim()));
+    msg="Backup imported: "+r.nw+(r.nw===1?" new wallet":" new wallets")+", "+r.nt+(r.nt===1?" new token":" new tokens")+" and "+r.ng+(r.ng===1?" new group.":" new groups.")+" What you already had was kept.";
+  }catch(e){ msg="That text does not look like a backup from this scanner."; }
+  state.bkmsg=msg; renderLista();
+}
+function downloadBackup(){
+  var d=new Date(), name="escaner-copia-"+d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)+".json";
+  var url=URL.createObjectURL(new Blob([JSON.stringify(backupObj())],{type:"application/json"}));
+  var a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); },3000);
+  state.bkmsg="Backup downloaded as "+name+". Keep it somewhere safe."; var m=$("#bkmsg"); if(m) m.textContent=state.bkmsg;
+}
+function backupHtml(){
+  return "<div class='lsec'><div class='eyebrow'>Backup</div>"+
+    "<p class='hint' style='margin:0 0 12px'>Save your list, your Confluence groups and the wallets you follow, to move them to another device or not lose them. It does not include your Helius URL.</p>"+
+    "<div class='actions' style='margin:0 0 12px'><button class='btn small' type='button' id='bkfile'>Download backup</button>"+
+    "<button class='btn small ghost' type='button' id='bkcopy'>Copy as text</button></div>"+
+    "<textarea id='bktext' rows='3' spellcheck='false' placeholder='Paste the text of a backup here to import it'></textarea>"+
+    "<div class='actions' style='margin:12px 0 4px'><button class='btn small ghost' type='button' id='bkimp'>Import text</button>"+
+    "<label class='btn small ghost' for='bkpick' style='cursor:pointer;display:inline-flex;align-items:center'>Import file…</label>"+
+    "<input id='bkpick' type='file' accept='.json,application/json' hidden></div>"+
+    "<p class='hint' id='bkmsg' style='margin:6px 0 12px'>"+esc(state.bkmsg||"")+"</p></div>";
+}
+
+function holdersText(){
+  var h=state.hold, w=h.rows.filter(function(r){return r.kind==="wallet";}).slice(0,5), clusters=h.clusters||{};
+  var ngroups=0, seen={}; Object.keys(clusters).forEach(function(a){ if(!seen[clusters[a].id]){ seen[clusters[a].id]=1; ngroups++; } });
+  return "Whales of $"+h.sym+" (largest balances)\n"+
+    w.map(function(r,i){ return (i+1)+". "+short(r.owner)+" · "+fmtPct(r.pct)+" of the supply"+(h.price?" · "+usd(r.value):"")+(clusters[r.owner]?" · group "+clusters[r.owner].id:""); }).join("\n")+
+    (ngroups?"\n"+ngroups+(ngroups===1?" group shares a":" groups share a")+" funding source among several of the wallets above.":"");
+}
+function creatorHtml(c){
+  if(!c) return "";
+  // Si la wallet está en la lista de holders se usa la misma clasificación que allí, para que no se contradigan
+  var top={}; ((state.hold&&state.hold.rows)||[]).forEach(function(r){ top[r.owner]=r.kind||"wallet"; });
+  (c.graph||[]).forEach(function(n){
+    if(!n.checked) return;
+    n.now=0;
+    n.nodes.forEach(function(x){ if(top[x.addr]==="programa") x.kind="programa"; if(x.kind!=="programa") n.now+=x.now||0; });
+  });
+  if(c.graph) c.graph.sort(function(a,b){ return (b.now||0)-(a.now||0)||b.hold-a.hold; });
+  var nets=(c.graph&&c.graph.length)?c.graph.map(function(n){
+    // Cada red se despliega con sus wallets: sin esto solo se sabía "red de 16 wallets" y no cuáles
+    function sp(v){ return c.supply>0?v/c.supply*100:0; }
+    // "0%" con tokens se confundiría con "sin tokens"
+    function fmtPct(v){ return v>0&&v<0.05?"<0.1%":v.toLocaleString("en-US",{maximumFractionDigits:1})+"%"; }
+    var rcP=sp(n.hold), wl=n.nodes.filter(function(x){ return x.kind!=="programa"; });
+    // Con saldo comprobado manda el de hoy; el de RugCheck queda como referencia porque puede ser antiguo
+    var head=!n.checked?"<b style='color:var(--fg)'>"+esc(fmtPct(rcP))+"</b> of the supply per RugCheck":
+      (n.now>0?"today they hold <b style='color:var(--fg)'>"+esc(fmtPct(sp(n.now)))+"</b> of the supply":"<b style='color:var(--fg)'>today they hold nothing</b>")+
+      (Math.abs(sp(n.now)-rcP)>=0.5?" <span style='color:var(--muted)'>(RugCheck: "+esc(fmtPct(rcP))+")</span>":"");
+    return "<details class='cdet' style='margin-top:0'><summary>Network of "+n.nodes.length+" wallets linked by transfers · "+head+"</summary>"+
+      n.nodes.map(function(x){
+        var prog=x.kind==="programa";
+        var amt=x.now===null||x.now===undefined?"<span title='Balance per RugCheck, not checked on chain'>"+esc(fmtPct(sp(x.hold)))+"*</span>":(x.now>0?esc(fmtPct(sp(x.now))):"no tokens");
+        return "<div class='nm-row' style='padding:6px 0'><span><span class='mono'>"+(prog?esc(short(x.addr)):wlink(x.addr))+"</span> "+
+          "<button class='copy' type='button' data-copy='"+esc(x.addr)+"' title='Copy address'>copy</button>"+
+          (prog?"<span class='tag seen' title='Not a person: a pool or a program. Not counted in the network total'>pool or program</span>":"")+
+          (top[x.addr]?"<span class='tag seen' title='Also in the top holders list below'>in the top</span>":"")+
+          "<a href='https://solscan.io/account/"+esc(x.addr)+"' target='_blank' rel='noopener' style='margin-left:8px;font-size:.84rem'>Solscan</a></span>"+
+          "<span class='hp'><span class='v' style='font-variant-numeric:tabular-nums;margin-right:6px'>"+amt+"</span>"+
+          (prog?"":"<button class='btn small ghost' type='button' data-analyze='"+esc(x.addr)+"'>Analyse</button>"+
+          "<button class='star' type='button' data-favw='"+esc(x.addr)+"' aria-pressed='"+(!!(lista.w[x.addr]&&lista.w[x.addr].fav))+"' title='Follow this wallet' aria-label='Follow this wallet'>"+((lista.w[x.addr]&&lista.w[x.addr].fav)?"★":"☆")+"</button>"+plusBtn(x.addr))+"</span></div>";
+      }).join("")+
+      (n.checked&&!n.now?"<p class='hint' style='margin:6px 0 0'>None of these wallets holds the token today: they sold it or moved it to other wallets.</p>":"")+
+      (wl.length?"<div class='actions' style='margin:8px 0 4px'><button class='btn small ghost' type='button' data-addnet='"+esc(wl.map(function(x){ return x.addr; }).join(" "))+"'>⊕ Add the "+wl.length+" to Confluence</button></div>":"")+
+      "</details>";
+  }).join(""):(c.insiderNetworks||[]).map(function(n){
+    var amt=n.currentHolding!==undefined?n.currentHolding:n.tokenAmount, p=c.supply>0?(amt||0)/c.supply*100:0;
+    var size=n.activeAccounts||n.size||0;
+    return "<div class='nm-row' style='padding:6px 0'><span>Network of "+size+" wallets linked by transfers</span>"+
+      "<span class='v' style='font-variant-numeric:tabular-nums'>"+pct(p)+" of the supply</span></div>";
+  }).join("");
+  var riskyOthers=0;
+  var othersHtml=c.others.slice(0,15).map(function(t){
+    var s=c.riskMap[t.mint], tag;
+    if(s===undefined) tag="<span class='tag seen'>not checked</span>";
+    else if(!s) tag="<span class='tag seen'>no RugCheck data</span>";
+    else if((s.risks&&s.risks.length)||s.lpLockedPct<20){ tag="<span class='tag' style='background:var(--alto-bg);color:var(--alto)'>with risk signals</span>"; riskyOthers++; }
+    else tag="<span class='tag win'>no alerts</span>";
+    var when=t.createdAt?new Date(t.createdAt).toLocaleDateString("en-US"):"unknown date";
+    return "<div class='nm-row' style='padding:6px 0'><span class='mono'>"+esc(short(t.mint))+"</span> "+tag+
+      "<span style='margin-left:8px;color:var(--muted)'>"+esc(when)+(t.marketCap?" · mcap "+usd(t.marketCap):"")+"</span>"+
+      "<a href='https://solscan.io/token/"+esc(t.mint)+"' target='_blank' rel='noopener' style='margin-left:8px;font-size:.84rem'>Solscan</a></div>";
+  }).join("");
+  return "<div class='lsec' style='margin-bottom:14px'><div class='eyebrow'>Token creator (per RugCheck)</div>"+
+    "<div class='lrow' style='padding:10px 0'><div class='main'><div class='hl1'>"+wlink(c.addr,'mono')+
+      "<a href='https://solscan.io/account/"+esc(c.addr)+"' target='_blank' rel='noopener' style='font-size:.88rem'>Solscan</a>"+
+      (c.rugged?"<span class='tag' style='background:var(--alto-bg);color:var(--alto)'>RugCheck flags this token as rugged</span>":"")+
+      (c.launchpad?"<span class='tag typ'>Launched on "+esc(c.launchpad)+"</span>":"")+"</div>"+
+      (c.balance>0?"<div class='meta'>Still holds tokens of its own creation</div>":"")+"</div>"+
+      "<div class='acts'><button class='btn small ghost' type='button' data-analyze='"+esc(c.addr)+"'>Analyse</button>"+
+      "<button class='star' type='button' data-favw='"+esc(c.addr)+"' aria-pressed='"+(!!(lista.w[c.addr]&&lista.w[c.addr].fav))+"' title='Follow this wallet' aria-label='Follow this wallet'>"+((lista.w[c.addr]&&lista.w[c.addr].fav)?"★":"☆")+"</button>"+plusBtn(c.addr)+"</div></div>"+
+    (c.others.length?
+      "<details class='cdet'><summary>Created "+c.others.length+(c.others.length===1?" more token":" more tokens")+
+        (c.checked?" · "+riskyOthers+" of "+c.checked+" checked have risk signals":"")+"</summary>"+othersHtml+
+        (c.others.length>15?"<p class='hint'>Showing the 15 most recent of "+c.others.length+".</p>":"")+
+      "</details>":"<p class='hint' style='margin:8px 0 0'>No record of it creating other tokens.</p>")+
+    (nets?"<div style='margin-top:10px'><div class='eyebrow' style='padding:8px 0 4px'>Linked wallet networks (detected by RugCheck)</div>"+nets+
+      "<p class='hint' style='margin-top:4px'>Wallets that sent tokens to each other in a way that suggests they are the same person or team. It is a different analysis from the “same funding source” one below: it can catch coordination that check misses. Press a network to see its wallets."+
+        ((c.graph&&c.graph.length)?" The percentage is what they hold today, checked on chain: the RugCheck figure can be old.":"")+"</p></div>":"")+
+    "</div>";
+}
+function renderHolders(keep){
+  var h=state.hold, rows=h.rows;
+  var wallets=rows.filter(function(r){return r.kind==="wallet";});
+  var bots=rows.filter(function(r){return r.kind==="activa";});
+  var progs=rows.filter(function(r){return r.kind==="programa";});
+  var shown=state.showAllH?rows:wallets;
+  var sumAll=rows.reduce(function(s,r){return s+r.pct;},0);
+  var sumW=wallets.reduce(function(s,r){return s+r.pct;},0);
+  var max=rows.length?rows[0].pct:1;
+  var auth=[]; if(h.mintAuth) auth.push("the creator can still mint more tokens"); if(h.freezeAuth) auth.push("the creator can freeze accounts");
+  var clusters=h.clusters||{}, clusteredAddrs=Object.keys(clusters), numGroups=0;
+  { var seen={}; clusteredAddrs.forEach(function(a){ if(!seen[clusters[a].id]){ seen[clusters[a].id]=1; numGroups++; } }); }
+
+  $("#hsummary").innerHTML=
+    "<div class='sum-head'>"+
+      "<div><div class='eyebrow'>Token</div><div style='margin-top:4px;font:700 1.15rem var(--f-display)'>"+esc(h.sym)+(h.name?"<span style='font:400 .9rem var(--f-body);color:var(--muted);margin-left:8px'>"+esc(h.name)+"</span>":"")+"</div>"+
+      "<div class='mono' style='margin-top:4px;overflow-wrap:anywhere'>"+esc(h.mint)+"</div></div>"+
+      "<div class='stats'>"+
+        "<div class='stat'><div class='eyebrow'>Price</div><div class='v'>"+(h.price?priceUsd(h.price):"no price")+"</div></div>"+
+        "<div class='stat'><div class='eyebrow'>People / others</div><div class='v'>"+wallets.length+" / "+(bots.length+progs.length)+"</div></div>"+
+      "</div>"+
+    "</div>"+
+    "<h2 class='verdict'>"+(wallets.length?(wallets.length===1?"1 of the "+rows.length+" largest accounts looks like a person":wallets.length+" of the "+rows.length+" largest accounts look like people"):"None of the "+rows.length+" largest accounts looks like a person")+"</h2>"+
+    "<p class='sub'>People hold "+esc(fmtPct(sumW))+" of the supply; bots, exchanges or very active accounts "+esc(fmtPct(bots.reduce(function(a,r){return a+r.pct;},0)))+" and pools or programs "+esc(fmtPct(progs.reduce(function(a,r){return a+r.pct;},0)))+"."+
+      (auth.length?" Note: "+esc(auth.join(" and "))+".":"")+
+      " “Looks like a person” is an estimate: a quiet wallet can be an exchange or a fund, so check Solscan before calling it a whale.</p>"+
+    (numGroups?"<p class='sub' style='color:var(--medio)'>"+clusteredAddrs.length+" of those that look like people are split across "+numGroups+(numGroups===1?" group":" groups")+" that share their funding source (the wallet that paid their first transaction): it could be one person or team splitting the supply to look more decentralised than it is. Take it as a lead, not proof: open the source on Solscan before drawing conclusions."+
+      (h.hotGroups?" Dismissed: "+h.hotGroups+(h.hotGroups===1?" possible group":" possible groups")+" whose source is an exchange or a very active account, because many unrelated people receive money from there.":"")+"</p>":
+      (h.hotGroups?"<p class='sub'>No group with the same funding source. Dismissed: "+h.hotGroups+(h.hotGroups===1?" match":" matches")+" because the source is an exchange or a very active account, where many unrelated people receive money from.</p>":""))+
+    ((bots.length+progs.length)?"<label class='check' style='margin-top:12px'><input type='checkbox' id='showAllH'"+(state.showAllH?" checked":"")+"> Also show the "+(bots.length+progs.length)+" accounts that do not look like people</label>":"")+
+    "<div class='actions'><button class='btn small' id='copyHold' type='button'>Copy top 5 for a post</button>"+
+    (wallets.length?"<button class='btn small ghost' id='addAllH' type='button'>⊕ Add the "+wallets.length+" people to Confluence</button>":"")+
+    "<a class='btn ghost small' style='text-decoration:none;display:inline-flex;align-items:center' target='_blank' rel='noopener' href='https://solscan.io/token/"+esc(h.mint)+"'>See on Solscan</a></div>";
+
+  $("#hlist").innerHTML=creatorHtml(h.creator)+(shown.length?"":"<div class='more'>No wallets of people among the 20 largest accounts. Tick the box above to see the rest.</div>")+shown.map(function(r){
+    var isW=r.kind==="wallet";
+    return "<article class='hrow"+(isW?"":" prog")+"'>"+
+      "<div class='rk'>"+r.rank+"</div>"+
+      "<div style='min-width:0'>"+
+        "<div class='hl1'><span class='mono'>"+esc(short(r.owner))+"</span>"+
+          "<button class='copy' type='button' data-copy='"+esc(r.owner)+"' title='Copy address'>copy</button>"+
+          "<span class='tag"+(isW?"":" p")+"'>"+(isW?"Person (likely)":(r.kind==="activa"?"Very active":"Program or pool"))+"</span>"+(r.kind==="activa"?"<span class='tag seen' title='Many moves in little time: typical of a bot, exchange or market maker'>200+ moves in "+(r.busy<48?r.busy+" h":"2 days")+"</span>":"")+(clusters[r.owner]?"<a class='tag cluster' style='text-decoration:none' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(clusters[r.owner].funder)+"' title='This wallet and "+(clusters[r.owner].n-1)+" others in the list got their first transaction from the same address ("+esc(short(clusters[r.owner].funder))+"): they could be the same person or team. It is a lead, not proof. Press to see the source on Solscan'>Group "+esc(clusters[r.owner].id)+" · "+clusters[r.owner].n+" wallets ↗</a>":"")+(isW?seenTag(r.owner):"")+"</div>"+
+        "<div class='hbar'><i style='width:"+Math.max(2,r.pct/max*100)+"%'></i></div>"+
+        "<div class='meta'><span>Balance <span class='v'>"+esc(fmtNum(r.tokens))+"</span></span>"+
+          (h.price?"<span>Value <span class='v'>"+usd(r.value)+"</span></span>":"")+
+          "<a href='https://solscan.io/account/"+esc(r.owner)+"' target='_blank' rel='noopener'>Solscan</a></div>"+
+      "</div>"+
+      "<div class='hside'><div class='pc'>"+esc(fmtPct(r.pct))+"</div>"+
+        (isW?"<div class='hp'><button class='btn small ghost' type='button' data-analyze='"+esc(r.owner)+"'>Analyse</button><button class='star' type='button' data-favw='"+esc(r.owner)+"' aria-pressed='"+(!!(lista.w[r.owner]&&lista.w[r.owner].fav))+"' title='Follow this wallet' aria-label='Follow this wallet'>"+((lista.w[r.owner]&&lista.w[r.owner].fav)?"★":"☆")+"</button>"+plusBtn(r.owner)+"</div>":"")+
+      "</div></article>";
+  }).join("");
+  state.shown.H=true;
+  if(state.mode==="H") $("#hresults").hidden=false;
+  if(!keep) $("#hresults").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function setMode(m){
+  state.mode=m;
+  $("#form").hidden=(m!=="W"); $("#hform").hidden=(m!=="H");
+  $("#tabL").setAttribute("aria-selected",String(m==="L"));
+  $("#tabC").setAttribute("aria-selected",String(m==="C"));
+  $("#cresults").hidden=(m!=="C"); if(m==="C") renderConf();
+  $("#lresults").hidden=(m!=="L"); if(m==="L") renderLista();
+  $("#tabW").setAttribute("aria-selected",String(m==="W"));
+  $("#tabH").setAttribute("aria-selected",String(m==="H"));
+  $("#results").hidden=!(m==="W"&&state.shown.W);
+  $("#hresults").hidden=!(m==="H"&&state.shown.H);
+  $("#error").hidden=true;
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener("click",function(ev){
+  var chip=ev.target.closest&&ev.target.closest(".chip");
+  if(chip){
+    state.filter=chip.getAttribute("data-f");
+    Array.prototype.forEach.call(document.querySelectorAll(".chip"),function(b){
+      b.setAttribute("aria-pressed",String(b===chip));
+    });
+    renderList(); return;
+  }
+  var cp=ev.target.closest&&ev.target.closest("[data-copy]");
+  if(cp){ copyText(cp.getAttribute("data-copy"),cp); return; }
+  var cdc=ev.target.closest&&ev.target.closest("[data-card]");
+  if(cdc){ ev.preventDefault(); shareCard(cdc.getAttribute("data-card"),cdc); return; }
+  if(ev.target.id==="copySum"){ copyText(summaryText(),ev.target); return; }
+  if(ev.target.id==="showAllH"){ state.showAllH=ev.target.checked; renderHolders(true); return; }
+  if(ev.target.id==="copyHold"){ copyText(holdersText(),ev.target); return; }
+  var fw=ev.target.closest&&ev.target.closest("[data-favw]");
+  if(fw){ var on=toggleWallet(fw.getAttribute("data-favw")); starOn(fw,on); if(state.mode==="L") renderLista(); return; }
+  var ft=ev.target.closest&&ev.target.closest("[data-favt]");
+  if(ft){
+    // El mismo token puede tener estrella en el resumen y en su ficha: se actualizan las dos
+    var fm=ft.getAttribute("data-favt"), on2=toggleToken(fm);
+    Array.prototype.forEach.call(document.querySelectorAll("[data-favt]"),function(b){ if(b.getAttribute("data-favt")===fm) starOn(b,on2); });
+    if(state.mode==="L") renderLista(); return;
+  }
+  var nm=ev.target.closest&&ev.target.closest("[data-name]");
+  if(nm){
+    var a=nm.getAttribute("data-name"), cur=(lista.w[a]&&lista.w[a].name)||"";
+    var v=window.prompt("Name for this wallet (leave empty to remove it):",cur);
+    if(v!==null){ var e=lista.w[a]||(lista.w[a]={fav:false}); e.name=v.trim().slice(0,40); saveList(); renderLista(); }
+    return;
+  }
+  var dl=ev.target.closest&&ev.target.closest("[data-del]");
+  if(dl){ var k=dl.getAttribute("data-del"); if(lista.w[k]&&!lista.w[k].fav){ delete lista.w[k]; saveList(); renderLista(); } return; }
+  var hd=ev.target.closest&&ev.target.closest("[data-hold]");
+  if(hd){ setMode("H"); $("#mint").value=hd.getAttribute("data-hold"); holders(); return; }
+  var ac=ev.target.closest&&ev.target.closest("[data-addc]");
+  if(ac){
+    var rr=toggleCart(ac.getAttribute("data-addc"));
+    if(rr===null){ ac.textContent="max "+CMAX; setTimeout(function(){ plusOn(ac,false); },1400); }
+    else plusOn(ac,rr);
+    return;
+  }
+  var dc=ev.target.closest&&ev.target.closest("[data-delc]");
+  if(dc){ toggleCart(dc.getAttribute("data-delc")); renderConf(); return; }
+  var co=ev.target.closest&&ev.target.closest("[data-copen]");
+  if(co){
+    var c0=conf.saved[co.getAttribute("data-copen")];
+    if(c0){ conf.cart=c0.wallets.slice(); conf.cur=co.getAttribute("data-copen"); conf.pct=c0.pct||30; state.cname=c0.name; state.cres=c0.res||null; state.cmsg=""; saveConf(); renderConf(); }
+    return;
+  }
+  var cd=ev.target.closest&&ev.target.closest("[data-cdel]");
+  if(cd){ var id0=cd.getAttribute("data-cdel"); delete conf.saved[id0]; if(conf.cur===id0) conf.cur=null; saveConf(); renderConf(); return; }
+  if(ev.target.id==="cgo"){ compare(); return; }
+  if(ev.target.id==="chgBtnL"){ checkChanges(Object.keys(lista.w).filter(function(k){return lista.w[k].fav;}),"L"); return; }
+  if(ev.target.id==="cchg"){ if(conf.cart.length) checkChanges(conf.cart.slice(),"conf"); return; }
+  if(ev.target.id==="chgcopy"){ copyText(chgText(state.chg),ev.target); return; }
+  if(ev.target.id==="dgo"){ discover(); return; }
+  if(ev.target.id==="dall"){ var r3=addAddrs(state.disc.rows.map(function(x){return x.a;}).join(" ")); state.cmsg=r3.added?"Added "+r3.added+" wallets from the search to the group.":(r3.full?"The group is full ("+CMAX+" wallets).":"They were all in the group already."); renderConf(); return; }
+  if(ev.target.id==="bkfile"){ downloadBackup(); return; }
+  if(ev.target.id==="bkcopy"){ copyText(JSON.stringify(backupObj()),ev.target); return; }
+  if(ev.target.id==="bkimp"){ var t0=$("#bktext").value; if(t0.trim()) importText(t0); return; }
+  if(ev.target.id==="estPnl"){ estimateOne(); return; }
+  if(ev.target.id==="csave"){ saveGroup(); return; }
+  if(ev.target.id==="cclear"){ conf.cart=[]; conf.cur=null; state.cres=null; state.cname=""; state.cmsg=""; saveConf(); renderConf(); return; }
+  if(ev.target.id==="caddfav"){
+    var favs=Object.keys(lista.w).filter(function(k){ return lista.w[k].fav; });
+    var r1=addAddrs(favs.join(" "));
+    state.cmsg=favs.length?(r1.added?"Added "+r1.added+" wallets you follow.":"All the wallets you follow were in the group already."):"You do not follow any wallet yet (press the ★ next to a wallet).";
+    renderConf(); return;
+  }
+  if(ev.target.id==="ccopy"&&state.cres){ copyText(confText(state.cres),ev.target); return; }
+  var an2=ev.target.closest&&ev.target.closest("[data-addnet]");
+  if(an2){
+    var rn=addAddrs(an2.getAttribute("data-addnet"));
+    an2.textContent=rn.added?"✓ Added "+rn.added+" to Confluence"+(rn.full?" ("+rn.full+" did not fit: max "+CMAX+")":""):(rn.full?"The group is full ("+CMAX+")":"They were all in Confluence already");
+    Array.prototype.forEach.call(document.querySelectorAll("[data-addc]"),function(b){ plusOn(b,inCart(b.getAttribute("data-addc"))); });
+    return;
+  }
+  if(ev.target.id==="addAllH"&&state.hold){
+    var r2=addAddrs(state.hold.rows.filter(function(x){return x.kind==="wallet";}).map(function(x){return x.owner;}).join(" "));
+    renderHolders(true);
+    var b2=$("#addAllH"); if(b2) b2.textContent=r2.added?"✓ Added "+r2.added+" to Confluence":(r2.full?"The group is full ("+CMAX+")":"They were all in Confluence already");
+    return;
+  }
+  var an=ev.target.closest&&ev.target.closest("[data-analyze]");
+  if(an){ ev.preventDefault(); setMode("W"); $("#wallet").value=an.getAttribute("data-analyze"); analyze(); }
+});
+function copyText(t,btn){
+  var old=btn.textContent;
+  function ok(){ btn.textContent="Copied"; setTimeout(function(){ btn.textContent=old; },1400); }
+  function fallback(){
+    var ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); ok(); }catch(e){}
+    ta.remove();
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(ok,fallback);
+  }else fallback();
+}
+$("#form").addEventListener("submit",function(e){ e.preventDefault(); analyze(); });
+$("#cancel").addEventListener("click",function(){ state.cancel=true; cancelEngine(); });
+$("#hform").addEventListener("submit",function(e){ e.preventDefault(); holders(); });
+$("#tabW").addEventListener("click",function(){ setMode("W"); });
+$("#tabH").addEventListener("click",function(){ setMode("H"); });
+$("#tabL").addEventListener("click",function(){ setMode("L"); });
+$("#tabC").addEventListener("click",function(){ setMode("C"); });
+document.addEventListener("submit",function(ev){
+  if(ev.target.id==="cform"){
+    ev.preventDefault();
+    var inp=$("#cadd"), r=addAddrs(inp.value);
+    state.cmsg=r.added?"Added "+r.added+(r.added===1?" wallet.":" wallets.")+(r.bad?" "+r.bad+" did not look like Solana addresses.":""):
+      (r.bad?"That does not look like a Solana address.":(r.full?"The group is full ("+CMAX+" wallets).":"That wallet was in the group already."));
+    renderConf();
+  }
+});
+document.addEventListener("input",function(ev){
+  if(ev.target.id==="cname") state.cname=ev.target.value;
+  if(ev.target.id==="dmints") state.dmints=ev.target.value;
+  if(ev.target.id==="dmin") state.dmin=ev.target.value;
+});
+document.addEventListener("toggle",function(ev){ if(ev.target.id==="ddet") state.dopen=ev.target.open; },true);
+document.addEventListener("change",function(ev){
+  if(ev.target.id==="bkpick"&&ev.target.files&&ev.target.files[0]){
+    var rd=new FileReader(); rd.onload=function(){ importText(rd.result); }; rd.readAsText(ev.target.files[0]);
+  }
+});
+document.addEventListener("change",function(ev){
+  if(ev.target.id==="cpct"){ var v=Math.round(Number(ev.target.value)); conf.pct=(v>=5&&v<=100)?v:30; saveConf(); renderConf(); }
+  if(ev.target.id==="cshow"){ conf.showAll=ev.target.checked; saveConf(); renderConf(); }
+  if(ev.target.id==="cpnl"){ conf.pnl=ev.target.checked; if(!conf.pnl) conf.pf="all"; saveConf(); renderConf(); }
+  if(ev.target.id==="cpf"){ conf.pf=ev.target.value; saveConf(); }
+});
+$("#wallet").addEventListener("input",walletHint);
+
+/* ajustes guardados */
+(function init(){
+  var rpcSaved=store("esc.rpc"), dust=store("esc.dust"), w=store("esc.wallet");
+  if(rpcSaved){ $("#rpc").value=rpcSaved; $("#setup").hidden=true; }
+  if(dust==="0") $("#dust").checked=false;
+  if(w) $("#wallet").value=w;
+  updateCount(); walletHint();
+  var mt=store("esc.mint"); if(mt) $("#mint").value=mt;
+  $("#rpc").addEventListener("input",function(){ $("#setup").hidden=!!$("#rpc").value.trim(); });
+  $("#openAdv").addEventListener("click",function(ev){ ev.preventDefault(); $("#adv").open=true; $(".guide").open=true; $("#rpc").focus(); });
+  // Enlace directo (?token=MINT): abre la app con ese token ya analizado
+  var q=null; try{ q=new URLSearchParams(location.search).get("token"); }catch(e){}
+  if(q&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(q)){ $("#wallet").value=q; walletHint(); analyze(); }
+})();
+})();
+</script>
+</body>
+</html>
