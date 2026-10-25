@@ -637,7 +637,6 @@ export const TEXT = {
   " alerta fuerte)": " strong alert)",
   " alertas fuertes)": " strong alerts)",
   " según el Escáner de Wallets de @elgatotradebtc": " according to the Wallet Scanner by @elgatotradebtc",
-  "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>Compartir en X</a>": "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>Share on X</a>",
 
   // ---------- risk history ----------
   "<div class='pchart'><div class='pc-head'><b>Historial del riesgo</b></div>": "<div class='pchart'><div class='pc-head'><b>Risk history</b></div>",
@@ -665,6 +664,23 @@ export const TEXT = {
   "<div class='lights' style='margin-top:10px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>": "<div class='lights' style='margin-top:10px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Launch buys</b><span>Checking who bought in the first second…</span></div></div></div>",
   "<i class='ld'></i><div style='min-width:0;flex:1'><b>Compras en el lanzamiento</b><span>": "<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>",
   " Sube a ": " Raised to ",
+
+  // ---------- share on X with an image ----------
+  "' title='Abre X con el texto escrito y una imagen con los datos del análisis'>": "' title='Opens X with the text written and an image with the analysis data'>",
+  "Compartir en X</button>": "Share on X</button>",
+  "lanzador en serie": "serial launcher",
+  "bundle en el lanzamiento": "launch bundle",
+  "Liquidez": "Liquidity",
+  "Vol. 24 h": "24h vol.",
+  "Precio": "Price",
+  "Capitalización": "Market cap",
+  "Creado": "Created",
+  "Precio · ": "Price · ",
+  "Sin gráfica todavía: el mercado tiene muy pocas operaciones": "No chart yet: the market has very few trades",
+  "Lanzamiento": "Launch",
+  " · No es consejo financiero": " · Not financial advice",
+  "📋 Imagen copiada: pégala en X con Ctrl+V": "📋 Image copied: paste it in X with Ctrl+V",
+  "⬇️ Imagen descargada: adjúntala al post": "⬇️ Image downloaded: attach it to the post",
   " por lo que pasó en el lanzamiento (mira «Compras en el lanzamiento»).": " because of what happened at launch (see Launch buys).",
   "No se puede revisar: tiene más de 25.000 operaciones y el lanzamiento queda demasiado atrás.": "Cannot be checked: it has more than 25,000 trades and the launch is too far back.",
   "No se puede revisar: tiene más de 4.000 operaciones y el lanzamiento queda demasiado atrás. Con tu propia URL de Helius en Ajustes se llega hasta 25.000.": "Cannot be checked: it has more than 4,000 trades and the launch is too far back. With your own Helius URL in Settings it reaches 25,000.",

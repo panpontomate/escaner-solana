@@ -1097,14 +1097,22 @@ function priceMenu(mint){
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(mint,""))+"'>✏️ Another price (choose it in the bot)</a>"+
     "<small>The Telegram bot opens with the alert ready: tap “Start”.</small></div></details>";
 }
-// Publicar en X el veredicto con el enlace a este análisis: cada vez que alguien lo usa, la web se da a conocer
+// Alertas fuertes del token: los cuatro semáforos y, si ya se revisó y salió en rojo, el lanzamiento
+function strongAlerts(r){
+  return (r.lights||[]).filter(function(l){ return l.s==="bad"; }).length+(r.launch&&r.launch.s==="bad"?1:0);
+}
+// Publicar en X el veredicto con el enlace a este análisis y una imagen con los datos: cada vez que alguien
+// lo usa, la web se da a conocer
+function xText(r){
+  var bad=strongAlerts(r);
+  return "🔎 $"+r.sym+": "+(dataOnly(r)?"medium risk due to missing data":LEVELS[r.lvl].label.toLowerCase())+
+    (bad?" ("+bad+(bad===1?" strong alert)":" strong alerts)"):"")+" according to the Wallet Scanner by @elgatotradebtc";
+}
+function xIntent(r){ return "https://x.com/intent/post?text="+encodeURIComponent(xText(r))+"&url="+encodeURIComponent(tokenLink(r.mint)); }
+var X_ICON="<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>";
 function xBtn(r){
   if(!r.lights) return "";
-  var bad=r.lights.filter(function(l){ return l.s==="bad"; }).length;
-  var t="🔎 $"+r.sym+": "+(dataOnly(r)?"medium risk due to missing data":LEVELS[r.lvl].label.toLowerCase())+
-    (bad?" ("+bad+(bad===1?" strong alert)":" strong alerts)"):"")+" according to the Wallet Scanner by @elgatotradebtc";
-  return "<a class='btn small xs' target='_blank' rel='noopener' href='https://x.com/intent/post?text="+encodeURIComponent(t)+"&url="+encodeURIComponent(tokenLink(r.mint))+"'>"+
-    "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>Share on X</a>";
+  return "<button class='btn small xs' type='button' data-xshare='"+esc(r.mint)+"' title='Opens X with the text written and an image with the analysis data'>"+X_ICON+"Share on X</button>";
 }
 // En la curva de Pump.fun DexScreener no da liquidez y el token salía con «liquidez 0 $»; GeckoTerminal sí
 // sabe lo que hay en la curva (el mismo pool), que es contra lo que se vende
@@ -1155,7 +1163,7 @@ function ringHtml(r){
   var fr={ALTO:.85,MEDIO:.55,BAJO:.25}[r.lvl];
   if(fr===undefined||!r.lights) return "";
   var col={ALTO:"var(--alto)",MEDIO:"var(--medio)",BAJO:"var(--bajo)"}[r.lvl];
-  var bad=r.lights.filter(function(l){return l.s==="bad";}).length+(r.launchLvl?1:0),   // + la del lanzamiento
+  var bad=strongAlerts(r),
       na=r.lights.filter(function(l){return l.s==="na";}).length,
       warn=r.lights.filter(function(l){return l.s==="warn";}).length;
   var parts=[]; if(bad) parts.push(bad+(bad===1?" strong alert":" strong alerts"));
@@ -1561,7 +1569,10 @@ async function paintBundle(){
     }).join("")+(b.capped?"<p class='hint'>The first 40 trades were checked.</p>":"")+
     (others.length>1?"<button class='btn ghost small' type='button' data-addnet='"+esc(others.join(" "))+"' style='margin-top:8px'>⊕ Compare in Confluence</button>":"")+"</details>";
   }
-  if(raiseByLaunch(r,v)){ r.hist=histRecord(r); renderToken(true); return; }
+  // Un lanzamiento en rojo cuenta como una alerta fuerte más (el círculo y el post de X la cuentan); si además
+  // sube el veredicto se guarda en el historial. Se repinta una sola vez: la segunda pasada ya tiene r.launch
+  var first=!r.launch; r.launch=v;
+  if(raiseByLaunch(r,v)||(first&&v.s==="bad")){ if(r.launchLvl) r.hist=histRecord(r); renderToken(true); return; }
   if(nS>=SRE.SERIAL_WARN) extra+="<p class='hint'>Wallet that paid for the launch: <a href='#' class='mono' data-analyze='"+esc(b.creator)+"' title='Analyse this wallet'>"+esc(short(b.creator))+"</a></p>";
   box.className="lt lt-"+v.s;
   box.innerHTML="<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>"+esc(v.t)+"</span>"+extra+"</div>";
@@ -1729,7 +1740,7 @@ async function drawCard(r){
     var ws=cardWhy(r);
     if(ws.length){
       y+=112; x.fillStyle=col[0]; x.font="600 28px "+FB;
-      var wl=cardLines(x,"Rated "+(r.lvl==="ALTO"?"alto":"medio")+" because: "+ws.join(" · "),IW,2);
+      var wl=cardLines(x,"Rated "+LEVELS[r.lvl].label.toLowerCase()+" because: "+ws.join(" · "),IW,2);
       wl.forEach(function(t,i){ x.fillText(t,P,y+i*38); });
       y+=60+(wl.length-1)*38;
     }else y+=128;
@@ -1790,6 +1801,130 @@ async function shareCard(mint,btn){
   }catch(e){
     btn.textContent="Could not generate"; setTimeout(function(){ btn.textContent=old; },2000);
   }
+}
+
+// Imagen para X: apaisada (16:9), que es como X la enseña entera en el timeline. A la izquierda el token,
+// el veredicto, por qué, cuatro cifras y la gráfica; a la derecha los semáforos, con el del lanzamiento
+async function drawXCard(r){
+  try{ await Promise.all(["700 72px 'Bricolage Grotesque'","600 26px Figtree","400 21px Figtree","400 18px 'IBM Plex Mono'"].map(function(f){ return document.fonts.load(f); })); }catch(e){}
+  var W=1600, H=900, P=64, LW=820, RX=P+LW+48, RW=W-P-RX;
+  var FD="'Bricolage Grotesque','Segoe UI',sans-serif", FB="Figtree,'Segoe UI',sans-serif", FM="'IBM Plex Mono',Consolas,monospace";
+  var c=document.createElement("canvas"); c.width=W; c.height=H;
+  var x=c.getContext("2d"), col=CARD.lvl[r.lvl]||CARD.lvl.MEDIO;
+  x.fillStyle=CARD.bg; x.fillRect(0,0,W,H);
+  x.fillStyle=col[0]; x.fillRect(0,0,W,10);
+  x.textBaseline="alphabetic";
+  x.fillStyle=CARD.muted; x.font="600 22px "+FB; x.fillText("WALLET SCANNER · SOLANA",P,P+16);
+  // Iniciales en vez del logo: la imagen del token viene de otro dominio y no dejaría exportar el canvas
+  x.fillStyle=CARD.surface; x.beginPath(); x.arc(P+46,P+96,46,0,Math.PI*2); x.fill();
+  x.fillStyle=CARD.fg; x.font="700 34px "+FD; x.textAlign="center"; x.fillText(r.sym.slice(0,2).toUpperCase(),P+46,P+108); x.textAlign="left";
+  x.font="700 68px "+FD; x.fillText(cardFit(x,r.sym,LW-120),P+116,P+112);
+  if(r.name){ x.fillStyle=CARD.muted; x.font="400 26px "+FB; x.fillText(cardFit(x,r.name,LW-120),P+118,P+150); }
+  // veredicto y recuento
+  var y=P+190, lbl=(dataOnly(r)?"Medium due to missing data":LEVELS[r.lvl].label).toUpperCase();
+  x.font="700 32px "+FD; var pw=x.measureText(lbl).width+56;
+  x.fillStyle=col[1]; cardRound(x,P,y,pw,64,32); x.fill();
+  x.fillStyle=col[0]; x.fillText(lbl,P+28,y+44);
+  var bad=strongAlerts(r), warn=r.lights.filter(function(l){ return l.s==="warn"; }).length+(r.launch&&r.launch.s==="warn"?1:0);
+  var cnt=[]; if(bad) cnt.push(bad+(bad===1?" strong alert":" strong alerts")); if(warn) cnt.push(warn+(warn===1?" warning":" warnings"));
+  if(cnt.length){ x.fillStyle=CARD.fg; x.font="600 26px "+FB; x.fillText(cardFit(x,cnt.join(" · "),LW-pw-24),P+pw+24,y+42); }
+  y+=112;
+  if(!dataOnly(r)&&(r.lvl==="ALTO"||r.lvl==="MEDIO")){
+    var ws=cardWhy(r);
+    if(r.launch&&r.launch.s==="bad") ws.unshift(r.launch.t.indexOf("serial launcher")>=0?"serial launcher":"launch bundle");
+    if(ws.length){
+      x.fillStyle=col[0]; x.font="600 25px "+FB;
+      cardLines(x,"Rated "+LEVELS[r.lvl].label.toLowerCase()+" because: "+ws.slice(0,3).join(" · "),LW,2).forEach(function(t,i){ x.fillText(t,P,y+i*34); });
+    }
+  }
+  // cuatro cifras
+  var par=r.par||{}, box=[["Liquidity",usdShort((par.liquidity&&par.liquidity.usd)||0)],["24h vol.",usdShort((par.volume&&par.volume.h24)||0)],
+    // En una memecoin el precio son muchos ceros que no caben ni se leen: la capitalización dice más
+    (par.marketCap||par.fdv)?["Market cap",usdShort(par.marketCap||par.fdv)]:["Price",par.priceUsd?priceUsd(Number(par.priceUsd)):"—"],
+    ["Created",par.pairCreatedAt?hace(par.pairCreatedAt):"—"]];
+  y=P+390; var bw=(LW-3*16)/4;
+  box.forEach(function(b,i){
+    var bx=P+i*(bw+16);
+    x.fillStyle=CARD.surface; cardRound(x,bx,y,bw,104,18); x.fill();
+    x.fillStyle=CARD.muted; x.font="500 20px "+FB; x.fillText(b[0],bx+20,y+36);
+    // la cifra entera aunque sea larga ("492,69 M $", "hace 2,2 años"): letra más pequeña antes que cortarla
+    x.fillStyle=CARD.fg;
+    for(var fs=30;fs>20;fs-=2){ x.font="700 "+fs+"px "+FD; if(x.measureText(b[1]).width<=bw-40) break; }
+    x.fillText(cardFit(x,b[1],bw-40),bx+20,y+80);
+  });
+  // gráfica: la que ya se cargó en la página (el periodo elegido, o 24 h)
+  y+=128;
+  var pts=par.pairAddress&&(charts[par.pairAddress+"|"+state.ctf]||charts[par.pairAddress+"|d"]), ch=H-P-60-y;
+  x.fillStyle=CARD.surface; cardRound(x,P,y,LW,ch,18); x.fill();
+  if(Array.isArray(pts)&&pts.length>=2){
+    var tf=charts[par.pairAddress+"|"+state.ctf]===pts?state.ctf:"d", lo=Infinity, hi=-Infinity;
+    pts.forEach(function(p){ lo=Math.min(lo,p[1]); hi=Math.max(hi,p[1]); });
+    var span=(hi-lo)||hi*0.02, t0=pts[0][0], t1=pts[pts.length-1][0], gx=P+20, gy=y+56, gw=LW-40, gh=ch-76;
+    var chg=(pts[pts.length-1][1]/pts[0][1]-1)*100, lc=chg>=0?CARD.dot.ok:CARD.dot.bad;
+    x.fillStyle=CARD.muted; x.font="500 20px "+FB; x.fillText("Price · "+CHART_TF[tf][3],gx,y+34);
+    x.fillStyle=lc; x.font="700 22px "+FB; x.textAlign="right"; x.fillText((chg>=0?"+":"")+fmtPct(chg),P+LW-20,y+34); x.textAlign="left";
+    x.beginPath();
+    pts.forEach(function(p,i){ var px=gx+(p[0]-t0)/((t1-t0)||1)*gw, py=gy+(1-(p[1]-lo)/span)*gh; if(i) x.lineTo(px,py); else x.moveTo(px,py); });
+    x.strokeStyle=lc; x.lineWidth=3; x.lineJoin="round"; x.stroke();
+    x.lineTo(gx+gw,gy+gh); x.lineTo(gx,gy+gh); x.closePath(); x.globalAlpha=.14; x.fillStyle=lc; x.fill(); x.globalAlpha=1;
+  }else{
+    x.fillStyle=CARD.muted; x.font="400 22px "+FB; x.fillText("No chart yet: the market has very few trades",P+20,y+ch/2+8);
+  }
+  // semáforos
+  var ry=P+16, rh=H-P-60-ry;
+  x.fillStyle=CARD.surface; cardRound(x,RX,ry,RW,rh,22); x.fill();
+  var ls=r.lights.map(function(l){ return {n:LKEYS[l.k],s:l.s,t:l.t}; });
+  if(r.launch&&r.launch.s!=="na") ls.push({n:"Launch",s:r.launch.s,t:r.launch.t});
+  var ly=ry+32, step=(rh-40)/ls.length;
+  ls.forEach(function(l){
+    x.fillStyle=CARD.dot[l.s]||CARD.dot.na; x.beginPath(); x.arc(RX+40,ly+16,11,0,Math.PI*2); x.fill();
+    x.fillStyle=CARD.fg; x.font="600 25px "+FB; x.fillText(l.n,RX+64,ly+25);
+    x.fillStyle=CARD.muted; x.font="400 20px "+FB;
+    cardLines(x,l.t,RW-88,Math.max(1,Math.floor((step-46)/27))).forEach(function(t,i){ x.fillText(t,RX+64,ly+56+i*27); });
+    ly+=step;
+  });
+  // pie
+  var site=(location.host+location.pathname).replace(/index\.html$/,"").replace(/\/$/,"");
+  x.fillStyle=col[0]; x.font="600 24px "+FB; x.fillText("@elgatotradebtc · "+site,P,H-P+8);
+  x.fillStyle=CARD.muted; x.font="400 20px "+FB; x.textAlign="right";
+  x.fillText(fdate(Date.now())+" · Not financial advice",W-P,H-P+8); x.textAlign="left";
+  return c;
+}
+function btnSay(btn,html,ms){ var old=btn.innerHTML; btn.innerHTML=html; setTimeout(function(){ btn.innerHTML=old; },ms); }
+async function shareX(mint,btn){
+  var r=state.results.filter(function(x){ return x.mint===mint; })[0];
+  if(!r||!r.lights||btn.disabled) return;
+  var url=xIntent(r), name="risk-"+r.sym.replace(/[^\w-]+/g,"").slice(0,20)+".png";
+  btn.disabled=true;
+  var blobP=drawXCard(r).then(function(cv){ return new Promise(function(ok){ cv.toBlob(ok,"image/png"); }); });
+  try{
+    // En el móvil, el menú de compartir del sistema lleva la imagen y el texto juntos: se elige X y listo
+    if(/Android|iPhone|iPad/i.test(navigator.userAgent)&&navigator.canShare){
+      var blob=await blobP, file=null;
+      try{ file=new File([blob],name,{type:"image/png"}); }catch(e){}
+      if(file&&navigator.canShare({files:[file]})){
+        try{ await navigator.share({files:[file],text:xText(r)+" "+tokenLink(r.mint)}); return; }
+        catch(e){ if(e.name==="AbortError") return; }
+      }
+    }
+    // En el ordenador X no acepta imágenes por enlace: se copia la imagen (se pega con Ctrl+V) y se abre X con el
+    // texto. La copia se pide dentro del clic (Safari solo lo deja así) y X se abre en cuanto termina
+    var copied=false;
+    try{ if(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write){ await navigator.clipboard.write([new ClipboardItem({"image/png":blobP})]); copied=true; } }catch(e){}
+    if(!copied){
+      var b=await blobP, a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=name;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); },4000);
+    }
+    btnSay(btn,copied?"📋 Image copied: paste it in X with Ctrl+V":"⬇️ Image downloaded: attach it to the post",8000);
+    openX(url);
+  }catch(e){
+    openX(url);
+  }finally{ btn.disabled=false; }
+}
+// Si el navegador bloquea la ventana nueva, X se abre en esta misma pestaña
+function openX(url){
+  var w=window.open(url,"_blank");
+  if(w) w.opener=null; else setTimeout(function(){ location.href=url; },1500);
 }
 
 /* ---------- buscar ballenas de un token ---------- */
@@ -2243,6 +2378,8 @@ document.addEventListener("click",function(ev){
   if(cp){ copyText(cp.getAttribute("data-copy"),cp); return; }
   var cdc=ev.target.closest&&ev.target.closest("[data-card]");
   if(cdc){ ev.preventDefault(); shareCard(cdc.getAttribute("data-card"),cdc); return; }
+  var xs=ev.target.closest&&ev.target.closest("[data-xshare]");
+  if(xs){ shareX(xs.getAttribute("data-xshare"),xs); return; }
   if(ev.target.id==="copySum"){ copyText(summaryText(),ev.target); return; }
   if(ev.target.id==="showAllH"){ state.showAllH=ev.target.checked; renderHolders(true); return; }
   if(ev.target.id==="copyHold"){ copyText(holdersText(),ev.target); return; }
