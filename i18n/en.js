@@ -33,6 +33,13 @@ export const CODE = [
   return (d/365).toFixed(1).replace(".",",")+" años";`, `  if(d<1) return "today"; if(d<30) return d+(d===1?" day":" days");
   if(d<365){ var mo=Math.floor(d/30); return mo+(mo===1?" month":" months"); }
   return (d/365).toFixed(1)+" years";`],
+  // dates of the chart, the risk history and the new tokens list: "25 Oct 15:30"
+  ['toLocaleDateString("es-ES",{day:"numeric",month:"short"})', 'toLocaleDateString("en-GB",{day:"numeric",month:"short"})'],
+  ['toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"})', 'toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})'],
+  // "5 min ago" instead of "hace 5 min"
+  [`  if(m<60) return "hace "+Math.max(1,m)+" min";
+  if(m<1440) return "hace "+Math.floor(m/60)+" h";`, `  if(m<60) return Math.max(1,m)+" min ago";
+  if(m<1440) return Math.floor(m/60)+" h ago";`],
   // engine error messages that the page recognises by their start
   ['if(/^(solo |no se pudieron leer)/.test(m))', 'if(/^(only |could not read)/.test(m))']
 ];
@@ -617,5 +624,83 @@ export const TEXT = {
   " wallets.": " wallets.",
   " no parecían direcciones de Solana.": " did not look like Solana addresses.",
   "Eso no parece una dirección de Solana.": "That does not look like a Solana address.",
-  "Esa wallet ya estaba en el grupo.": "That wallet was in the group already."
+  "Esa wallet ya estaba en el grupo.": "That wallet was in the group already.",
+
+  // ---------- share on X, price alert menu ----------
+  "<details class='pmenu'><summary class='btn small'>💲 Alerta de precio</summary><div class='pmenu-body'>": "<details class='pmenu'><summary class='btn small'>💲 Price alert</summary><div class='pmenu-body'>",
+  "'>📈 Si sube un 50%</a>": "'>📈 If it rises 50%</a>",
+  "'>📉 Si baja un 30%</a>": "'>📉 If it drops 30%</a>",
+  "'>↕️ Cada vez que se mueva un 20%</a>": "'>↕️ Every time it moves 20%</a>",
+  "'>✏️ Otro precio (lo eliges en el bot)</a>": "'>✏️ Another price (choose it in the bot)</a>",
+  "<small>Se abre el bot de Telegram con la alerta lista: pulsa «Iniciar».</small></div></details>": "<small>The Telegram bot opens with the alert ready: tap “Start”.</small></div></details>",
+  "' target='_blank' rel='noopener' title='Te avisa en Telegram cuando el precio llegue a donde digas'>💲 Alerta de precio</a>": "' target='_blank' rel='noopener' title='Alerts you on Telegram when the price gets where you say'>💲 Price alert</a>",
+  " alerta fuerte)": " strong alert)",
+  " alertas fuertes)": " strong alerts)",
+  " según el Escáner de Wallets de @elgatotradebtc": " according to the Wallet Scanner by @elgatotradebtc",
+  "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>Compartir en X</a>": "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>Share on X</a>",
+
+  // ---------- risk history ----------
+  "<div class='pchart'><div class='pc-head'><b>Historial del riesgo</b></div>": "<div class='pchart'><div class='pc-head'><b>Risk history</b></div>",
+  "<p class='hint' style='margin-top:6px'>Es la primera vez que lo analizas en este navegador. Cada vez que vuelvas a hacerlo se guardará aquí cómo cambia su riesgo.</p></div>": "<p class='hint' style='margin-top:6px'>This is the first time you check it in this browser. Every time you check it again, how its risk changes will be saved here.</p></div>",
+  "Mismo nivel en tus ": "Same level in your ",
+  " análisis desde el ": " checks since ",
+  "Ha pasado de ": "It went from ",
+  ") a ": ") to ",
+  " Precio desde entonces: ": " Price since then: ",
+  " Se guarda solo en este navegador.</p></div>": " It is saved only in this browser.</p></div>",
+
+  // ---------- price chart ----------
+  "7 días": "7 days",
+  "30 días": "30 days",
+  "<div class='pchart'><div class='pc-head'><b>Precio</b><span class='pc-chg' id='pcchg'></span><span class='segs'>": "<div class='pchart'><div class='pc-head'><b>Price</b><span class='pc-chg' id='pcchg'></span><span class='segs'>",
+  "</span></div><div class='pc-body' id='pcbody'><p class='hint'>Cargando gráfica…</p></div></div>": "</span></div><div class='pc-body' id='pcbody'><p class='hint'>Loading chart…</p></div></div>",
+  "<p class='hint'>Cargando gráfica…</p>": "<p class='hint'>Loading chart…</p>",
+  "No se pudo cargar la gráfica: GeckoTerminal no responde o todavía no tiene este mercado.": "Could not load the chart: GeckoTerminal is not answering or does not have this market yet.",
+  "Todavía no hay operaciones suficientes para dibujar la gráfica.": "There are not enough trades yet to draw the chart.",
+  "' preserveAspectRatio='none' role='img' aria-label='Gráfica de precio'>": "' preserveAspectRatio='none' role='img' aria-label='Price chart'>",
+  "Máx. ": "High ",
+  " · Mín. ": " · Low ",
+
+  // ---------- launch buys (bundles) ----------
+  "<div class='lights' style='margin-top:10px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>": "<div class='lights' style='margin-top:10px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Launch buys</b><span>Checking who bought in the first second…</span></div></div></div>",
+  "<i class='ld'></i><div style='min-width:0;flex:1'><b>Compras en el lanzamiento</b><span>": "<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>",
+  "No se puede revisar: tiene más de 4.000 operaciones y el lanzamiento queda demasiado atrás.": "Cannot be checked: it has more than 4,000 trades and the launch is too far back.",
+  "Todavía no tiene operaciones que revisar.": "It has no trades to check yet.",
+  " El creador, otro ": " The creator, another ",
+  " El creador compró el ": " The creator bought ",
+  "Posible bundle: ": "Possible bundle: ",
+  " además del creador compraron en el primer segundo y se llevaron el ": " besides the creator bought in the first second and took ",
+  " del suministro.": " of the supply.",
+  " Suelen ser del mismo dueño y vender a la vez.": " They usually belong to the same owner and sell at the same time.",
+  " Puede ser un bundle o bots rápidos.": " It may be a bundle or fast bots.",
+  "Sin compras agrupadas: nadie más que el creador compró en el primer segundo.": "No grouped buys: nobody but the creator bought in the first second.",
+  "Sin compras agrupadas: ": "No grouped buys: ",
+  " compraron en el primer segundo, solo el ": " bought in the first second, only ",
+  "No se pudo revisar el lanzamiento por un fallo de red. Vuelve a analizar el token.": "Could not check the launch because of a network error. Analyse the token again.",
+  "<details class='cdet'><summary>Ver quién compró (": "<details class='cdet'><summary>See who bought (",
+  "' title='Analizar esta wallet'>": "' title='Analyse this wallet'>",
+  " · creador": " · creator",
+  "<p class='hint'>Se han revisado las primeras 40 operaciones.</p>": "<p class='hint'>The first 40 trades were checked.</p>",
+  "' style='margin-top:8px'>⊕ Comparar en Confluencia</button>": "' style='margin-top:8px'>⊕ Compare in Confluence</button>",
+
+  // ---------- new tokens tab ----------
+  "Tokens nuevos": "New tokens",
+  "Nuevos": "New",
+  "No se pudo cargar la lista": "Could not load the list",
+  "Buscando tokens…": "Looking for tokens…",
+  "No hay tokens que mostrar": "No tokens to show",
+  " tokens con riesgo alto": " tokens with high risk",
+  "<div class='eyebrow'>Tokens nuevos de Solana</div>": "<div class='eyebrow'>New Solana tokens</div>",
+  "Los últimos tokens que han abierto mercado en Solana (Pump.fun, Raydium, Meteora…), revisados con los mismos semáforos. Casi todos salen con riesgo alto o medio: con minutos de vida, ninguno se puede dar por bueno.": "The latest tokens to open a market on Solana (Pump.fun, Raydium, Meteora…), checked with the same traffic lights. Almost all come out high or medium risk: minutes old, none can be trusted yet.",
+  "Los tokens con más movimiento de las últimas 24 horas en Solana, revisados con los mismos semáforos.": "The most traded Solana tokens of the last 24 hours, checked with the same traffic lights.",
+  "'>Recién creados</button>": "'>Just created</button>",
+  "'>En tendencia</button></span>": "'>Trending</button></span>",
+  "<button class='btn ghost small' type='button' id='nreload'>Actualizar</button>": "<button class='btn ghost small' type='button' id='nreload'>Refresh</button>",
+  "Datos de GeckoTerminal, ": "GeckoTerminal data, ",
+  "Revisando…": "Checking…",
+  "No se pudo revisar": "Could not check",
+  "En cola": "Queued",
+  "Liquidez <span class='v'>": "Liquidity <span class='v'>",
+  "Vol. 24 h <span class='v'>": "24h vol. <span class='v'>",
+  "'>Ver análisis completo</a>": "'>See full analysis</a>"
 };

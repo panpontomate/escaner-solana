@@ -266,7 +266,7 @@ a{color:#a99fff}
   body{padding-bottom:120px}
   /* navegación abajo, como en una app */
   .tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;margin:0;border-radius:0;gap:2px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line)}
-  .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+  .tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
   .tab{font-size:.68rem;padding:8px 2px;line-height:1.15;border-radius:12px;min-height:46px;display:flex;align-items:center;justify-content:center;text-align:center}
 }
 
@@ -278,6 +278,46 @@ a{color:#a99fff}
 .tok .lt b{font-size:.95rem;letter-spacing:0;text-transform:none;color:var(--fg);font-weight:700}
 .tok .lt span{color:var(--muted);font-size:.9rem}
 @media (min-width:1000px){#summary .ringbox{margin-top:6px}}
+
+/* compartir en X y alerta de precio */
+a.btn.xs{text-decoration:none;display:inline-flex;align-items:center;gap:7px;background:#000;color:#fff;border:1px solid #3a3f6e}
+a.btn.xs svg{width:14px;height:14px;fill:currentColor}
+details.pmenu{position:relative}
+details.pmenu>summary{list-style:none;display:inline-flex;align-items:center;cursor:pointer;background:#229ed9;color:#fff}
+details.pmenu>summary::-webkit-details-marker{display:none}
+.pmenu-body{position:absolute;z-index:20;top:calc(100% + 6px);left:0;min-width:250px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 14px 40px rgba(5,6,20,.5);display:flex;flex-direction:column;gap:2px}
+.pmenu-body a{padding:9px 12px;border-radius:10px;color:var(--fg)}
+.pmenu-body a:hover{background:var(--surface-2);text-decoration:none}
+.pmenu-body small{color:var(--muted);padding:6px 12px 4px;font-size:.8rem}
+/* botones de segmento (gráfica, fuente de tokens nuevos) */
+.segs{display:inline-flex;gap:4px;padding:3px;background:var(--surface-2);border-radius:12px}
+.seg{border:0;background:transparent;color:var(--muted);border-radius:9px;padding:6px 11px;font-size:.84rem;font-weight:600;cursor:pointer}
+.seg[aria-pressed="true"]{background:var(--accent);color:#fff}
+/* gráfica de precio */
+.pchart{margin-top:14px;background:var(--surface-2);border:1px solid var(--line);border-radius:18px;padding:12px 14px}
+.pc-head{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
+.pc-head b{font-size:.95rem}
+.pc-chg{font-weight:700;font-variant-numeric:tabular-nums;font-size:.92rem}
+.pc-chg.up{color:var(--bajo)} .pc-chg.down{color:var(--alto)}
+.pc-head .segs{margin-left:auto}
+.pc-body{position:relative;margin-top:8px}
+.pc-body>.hint{margin:4px 0 2px}
+#bundlebox{align-items:flex-start} #bundlebox .ld{margin-top:.35em}
+.pmenu-body{min-width:290px} .pmenu-body a{white-space:nowrap}
+@media (max-width:520px){.pmenu-body{position:fixed;left:16px;right:16px;top:auto;bottom:96px;min-width:0}.pmenu-body a{white-space:normal}}
+.pc-body svg{display:block;width:100%;height:170px;touch-action:pan-y}
+.pc-tip{position:absolute;top:0;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:.78rem;white-space:nowrap;transform:translateX(-50%)}
+.pc-axis{display:flex;justify-content:space-between;color:var(--muted);font-size:.76rem;margin-top:2px}
+/* historial del riesgo */
+.hist{display:flex;align-items:flex-start;gap:0;margin-top:10px;overflow-x:auto;padding-bottom:4px}
+.hist .hp0{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:58px;font-size:.72rem;color:var(--muted);text-align:center;position:relative}
+.hist .hp0::before{content:"";position:absolute;top:6px;left:-50%;width:100%;height:2px;background:var(--line);z-index:0}
+.hist .hp0:first-child::before{display:none}
+.hist .hp0 i{width:14px;height:14px;border-radius:50%;background:var(--nm);position:relative;z-index:1}
+.hist .h-ALTO i{background:var(--alto)} .hist .h-MEDIO i{background:var(--medio)} .hist .h-BAJO i{background:var(--bajo)}
+/* lista de tokens nuevos */
+.ntop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.tok .nwhy{color:var(--muted);font-size:.9rem;margin-top:8px}
 </style>
 </head>
 <body>
@@ -302,6 +342,7 @@ a{color:#a99fff}
       <button type="button" class="tab" id="tabH" role="tab" aria-selected="false"><span class="tl-lg">Buscar ballenas de un token</span><span class="tl-sm">Ballenas</span></button>
       <button type="button" class="tab" id="tabL" role="tab" aria-selected="false">Mi lista <span id="lcount"></span></button>
       <button type="button" class="tab" id="tabC" role="tab" aria-selected="false">Confluencia <span id="ccount"></span></button>
+      <button type="button" class="tab" id="tabN" role="tab" aria-selected="false"><span class="tl-lg">Tokens nuevos</span><span class="tl-sm">Nuevos</span></button>
     </div>
     <form id="form" autocomplete="off">
       <label class="eyebrow" for="wallet">Wallet o token</label>
@@ -367,6 +408,11 @@ a{color:#a99fff}
   <section id="hresults" hidden>
     <div class="card" id="hsummary"></div>
     <div class="list" id="hlist" style="margin-top:14px"></div>
+  </section>
+
+  <section id="nresults" hidden>
+    <div class="card" id="nsummary"></div>
+    <div class="list" id="nlist" style="margin-top:14px"></div>
   </section>
 
   <p class="foot">Es una ayuda para detectar señales de alerta, no una garantía ni consejo financiero. Un token con riesgo bajo puede seguir siendo una estafa. La concentración se calcula con wallets individuales (se excluyen pools y programas), pero un exchange o un fondo puede contar como persona.</p>
@@ -1040,13 +1086,59 @@ function tgLink(addr){ return "https://t.me/"+TG_BOT+"?start="+encodeURIComponen
 function tgBtn(addr,title){
   return "<a class='btn small tg' target='_blank' rel='noopener' href='"+esc(tgLink(addr))+"' title='"+esc(title)+"'>🔔 Vigilar en Telegram</a>";
 }
+// Alerta de precio: el bot recibe "/start p_<mint>_<a|b|m><n>" (sube n %, baja n %, cada n %) y la deja puesta;
+// solo "p_<mint>" le hace enseñar el precio y cómo elegir otro
+function tgPrice(mint,cond){ return "https://t.me/"+TG_BOT+"?start=p_"+mint+(cond?"_"+cond:""); }
+function priceMenu(mint){
+  return "<details class='pmenu'><summary class='btn small'>💲 Alerta de precio</summary><div class='pmenu-body'>"+
+    "<a target='_blank' rel='noopener' href='"+esc(tgPrice(mint,"a50"))+"'>📈 Si sube un 50%</a>"+
+    "<a target='_blank' rel='noopener' href='"+esc(tgPrice(mint,"b30"))+"'>📉 Si baja un 30%</a>"+
+    "<a target='_blank' rel='noopener' href='"+esc(tgPrice(mint,"m20"))+"'>↕️ Cada vez que se mueva un 20%</a>"+
+    "<a target='_blank' rel='noopener' href='"+esc(tgPrice(mint,""))+"'>✏️ Otro precio (lo eliges en el bot)</a>"+
+    "<small>Se abre el bot de Telegram con la alerta lista: pulsa «Iniciar».</small></div></details>";
+}
+// Publicar en X el veredicto con el enlace a este análisis: cada vez que alguien lo usa, la web se da a conocer
+function xBtn(r){
+  if(!r.lights) return "";
+  var bad=r.lights.filter(function(l){ return l.s==="bad"; }).length;
+  var t="🔎 $"+r.sym+": "+(dataOnly(r)?"riesgo medio por falta de datos":LEVELS[r.lvl].label.toLowerCase())+
+    (bad?" ("+bad+(bad===1?" alerta fuerte)":" alertas fuertes)"):"")+" según el Escáner de Wallets de @elgatotradebtc";
+  return "<a class='btn small xs' target='_blank' rel='noopener' href='https://x.com/intent/post?text="+encodeURIComponent(t)+"&url="+encodeURIComponent(tokenLink(r.mint))+"'>"+
+    "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>Compartir en X</a>";
+}
+// En la curva de Pump.fun DexScreener no da liquidez y el token salía con «liquidez 0 $»; GeckoTerminal sí
+// sabe lo que hay en la curva (el mismo pool), que es contra lo que se vende
+async function fillLiquidity(par,known){
+  if(!par||(par.liquidity&&par.liquidity.usd)||!par.pairAddress) return;
+  var v=known||0;
+  if(!v){ try{ var j=await jfetch(GT+"pools/"+par.pairAddress); v=Number(j&&j.data&&j.data.attributes&&j.data.attributes.reserve_in_usd)||0; }catch(e){} }
+  if(v>0) par.liquidity=Object.assign({},par.liquidity,{usd:v});
+}
+// Un token de hace segundos todavía no está en DexScreener, pero sí en GeckoTerminal: su pool, con la forma
+// de un par de DexScreener (lo que lee el motor: precio, liquidez, volumen y fecha), sirve de mercado
+function gtPairFrom(a,dex,base){
+  return {pairAddress:a.address,dexId:dex,baseToken:base,priceUsd:String(a.base_token_price_usd||0),
+    liquidity:{usd:Number(a.reserve_in_usd)||0},volume:{h24:Number(a.volume_usd&&a.volume_usd.h24)||0},
+    pairCreatedAt:Date.parse(a.pool_created_at)||0,info:{imageUrl:base.img||null}};
+}
+async function gtPair(mint){
+  try{
+    var j=await jfetch(GT+"tokens/"+mint+"/pools?page=1&include=base_token"), p=j&&j.data&&j.data[0];
+    if(!p) return null;
+    var t=((j.included||[])[0]||{}).attributes||{}, rel=p.relationships||{};
+    return gtPairFrom(p.attributes||{},(rel.dex&&rel.dex.data&&rel.dex.data.id)||"",{address:mint,symbol:t.symbol,name:t.name,img:t.image_url&&!/missing/.test(t.image_url)?t.image_url:null});
+  }catch(e){ return null; }
+}
 async function checkToken(mint){
   setProgress("Consultando precio y liquidez…",0.15);
   var mkr=await getMarkets([mint],function(){});
+  if(!mkr.data[mint]&&!mkr.failed.length){ var gp=await gtPair(mint); if(gp) mkr.data[mint]=gp; }
+  await fillLiquidity(mkr.data[mint]);
   setProgress("Revisando el token…",0.45);
   var r=await assess(mint,mkr.data[mint]||null,0,mkr.failed.length>0);
   if(!r){ showError("Esa dirección es un NFT, no un token. El escáner no revisa NFTs."); return; }
   setProgress("Listo",1);
+  r.hist=histRecord(r);
   state.results=[r]; state.token=r; state.filter="TODOS";
   setUrl(mint);
   renderToken();
@@ -1094,7 +1186,8 @@ function renderToken(){
     "<p class='sub'>"+esc(tip)+"</p>"+
     "<div class='actions'>"+
       (r.lights?"<button class='btn small' type='button' data-card='"+esc(r.mint)+"'>Imagen para compartir</button>":"")+
-      (r.par?tgBtn(r.mint,"Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende"):"")+
+      xBtn(r)+
+      (r.par?tgBtn(r.mint,"Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende")+priceMenu(r.mint):"")+
       "<button class='btn ghost small' type='button' data-copy='"+esc(tokenLink(r.mint))+"' title='Copia un enlace que abre directamente este análisis'>Copiar enlace</button>"+
       (r.par?"<button class='btn ghost small' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+(fav?"★ Siguiendo":"☆ Seguir token")+"</button>":"")+
       "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'>Buscar ballenas</button>"+
@@ -1218,7 +1311,8 @@ function renderList(){
     }).join("")+r.warn.map(function(w){ return "<li class='warn'>"+esc(w)+"</li>"; }).join("");
     var av=r.img?"<img src='"+esc(r.img)+"' alt='' loading='lazy' referrerpolicy='no-referrer' onerror=\"this.remove()\">":"";
     if(r.lights) links+="<a href='#' data-card='"+esc(r.mint)+"' title='Descargar una imagen con el veredicto para compartirla'>Imagen para compartir</a>";
-    if(r.par&&!KNOWN[r.mint]) links+="<a href='"+esc(tgLink(r.mint))+"' target='_blank' rel='noopener' title='Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende'>🔔 Vigilar en Telegram</a>";
+    if(r.par&&!KNOWN[r.mint]) links+="<a href='"+esc(tgLink(r.mint))+"' target='_blank' rel='noopener' title='Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende'>🔔 Vigilar en Telegram</a>"+
+      "<a href='"+esc(tgPrice(r.mint,""))+"' target='_blank' rel='noopener' title='Te avisa en Telegram cuando el precio llegue a donde digas'>💲 Alerta de precio</a>";
     return "<article class='tok lvl-"+L.cls+"'>"+
       "<div class='av' aria-hidden='true'>"+(av||esc(r.sym.slice(0,2).toUpperCase()))+"</div>"+
       "<div style='min-width:0'>"+
@@ -1229,6 +1323,7 @@ function renderList(){
             return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div><b>"+LKEYS[l.k]+"</b><span>"+esc(l.t)+"</span></div></div>";
           }).join("")+"</div>"+(r.type&&r.type!=="ABIERTO"?"<p class='tnote'>"+esc(TYPES[r.type].note)+"</p>":"")
           :"<ul class='why'>"+why+"</ul>")+
+        (state.token===r?tokenExtrasHtml(r):"")+
         "<div class='links'>"+links+"</div>"+
       "</div></article>";
   }).join("");
@@ -1244,6 +1339,282 @@ function renderList(){
   html+=group(items.filter(function(r){return r.lvl==="SIN DATOS";})," token sin comprobar"," tokens sin comprobar","no se pudo consultar su mercado por un fallo de red al conectar con DexScreener. No es que esté mal, es que no se ha podido ver: vuelve a analizar la wallet.");
   html+=group(items.filter(function(r){return r.lvl==="SIN MERCADO";})," token sin mercado"," tokens sin mercado","suelen ser tokens muertos o airdrops sin peligro claro. No interactúes con ellos.");
   $("#list").innerHTML=html||"<div class='more'>No hay tokens en esta categoría.</div>";
+  if(state.token&&state.results[0]===state.token) fillTokenExtras();
+}
+
+/* ---------- extras del análisis de un token: gráfica, lanzamiento e historial ---------- */
+function fdate(ts){ return new Date(ts).toLocaleDateString("es-ES",{day:"numeric",month:"short"}); }
+function ftime(ts){ return new Date(ts).toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"}); }
+// "hace 5 min", "hace 3 h"; a partir de un día, como hace()
+function haceMin(ts){
+  var m=Math.floor((Date.now()-ts)/60000);
+  if(m<60) return "hace "+Math.max(1,m)+" min";
+  if(m<1440) return "hace "+Math.floor(m/60)+" h";
+  return hace(ts);
+}
+function tokenExtrasHtml(r){
+  // El lanzamiento solo se puede revisar en tokens jóvenes: en los viejos queda detrás de miles de operaciones
+  var young=r.par&&r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<7*86400000;
+  return chartHtml(r)+
+    (young?"<div class='lights' style='margin-top:10px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>":"")+
+    histHtml(r);
+}
+function fillTokenExtras(){ paintChart(); paintBundle(); }
+
+// Historial: cada análisis de un token con mercado deja un punto (riesgo y precio) en este navegador;
+// dos análisis en menos de 10 minutos cuentan como uno
+var HKEY="esc.hist";
+function histAll(){ try{ var h=JSON.parse(store(HKEY)||"null"); if(h&&typeof h==="object") return h; }catch(e){} return {}; }
+function histRecord(r){
+  if(!r.par||!/^(ALTO|MEDIO|BAJO)$/.test(r.lvl)) return null;
+  var h=histAll(), l=h[r.mint]||[], now=Date.now();
+  var e={ts:now,lvl:r.lvl,p:Number(r.par.priceUsd||0)};
+  if(l.length&&now-l[l.length-1].ts<600000) l[l.length-1]=e; else l.push(e);
+  h[r.mint]=l.slice(-40);
+  var ks=Object.keys(h);
+  if(ks.length>150){
+    ks.sort(function(a,b){ return h[a][h[a].length-1].ts-h[b][h[b].length-1].ts; });
+    ks.slice(0,ks.length-150).forEach(function(k){ delete h[k]; });
+  }
+  store(HKEY,JSON.stringify(h));
+  return h[r.mint];
+}
+function histHtml(r){
+  var l=r.hist; if(!l) return "";
+  var head="<div class='pchart'><div class='pc-head'><b>Historial del riesgo</b></div>";
+  if(l.length<2) return head+"<p class='hint' style='margin-top:6px'>Es la primera vez que lo analizas en este navegador. Cada vez que vuelvas a hacerlo se guardará aquí cómo cambia su riesgo.</p></div>";
+  var first=l[0], last=l[l.length-1];
+  var msg=first.lvl===last.lvl?"Mismo nivel en tus "+l.length+" análisis desde el "+fdate(first.ts)+".":
+    "Ha pasado de "+LEVELS[first.lvl].label.toLowerCase()+" ("+fdate(first.ts)+") a "+LEVELS[last.lvl].label.toLowerCase()+".";
+  if(first.p>0&&last.p>0) msg+=" Precio desde entonces: "+(last.p>=first.p?"+":"")+fmtPct((last.p/first.p-1)*100)+".";
+  return head+"<div class='hist'>"+l.slice(-12).map(function(e){
+    return "<div class='hp0 h-"+e.lvl+"' title='"+esc(LEVELS[e.lvl].label+" · "+priceUsd(e.p)+" · "+fdate(e.ts)+" "+ftime(e.ts))+"'><i></i><span>"+esc(fdate(e.ts))+"<br>"+esc(ftime(e.ts))+"</span></div>";
+  }).join("")+"</div><p class='hint' style='margin-top:6px'>"+esc(msg)+" Se guarda solo en este navegador.</p></div>";
+}
+
+// Gráfica de precio con las velas de GeckoTerminal (gratis y sin clave). Su dirección de pool es la misma de DexScreener
+var GT="https://api.geckoterminal.com/api/v2/networks/solana/";
+var CHART_TF={d:["minute",15,96,"24 h"],w:["hour",1,168,"7 días"],m:["hour",4,180,"30 días"]};
+var charts={};   // "pool|periodo" -> [[ms, cierre]...], "loading" o "err"
+state.ctf="d";
+function chartHtml(r){
+  if(!r.par||!r.par.pairAddress) return "";
+  return "<div class='pchart'><div class='pc-head'><b>Precio</b><span class='pc-chg' id='pcchg'></span><span class='segs'>"+
+    Object.keys(CHART_TF).map(function(k){ return "<button type='button' class='seg' data-ctf='"+k+"' aria-pressed='"+(state.ctf===k)+"'>"+esc(CHART_TF[k][3])+"</button>"; }).join("")+
+    "</span></div><div class='pc-body' id='pcbody'><p class='hint'>Cargando gráfica…</p></div></div>";
+}
+async function paintChart(){
+  var r=state.token, box=$("#pcbody");
+  if(!r||!r.par||!r.par.pairAddress||!box) return;
+  var key=r.par.pairAddress+"|"+state.ctf, c=charts[key];
+  if(c===undefined){
+    charts[key]="loading";
+    var tf=CHART_TF[state.ctf];
+    try{
+      var j=await jfetch(GT+"pools/"+r.par.pairAddress+"/ohlcv/"+tf[0]+"?aggregate="+tf[1]+"&limit="+tf[2]+"&currency=usd");
+      var l=(j&&j.data&&j.data.attributes&&j.data.attributes.ohlcv_list)||[];
+      charts[key]=l.map(function(v){ return [v[0]*1000,Number(v[4])]; }).filter(function(p){ return p[1]>0; }).sort(function(a,b){ return a[0]-b[0]; });
+    }catch(e){ charts[key]="err"; }
+    return paintChart();   // puede que entretanto se haya cambiado de token o de periodo
+  }
+  if(c==="loading") return;
+  state.cpts=null;
+  if(c==="err"||c.length<2){
+    box.innerHTML="<p class='hint'>"+(c==="err"?"No se pudo cargar la gráfica: GeckoTerminal no responde o todavía no tiene este mercado.":"Todavía no hay operaciones suficientes para dibujar la gráfica.")+"</p>";
+    $("#pcchg").textContent=""; return;
+  }
+  var W=600, H=170, P=8, lo=Infinity, hi=-Infinity;
+  c.forEach(function(p){ lo=Math.min(lo,p[1]); hi=Math.max(hi,p[1]); });
+  var span=(hi-lo)||hi*0.02, t0=c[0][0], t1=c[c.length-1][0];
+  function X(t){ return (t-t0)/((t1-t0)||1)*W; }
+  function Y(v){ return P+(1-(v-lo)/span)*(H-2*P); }
+  var d=c.map(function(p,i){ return (i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1); }).join("");
+  var chg=(c[c.length-1][1]/c[0][1]-1)*100, up=chg>=0, col=up?"var(--bajo)":"var(--alto)";
+  box.innerHTML="<svg viewBox='0 0 "+W+" "+H+"' preserveAspectRatio='none' role='img' aria-label='Gráfica de precio'>"+
+    "<path d='"+d+"L"+W+" "+H+"L0 "+H+"Z' fill='"+col+"' opacity='.13'/>"+
+    "<path d='"+d+"' fill='none' stroke='"+col+"' stroke-width='2' stroke-linejoin='round' vector-effect='non-scaling-stroke'/>"+
+    "<line id='pcx' x1='0' x2='0' y1='0' y2='"+H+"' stroke='var(--muted)' stroke-width='1' vector-effect='non-scaling-stroke' visibility='hidden'/></svg>"+
+    "<div class='pc-tip' id='pctip' hidden></div>"+
+    "<div class='pc-axis'><span>"+esc(fdate(t0)+" "+ftime(t0))+"</span><span>"+esc("Máx. "+priceUsd(hi)+" · Mín. "+priceUsd(lo))+"</span><span>"+esc(ftime(t1))+"</span></div>";
+  var el=$("#pcchg"); el.textContent=(up?"+":"")+fmtPct(chg)+" · "+priceUsd(c[c.length-1][1]); el.className="pc-chg "+(up?"up":"down");
+  state.cpts={c:c,W:W};
+}
+// Al pasar el dedo o el ratón por la gráfica: precio y hora del punto más cercano
+document.addEventListener("pointermove",function(ev){
+  var tip=$("#pctip"), ln=$("#pcx"); if(!tip||!ln) return;
+  var sv=ev.target.closest&&ev.target.closest("#pcbody svg");
+  if(!sv||!state.cpts){ tip.hidden=true; ln.setAttribute("visibility","hidden"); return; }
+  var c=state.cpts.c, b=sv.getBoundingClientRect(), fx=Math.max(0,Math.min(1,(ev.clientX-b.left)/b.width));
+  var t=c[0][0]+fx*(c[c.length-1][0]-c[0][0]), k=0;
+  for(var i=1;i<c.length;i++) if(Math.abs(c[i][0]-t)<Math.abs(c[k][0]-t)) k=i;
+  var kx=(c[k][0]-c[0][0])/((c[c.length-1][0]-c[0][0])||1);
+  ln.setAttribute("x1",kx*state.cpts.W); ln.setAttribute("x2",kx*state.cpts.W); ln.setAttribute("visibility","visible");
+  tip.hidden=false; tip.style.left=Math.max(16,Math.min(84,kx*100))+"%";
+  tip.textContent=priceUsd(c[k][1])+" · "+fdate(c[k][0])+" "+ftime(c[k][0]);
+});
+
+// Compras en el lanzamiento. Varias wallets comprando en el mismo bloque en que nace el token (o el siguiente:
+// menos de un segundo) suelen ser del mismo dueño: es un "bundle". Reparte el suministro para que no se vea la
+// concentración y luego venden a la vez. Se lee del historial del propio mint, así que solo llega a tokens con
+// menos de 4.000 operaciones
+var bundles={};
+async function launchBuys(mint){
+  var before=null, all=[], pages=0;
+  for(;;){
+    var sigs=await rpc("getSignaturesForAddress",[mint,before?{limit:1000,before:before}:{limit:1000}]);
+    all=all.concat(sigs||[]); pages++;
+    if(!sigs||sigs.length<1000) break;
+    if(pages>=4) return {tooOld:true};
+    before=sigs[sigs.length-1].signature;
+  }
+  var ok=all.filter(function(s){ return !s.err; });
+  if(!ok.length) return {none:true};
+  var s0=Math.min.apply(null,ok.map(function(s){ return s.slot; }));
+  var early=ok.filter(function(s){ return s.slot<=s0+1; }).reverse(), capped=early.length>40;
+  early=early.slice(0,40);
+  var mi=await getMint(mint), txs=new Array(early.length);
+  await pool(early,4,async function(s,i){
+    var p={encoding:"jsonParsed",maxSupportedTransactionVersion:1,commitment:"confirmed"};
+    try{ txs[i]=await rpc("getTransaction",[s.signature,p]); }
+    catch(e){
+      // un RPC antiguo que no conoce la versión 1 de las transacciones
+      if(!/version|invalid param/i.test(e.message||"")) throw e;
+      p.maxSupportedTransactionVersion=0; txs[i]=await rpc("getTransaction",[s.signature,p]);
+    }
+  });
+  txs=txs.filter(Boolean);
+  // quien firma la primera operación es quien lo creó
+  var k0=txs.length?txs[0].transaction.message.accountKeys.filter(function(k){ return k.signer; })[0]:null;
+  var creator=k0?(k0.pubkey||k0):null, got={};
+  txs.forEach(function(tx){
+    var pre={}, post={};
+    (tx.meta.preTokenBalances||[]).forEach(function(b){ if(b.mint===mint&&b.owner) pre[b.owner]=(pre[b.owner]||0)+Number(b.uiTokenAmount.amount); });
+    (tx.meta.postTokenBalances||[]).forEach(function(b){ if(b.mint===mint&&b.owner) post[b.owner]=(post[b.owner]||0)+Number(b.uiTokenAmount.amount); });
+    // solo personas: la curva de Pump.fun y los pools son PDAs, fuera de la curva ed25519
+    Object.keys(post).forEach(function(o){ var d=post[o]-(pre[o]||0); if(d>0&&SRE.isOnCurve(o)) got[o]=(got[o]||0)+d; });
+  });
+  var sup=(mi&&mi.supply)||0;
+  var ws=Object.keys(got).map(function(w){ return {w:w,pct:sup?got[w]/sup*100:0,creator:w===creator}; })
+    .filter(function(x){ return x.pct>=0.1||x.creator; }).sort(function(a,b){ return b.pct-a.pct; });
+  return {ws:ws,capped:capped};
+}
+function bundleVerdict(b){
+  if(b.tooOld) return {s:"na",t:"No se puede revisar: tiene más de 4.000 operaciones y el lanzamiento queda demasiado atrás."};
+  if(b.none) return {s:"na",t:"Todavía no tiene operaciones que revisar."};
+  var oth=b.ws.filter(function(x){ return !x.creator; }), cr=b.ws.filter(function(x){ return x.creator; })[0];
+  var po=oth.reduce(function(s,x){ return s+x.pct; },0), tot=po+(cr?cr.pct:0);
+  var n=oth.length+(oth.length===1?" wallet":" wallets");
+  var crt=cr&&cr.pct>=0.1?(oth.length?" El creador, otro "+fmtPct(cr.pct)+".":" El creador compró el "+fmtPct(cr.pct)+"."):"";
+  if((oth.length>=3&&tot>=15)||(oth.length>=1&&tot>=25))
+    return {s:"bad",t:"Posible bundle: "+n+" además del creador compraron en el primer segundo y se llevaron el "+fmtPct(po)+" del suministro."+crt+" Suelen ser del mismo dueño y vender a la vez."};
+  if(oth.length>=3||tot>=10)
+    return {s:"warn",t:n+" además del creador compraron en el primer segundo y se llevaron el "+fmtPct(po)+" del suministro."+crt+" Puede ser un bundle o bots rápidos."};
+  if(!oth.length) return {s:"ok",t:"Sin compras agrupadas: nadie más que el creador compró en el primer segundo."+crt};
+  return {s:"ok",t:"Sin compras agrupadas: "+n+" compraron en el primer segundo, solo el "+fmtPct(po)+" del suministro."+crt};
+}
+async function paintBundle(){
+  var r=state.token, box=$("#bundlebox"); if(!r||!box) return;
+  var b=bundles[r.mint];
+  if(b===undefined){
+    bundles[r.mint]="loading";
+    try{ bundles[r.mint]=await launchBuys(r.mint); }
+    catch(e){ if(e.message==="cancelado"){ delete bundles[r.mint]; return; } bundles[r.mint]="err"; }
+    return paintBundle();
+  }
+  if(b==="loading") return;
+  var v=b==="err"?{s:"na",t:"No se pudo revisar el lanzamiento por un fallo de red. Vuelve a analizar el token."}:bundleVerdict(b), extra="";
+  if(b.ws&&b.ws.length){
+    var others=b.ws.filter(function(x){ return !x.creator; }).map(function(x){ return x.w; });
+    extra="<details class='cdet'><summary>Ver quién compró ("+b.ws.length+")</summary>"+b.ws.map(function(x){
+      return "<div class='nm-row'><span class='mono'><a href='#' data-analyze='"+esc(x.w)+"' title='Analizar esta wallet'>"+esc(short(x.w))+"</a>"+(x.creator?" · creador":"")+"</span><span class='v'>"+esc(fmtPct(x.pct))+"</span></div>";
+    }).join("")+(b.capped?"<p class='hint'>Se han revisado las primeras 40 operaciones.</p>":"")+
+    (others.length>1?"<button class='btn ghost small' type='button' data-addnet='"+esc(others.join(" "))+"' style='margin-top:8px'>⊕ Comparar en Confluencia</button>":"")+"</details>";
+  }
+  box.className="lt lt-"+v.s;
+  box.innerHTML="<i class='ld'></i><div style='min-width:0;flex:1'><b>Compras en el lanzamiento</b><span>"+esc(v.t)+"</span>"+extra+"</div>";
+}
+
+/* ---------- tokens nuevos (GeckoTerminal) ---------- */
+var DEXN={"pump-fun":"Pump.fun","pumpswap":"PumpSwap","raydium":"Raydium","raydium-clmm":"Raydium CLMM","raydium-launchlab":"LaunchLab",
+  "meteora":"Meteora","meteora-damm-v2":"Meteora","meteora-dbc":"Meteora DBC","orca":"Orca"};
+var news={run:0,rows:null,err:"",ts:0};
+state.nsrc="new";
+async function loadNew(){
+  var run=++news.run; news.rows=null; news.err=""; renderNew();
+  try{
+    var j=await jfetch(GT+(state.nsrc==="new"?"new_pools?page=1":"trending_pools?page=1&duration=24h")+"&include=base_token");
+    var toks={}; (j.included||[]).forEach(function(t){ toks[t.id]=t.attributes||{}; });
+    var seen={}, rows=[];
+    (j.data||[]).forEach(function(p){
+      var rel=p.relationships||{}, id=rel.base_token&&rel.base_token.data&&rel.base_token.data.id, m=id&&id.replace(/^solana_/,"");
+      if(!m||seen[m]||KNOWN[m]) return;   // el mismo token en dos pools, o SOL/USDC como base
+      seen[m]=1;
+      var a=p.attributes||{}, t=toks[id]||{};
+      var x={mint:m,pool:a.address,sym:t.symbol||String(a.name||"?").split(" / ")[0],name:t.name||"",
+        img:t.image_url&&!/missing/.test(t.image_url)?t.image_url:null,dex:(rel.dex&&rel.dex.data&&rel.dex.data.id)||"",
+        created:Date.parse(a.pool_created_at)||0,liq:Number(a.reserve_in_usd)||0,vol:Number(a.volume_usd&&a.volume_usd.h24)||0,r:null,st:"wait"};
+      x.gt=gtPairFrom(a,x.dex,{address:m,symbol:x.sym,name:x.name,img:x.img});
+      rows.push(x);
+    });
+    if(run!==news.run) return;
+    news.rows=rows; news.ts=Date.now(); renderNew();
+    var mk=await getMarkets(rows.map(function(x){ return x.mint; }));
+    await pool(rows,2,async function(x){
+      if(run!==news.run) return;
+      x.st="run"; updateNRow(x);
+      var par=mk.data[x.mint]||x.gt;
+      await fillLiquidity(par,x.liq);
+      try{ x.r=await assess(x.mint,par,0,false); x.st=x.r?"done":"err"; }
+      catch(e){ x.st="err"; }
+      if(run===news.run){ updateNRow(x); renderNewHead(); }
+    });
+  }catch(e){
+    if(run===news.run&&e.message!=="cancelado"){ news.err=friendlyError(e); renderNew(); }
+  }
+}
+function renderNewHead(){
+  var rows=news.rows||[], c={ALTO:0,MEDIO:0,BAJO:0}, done=0;
+  rows.forEach(function(x){ if(x.st==="done"||x.st==="err") done++; if(x.r&&c[x.r.lvl]!==undefined) c[x.r.lvl]++; });
+  var head=news.err?"No se pudo cargar la lista":!news.rows?"Buscando tokens…":!rows.length?"No hay tokens que mostrar":
+    done<rows.length?"Revisando tokens… "+done+"/"+rows.length:c.ALTO+" de "+rows.length+" tokens con riesgo alto";
+  $("#nsummary").innerHTML="<div class='eyebrow'>Tokens nuevos de Solana</div>"+
+    "<h2 class='verdict'>"+esc(head)+"</h2>"+
+    "<p class='sub'>"+esc(state.nsrc==="new"?
+      "Los últimos tokens que han abierto mercado en Solana (Pump.fun, Raydium, Meteora…), revisados con los mismos semáforos. Casi todos salen con riesgo alto o medio: con minutos de vida, ninguno se puede dar por bueno.":
+      "Los tokens con más movimiento de las últimas 24 horas en Solana, revisados con los mismos semáforos.")+"</p>"+
+    "<div class='ntop'><span class='segs'><button type='button' class='seg' data-nsrc='new' aria-pressed='"+(state.nsrc==="new")+"'>Recién creados</button>"+
+    "<button type='button' class='seg' data-nsrc='trend' aria-pressed='"+(state.nsrc==="trend")+"'>En tendencia</button></span>"+
+    "<button class='btn ghost small' type='button' id='nreload'>Actualizar</button>"+
+    (news.ts?"<span class='hint' style='margin:0'>"+esc("Datos de GeckoTerminal, "+ftime(news.ts))+"</span>":"")+"</div>"+
+    (news.err?"<div class='notice err'>"+news.err+"</div>":"");
+}
+function renderNew(){
+  if(!$("#nsummary")) return;
+  renderNewHead();
+  $("#nlist").innerHTML=(news.rows||[]).map(nrowHtml).join("");
+}
+function updateNRow(x){
+  Array.prototype.forEach.call(document.querySelectorAll("[data-nrow]"),function(el){ if(el.getAttribute("data-nrow")===x.mint) el.outerHTML=nrowHtml(x); });
+}
+function nrowHtml(x){
+  var r=x.st==="done"?x.r:null, cls=r?LEVELS[r.lvl].cls:"nm";
+  var pill=r?lvlLabel(r):x.st==="run"?"Revisando…":x.st==="err"?"No se pudo revisar":"En cola";
+  var why="";
+  if(r){
+    var l0=r.lights&&(r.lights.filter(function(l){ return l.s==="bad"; })[0]||r.lights.filter(function(l){ return l.s==="warn"; })[0]);
+    why=l0?l0.t:(r.why[0]||"Sin señales de alerta en los chequeos");
+  }
+  var meta=[esc(DEXN[x.dex]||x.dex)];
+  if(x.created) meta.push(esc(haceMin(x.created)));
+  meta.push("Liquidez <span class='v'>"+usd(x.liq)+"</span>");
+  if(x.vol) meta.push("Vol. 24 h <span class='v'>"+usd(x.vol)+"</span>");
+  var av=x.img?"<img src='"+esc(x.img)+"' alt='' loading='lazy' referrerpolicy='no-referrer' onerror=\"this.remove()\">":"";
+  return "<article class='tok lvl-"+cls+"' data-nrow='"+esc(x.mint)+"'><div class='av' aria-hidden='true'>"+(av||esc(x.sym.slice(0,2).toUpperCase()))+"</div><div style='min-width:0'>"+
+    "<div class='head'><h3>"+esc(x.sym)+(x.name&&x.name!==x.sym?"<span>"+esc(x.name)+"</span>":"")+"</h3><span class='pill'>"+esc(pill)+"</span></div>"+
+    "<div class='meta'>"+meta.filter(Boolean).map(function(m){ return "<span>"+m+"</span>"; }).join("")+"</div>"+
+    (why?"<div class='nwhy'>"+esc(why)+"</div>":"")+
+    "<div class='links'><a href='#' data-analyze='"+esc(x.mint)+"'>Ver análisis completo</a>"+
+    (x.pool?"<a href='https://dexscreener.com/solana/"+esc(x.pool)+"' target='_blank' rel='noopener'>DexScreener</a>":"")+"</div></div></article>";
 }
 
 /* ---------- tarjeta de riesgo compartible ---------- */
@@ -1804,6 +2175,8 @@ function setMode(m){
   $("#tabC").setAttribute("aria-selected",String(m==="C"));
   $("#cresults").hidden=(m!=="C"); if(m==="C") renderConf();
   $("#lresults").hidden=(m!=="L"); if(m==="L") renderLista();
+  $("#tabN").setAttribute("aria-selected",String(m==="N"));
+  $("#nresults").hidden=(m!=="N"); if(m==="N"&&!news.run) loadNew();
   $("#tabW").setAttribute("aria-selected",String(m==="W"));
   $("#tabH").setAttribute("aria-selected",String(m==="H"));
   $("#results").hidden=!(m==="W"&&state.shown.W);
@@ -1813,6 +2186,18 @@ function setMode(m){
 
 /* ---------- eventos ---------- */
 document.addEventListener("click",function(ev){
+  var ctf=ev.target.closest&&ev.target.closest("[data-ctf]");
+  if(ctf){
+    state.ctf=ctf.getAttribute("data-ctf");
+    Array.prototype.forEach.call(document.querySelectorAll("[data-ctf]"),function(b){ b.setAttribute("aria-pressed",String(b===ctf)); });
+    var pb=$("#pcbody"); if(pb) pb.innerHTML="<p class='hint'>Cargando gráfica…</p>";
+    paintChart(); return;
+  }
+  var ns=ev.target.closest&&ev.target.closest("[data-nsrc]");
+  if(ns){ if(state.nsrc!==ns.getAttribute("data-nsrc")){ state.nsrc=ns.getAttribute("data-nsrc"); loadNew(); } return; }
+  if(ev.target.id==="nreload"){ loadNew(); return; }
+  // el menú de la alerta de precio se cierra al elegir una opción o al pulsar fuera
+  Array.prototype.forEach.call(document.querySelectorAll("details.pmenu[open]"),function(d){ if(!d.contains(ev.target)||ev.target.closest("a")) d.open=false; });
   var chip=ev.target.closest&&ev.target.closest(".chip");
   if(chip){
     state.filter=chip.getAttribute("data-f");
@@ -1920,6 +2305,7 @@ $("#tabW").addEventListener("click",function(){ setMode("W"); });
 $("#tabH").addEventListener("click",function(){ setMode("H"); });
 $("#tabL").addEventListener("click",function(){ setMode("L"); });
 $("#tabC").addEventListener("click",function(){ setMode("C"); });
+$("#tabN").addEventListener("click",function(){ setMode("N"); });
 document.addEventListener("submit",function(ev){
   if(ev.target.id==="cform"){
     ev.preventDefault();
