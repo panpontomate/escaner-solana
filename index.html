@@ -429,7 +429,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="No se pudo cargar el motor del escáner desde cdn.jsdelivr.net. Revisa tu conexión a internet y recarga la página."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.2.0/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.3.0/src/index.js";
 window.__escOk=true;
 (function(){
 "use strict";
@@ -1496,7 +1496,15 @@ async function launchBuys(mint){
   var sup=(mi&&mi.supply)||0;
   var ws=Object.keys(got).map(function(w){ return {w:w,pct:sup?got[w]/sup*100:0,creator:w===creator}; })
     .filter(function(x){ return x.pct>=0.1||x.creator; }).sort(function(a,b){ return b.pct-a.pct; });
-  return {ws:ws,capped:capped};
+  // Las granjas de lanzamientos pagan todos desde una wallet pero ponen un "creador" nuevo cada vez, así que
+  // RugCheck ve un token por creador: se cuenta en la cadena qué más lanzó quien pagó este
+  var serial=null;
+  if(creator){ try{ serial=await call(SRE.recentLaunches(client(),creator)); }catch(e){ if(e.message==="cancelado") throw e; } }
+  return {ws:ws,capped:capped,creator:creator,serial:serial};
+}
+// Otros tokens que lanzó en 24 h la wallet que pagó este (el propio token también sale en la cuenta)
+function serialOthers(b,mint){
+  return b&&b.serial?b.serial.mints.filter(function(m){ return m!==mint; }).length:0;
 }
 function bundleVerdict(b){
   if(b.tooOld) return {s:"na",t:"No se puede revisar: tiene más de 4.000 operaciones y el lanzamiento queda demasiado atrás."};
@@ -1507,6 +1515,8 @@ function bundleVerdict(b){
   var crt=cr&&cr.pct>=0.1?(oth.length?" El creador, otro "+fmtPct(cr.pct)+".":" El creador compró el "+fmtPct(cr.pct)+"."):"";
   if((oth.length>=3&&tot>=15)||(oth.length>=1&&tot>=25))
     return {s:"bad",t:"Posible bundle: "+n+" además del creador compraron en el primer segundo y se llevaron el "+fmtPct(po)+" del suministro."+crt+" Suelen ser del mismo dueño y vender a la vez."};
+  if(!oth.length&&tot>=10)
+    return {s:"warn",t:"Nadie más compró en el primer segundo, pero el creador se quedó el "+fmtPct(cr.pct)+" del suministro al lanzarlo: puede venderlo de golpe."};
   if(oth.length>=3||tot>=10)
     return {s:"warn",t:n+" además del creador compraron en el primer segundo y se llevaron el "+fmtPct(po)+" del suministro."+crt+" Puede ser un bundle o bots rápidos."};
   if(!oth.length) return {s:"ok",t:"Sin compras agrupadas: nadie más que el creador compró en el primer segundo."+crt};
@@ -1523,6 +1533,11 @@ async function paintBundle(){
   }
   if(b==="loading") return;
   var v=b==="err"?{s:"na",t:"No se pudo revisar el lanzamiento por un fallo de red. Vuelve a analizar el token."}:bundleVerdict(b), extra="";
+  var nS=serialOthers(b,r.mint);
+  if(nS>=SRE.SERIAL_WARN){
+    var sS=nS>=SRE.SERIAL_BAD?"bad":"warn";
+    v={s:v.s==="bad"||sS==="bad"?"bad":"warn",t:v.t+" La wallet que pagó el lanzamiento ha lanzado "+nS+(b.serial.more?" o más":"")+" tokens más en las últimas 24 h: es un lanzador en serie, que suele abandonar cada token en cuanto llegan compradores."};
+  }
   if(b.ws&&b.ws.length){
     var others=b.ws.filter(function(x){ return !x.creator; }).map(function(x){ return x.w; });
     extra="<details class='cdet'><summary>Ver quién compró ("+b.ws.length+")</summary>"+b.ws.map(function(x){
@@ -1530,6 +1545,7 @@ async function paintBundle(){
     }).join("")+(b.capped?"<p class='hint'>Se han revisado las primeras 40 operaciones.</p>":"")+
     (others.length>1?"<button class='btn ghost small' type='button' data-addnet='"+esc(others.join(" "))+"' style='margin-top:8px'>⊕ Comparar en Confluencia</button>":"")+"</details>";
   }
+  if(nS>=SRE.SERIAL_WARN) extra+="<p class='hint'>Wallet que pagó el lanzamiento: <a href='#' class='mono' data-analyze='"+esc(b.creator)+"' title='Analizar esta wallet'>"+esc(short(b.creator))+"</a></p>";
   box.className="lt lt-"+v.s;
   box.innerHTML="<i class='ld'></i><div style='min-width:0;flex:1'><b>Compras en el lanzamiento</b><span>"+esc(v.t)+"</span>"+extra+"</div>";
 }

@@ -681,6 +681,12 @@ export const TEXT = {
   "' title='Analizar esta wallet'>": "' title='Analyse this wallet'>",
   " · creador": " · creator",
   "<p class='hint'>Se han revisado las primeras 40 operaciones.</p>": "<p class='hint'>The first 40 trades were checked.</p>",
+  "Nadie más compró en el primer segundo, pero el creador se quedó el ": "Nobody else bought in the first second, but the creator kept ",
+  " del suministro al lanzarlo: puede venderlo de golpe.": " of the supply at launch: they can sell it all at once.",
+  " La wallet que pagó el lanzamiento ha lanzado ": " The wallet that paid for the launch has launched ",
+  " o más": " or more",
+  " tokens más en las últimas 24 h: es un lanzador en serie, que suele abandonar cada token en cuanto llegan compradores.": " other tokens in the last 24 h: a serial launcher, who usually drops each token as soon as buyers arrive.",
+  "<p class='hint'>Wallet que pagó el lanzamiento: <a href='#' class='mono' data-analyze='": "<p class='hint'>Wallet that paid for the launch: <a href='#' class='mono' data-analyze='",
   "' style='margin-top:8px'>⊕ Comparar en Confluencia</button>": "' style='margin-top:8px'>⊕ Compare in Confluence</button>",
 
   // ---------- new tokens tab ----------
