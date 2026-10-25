@@ -62,6 +62,8 @@ a:hover{text-decoration:underline}
 .brand .by:hover{color:var(--fg);border-color:var(--muted)}
 .brand .by svg{width:14px;height:14px;fill:currentColor}
 @media (max-width:620px){.brand{flex-wrap:wrap}.brand .by{margin-left:0}}
+a.btn.tg{text-decoration:none;display:inline-flex;align-items:center;background:#229ed9;color:#fff;border-color:#229ed9}
+a.btn.tg:hover{filter:brightness(1.08)}
 .credits{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:8px}
 .credits a{color:var(--muted)}
 
@@ -1029,6 +1031,12 @@ function setUrl(mint){
   try{ history.replaceState(null,"",location.pathname+(mint?"?token="+mint:"")); }catch(e){}
 }
 function tokenLink(mint){ return location.origin+location.pathname+"?token="+mint; }
+// Abre el bot de Telegram y empieza a vigilar esa dirección: el bot recibe "/start <dirección>"
+var TG_BOT="panpontomate_escaner_bot";
+function tgLink(addr){ return "https://t.me/"+TG_BOT+"?start="+encodeURIComponent(addr); }
+function tgBtn(addr,title){
+  return "<a class='btn small tg' target='_blank' rel='noopener' href='"+esc(tgLink(addr))+"' title='"+esc(title)+"'>🔔 Vigilar en Telegram</a>";
+}
 async function checkToken(mint){
   setProgress("Consultando precio y liquidez…",0.15);
   var mkr=await getMarkets([mint],function(){});
@@ -1081,6 +1089,7 @@ function renderToken(){
     "<p class='sub'>"+esc(tip)+"</p>"+
     "<div class='actions'>"+
       (r.lights?"<button class='btn small' type='button' data-card='"+esc(r.mint)+"'>Imagen para compartir</button>":"")+
+      (r.par?tgBtn(r.mint,"Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende"):"")+
       "<button class='btn ghost small' type='button' data-copy='"+esc(tokenLink(r.mint))+"' title='Copia un enlace que abre directamente este análisis'>Copiar enlace</button>"+
       (r.par?"<button class='btn ghost small' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+(fav?"★ Siguiendo":"☆ Seguir token")+"</button>":"")+
       "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'>Buscar ballenas</button>"+
@@ -1157,6 +1166,7 @@ function render(){
     "<p class='sub'>"+esc(tip)+(split?" "+esc(split):"")+(state.hidden?(state.hidden===1?" Se ha ocultado 1 token de menos de 1 $.":" Se han ocultado "+state.hidden+" tokens de menos de 1 $."):"")+"</p>"+
     (n?"<div class='bar' role='img' aria-label='Reparto de tokens por nivel de riesgo'>"+segs+"</div><div class='legend'>"+legend+"</div>":"")+
     "<div class='actions'><button class='btn small' id='copySum' type='button'>Copiar resumen</button>"+
+    tgBtn(state.wallet,"Te avisa en Telegram de lo que compra o vende esta wallet")+
     "<button class='btn ghost small' type='button' data-long data-favw='"+esc(state.wallet)+"' aria-pressed='"+(!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"'>"+(lista.w[state.wallet]&&lista.w[state.wallet].fav?"★ Siguiendo":"☆ Seguir wallet")+"</button>"+
     "<button class='btn ghost small' type='button' id='estPnl'>Estimar resultado</button>"+
     "<button class='btn ghost small' type='button' data-long data-addc='"+esc(state.wallet)+"' aria-pressed='"+inCart(state.wallet)+"'>"+(inCart(state.wallet)?"✓ En Confluencia":"⊕ A Confluencia")+"</button>"+
@@ -1203,6 +1213,7 @@ function renderList(){
     }).join("")+r.warn.map(function(w){ return "<li class='warn'>"+esc(w)+"</li>"; }).join("");
     var av=r.img?"<img src='"+esc(r.img)+"' alt='' loading='lazy' referrerpolicy='no-referrer' onerror=\"this.remove()\">":"";
     if(r.lights) links+="<a href='#' data-card='"+esc(r.mint)+"' title='Descargar una imagen con el veredicto para compartirla'>Imagen para compartir</a>";
+    if(r.par&&!KNOWN[r.mint]) links+="<a href='"+esc(tgLink(r.mint))+"' target='_blank' rel='noopener' title='Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende'>🔔 Vigilar en Telegram</a>";
     return "<article class='tok lvl-"+L.cls+"'>"+
       "<div class='av' aria-hidden='true'>"+(av||esc(r.sym.slice(0,2).toUpperCase()))+"</div>"+
       "<div style='min-width:0'>"+
