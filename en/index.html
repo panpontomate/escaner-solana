@@ -118,7 +118,7 @@ details.guide .mono{overflow-wrap:anywhere}
 .legend b{color:var(--fg);font-variant-numeric:tabular-nums}
 .dot{width:10px;height:10px;border-radius:50%;flex:none}
 .c-spam{background:var(--alto);opacity:.4} .c-alto{background:var(--alto)} .c-medio{background:var(--medio)} .c-bajo{background:var(--bajo)} .c-nm{background:var(--nm)}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
 
 /* filtros */
 .filters{display:flex;gap:8px;flex-wrap:wrap}
@@ -280,8 +280,9 @@ a{color:#a99fff}
 @media (min-width:1000px){#summary .ringbox{margin-top:6px}}
 
 /* compartir en X y alerta de precio */
-a.btn.xs{text-decoration:none;display:inline-flex;align-items:center;gap:7px;background:#000;color:#fff;border:1px solid #3a3f6e}
-a.btn.xs svg{width:14px;height:14px;fill:currentColor}
+.btn.xs{text-decoration:none;display:inline-flex;align-items:center;gap:7px;background:#000;color:#fff;border:1px solid #3a3f6e}
+.btn.xs svg{width:14px;height:14px;flex:none;fill:currentColor}
+.btn.xs:disabled{opacity:.7;cursor:progress}
 details.pmenu{position:relative}
 details.pmenu>summary{list-style:none;display:inline-flex;align-items:center;cursor:pointer;background:#229ed9;color:#fff}
 details.pmenu>summary::-webkit-details-marker{display:none}
