@@ -1155,7 +1155,7 @@ function ringHtml(r){
   var fr={ALTO:.85,MEDIO:.55,BAJO:.25}[r.lvl];
   if(fr===undefined||!r.lights) return "";
   var col={ALTO:"var(--alto)",MEDIO:"var(--medio)",BAJO:"var(--bajo)"}[r.lvl];
-  var bad=r.lights.filter(function(l){return l.s==="bad";}).length,
+  var bad=r.lights.filter(function(l){return l.s==="bad";}).length+(r.launchLvl?1:0),   // + la del lanzamiento
       na=r.lights.filter(function(l){return l.s==="na";}).length,
       warn=r.lights.filter(function(l){return l.s==="warn";}).length;
   var parts=[]; if(bad) parts.push(bad+(bad===1?" strong alert":" strong alerts"));
@@ -1171,9 +1171,10 @@ function ringHtml(r){
     "<text x='65' y='86' text-anchor='middle' font-size='10' fill='var(--muted)'>risk</text></svg>"+
     "<div class='ringtxt'>"+esc(parts.join(" · ")||"No alerts")+"</div></div>";
 }
-function renderToken(){
+function renderToken(noScroll){
   var r=state.token, L=LEVELS[r.lvl], fav=!!lista.t[r.mint];
   var tip=TOKEN_TIP[r.lvl]||"";
+  if(r.launchLvl) tip+=" Raised to "+L.label.toLowerCase()+" because of what happened at launch (see Launch buys).";
   if(r.imp) tip="It is a copy of "+r.imp.sym+" with another address. Even if it shows a price, it is not worth that: do not buy it, and if you hold it, do not visit websites under its name to “swap” or “claim” it.";
   else if(dataOnly(r)){
     tip="There is no concrete warning sign: it is rated medium only because this is still unchecked: "+missingText(r)+". What was not checked is never assumed fine. Analyse it again in a while: the verdict may drop to low risk.";
@@ -1196,7 +1197,7 @@ function renderToken(){
   renderList();
   state.shown.W=true;
   if(state.mode==="W") $("#results").hidden=false;
-  $("#results").scrollIntoView({behavior:"smooth",block:"start"});
+  if(!noScroll) $("#results").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 /* ---------- pintado ---------- */
@@ -1527,6 +1528,16 @@ function bundleVerdict(b){
   if(!oth.length) return {s:"ok",t:"No grouped buys: nobody but the creator bought in the first second."+crt};
   return {s:"ok",t:"No grouped buys: "+n+" bought in the first second, only "+fmtPct(po)+" of the supply."+crt};
 }
+// Lo que se ve en el lanzamiento cuenta como un semáforo más, con la misma regla que los otros cuatro: un bundle
+// o un lanzador en serie en rojo, junto con otra alerta fuerte o un aviso, da riesgo alto. El amarillo no sube
+// nada: varias compras en el primer segundo también pueden ser bots rápidos
+function raiseByLaunch(r,v){
+  if(r.launchLvl||!r.lights||v.s!=="bad"||r.lvl==="ALTO"||!/^(MEDIO|BAJO)$/.test(r.lvl)) return false;
+  var others=r.lights.some(function(l){ return l.s==="bad"||l.s==="warn"; });
+  var lvl=others?"ALTO":"MEDIO";
+  if(lvl===r.lvl) return false;
+  r.launchLvl=r.lvl; r.lvl=lvl; return true;
+}
 async function paintBundle(){
   var r=state.token, box=$("#bundlebox"); if(!r||!box) return;
   var b=bundles[r.mint];
@@ -1550,6 +1561,7 @@ async function paintBundle(){
     }).join("")+(b.capped?"<p class='hint'>The first 40 trades were checked.</p>":"")+
     (others.length>1?"<button class='btn ghost small' type='button' data-addnet='"+esc(others.join(" "))+"' style='margin-top:8px'>⊕ Compare in Confluence</button>":"")+"</details>";
   }
+  if(raiseByLaunch(r,v)){ r.hist=histRecord(r); renderToken(true); return; }
   if(nS>=SRE.SERIAL_WARN) extra+="<p class='hint'>Wallet that paid for the launch: <a href='#' class='mono' data-analyze='"+esc(b.creator)+"' title='Analyse this wallet'>"+esc(short(b.creator))+"</a></p>";
   box.className="lt lt-"+v.s;
   box.innerHTML="<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>"+esc(v.t)+"</span>"+extra+"</div>";
