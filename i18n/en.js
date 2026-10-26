@@ -130,8 +130,7 @@ export const TEXT = {
   "Token muy conocido": "Well-known token",
 
   // ---------- my list ----------
-  "★ Siguiendo": "★ Following",
-  "☆ Seguir ": "☆ Follow ",
+  "<span class='ic'>★</span><span class='lb'>Siguiendo</span>": "<span class='ic'>★</span><span class='lb'>Following</span>",
   "<span class='tag seen' title='Ya la analizaste'>Analizada ": "<span class='tag seen' title='You analysed it before'>Analysed ",
   " alto": " high",
   "Analizada ": "Analysed ",
@@ -327,7 +326,7 @@ export const TEXT = {
   "Revisando el token…": "Reviewing the token…",
   "Listo": "Done",
   "Esa dirección es un NFT, no un token. El escáner no revisa NFTs.": "That address is an NFT, not a token. The scanner does not review NFTs.",
-  "'>🔔 Vigilar en Telegram</a>": "'>🔔 Watch on Telegram</a>",
+  "'><span class='ic'>🔔</span><span class='lb'><span class='lg'>Vigilar en </span>Telegram</span></a>": "'><span class='ic'>🔔</span><span class='lb'><span class='lg'>Watch on </span>Telegram</span></a>",
   "Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende": "Alerts you on Telegram if risk rises, liquidity drops or the creator sells",
   "Te avisa en Telegram de lo que compra o vende esta wallet": "Alerts you on Telegram about what this wallet buys or sells",
 
@@ -352,10 +351,10 @@ export const TEXT = {
   ", y lo que no se ha comprobado no se da por bueno. Vuelve a analizarlo en un rato: el veredicto puede bajar a riesgo bajo.": ". What was not checked is never assumed fine. Analyse it again in a while: the verdict may drop to low risk.",
   " Si te pasa a menudo, una URL de Helius (gratis) en Ajustes lo hace más fiable.": " If it happens often, a free Helius URL in Settings makes it more reliable.",
   "riesgo medio por falta de datos": "medium risk due to missing data",
-  "'>Imagen para compartir</button>": "'>Image to share</button>",
-  "' title='Copia un enlace que abre directamente este análisis'>Copiar enlace</button>": "' title='Copy a link that opens this analysis directly'>Copy link</button>",
-  "☆ Seguir token": "☆ Follow token",
-  "'>Buscar ballenas</button>": "'>Find whales</button>",
+  "'><span class='lg'>Imagen para compartir</span><span class='sh'>Descargar</span></button>": "'><span class='lg'>Image to share</span><span class='sh'>Download</span></button>",
+  "' title='Copia un enlace que abre directamente este análisis'><span class='ic'>🔗</span><span class='lb'>Copiar enlace</span></button>": "' title='Copy a link that opens this analysis directly'><span class='ic'>🔗</span><span class='lb'>Copy link</span></button>",
+  "Seguir token": "Follow token",
+  "'><span class='ic'>🐳</span><span class='lb'>Buscar ballenas</span></button></div>": "'><span class='ic'>🐳</span><span class='lb'>Find whales</span></button></div>",
 
   // ---------- wallet verdict ----------
   "Solo tiene tokens de menos de 1 $": "It only holds tokens worth under $1",
@@ -392,7 +391,7 @@ export const TEXT = {
   " tokens de menos de 1 $.": " tokens worth under $1.",
   "<div class='bar' role='img' aria-label='Reparto de tokens por nivel de riesgo'>": "<div class='bar' role='img' aria-label='Tokens by risk level'>",
   "<div class='actions'><button class='btn small' id='copySum' type='button'>Copiar resumen</button>": "<div class='actions'><button class='btn small' id='copySum' type='button'>Copy summary</button>",
-  "☆ Seguir wallet": "☆ Follow wallet",
+  "Seguir wallet": "Follow wallet",
   "<button class='btn ghost small' type='button' id='estPnl'>Estimar resultado</button>": "<button class='btn ghost small' type='button' id='estPnl'>Estimate result</button>",
   "'>Ver en Solscan</a></div>": "'>See on Solscan</a></div>",
   "<div class='hint'>Último resultado estimado: ": "<div class='hint'>Last estimated result: ",
@@ -627,7 +626,7 @@ export const TEXT = {
   "Esa wallet ya estaba en el grupo.": "That wallet was in the group already.",
 
   // ---------- share on X, price alert menu ----------
-  "<details class='pmenu'><summary class='btn small'>💲 Alerta de precio</summary><div class='pmenu-body'>": "<details class='pmenu'><summary class='btn small'>💲 Price alert</summary><div class='pmenu-body'>",
+  "<details class='pmenu'><summary class='btn small'><span class='ic'>💲</span><span class='lb'>Alerta<span class='lg'> de</span> precio</span></summary><div class='pmenu-body'>": "<details class='pmenu'><summary class='btn small'><span class='ic'>💲</span><span class='lb'>Price alert</span></summary><div class='pmenu-body'>",
   "'>📈 Si sube un 50%</a>": "'>📈 If it rises 50%</a>",
   "'>📉 Si baja un 30%</a>": "'>📉 If it drops 30%</a>",
   "'>↕️ Cada vez que se mueva un 20%</a>": "'>↕️ Every time it moves 20%</a>",
@@ -667,7 +666,7 @@ export const TEXT = {
 
   // ---------- share on X with an image ----------
   "' title='Abre X con el texto escrito y una imagen con los datos del análisis'>": "' title='Opens X with the text written and an image with the analysis data'>",
-  "Compartir en X</button>": "Share on X</button>",
+  "<span class='lb'>Compartir en X</span></button>": "<span class='lb'>Share on X</span></button>",
   "lanzador en serie": "serial launcher",
   "bundle en el lanzamiento": "launch bundle",
   "Liquidez": "Liquidity",

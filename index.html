@@ -305,6 +305,29 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 .pc-body>.hint{margin:4px 0 2px}
 #bundlebox{align-items:flex-start} #bundlebox .ld{margin-top:.35em}
 .pmenu-body{min-width:290px} .pmenu-body a{white-space:nowrap}
+/* botones del token: en el ordenador una fila normal; en el móvil, Descargar entero, X · Telegram · Alerta
+   en tres cuadrados y Copiar · Seguir · Ballenas en una barra con separadores */
+.btn .ic,.btn .lb{display:inline}
+.btn .ic+.lb{margin-left:6px}
+.tacts .sh{display:none}
+.trow,.tsub{display:contents}
+@media (max-width:520px){
+  .tacts{display:flex;flex-direction:column;align-items:stretch;gap:10px}
+  .tacts .lg{display:none} .tacts .sh{display:inline}
+  .tacts>.tmain{border-radius:999px;padding:13px 16px;font-size:1.05rem;justify-content:center}
+  .trow{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:10px}
+  .trow>.btn,.trow>.pmenu>summary{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;min-height:74px;border-radius:20px;padding:10px 4px;font-weight:700;font-size:.84rem;text-align:center}
+  .trow>.pmenu{display:block}
+  .trow .ic{font-size:1.5rem;line-height:1}
+  .trow .ic+.lb{margin-left:0}
+  .trow>.xs svg{width:30px;height:30px}
+  .trow>.xs .lb{display:none}
+  .tsub{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface-2);border-radius:18px;overflow:hidden}
+  .tsub>.btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:transparent;border:0;border-radius:0;padding:12px 2px;font-weight:500;font-size:.84rem;text-align:center}
+  .tsub>.btn+.btn{border-left:1px solid var(--line)}
+  .tsub .ic{font-size:1.25rem;line-height:1}
+  .tsub .ic+.lb{margin-left:0}
+}
 @media (max-width:520px){.pmenu-body{position:fixed;left:16px;right:16px;top:auto;bottom:96px;min-width:0}.pmenu-body a{white-space:normal}}
 .pc-body svg{display:block;width:100%;height:170px;touch-action:pan-y}
 .pc-tip{position:absolute;top:0;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:3px 8px;font-size:.78rem;white-space:nowrap;transform:translateX(-50%)}
@@ -480,7 +503,12 @@ function updateCount(){
 }
 function starOn(b,on){
   b.setAttribute("aria-pressed",String(on));
-  b.textContent=b.hasAttribute("data-long")?(on?"★ Siguiendo":"☆ Seguir "+(b.getAttribute("data-long")||"wallet")):(on?"★":"☆");
+  if(b.hasAttribute("data-long")) b.innerHTML=starHtml(b.getAttribute("data-long")||"wallet",on);
+  else b.textContent=on?"★":"☆";
+}
+// Botón largo de seguir: estrella y texto por separado para que en el móvil la estrella vaya encima
+function starHtml(kind,on){
+  return on?"<span class='ic'>★</span><span class='lb'>Siguiendo</span>":"<span class='ic'>☆</span><span class='lb'>"+(kind==="token"?"Seguir token":"Seguir wallet")+"</span>";
 }
 function toggleWallet(addr){
   var e=lista.w[addr]||(lista.w[addr]={fav:false,name:""});
@@ -1085,13 +1113,13 @@ function tokenLink(mint){ return location.origin+location.pathname+"?token="+min
 var TG_BOT="panpontomate_escaner_bot";
 function tgLink(addr){ return "https://t.me/"+TG_BOT+"?start="+encodeURIComponent(addr); }
 function tgBtn(addr,title){
-  return "<a class='btn small tg' target='_blank' rel='noopener' href='"+esc(tgLink(addr))+"' title='"+esc(title)+"'>🔔 Vigilar en Telegram</a>";
+  return "<a class='btn small tg' target='_blank' rel='noopener' href='"+esc(tgLink(addr))+"' title='"+esc(title)+"'><span class='ic'>🔔</span><span class='lb'><span class='lg'>Vigilar en </span>Telegram</span></a>";
 }
 // Alerta de precio: el bot recibe "/start p_<mint>_<a|b|m><n>" (sube n %, baja n %, cada n %) y la deja puesta;
 // solo "p_<mint>" le hace enseñar el precio y cómo elegir otro
 function tgPrice(mint,cond){ return "https://t.me/"+TG_BOT+"?start=p_"+mint+(cond?"_"+cond:""); }
 function priceMenu(mint){
-  return "<details class='pmenu'><summary class='btn small'>💲 Alerta de precio</summary><div class='pmenu-body'>"+
+  return "<details class='pmenu'><summary class='btn small'><span class='ic'>💲</span><span class='lb'>Alerta<span class='lg'> de</span> precio</span></summary><div class='pmenu-body'>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(mint,"a50"))+"'>📈 Si sube un 50%</a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(mint,"b30"))+"'>📉 Si baja un 30%</a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(mint,"m20"))+"'>↕️ Cada vez que se mueva un 20%</a>"+
@@ -1113,7 +1141,7 @@ function xIntent(r){ return "https://x.com/intent/post?text="+encodeURIComponent
 var X_ICON="<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>";
 function xBtn(r){
   if(!r.lights) return "";
-  return "<button class='btn small xs' type='button' data-xshare='"+esc(r.mint)+"' title='Abre X con el texto escrito y una imagen con los datos del análisis'>"+X_ICON+"Compartir en X</button>";
+  return "<button class='btn small xs' type='button' data-xshare='"+esc(r.mint)+"' title='Abre X con el texto escrito y una imagen con los datos del análisis'>"+X_ICON+"<span class='lb'>Compartir en X</span></button>";
 }
 // En la curva de Pump.fun DexScreener no da liquidez y el token salía con «liquidez 0 $»; GeckoTerminal sí
 // sabe lo que hay en la curva (el mismo pool), que es contra lo que se vende
@@ -1194,13 +1222,13 @@ function renderToken(noScroll){
     ringHtml(r)+
     "<h2 class='verdict'>"+esc(r.sym)+": "+esc((dataOnly(r)?"riesgo medio por falta de datos":L.label).toLowerCase())+"</h2>"+
     "<p class='sub'>"+esc(tip)+"</p>"+
-    "<div class='actions'>"+
-      (r.lights?"<button class='btn small' type='button' data-card='"+esc(r.mint)+"'>Imagen para compartir</button>":"")+
-      xBtn(r)+
-      (r.par?tgBtn(r.mint,"Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende")+priceMenu(r.mint):"")+
-      "<button class='btn ghost small' type='button' data-copy='"+esc(tokenLink(r.mint))+"' title='Copia un enlace que abre directamente este análisis'>Copiar enlace</button>"+
-      (r.par?"<button class='btn ghost small' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+(fav?"★ Siguiendo":"☆ Seguir token")+"</button>":"")+
-      "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'>Buscar ballenas</button>"+
+    "<div class='actions tacts'>"+
+      (r.lights?"<button class='btn small tmain' type='button' data-card='"+esc(r.mint)+"'><span class='lg'>Imagen para compartir</span><span class='sh'>Descargar</span></button>":"")+
+      "<div class='trow'>"+xBtn(r)+
+      (r.par?tgBtn(r.mint,"Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende")+priceMenu(r.mint):"")+"</div>"+
+      "<div class='tsub'><button class='btn ghost small' type='button' data-copy='"+esc(tokenLink(r.mint))+"' title='Copia un enlace que abre directamente este análisis'><span class='ic'>🔗</span><span class='lb'>Copiar enlace</span></button>"+
+      (r.par?"<button class='btn ghost small' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
+      "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'>Buscar ballenas</span></button></div>"+
     "</div>";
   $("#filters").style.display="none";
   renderList();
@@ -1275,7 +1303,7 @@ function render(){
     (n?"<div class='bar' role='img' aria-label='Reparto de tokens por nivel de riesgo'>"+segs+"</div><div class='legend'>"+legend+"</div>":"")+
     "<div class='actions'><button class='btn small' id='copySum' type='button'>Copiar resumen</button>"+
     tgBtn(state.wallet,"Te avisa en Telegram de lo que compra o vende esta wallet")+
-    "<button class='btn ghost small' type='button' data-long data-favw='"+esc(state.wallet)+"' aria-pressed='"+(!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"'>"+(lista.w[state.wallet]&&lista.w[state.wallet].fav?"★ Siguiendo":"☆ Seguir wallet")+"</button>"+
+    "<button class='btn ghost small' type='button' data-long data-favw='"+esc(state.wallet)+"' aria-pressed='"+(!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"'>"+starHtml("wallet",!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"</button>"+
     "<button class='btn ghost small' type='button' id='estPnl'>Estimar resultado</button>"+
     "<button class='btn ghost small' type='button' data-long data-addc='"+esc(state.wallet)+"' aria-pressed='"+inCart(state.wallet)+"'>"+(inCart(state.wallet)?"✓ En Confluencia":"⊕ A Confluencia")+"</button>"+
     "<a class='btn ghost small' style='text-decoration:none;display:inline-flex;align-items:center' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(state.wallet)+"'>Ver en Solscan</a></div>"+
@@ -1783,7 +1811,7 @@ async function drawCard(r){
 async function shareCard(mint,btn){
   var r=state.results.filter(function(x){ return x.mint===mint; })[0];
   if(!r||!r.lights) return;
-  var old=btn.textContent; btn.textContent="Generando…";
+  var old=btn.innerHTML; btn.textContent="Generando…";
   try{
     var cv=await drawCard(r);
     var blob=await new Promise(function(ok){ cv.toBlob(ok,"image/png"); });
@@ -1792,15 +1820,15 @@ async function shareCard(mint,btn){
     try{ file=new File([blob],name,{type:"image/png"}); }catch(e){}
     // En el móvil se abre el menú de compartir del sistema; en el ordenador se descarga
     if(file&&navigator.canShare&&navigator.canShare({files:[file]})&&/Android|iPhone|iPad/i.test(navigator.userAgent)){
-      try{ await navigator.share({files:[file],title:r.sym+": "+LEVELS[r.lvl].label}); btn.textContent=old; return; }
-      catch(e){ if(e.name==="AbortError"){ btn.textContent=old; return; } }
+      try{ await navigator.share({files:[file],title:r.sym+": "+LEVELS[r.lvl].label}); btn.innerHTML=old; return; }
+      catch(e){ if(e.name==="AbortError"){ btn.innerHTML=old; return; } }
     }
     var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function(){ URL.revokeObjectURL(a.href); },4000);
-    btn.textContent="Descargada"; setTimeout(function(){ btn.textContent=old; },1600);
+    btn.textContent="Descargada"; setTimeout(function(){ btn.innerHTML=old; },1600);
   }catch(e){
-    btn.textContent="No se pudo generar"; setTimeout(function(){ btn.textContent=old; },2000);
+    btn.textContent="No se pudo generar"; setTimeout(function(){ btn.innerHTML=old; },2000);
   }
 }
 
@@ -2457,8 +2485,8 @@ document.addEventListener("click",function(ev){
   if(an){ ev.preventDefault(); setMode("W"); $("#wallet").value=an.getAttribute("data-analyze"); analyze(); }
 });
 function copyText(t,btn){
-  var old=btn.textContent;
-  function ok(){ btn.textContent="Copiado"; setTimeout(function(){ btn.textContent=old; },1400); }
+  var old=btn.innerHTML;
+  function ok(){ btn.textContent="Copiado"; setTimeout(function(){ btn.innerHTML=old; },1400); }
   function fallback(){
     var ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0";
     document.body.appendChild(ta); ta.select();
