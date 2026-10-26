@@ -309,11 +309,10 @@ details.pmenu>summary::-webkit-details-marker{display:none}
    en tres cuadrados y Copiar · Seguir · Ballenas en una barra con separadores */
 .btn .ic,.btn .lb{display:inline}
 .btn .ic+.lb{margin-left:6px}
-.tacts .sh{display:none}
 .trow,.tsub{display:contents}
 @media (max-width:520px){
   .tacts{display:flex;flex-direction:column;align-items:stretch;gap:10px}
-  .tacts .lg{display:none} .tacts .sh{display:inline}
+  .tacts .lg{display:none}
   .tacts>.tmain{border-radius:999px;padding:13px 16px;font-size:1.05rem;justify-content:center}
   .trow{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:10px}
   .trow>.btn,.trow>.pmenu>summary{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;min-height:74px;border-radius:20px;padding:10px 4px;font-weight:700;font-size:.84rem;text-align:center}
@@ -1141,7 +1140,7 @@ function xIntent(r){ return "https://x.com/intent/post?text="+encodeURIComponent
 var X_ICON="<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>";
 function xBtn(r){
   if(!r.lights) return "";
-  return "<button class='btn small xs' type='button' data-xshare='"+esc(r.mint)+"' title='Opens X with the text written and an image with the analysis data'>"+X_ICON+"<span class='lb'>Share on X</span></button>";
+  return "<button class='btn small xs' type='button' data-xshare='"+esc(r.mint)+"' title='Opens X with the text written and an image with the analysis data'>"+"<span class='lb'>Share on</span>"+X_ICON+"</button>";
 }
 // En la curva de Pump.fun DexScreener no da liquidez y el token salía con «liquidez 0 $»; GeckoTerminal sí
 // sabe lo que hay en la curva (el mismo pool), que es contra lo que se vende
@@ -1223,7 +1222,7 @@ function renderToken(noScroll){
     "<h2 class='verdict'>"+esc(r.sym)+": "+esc((dataOnly(r)?"medium risk due to missing data":L.label).toLowerCase())+"</h2>"+
     "<p class='sub'>"+esc(tip)+"</p>"+
     "<div class='actions tacts'>"+
-      (r.lights?"<button class='btn small tmain' type='button' data-card='"+esc(r.mint)+"'><span class='lg'>Image to share</span><span class='sh'>Download</span></button>":"")+
+      (r.lights?"<button class='btn small tmain' type='button' data-card='"+esc(r.mint)+"'>Download</button>":"")+
       "<div class='trow'>"+xBtn(r)+
       (r.par?tgBtn(r.mint,"Alerts you on Telegram if risk rises, liquidity drops or the creator sells")+priceMenu(r.mint):"")+"</div>"+
       "<div class='tsub'><button class='btn ghost small' type='button' data-copy='"+esc(tokenLink(r.mint))+"' title='Copy a link that opens this analysis directly'><span class='ic'>🔗</span><span class='lb'>Copy link</span></button>"+

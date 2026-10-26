@@ -351,7 +351,7 @@ export const TEXT = {
   ", y lo que no se ha comprobado no se da por bueno. Vuelve a analizarlo en un rato: el veredicto puede bajar a riesgo bajo.": ". What was not checked is never assumed fine. Analyse it again in a while: the verdict may drop to low risk.",
   " Si te pasa a menudo, una URL de Helius (gratis) en Ajustes lo hace más fiable.": " If it happens often, a free Helius URL in Settings makes it more reliable.",
   "riesgo medio por falta de datos": "medium risk due to missing data",
-  "'><span class='lg'>Imagen para compartir</span><span class='sh'>Descargar</span></button>": "'><span class='lg'>Image to share</span><span class='sh'>Download</span></button>",
+  "'>Descargar</button>": "'>Download</button>",
   "' title='Copia un enlace que abre directamente este análisis'><span class='ic'>🔗</span><span class='lb'>Copiar enlace</span></button>": "' title='Copy a link that opens this analysis directly'><span class='ic'>🔗</span><span class='lb'>Copy link</span></button>",
   "Seguir token": "Follow token",
   "'><span class='ic'>🐳</span><span class='lb'>Buscar ballenas</span></button></div>": "'><span class='ic'>🐳</span><span class='lb'>Find whales</span></button></div>",
@@ -666,7 +666,7 @@ export const TEXT = {
 
   // ---------- share on X with an image ----------
   "' title='Abre X con el texto escrito y una imagen con los datos del análisis'>": "' title='Opens X with the text written and an image with the analysis data'>",
-  "<span class='lb'>Compartir en X</span></button>": "<span class='lb'>Share on X</span></button>",
+  "<span class='lb'>Compartir en</span>": "<span class='lb'>Share on</span>",
   "lanzador en serie": "serial launcher",
   "bundle en el lanzamiento": "launch bundle",
   "Liquidez": "Liquidity",
