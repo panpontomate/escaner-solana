@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wallet Scanner</title>
+<title>SolFlag · Solana risk scanner</title>
+<meta name="description" content="Paste any Solana token or wallet and see its red flags: creator control, concentration, liquidity and launch. Free, no sign-up and open source.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Manrope:wght@400;500;600;700&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
 <style>
 /* Concepto: una sola columna, tipo "informe de inspección".
    Arriba el formulario, después un veredicto con barra de riesgo y la lista de tokens ordenada de peor a mejor. */
@@ -341,39 +342,177 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 /* lista de tokens nuevos */
 .ntop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
 .tok .nwhy{color:var(--muted);font-size:.9rem;margin-top:8px}
+
+/* ===== SolFlag: lila oscuro, turquesa pastel, titulares con serifa ===== */
+html:root:root:root:root{
+  --bg:#0e0926; --surface:#18113e; --surface-2:#221a52; --line:#3a2c7a;
+  --fg:#f1eeff; --muted:#c9c1ea; --accent:#7ab8c4; --accent-fg:#140e31;
+  --alto:#ff6b6b; --alto-bg:#3d1f3a;
+  --medio:#fbbf24; --medio-bg:#3a2c18;
+  --bajo:#4ade80; --bajo-bg:#163a2c;
+  --nm:#b4acdc; --nm-bg:#2a2350;
+  --f-display:'Fraunces',Georgia,serif;
+  --f-body:'Manrope','Segoe UI',system-ui,sans-serif;
+  --kick:#8ec5cf;
+}
+body{background:radial-gradient(1100px 720px at 88% -8%,rgba(139,92,246,.38),transparent 62%),radial-gradient(900px 640px at -12% 26%,rgba(192,38,211,.16),transparent 60%),linear-gradient(180deg,#140d33 0%,#0e0926 45%,#0a061c 100%) fixed;background-color:var(--bg);padding-block:0 56px}
+.bgfx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.42;filter:blur(1.2px)}
+.bgflow{stroke-dasharray:70 550;animation:bgFlow 5s linear infinite}
+@keyframes bgFlow{to{stroke-dashoffset:-620}}
+@media (prefers-reduced-motion:reduce){.bgflow{animation:none}.bgmove{display:none}}
+a{color:var(--kick)}
+.wrap{max-width:1180px;gap:24px}
+#progress,#results,#cresults,#lresults,#hresults,#nresults{width:100%;max-width:980px;margin-inline:auto}
+.card,.tok,.lsec,.nm-group,.hrow{background:rgba(24,17,62,.96);border-color:rgba(196,181,253,.3)}
+.card{border-radius:24px}
+.kick{margin:0;color:var(--kick);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+.verdict,.head h3,.scan-t{font-family:var(--f-display)}
+
+/* cabecera */
+.brand{gap:10px 26px;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22);flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo:hover{text-decoration:none}
+.logo svg{width:44px;height:44px;flex:none}
+.wm{font:700 32px/1 'Barlow Condensed','Arial Narrow',sans-serif;letter-spacing:-.01em}
+.wm-a{color:#fff} .wm-b{color:#c4b5fd}
+.brand .tabs{margin:0 0 0 auto;padding:0;background:transparent;gap:2px;flex:0 1 auto}
+.brand .tab{flex:none;background:transparent;color:#e4dffa;padding:8px 12px;font-size:.95rem;font-weight:600;border-radius:10px;display:flex;align-items:center;gap:6px}
+.brand .tab:hover{color:#fff;background:rgba(196,181,253,.08)}
+.brand .tab[aria-selected="true"]{background:transparent;color:var(--kick);box-shadow:inset 0 -2px 0 var(--kick);border-radius:0}
+.tab .ti{display:none;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.botlink{color:#e4dffa;font-weight:600;font-size:.95rem}
+.brand .lang{color:var(--kick);border-color:#6d58c4}
+
+/* portada: texto a la izquierda, escáner a la derecha */
+.hero{display:flex;flex-wrap:wrap;gap:40px 56px;align-items:center;padding:56px 0 24px}
+.hero-txt{flex:1 1 440px;min-width:0}
+.hero-txt h1{font:800 clamp(2.4rem,5.2vw,4.2rem)/1.04 var(--f-display);letter-spacing:-.015em;margin:20px 0 0;color:#f7f4ff}
+.hero-sub{margin:22px 0 0;color:#ddd7f5;font-size:1.15rem;max-width:520px}
+.trust{list-style:none;margin:26px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
+.trust li{border:1px solid #5e4bb0;background:rgba(30,22,74,.95);border-radius:999px;padding:6px 14px;font-size:.88rem;color:#ece8fd}
+.motto{margin:34px 0 0;display:flex;align-items:center;gap:16px;color:var(--muted);font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.motto span{width:48px;height:1px;background:currentColor}
+.hero>.scan{flex:1 1 460px;min-width:0;padding:30px;box-shadow:0 30px 80px rgba(46,16,101,.55);border-color:rgba(196,181,253,.38)}
+.scan-t{margin:8px 0 20px;font-size:1.9rem;font-weight:700;line-height:1.15;color:#f7f4ff}
+.scan .row .btn{flex:1 1 140px}
+.scan .row input{flex:1 1 100%}
+.tryw{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px;font-size:.88rem;color:var(--muted)}
+.tryw .chip{border:1px solid #5e4bb0;color:#f3f0ff}
+.safe{font-size:.82rem}
+/* con un análisis abierto o en otra sección, la portada se recoge: solo queda el escáner */
+body:not(.landing) .hero{padding-top:24px}
+body:not(.landing) .hero-txt,body:not(.landing) #landing{display:none}
+body:not(.landing) .hero>.scan{flex-basis:100%;max-width:980px;margin-inline:auto;padding:20px 22px}
+body:not(.landing) .scan>.kick,body:not(.landing) .scan-t,body:not(.landing) .tryw,body:not(.landing) .safe{display:none}
+body:not(.landing) .scan .row input{flex:1 1 320px}
+body:not(.landing) .scan .row .btn{flex:0 0 auto}
+
+/* secciones de la portada */
+#landing{display:flex;flex-direction:column;gap:56px;padding:40px 0 16px}
+.lhead{display:flex;flex-wrap:wrap;gap:12px 40px;align-items:flex-end;justify-content:space-between}
+.lhead h2,.lsect h2{font:700 clamp(1.8rem,3.4vw,2.8rem)/1.1 var(--f-display);margin:8px 0 0;color:#f7f4ff}
+.lhead p{margin:0;color:var(--muted);max-width:400px}
+.flags5{margin-top:28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.f5{background:rgba(24,17,62,.96);border:1px solid rgba(196,181,253,.3);border-radius:20px;padding:22px}
+.f5 svg{width:26px;height:26px;fill:none;stroke:var(--kick);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.f5 h3{margin:14px 0 6px;font-size:1.05rem}
+.f5 p{margin:0;color:#d3cdef;font-size:.94rem}
+.lsect.two{display:flex;flex-wrap:wrap;gap:20px}
+.lsect.two>.card{flex:1 1 420px;min-width:0;padding:32px}
+.lsect.two h2{font-size:2rem;margin-bottom:18px}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.checks li{padding-left:30px;position:relative}
+.checks li::before{content:"";position:absolute;left:2px;top:.35em;width:14px;height:8px;border-left:2.4px solid var(--kick);border-bottom:2.4px solid var(--kick);transform:rotate(-45deg)}
+.chat{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.chat .me{align-self:flex-end;background:#5340ad;border-radius:16px 16px 4px 16px;padding:9px 14px}
+.chat .bot{background:#120c2c;border:1px solid #44358f;border-radius:16px 16px 16px 4px;padding:11px 15px;color:#ddd7f5;max-width:90%}
+.chat .bot b{color:#ffa3a3}
+a.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+
+/* pie */
+.sitefoot{border-top:1px solid rgba(196,181,253,.22);padding-top:20px}
+.sitefoot .credits{align-items:center}
+.sitefoot .credits .wm{font-size:22px;margin-right:6px}
+
+@media (max-width:860px){.botlink{display:none}}
+@media (max-width:700px){
+  .brand{padding:12px 0}
+  .logo svg{width:36px;height:36px}
+  .wm{font-size:28px}
+  .brand .lang{margin-left:auto}
+  /* la barra de secciones va abajo, como en una app, con iconos */
+  .brand .tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;margin:0;border-radius:0;gap:4px;padding:8px 8px calc(10px + env(safe-area-inset-bottom));background:rgba(14,9,38,.97);border-top:1px solid rgba(196,181,253,.3);display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+  .brand .tab{flex-direction:column;gap:3px;font-size:.68rem;padding:6px 2px;border-radius:12px;min-height:52px;justify-content:center;color:#e4dffa}
+  .brand .tab[aria-selected="true"]{background:var(--accent);color:var(--accent-fg);box-shadow:none;border-radius:12px}
+  .tab .ti{display:block}
+  .tab span span{display:none}
+  .hero{padding-top:28px;gap:24px}
+  .hero>.scan{padding:20px}
+  .scan-t{font-size:1.5rem}
+  .scan .row .btn{flex:1 1 100%}
+  #landing{gap:40px}
+  .lsect.two>.card{padding:22px}
+}
 </style>
 </head>
 <body>
+<svg class="bgfx" aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bgB" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff" stop-opacity=".03"/><stop offset="68%" stop-color="#e9d5ff" stop-opacity=".1"/><stop offset="90%" stop-color="#fff" stop-opacity=".42"/><stop offset="100%" stop-color="#fff" stop-opacity=".06"/></radialGradient>
+    <g id="bgb"><circle r="1" fill="url(#bgB)"/><ellipse cx="-.38" cy="-.44" rx=".24" ry=".11" transform="rotate(-35 -.38 -.44)" fill="#fff" fill-opacity=".6"/></g>
+    <path id="bgr1" d="M-60 120 C300 40 520 260 760 220 S1240 100 1500 300"/>
+    <path id="bgr2" d="M1500 560 C1200 480 1000 760 700 700 S220 560 -60 820"/>
+  </defs>
+  <g fill="none"><use href="#bgr1" stroke="#fff7e0" stroke-width="10" stroke-opacity=".45"/><use href="#bgr1" stroke="#4b2fa0" stroke-width="5"/><use class="bgflow" href="#bgr1" stroke="#fff3c4" stroke-width="2.5" stroke-linecap="round"/>
+  <use href="#bgr2" stroke="#fff7e0" stroke-width="10" stroke-opacity=".45"/><use href="#bgr2" stroke="#4b2fa0" stroke-width="5"/><use class="bgflow" href="#bgr2" stroke="#fff3c4" stroke-width="2.5" stroke-linecap="round" style="animation-delay:-2.5s"/></g>
+  <g class="bgmove">
+    <g><animateMotion dur="60s" repeatCount="indefinite"><mpath href="#bgr1"/></animateMotion><use href="#bgb" transform="scale(40)"/></g>
+    <g><animateMotion dur="60s" repeatCount="indefinite" begin="-30s"><mpath href="#bgr1"/></animateMotion><use href="#bgb" transform="scale(20)"/></g>
+    <g><animateMotion dur="70s" repeatCount="indefinite" begin="-12s"><mpath href="#bgr2"/></animateMotion><use href="#bgb" transform="scale(52)"/></g>
+    <g><animateMotion dur="70s" repeatCount="indefinite" begin="-45s"><mpath href="#bgr2"/></animateMotion><use href="#bgb" transform="scale(24)"/></g>
+  </g>
+  <use href="#bgb" transform="translate(150 480) scale(46)"/><use href="#bgb" transform="translate(1290 420) scale(30)"/><use href="#bgb" transform="translate(520 840) scale(22)"/><use href="#bgb" transform="translate(1100 820) scale(60)"/>
+  <g fill="#fff"><circle cx="90" cy="80" r="2"/><circle cx="610" cy="60" r="2.5"/><circle cx="1120" cy="70" r="2"/><circle cx="220" cy="380" r="1.5"/><circle cx="1010" cy="460" r="1.5"/><circle cx="1360" cy="640" r="2"/><circle cx="380" cy="660" r="1.5"/><circle cx="860" cy="560" r="2"/></g>
+</svg>
 <div class="wrap">
 
   <header class="brand">
-    <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v4M12 16v4M4 12h4M16 12h4"/></svg></div>
-    <div>
-      <h1>Wallet Scanner</h1>
-      <p>Check one token, or every token in a Solana wallet, and spot the signs of a scam.</p>
-    </div>
-    <a class="by" href="https://x.com/elgatotradebtc" target="_blank" rel="noopener" title="Follow me on X">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/></svg>
-      by El Gato Trade
+    <a class="logo" href="/" title="SolFlag, go to the home page">
+      <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="22" fill="#3a2a80" stroke="#a78bfa" stroke-width="2"/><g fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M23 10.5l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M19 12.8l4 2.3 4-2.3M23 15.1v4.6"/><path d="M14 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M10 26.3l4 2.3 4-2.3M14 28.6v4.6"/><path d="M32 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M28 26.3l4 2.3 4-2.3M32 28.6v4.6"/><path d="M19 15.1l-4.6 2.6v6.3M27 15.1l4.6 2.6v6.3M18 30.9L23 33.8l5-2.9"/></g></svg>
+      <span class="wm"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
     </a>
+    <div class="tabs" role="tablist" aria-label="Sections">
+      <button type="button" class="tab" id="tabW" role="tab" aria-selected="true"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Scanner</span></button>
+      <button type="button" class="tab" id="tabH" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13c3-4 7-6 12-5l4-3v6c0 4-4 7-9 7-3 0-5-1-7-3"/></svg><span>Whales</span></button>
+      <button type="button" class="tab" id="tabN" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg><span class="tl-lg">New tokens</span><span class="tl-sm">New</span></button>
+      <button type="button" class="tab" id="tabL" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>My list <span id="lcount"></span></span></button>
+      <button type="button" class="tab" id="tabC" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg><span>Confluence <span id="ccount"></span></span></button>
+    </div>
+    <a class="botlink" href="https://t.me/panpontomate_escaner_bot" target="_blank" rel="noopener">Telegram bot</a>
     <a class="lang" href="https://solflag.com/" hreflang="es" title="Versión en español">ES</a>
   </header>
 
-  <section class="card">
-    <div class="tabs" role="tablist" aria-label="Mode">
-      <button type="button" class="tab" id="tabW" role="tab" aria-selected="true"><span class="tl-lg">Analyse a wallet or token</span><span class="tl-sm">Analyse</span></button>
-      <button type="button" class="tab" id="tabH" role="tab" aria-selected="false"><span class="tl-lg">Find a token’s whales</span><span class="tl-sm">Whales</span></button>
-      <button type="button" class="tab" id="tabL" role="tab" aria-selected="false">My list <span id="lcount"></span></button>
-      <button type="button" class="tab" id="tabC" role="tab" aria-selected="false">Confluence <span id="ccount"></span></button>
-      <button type="button" class="tab" id="tabN" role="tab" aria-selected="false"><span class="tl-lg">New tokens</span><span class="tl-sm">New</span></button>
-    </div>
+  <section class="hero" id="hero">
+  <div class="hero-txt">
+    <p class="kick">Check the flags before you buy</p>
+    <h1>A second look before you jump in.</h1>
+    <p class="hero-sub">SolFlag checks any Solana token or wallet and explains its red flags in plain words: the creator, who holds it, the liquidity and how it launched.</p>
+    <ul class="trust"><li>Free</li><li>No sign-up</li><li>No wallet connection</li><li>Open source</li></ul>
+    <p class="motto"><span></span>Check first. Then decide.</p>
+  </div>
+  <section class="card scan">
+    <p class="kick sk">Solana scanner</p>
+    <h2 class="scan-t">Check a token or a wallet</h2>
     <form id="form" autocomplete="off">
-      <label class="eyebrow" for="wallet">Wallet or token</label>
+      <label class="eyebrow" for="wallet">Address</label>
       <div class="row">
-        <input id="wallet" type="text" spellcheck="false" placeholder="Paste a wallet or a token address">
+        <input id="wallet" type="text" spellcheck="false" placeholder="Paste the token or wallet address here">
         <button class="btn" id="go" type="submit">Analyse</button>
+        <button class="btn ghost" id="goH" type="button">Find whales</button>
       </div>
       <p class="hint" id="whint" hidden></p>
+      <div class="tryw"><span>Try</span><button type="button" class="chip" data-try="DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263">BONK</button><button type="button" class="chip" data-try="JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN">JUP</button><button type="button" class="chip" data-trynew>A token launched just now</button></div>
+      <p class="hint safe">We only read public data. We will never ask for keys, recovery phrases or signatures.</p>
     </form>
     <form id="hform" autocomplete="off" hidden>
       <label class="eyebrow" for="mint">Token address</label>
@@ -408,6 +547,7 @@ details.pmenu>summary::-webkit-details-marker{display:none}
     </div>
     <div class="notice err" id="error" hidden></div>
   </section>
+  </section>
 
   <section class="card prog" id="progress" hidden aria-live="polite">
     <div class="top"><span id="ptext">Getting ready…</span><button class="btn ghost small" id="cancel" type="button">Cancel</button></div>
@@ -438,12 +578,45 @@ details.pmenu>summary::-webkit-details-marker{display:none}
     <div class="list" id="nlist" style="margin-top:14px"></div>
   </section>
 
-  <p class="foot">This helps you spot warning signs. It is not a guarantee or financial advice: a low-risk token can still be a scam. Concentration is computed from individual wallets (pools and programs are excluded), but an exchange or a fund can count as a person.</p>
-  <p class="foot credits">
-    <a href="https://x.com/elgatotradebtc" target="_blank" rel="noopener">Made by @elgatotradebtc on X</a>
-    <a href="https://t.me/panpontomate_escaner_bot" target="_blank" rel="noopener">Telegram alerts</a>
-    <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Open source</a>
-  </p>
+  <div id="landing">
+    <section class="lsect">
+      <div class="lhead"><div><p class="kick">The 5 flags</p><h2>The signals that matter.</h2></div><p>Each flag shows green, amber or red, always with its reason in one sentence.</p></div>
+      <div class="flags5">
+        <div class="f5"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><h3>01 / Creator</h3><p>Whether they can mint more tokens or freeze yours.</p></div>
+        <div class="f5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg><h3>02 / Concentration</h3><p>A few wallets holding a lot, even when they hide in groups.</p></div>
+        <div class="f5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7c3.5 4 6 7.4 6 10.3a6 6 0 0 1-12 0c0-2.9 2.5-6.3 6-10.3z"/></svg><h3>03 / Liquidity</h3><p>Real, inflated or able to be pulled at once.</p></div>
+        <div class="f5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><h3>04 / Dependency</h3><p>Bridges and programs you have to trust.</p></div>
+        <div class="f5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 15-3-3a22 22 0 0 1 2-3.9A12.9 12.9 0 0 1 22 2c0 2.7-.8 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9a2.2 2.2 0 0 0-2.9-.1z"/></svg><h3>05 / Launch</h3><p>Bundles at launch and serial launchers.</p></div>
+      </div>
+    </section>
+    <section class="lsect two">
+      <div class="card">
+        <p class="kick">Why trust it</p><h2>No tricks.</h2>
+        <ul class="checks">
+          <li><b>Open source.</b> The engine is public on GitHub and npm: anyone can review it.</li>
+          <li><b>You never connect your wallet.</b> You only read public blockchain data.</li>
+          <li><b>It explains, not just scores.</b> Every flag says why.</li>
+          <li><b>In English and Spanish.</b></li>
+        </ul>
+      </div>
+      <div class="card">
+        <p class="kick">Telegram bot</p><h2>Let the bot warn you, not the loss.</h2>
+        <div class="chat"><div class="me">/watch $TOKEN</div><div class="bot"><b>The creator is selling</b><br>$TOKEN: medium risk → high risk</div></div>
+        <a class="btn" href="https://t.me/panpontomate_escaner_bot" target="_blank" rel="noopener">Open the bot</a>
+      </div>
+    </section>
+  </div>
+
+  <footer class="sitefoot">
+    <p class="foot">This helps you spot warning signs. It is not a guarantee or financial advice: a low-risk token can still be a scam. Concentration is computed from individual wallets (pools and programs are excluded), but an exchange or a fund can count as a person.</p>
+    <p class="foot credits">
+      <span class="wm"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
+      <a href="https://x.com/elgatotradebtc" target="_blank" rel="noopener">X @elgatotradebtc</a>
+      <a href="https://t.me/Chocolatevegano" target="_blank" rel="noopener">Telegram @Chocolatevegano</a>
+      <a href="https://t.me/panpontomate_escaner_bot" target="_blank" rel="noopener">Alerts bot</a>
+      <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Open source</a>
+    </p>
+  </footer>
 </div>
 
 <script>
@@ -2531,6 +2704,19 @@ document.addEventListener("change",function(ev){
   if(ev.target.id==="cpf"){ conf.pf=ev.target.value; saveConf(); }
 });
 $("#wallet").addEventListener("input",walletHint);
+// Portada: «Buscar ballenas» usa la misma dirección; «Prueba con» rellena y analiza
+$("#goH").addEventListener("click",function(){
+  var v=$("#wallet").value.trim(); setMode("H"); if(v){ $("#mint").value=v; holders(); } else $("#mint").focus();
+});
+document.addEventListener("click",function(ev){
+  var t=ev.target.closest&&ev.target.closest("[data-try]");
+  if(t){ $("#wallet").value=t.getAttribute("data-try"); walletHint(); analyze(); return; }
+  if(ev.target.closest&&ev.target.closest("[data-trynew]")) setMode("N");
+});
+// La portada (texto, banderas, bot) solo se ve en el escáner y mientras no hay un análisis abierto
+function updateLanding(){ document.body.classList.toggle("landing",state.mode==="W"&&$("#results").hidden&&$("#progress").hidden); }
+new MutationObserver(updateLanding).observe(document.querySelector(".wrap"),{subtree:true,attributes:true,attributeFilter:["hidden","aria-selected"]});
+updateLanding();
 
 /* ajustes guardados */
 (function init(){
