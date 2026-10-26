@@ -1,6 +1,6 @@
 # Escáner de Wallets de Solana
 
-**Pruébalo:** https://panpontomate.github.io/escaner-solana/
+**Pruébalo:** https://solflag.com/
 
 Analiza el riesgo de los tokens de una wallet de Solana, o de un token suelto, y explica el motivo de cada aviso. Funciona entero en el navegador: no hay registro ni servidor, y lo que guardas se queda en tu navegador.
 

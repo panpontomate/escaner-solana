@@ -11,8 +11,8 @@
 
 export const CODE = [
   ['<html lang="es">', '<html lang="en">'],
-  ['<a class="lang" href="https://panpontomate.github.io/escaner-solana/en/" hreflang="en" title="English version">EN</a>',
-   '<a class="lang" href="https://panpontomate.github.io/escaner-solana/" hreflang="es" title="Versión en español">ES</a>'],
+  ['<a class="lang" href="https://solflag.com/en/" hreflang="en" title="English version">EN</a>',
+   '<a class="lang" href="https://solflag.com/" hreflang="es" title="Versión en español">ES</a>'],
   // the engine's own texts (traffic lights, signals, progress) in English
   ['SRE.explainLight(l,"es")', 'SRE.explainLight(l,"en")'],
   ['SRE.describe(x,"es")', 'SRE.describe(x,"en")'],
