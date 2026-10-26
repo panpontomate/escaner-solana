@@ -458,6 +458,30 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 @media (max-width:860px){.tgrid{grid-template-columns:1fr}}
 @media (max-width:620px){.tsum{justify-content:center}#summary{padding:20px}.tsum-t{flex-basis:100%}}
 
+/* ballenas: resumen con 4 cifras; holders a la izquierda, grupos, creador y excluidas a la derecha */
+#hresults{max-width:1180px}
+#hsummary{padding:30px}
+.htiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:22px}
+.htiles>div{background:#1d1550;border:1px solid #3a2c7a;border-radius:18px;padding:16px 18px;display:flex;flex-direction:column}
+.htiles span{color:var(--muted);font-size:.88rem}
+.htiles b{font:800 2rem/1.15 var(--f-display);color:#fff;margin-top:4px}
+.htiles small{color:var(--nm);font-size:.82rem;font-weight:700}
+.htiles small.warnc{color:var(--medio)}
+.hgrid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
+.hmain{display:flex;flex-direction:column;gap:10px;min-width:0}
+.hmain>.tgt{margin:4px 0 4px}
+.hside2{display:flex;flex-direction:column;gap:16px;min-width:0}
+.hside2>.card,.hside2>.lsec{padding:22px}
+.hcard .tgt{font-size:1.35rem}
+.hgrp{background:#1d1550;border:1px solid #3a2c7a;border-radius:14px;padding:12px 14px;margin-top:10px}
+.hgrp-h{display:flex;justify-content:space-between;gap:10px}
+.hgrp-h b:first-child{color:var(--medio)}
+.hgrp p{margin:4px 0 0;color:#d3cdef;font-size:.92rem}
+.hex{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:.92rem;color:#d3cdef}
+.hex:first-of-type{border-top:0;margin-top:8px}
+@media (max-width:960px){.hgrid{grid-template-columns:1fr}}
+@media (max-width:620px){#hsummary{padding:20px}.htiles{grid-template-columns:repeat(2,minmax(0,1fr))}.htiles b{font-size:1.6rem}}
+
 /* radar de la portada */
 .rdgrid{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
 .rdc{display:flex;flex-direction:column;gap:10px;background:rgba(24,17,62,.96);border:1px solid rgba(196,181,253,.3);border-radius:20px;padding:20px 22px;color:var(--fg);text-decoration:none;min-height:120px;box-sizing:border-box}
@@ -2624,6 +2648,12 @@ function renderHolders(keep){
         "<div class='stat'><div class='eyebrow'>People / others</div><div class='v'>"+wallets.length+" / "+(bots.length+progs.length)+"</div></div>"+
       "</div>"+
     "</div>"+
+    "<div class='htiles'>"+
+      "<div><span>People</span><b>"+esc(fmtPct(sumW))+"</b><small>"+wallets.length+" wallets</small></div>"+
+      "<div><span>Pools and programs</span><b>"+esc(fmtPct(progs.reduce(function(a,r){return a+r.pct;},0)))+"</b><small>not whales</small></div>"+
+      "<div><span>Groups by funder</span><b>"+numGroups+"</b><small"+(numGroups?" class='warnc'":"")+">"+clusteredAddrs.length+" linked wallets</small></div>"+
+      "<div><span>Excluded</span><b>"+bots.length+"</b><small>bots or exchanges</small></div>"+
+    "</div>"+
     "<h2 class='verdict'>"+(wallets.length?(wallets.length===1?"1 of the "+rows.length+" largest accounts looks like a person":wallets.length+" of the "+rows.length+" largest accounts look like people"):"None of the "+rows.length+" largest accounts looks like a person")+"</h2>"+
     "<p class='sub'>People hold "+esc(fmtPct(sumW))+" of the supply; bots, exchanges or very active accounts "+esc(fmtPct(bots.reduce(function(a,r){return a+r.pct;},0)))+" and pools or programs "+esc(fmtPct(progs.reduce(function(a,r){return a+r.pct;},0)))+"."+
       (auth.length?" Note: "+esc(auth.join(" and "))+".":"")+
@@ -2636,7 +2666,25 @@ function renderHolders(keep){
     (wallets.length?"<button class='btn small ghost' id='addAllH' type='button'>⊕ Add the "+wallets.length+" people to Confluence</button>":"")+
     "<a class='btn ghost small' style='text-decoration:none;display:inline-flex;align-items:center' target='_blank' rel='noopener' href='https://solscan.io/token/"+esc(h.mint)+"'>See on Solscan</a></div>";
 
-  $("#hlist").innerHTML=creatorHtml(h.creator)+(shown.length?"":"<div class='more'>No wallets of people among the 20 largest accounts. Tick the box above to see the rest.</div>")+shown.map(function(r){
+  // Columna derecha: grupos por financiador, creador y cuentas excluidas
+  var groups={};
+  clusteredAddrs.forEach(function(a){
+    var c=clusters[a], g=groups[c.id]||(groups[c.id]={id:c.id,funder:c.funder,n:0,pct:0});
+    g.n++; rows.forEach(function(r){ if(r.owner===a) g.pct+=r.pct; });
+  });
+  var glist=Object.keys(groups).map(function(k){ return groups[k]; }).sort(function(a,b){ return b.pct-a.pct; });
+  var side="<div class='card hcard'><p class='kick'>Groups by funder</p><h3 class='tgt'>Wallets that move together</h3>"+
+    (glist.length?glist.map(function(g){
+      return "<div class='hgrp'><div class='hgrp-h'><b>Group "+esc(g.id)+"</b><b>"+esc(fmtPct(g.pct))+"</b></div>"+
+        "<p>"+g.n+" wallets funded by <a class='mono' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(g.funder)+"'>"+esc(short(g.funder))+"</a></p></div>";
+    }).join(""):"<p class='hint'>No group sharing the same source of funds among the people.</p>")+
+    "</div>"+
+    creatorHtml(h.creator)+
+    "<div class='card hcard'><p class='kick'>Excluded</p>"+
+      "<div class='hex'><span>"+bots.length+" very active accounts (bots, exchanges, market makers)</span><b>"+esc(fmtPct(bots.reduce(function(a,r){return a+r.pct;},0)))+"</b></div>"+
+      "<div class='hex'><span>"+progs.length+" pools or programs</span><b>"+esc(fmtPct(progs.reduce(function(a,r){return a+r.pct;},0)))+"</b></div>"+
+    "</div>";
+  $("#hlist").innerHTML="<div class='hgrid'><div class='hmain'><h3 class='tgt'>Top holders</h3>"+(shown.length?"":"<div class='more'>No wallets of people among the 20 largest accounts. Tick the box above to see the rest.</div>")+shown.map(function(r){
     var isW=r.kind==="wallet";
     return "<article class='hrow"+(isW?"":" prog")+"'>"+
       "<div class='rk'>"+r.rank+"</div>"+
@@ -2652,7 +2700,7 @@ function renderHolders(keep){
       "<div class='hside'><div class='pc'>"+esc(fmtPct(r.pct))+"</div>"+
         (isW?"<div class='hp'><button class='btn small ghost' type='button' data-analyze='"+esc(r.owner)+"'>Analyse</button><button class='star' type='button' data-favw='"+esc(r.owner)+"' aria-pressed='"+(!!(lista.w[r.owner]&&lista.w[r.owner].fav))+"' title='Follow this wallet' aria-label='Follow this wallet'>"+((lista.w[r.owner]&&lista.w[r.owner].fav)?"★":"☆")+"</button>"+plusBtn(r.owner)+"</div>":"")+
       "</div></article>";
-  }).join("");
+  }).join("")+"</div><aside class='hside2'>"+side+"</aside></div>";
   state.shown.H=true;
   if(state.mode==="H") $("#hresults").hidden=false;
   if(!keep) $("#hresults").scrollIntoView({behavior:"smooth",block:"start"});

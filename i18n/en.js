@@ -46,6 +46,21 @@ export const CODE = [
 
 export const TEXT = {
   // ---------- SolFlag: cabecera, portada y pie (oct 2026) ----------
+  "<div><span>Personas</span><b>": "<div><span>People</span><b>",
+  "<div><span>Pools y programas</span><b>": "<div><span>Pools and programs</span><b>",
+  "</b><small>no son ballenas</small></div>": "</b><small>not whales</small></div>",
+  "<div><span>Grupos por financiador</span><b>": "<div><span>Groups by funder</span><b>",
+  " wallets conectadas</small></div>": " linked wallets</small></div>",
+  "<div><span>Excluidas</span><b>": "<div><span>Excluded</span><b>",
+  "</b><small>bots o exchanges</small></div>": "</b><small>bots or exchanges</small></div>",
+  "<div class='card hcard'><p class='kick'>Grupos por financiador</p><h3 class='tgt'>Wallets que se mueven juntas</h3>": "<div class='card hcard'><p class='kick'>Groups by funder</p><h3 class='tgt'>Wallets that move together</h3>",
+  "<div class='hgrp'><div class='hgrp-h'><b>Grupo ": "<div class='hgrp'><div class='hgrp-h'><b>Group ",
+  " wallets financiadas por <a class='mono' target='_blank' rel='noopener' href='https://solscan.io/account/": " wallets funded by <a class='mono' target='_blank' rel='noopener' href='https://solscan.io/account/",
+  "<p class='hint'>Ningún grupo con el mismo origen de fondos entre las personas.</p>": "<p class='hint'>No group sharing the same source of funds among the people.</p>",
+  "<div class='card hcard'><p class='kick'>Excluidas</p>": "<div class='card hcard'><p class='kick'>Excluded</p>",
+  " cuentas muy activas (bots, exchanges, market makers)</span><b>": " very active accounts (bots, exchanges, market makers)</span><b>",
+  " pools o programas</span><b>": " pools or programs</span><b>",
+  "<div class='hgrid'><div class='hmain'><h3 class='tgt'>Mayores holders</h3>": "<div class='hgrid'><div class='hmain'><h3 class='tgt'>Top holders</h3>",
   "precaución": "caution",
   "sin comprobar": "not checked",
   "Volumen 24 h": "24h volume",
