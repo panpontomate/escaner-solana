@@ -80,7 +80,7 @@ export const TEXT = {
   " tokens recién lanzados…": " freshly launched tokens…",
   "Revisados los ": "Checked the ",
   " últimos lanzamientos, ": " latest launches, ",
-  "En directo": "Live",
+  "En tiempo real": "Real time",
   "Radar de red flags.": "Red flag radar.",
   "Los últimos tokens lanzados en Solana, revisados con las 5 banderas. Arriba, los más peligrosos.": "The latest Solana launches, checked with the 5 flags. The most dangerous come first.",
   "Ver todos los tokens nuevos →": "See all new tokens →",
