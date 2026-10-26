@@ -10,6 +10,10 @@
 // wallet, token, con, spam, hoy, cancelado, helius, sol, dex) are deliberately not here.
 
 export const CODE = [
+  // link previews (X, Telegram, WhatsApp): English image and address
+  ['<meta property="og:url" content="https://solflag.com/">', '<meta property="og:url" content="https://solflag.com/en/">'],
+  ['<meta property="og:image" content="https://solflag.com/og.png">', '<meta property="og:image" content="https://solflag.com/og-en.png">'],
+  ['<meta name="twitter:image" content="https://solflag.com/og.png">', '<meta name="twitter:image" content="https://solflag.com/og-en.png">'],
   ['<html lang="es">', '<html lang="en">'],
   ['<a class="lang" href="https://solflag.com/en/" hreflang="en" title="English version">EN</a>',
    '<a class="lang" href="https://solflag.com/" hreflang="es" title="Versión en español">ES</a>'],
@@ -46,6 +50,7 @@ export const CODE = [
 
 export const TEXT = {
   // ---------- SolFlag: cabecera, portada y pie (oct 2026) ----------
+  "Contamos visitas y análisis de forma anónima, sin cookies ni datos personales.": "We count visits and analyses anonymously, with no cookies and no personal data.",
   "Blog · Avances": "Blog · Updates (Spanish)",
   "Sin revisar todavía": "Not checked yet",
   "No aplica: mercado de más de 7 días": "Not applicable: market older than 7 days",

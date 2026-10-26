@@ -5,9 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SolFlag · Solana risk scanner</title>
 <meta name="description" content="Paste any Solana token or wallet and see its red flags: creator control, concentration, liquidity and launch. Free, no sign-up and open source.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SolFlag">
+<meta property="og:title" content="SolFlag · Solana risk scanner">
+<meta property="og:description" content="Paste any Solana token or wallet and see its red flags: creator control, concentration, liquidity and launch. Free, no sign-up and open source.">
+<meta property="og:url" content="https://solflag.com/en/">
+<meta property="og:image" content="https://solflag.com/og-en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@elgatotradebtc">
+<meta name="twitter:image" content="https://solflag.com/og-en.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Manrope:wght@400;500;600;700&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
+<!-- Estadísticas anónimas sin cookies (GoatCounter): visitas y cuántos análisis se hacen, nada personal -->
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <style>
 /* Concepto: una sola columna, tipo "informe de inspección".
    Arriba el formulario, después un veredicto con barra de riesgo y la lista de tokens ordenada de peor a mejor. */
@@ -685,6 +698,7 @@ a.rdc{transition:transform .15s,border-color .15s}
 
   <footer class="sitefoot">
     <p class="foot">This helps you spot warning signs. It is not a guarantee or financial advice: a low-risk token can still be a scam. Concentration is computed from individual wallets (pools and programs are excluded), but an exchange or a fund can count as a person.</p>
+    <p class="foot">We count visits and analyses anonymously, with no cookies and no personal data.</p>
     <p class="foot credits">
       <span class="wm"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
       <a href="https://x.com/elgatotradebtc" target="_blank" rel="noopener">X @elgatotradebtc</a>
@@ -1309,7 +1323,7 @@ async function analyze(){
   $("#go").disabled=true; $("#results").hidden=true; state.shown.W=false; $("#progress").hidden=false;
   try{
     setProgress("Checking the address…",0.01);
-    if(await isMint(wallet)){ await checkToken(wallet); return; }
+    if(await isMint(wallet)){ await checkToken(wallet); track("scan-token"); return; }
     setUrl(""); state.token=null;
     setProgress("Reading the wallet…",0.02);
     var w=await getTokens(wallet);
@@ -1317,7 +1331,7 @@ async function analyze(){
     state.sol=w.sol; state.bal=w.tokens;
     if(!mints.length){
       state.results=[]; state.hidden=0; state.total=0;
-      render(); return;
+      render(); track("scan-wallet"); return;
     }
     setProgress("Fetching prices and liquidity…",0.08);
     var mkr=await getMarkets(mints,function(d,n){ setProgress("Fetching prices and liquidity… "+d+"/"+n,0.08+0.12*d/n); });
@@ -1344,7 +1358,7 @@ async function analyze(){
       return ORDER.indexOf(a.lvl)-ORDER.indexOf(b.lvl)||(b.sev||0)-(a.sev||0)||b.pts-a.pts||b.valor-a.valor;
     });
     state.results=out; state.hidden=hidden; state.total=mints.length;
-    render();
+    render(); track("scan-wallet");
   }catch(e){
     if(e.message!=="cancelado") showError(friendlyError(e));
   }finally{
@@ -1355,6 +1369,10 @@ async function analyze(){
 /* ---------- revisar un token suelto ---------- */
 function ownRpc(){ return state.rpc!==PUBLIC_RPC; }
 // Deja en la barra de direcciones un enlace que abre directamente este token
+// Cuenta un uso (análisis, ballenas, compartir…) en las estadísticas anónimas; si no cargan, no pasa nada
+function track(name){
+  try{ if(window.goatcounter&&goatcounter.count) goatcounter.count({path:name+(document.documentElement.lang==="en"?"-en":""),title:name,event:true}); }catch(e){}
+}
 function setUrl(mint){
   try{ history.replaceState(null,"",location.pathname+(mint?"?token="+mint:"")); }catch(e){}
 }
@@ -2196,6 +2214,7 @@ async function drawCard(r){
   return c;
 }
 async function shareCard(mint,btn){
+  track("download-image");
   var r=state.results.filter(function(x){ return x.mint===mint; })[0];
   if(!r||!r.lights) return;
   var old=btn.innerHTML; btn.textContent="Generating…";
@@ -2283,6 +2302,7 @@ async function drawXCard(r){
 }
 function btnSay(btn,html,ms){ var old=btn.innerHTML; btn.innerHTML=html; setTimeout(function(){ btn.innerHTML=old; },ms); }
 async function shareX(mint,btn){
+  track("share-x");
   var r=state.results.filter(function(x){ return x.mint===mint; })[0];
   if(!r||!r.lights||btn.disabled) return;
   var url=xIntent(r), name="risk-"+r.sym.replace(/[^\w-]+/g,"").slice(0,20)+".png";
@@ -2380,7 +2400,7 @@ async function holders(){
     state.hold={mint:mint,sym:(par&&par.baseToken&&par.baseToken.symbol)||short(mint),
       name:(par&&par.baseToken&&par.baseToken.name)||"",price:hr.price,rows:hr.rows,
       mintAuth:!!b.info.mintAuth,freezeAuth:!!b.info.freezeAuth,clusters:clusters,hotGroups:hotGroups,creator:creator};
-    renderHolders();
+    renderHolders(); track("whales");
   }catch(e){
     if(e.message!=="cancelado") showError(friendlyError(e));
   }finally{
@@ -2925,8 +2945,12 @@ $("#goH").addEventListener("click",function(){
   var v=$("#wallet").value.trim(); setMode("H"); if(v){ $("#mint").value=v; holders(); } else $("#mint").focus();
 });
 document.addEventListener("click",function(ev){
+  if(ev.target.closest){
+    if(ev.target.closest("a[href*='t.me/panpontomate_escaner_bot']")) track("telegram");
+    if(ev.target.closest(".rdc[data-analyze]")) track("radar");
+  }
   var t=ev.target.closest&&ev.target.closest("[data-try]");
-  if(t){ $("#wallet").value=t.getAttribute("data-try"); walletHint(); analyze(); return; }
+  if(t){ track("try-example"); $("#wallet").value=t.getAttribute("data-try"); walletHint(); analyze(); return; }
   if(ev.target.closest&&ev.target.closest("[data-trynew]")) setMode("N");
 });
 // La portada (texto, banderas, bot) solo se ve en el escáner y mientras no hay un análisis abierto
