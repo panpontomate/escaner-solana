@@ -46,6 +46,21 @@ export const CODE = [
 
 export const TEXT = {
   // ---------- SolFlag: cabecera, portada y pie (oct 2026) ----------
+  "precaución": "caution",
+  "sin comprobar": "not checked",
+  "Volumen 24 h": "24h volume",
+  "Edad": "Age",
+  "<div class='tgrid'><div class='tcol'><p class='kick'>Las 5 banderas</p><h3 class='tgt'>Por qué sale así</h3>": "<div class='tgrid'><div class='tcol'><p class='kick'>The 5 flags</p><h3 class='tgt'>Why it scores this way</h3>",
+  "No se pudo cargar el radar ahora mismo.": "The radar could not load right now.",
+  "Buscando los últimos lanzamientos…": "Looking for the latest launches…",
+  "Revisando ": "Checking ",
+  " tokens recién lanzados…": " freshly launched tokens…",
+  "Revisados los ": "Checked the ",
+  " últimos lanzamientos, ": " latest launches, ",
+  "En directo": "Live",
+  "Radar de red flags.": "Red flag radar.",
+  "Los últimos tokens lanzados en Solana, revisados con las 5 banderas. Arriba, los más peligrosos.": "The latest Solana launches, checked with the 5 flags. The most dangerous come first.",
+  "Ver todos los tokens nuevos →": "See all new tokens →",
   "SolFlag · Escáner de riesgo de Solana": "SolFlag · Solana risk scanner",
   "Pega cualquier token o wallet de Solana y mira sus red flags: control del creador, concentración, liquidez y lanzamiento. Gratis, sin registro y de código abierto.": "Paste any Solana token or wallet and see its red flags: creator control, concentration, liquidity and launch. Free, no sign-up and open source.",
   "SolFlag, ir a la portada": "SolFlag, go to the home page",

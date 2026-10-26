@@ -435,6 +435,45 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .sitefoot .credits{align-items:center}
 .sitefoot .credits .wm{font-size:22px;margin-right:6px}
 
+/* resultado de un token: aro a la izquierda, veredicto y cifras a la derecha */
+.tsum{display:flex;flex-wrap:wrap;gap:20px 34px;align-items:center}
+.tsum .ringbox{margin:0;flex:none}
+.tsum-t{flex:1 1 420px;min-width:0}
+.tsum-t .verdict{font-size:clamp(1.8rem,3.4vw,2.7rem);margin:10px 0 8px;color:#f7f4ff}
+.tmint{margin-top:6px;color:var(--muted);font-size:.78rem;overflow-wrap:anywhere}
+.tchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.tchips span{background:#2e2268;border-radius:12px;padding:7px 13px;font-size:.88rem;color:var(--muted)}
+.tchips b{color:#fff;font-variant-numeric:tabular-nums}
+#summary{padding:30px}
+#summary .tacts{padding-top:20px;border-top:1px solid var(--line)}
+.tgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;margin-top:16px;align-items:start}
+.tgt{font:700 1.6rem/1.2 var(--f-display);margin:6px 0 12px;color:#f7f4ff}
+.tcol .lights{margin-top:0}
+.tcol .pchart{margin-top:0}
+.lfl{font-style:normal;font-size:.78rem;font-weight:700;margin-left:4px}
+.lt-ok .lfl{color:var(--bajo)} .lt-warn .lfl{color:var(--medio)} .lt-bad .lfl{color:var(--alto)} .lt-na .lfl{color:var(--nm)}
+.tok .lt{background:#1d1550;border-color:#3a2c7a}
+#hsummary .verdict,#nsummary .verdict{font-size:clamp(1.6rem,3vw,2.3rem);color:#f7f4ff}
+.hrow .rk{background:#2e2268}
+@media (max-width:860px){.tgrid{grid-template-columns:1fr}}
+@media (max-width:620px){.tsum{justify-content:center}#summary{padding:20px}.tsum-t{flex-basis:100%}}
+
+/* radar de la portada */
+.rdgrid{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.rdc{display:flex;flex-direction:column;gap:10px;background:rgba(24,17,62,.96);border:1px solid rgba(196,181,253,.3);border-radius:20px;padding:20px 22px;color:var(--fg);text-decoration:none;min-height:120px;box-sizing:border-box}
+a.rdc:hover{text-decoration:none;border-color:var(--kick);transform:translateY(-2px)}
+a.rdc{transition:transform .15s,border-color .15s}
+.rdh{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rdh b{font-size:1.1rem;overflow-wrap:anywhere}
+.rdw{color:#ece8fd;font-size:.98rem;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;line-clamp:4;overflow:hidden}
+.rdm{color:var(--nm);font-size:.82rem;margin-top:auto}
+.rdwait{opacity:.5}
+.rdwait .rdh b,.rdwait .rdw{background:#2e2268;border-radius:8px;width:60%}
+.rdwait .rdw{width:90%;height:1.2em}
+.rdfoot{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;margin:18px 0 0;color:var(--nm);font-size:.88rem}
+.rdfoot a{font-weight:700}
+@media (prefers-reduced-motion:reduce){a.rdc{transition:none}a.rdc:hover{transform:none}}
+
 @media (max-width:860px){.botlink{display:none}}
 @media (max-width:700px){
   .brand{padding:12px 0}
@@ -580,6 +619,11 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
   </section>
 
   <div id="landing">
+    <section class="lsect" id="radar">
+      <div class="lhead"><p class="kick">En directo</p><h2>Radar de red flags.</h2><p>Los últimos tokens lanzados en Solana, revisados con las 5 banderas. Arriba, los más peligrosos.</p></div>
+      <div class="rdgrid" id="rdlist"></div>
+      <p class="rdfoot"><span id="rdstat"></span><a href="#" data-trynew>Ver todos los tokens nuevos →</a></p>
+    </section>
     <section class="lsect">
       <div class="lhead"><div><p class="kick">Las 5 banderas</p><h2>Las señales que importan.</h2></div><p>Cada bandera sale verde, amarilla o roja, y siempre con su motivo en una frase.</p></div>
       <div class="flags5">
@@ -1177,6 +1221,7 @@ var TYPES={
   ABIERTO:{label:"Token abierto",note:"Sin autoridades del creador, típico de memecoins y proyectos nuevos. Pesan sobre todo la concentración en personas y la liquidez."}
 };
 var LKEYS={ctl:"Control del creador",con:"Concentración",mkt:"Mercado y salida",dep:"Dependencia"};
+var FLAGTXT={ok:"green flag",warn:"precaución",bad:"red flag",na:"sin comprobar"};
 var RANKS={ok:0,na:0,warn:1,bad:2};
 // "Medio" sin ninguna señal concreta: solo porque algún chequeo no se pudo hacer (p. ej. holders sin Helius).
 // Se dice expresamente para que no parezca que el escáner marca todo igual
@@ -1390,11 +1435,21 @@ function renderToken(noScroll){
     tip="No hay ninguna señal de alerta concreta: sale como riesgo medio solo porque falta comprobar "+missingText(r)+", y lo que no se ha comprobado no se da por bueno. Vuelve a analizarlo en un rato: el veredicto puede bajar a riesgo bajo.";
     if(!ownRpc()) tip+=" Si te pasa a menudo, una URL de Helius (gratis) en Ajustes lo hace más fiable.";
   }
+  var par=r.par||{}, chips=[];
+  if(r.par){
+    chips.push(["Precio",priceUsd(Number(par.priceUsd||0))]);
+    chips.push(["Liquidez",usd((par.liquidity&&par.liquidity.usd)||0)]);
+    chips.push(["Volumen 24 h",usd((par.volume&&par.volume.h24)||0)]);
+    if(par.pairCreatedAt) chips.push(["Edad",ago(par.pairCreatedAt)]);
+  }
   $("#summary").innerHTML=
-    "<div class='eyebrow'>Token</div><div class='mono' style='margin-top:4px;overflow-wrap:anywhere'>"+esc(r.mint)+"</div>"+
-    ringHtml(r)+
+    "<div class='tsum'>"+ringHtml(r)+
+    "<div class='tsum-t'><p class='kick'>Token"+(r.type?" · "+esc(TYPES[r.type].label):"")+"</p>"+
+    "<div class='mono tmint'>"+esc(r.mint)+"</div>"+
     "<h2 class='verdict'>"+esc(r.sym)+": "+esc((dataOnly(r)?"riesgo medio por falta de datos":L.label).toLowerCase())+"</h2>"+
     "<p class='sub'>"+esc(tip)+"</p>"+
+    (chips.length?"<div class='tchips'>"+chips.map(function(c){ return "<span>"+esc(c[0])+" <b>"+esc(c[1])+"</b></span>"; }).join("")+"</div>":"")+
+    "</div></div>"+
     "<div class='actions tacts'>"+
       (r.lights?"<button class='btn small tmain' type='button' data-card='"+esc(r.mint)+"'>Descargar</button>":"")+
       "<div class='trow'>"+xBtn(r)+
@@ -1529,12 +1584,16 @@ function renderList(){
       "<div style='min-width:0'>"+
         "<div class='head'><h3>"+esc(r.sym)+(r.name?"<span>"+esc(r.name)+"</span>":"")+"</h3><span class='hp'><span class='pill'>"+esc(lvlLabel(r))+"</span><button class='star' type='button' data-favt='"+esc(r.mint)+"' aria-pressed='"+(!!lista.t[r.mint])+"' title='Seguir este token' aria-label='Seguir este token'>"+(lista.t[r.mint]?"★":"☆")+"</button></span></div>"+
         "<div class='meta'>"+meta.join("")+"</div>"+
-        (r.lights?
-          "<div class='lights'>"+r.lights.map(function(l){
-            return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div><b>"+LKEYS[l.k]+"</b><span>"+esc(l.t)+"</span></div></div>";
+        (function(){
+          var lh=r.lights?"<div class='lights'>"+r.lights.map(function(l){
+            return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div><b>"+LKEYS[l.k]+" <em class='lfl'>"+esc(FLAGTXT[l.s]||"")+"</em></b><span>"+esc(l.t)+"</span></div></div>";
           }).join("")+"</div>"+(r.type&&r.type!=="ABIERTO"?"<p class='tnote'>"+esc(TYPES[r.type].note)+"</p>":"")
-          :"<ul class='why'>"+why+"</ul>")+
-        (state.token===r?tokenExtrasHtml(r):"")+
+          :"<ul class='why'>"+why+"</ul>";
+          // Un token suelto: banderas a la izquierda y gráfica, lanzamiento e historial a la derecha
+          if(state.token!==r) return lh;
+          return "<div class='tgrid'><div class='tcol'><p class='kick'>Las 5 banderas</p><h3 class='tgt'>Por qué sale así</h3>"+lh+"</div>"+
+            "<div class='tcol'>"+tokenExtrasHtml(r)+"</div></div>";
+        })()+
         "<div class='links'>"+links+"</div>"+
       "</div></article>";
   }).join("");
@@ -1863,6 +1922,65 @@ function nrowHtml(x){
     (x.pool?"<a href='https://dexscreener.com/solana/"+esc(x.pool)+"' target='_blank' rel='noopener'>DexScreener</a>":"")+"</div></div></article>";
 }
 
+/* ---------- radar de la portada: los últimos lanzamientos, los más peligrosos primero ---------- */
+// Revisa pocos tokens y de uno en uno para no frenar los análisis de quien está usando la web,
+// y se para en cuanto la portada deja de verse
+var RADAR_N=10, RADAR_SHOW=4, radar={run:0,ts:0,rows:null,err:false};
+var SEV={ALTO:0,MEDIO:1,BAJO:2};
+function topWhy(r){
+  var l0=r.lights&&(r.lights.filter(function(l){ return l.s==="bad"; })[0]||r.lights.filter(function(l){ return l.s==="warn"; })[0]);
+  return l0?l0.t:(r.why[0]||"Sin señales de alerta en los chequeos");
+}
+async function loadRadar(){
+  if(!document.body.classList.contains("landing")) return;
+  var run=++radar.run; radar.ts=Date.now(); radar.rows=null; radar.err=false; paintRadar();
+  try{
+    var j=await jfetch(GT+"new_pools?page=1&include=base_token");
+    var toks={}; (j.included||[]).forEach(function(t){ toks[t.id]=t.attributes||{}; });
+    var seen={}, rows=[];
+    (j.data||[]).forEach(function(p){
+      if(rows.length>=RADAR_N) return;
+      var rel=p.relationships||{}, id=rel.base_token&&rel.base_token.data&&rel.base_token.data.id, m=id&&id.replace(/^solana_/,"");
+      if(!m||seen[m]||KNOWN[m]) return;
+      seen[m]=1;
+      var a=p.attributes||{}, t=toks[id]||{};
+      var x={mint:m,sym:t.symbol||String(a.name||"?").split(" / ")[0],dex:(rel.dex&&rel.dex.data&&rel.dex.data.id)||"",
+        created:Date.parse(a.pool_created_at)||0,liq:Number(a.reserve_in_usd)||0,r:null,st:"wait"};
+      x.gt=gtPairFrom(a,x.dex,{address:m,symbol:x.sym,name:t.name||"",img:null});
+      rows.push(x);
+    });
+    if(run!==radar.run) return;
+    radar.rows=rows; paintRadar();
+    var mk=await getMarkets(rows.map(function(x){ return x.mint; }));
+    await pool(rows,1,async function(x){
+      if(run!==radar.run||!document.body.classList.contains("landing")) return;
+      var par=mk.data[x.mint]||x.gt;
+      await fillLiquidity(par,x.liq);
+      try{ x.r=await assess(x.mint,par,0,false); }catch(e){ x.r=null; }
+      x.st="done";
+      if(run===radar.run) paintRadar();
+    });
+  }catch(e){ if(run===radar.run){ radar.err=true; paintRadar(); } }
+}
+function paintRadar(){
+  var box=$("#rdlist"); if(!box) return;
+  var rows=radar.rows||[], done=rows.filter(function(x){ return x.st==="done"; });
+  var top=done.filter(function(x){ return x.r&&SEV[x.r.lvl]!==undefined; })
+    .sort(function(a,b){ return SEV[a.r.lvl]-SEV[b.r.lvl]||b.created-a.created; }).slice(0,RADAR_SHOW);
+  var html=top.map(function(x){
+    var L=LEVELS[x.r.lvl];
+    return "<a href='#' class='rdc lvl-"+L.cls+"' data-analyze='"+esc(x.mint)+"'>"+
+      "<span class='rdh'><b>"+esc(x.sym)+"</b><span class='pill'>"+esc(lvlLabel(x.r))+"</span></span>"+
+      "<span class='rdw'>"+esc(topWhy(x.r))+"</span>"+
+      "<span class='rdm'>"+esc([x.created?haceMin(x.created):"",DEXN[x.dex]||x.dex].filter(Boolean).join(" · "))+"</span></a>";
+  }).join("");
+  for(var i=top.length;i<RADAR_SHOW&&!radar.err&&done.length<rows.length+(radar.rows?0:1);i++) html+="<div class='rdc rdwait' aria-hidden='true'><span class='rdh'><b>&nbsp;</b></span><span class='rdw'>&nbsp;</span></div>";
+  box.innerHTML=html;
+  $("#rdstat").textContent=radar.err?"No se pudo cargar el radar ahora mismo.":!radar.rows?"Buscando los últimos lanzamientos…":
+    done.length<rows.length?"Revisando "+done.length+"/"+rows.length+" tokens recién lanzados…":
+    "Revisados los "+rows.length+" últimos lanzamientos, "+ftime(radar.ts)+".";
+}
+
 /* ---------- tarjeta de riesgo compartible ---------- */
 // Si algún día la app tiene una URL pública, ponla aquí y saldrá en el pie de cada tarjeta
 var CARD_URL="";
@@ -2145,6 +2263,8 @@ async function holders(){
   state.rpc=$("#rpc").value.trim()||PUBLIC_RPC;
   state.cancel=false;
   store("esc.rpc",$("#rpc").value.trim()); store("esc.mint",mint);
+  // Cada búsqueda de ballenas tiene su propio enlace: solflag.com/?ballenas=<mint>
+  try{ history.replaceState(null,"",location.pathname+"?ballenas="+mint); }catch(e){}
   $("#hgo").disabled=true; $("#hresults").hidden=true; state.shown.H=false; $("#progress").hidden=false;
   try{
     var b=await holderBase(mint,setProgress);
@@ -2715,7 +2835,12 @@ document.addEventListener("click",function(ev){
   if(ev.target.closest&&ev.target.closest("[data-trynew]")) setMode("N");
 });
 // La portada (texto, banderas, bot) solo se ve en el escáner y mientras no hay un análisis abierto
-function updateLanding(){ document.body.classList.toggle("landing",state.mode==="W"&&$("#results").hidden&&$("#progress").hidden); }
+function updateLanding(){
+  var on=state.mode==="W"&&$("#results").hidden&&$("#progress").hidden;
+  document.body.classList.toggle("landing",on);
+  // El radar se carga al ver la portada y se refresca si han pasado 5 minutos
+  if(on&&Date.now()-radar.ts>300000){ radar.ts=Date.now(); setTimeout(loadRadar,1500); }
+}
 new MutationObserver(updateLanding).observe(document.querySelector(".wrap"),{subtree:true,attributes:true,attributeFilter:["hidden","aria-selected"]});
 updateLanding();
 
@@ -2732,6 +2857,8 @@ updateLanding();
   // Enlace directo (?token=MINT): abre la app con ese token ya analizado
   var q=null; try{ q=new URLSearchParams(location.search).get("token"); }catch(e){}
   if(q&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(q)){ $("#wallet").value=q; walletHint(); analyze(); }
+  var qb=null; try{ qb=new URLSearchParams(location.search).get("ballenas"); }catch(e){}
+  if(!q&&qb&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(qb)){ setMode("H"); $("#mint").value=qb; holders(); }
 })();
 })();
 </script>
