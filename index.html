@@ -1377,7 +1377,7 @@ function strongAlerts(r){
 function xText(r){
   var bad=strongAlerts(r);
   return "🔎 $"+r.sym+": "+(dataOnly(r)?"riesgo medio por falta de datos":LEVELS[r.lvl].label.toLowerCase())+
-    (bad?" ("+bad+(bad===1?" alerta fuerte)":" alertas fuertes)"):"")+" según el Escáner de Wallets de @elgatotradebtc";
+    (bad?" ("+bad+(bad===1?" alerta fuerte)":" alertas fuertes)"):"")+" según SolFlag de @elgatotradebtc";
 }
 function xIntent(r){ return "https://x.com/intent/post?text="+encodeURIComponent(xText(r))+"&url="+encodeURIComponent(tokenLink(r.mint)); }
 var X_ICON="<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>";
@@ -2008,9 +2008,9 @@ function paintRadar(){
 /* ---------- tarjeta de riesgo compartible ---------- */
 // Si algún día la app tiene una URL pública, ponla aquí y saldrá en el pie de cada tarjeta
 var CARD_URL="";
-var CARD={bg:"#0e1020",surface:"#171a3a",line:"#2a2f63",fg:"#eef0ff",muted:"#9097dc",
-  lvl:{ALTO:["#ff7b7b","#3a1b33"],MEDIO:["#ffc247","#3b2f14"],BAJO:["#3ddc97","#10362d"]},
-  dot:{ok:"#3ddc97",warn:"#ffc247",bad:"#ff7b7b",na:"#a3a9e0"}};
+var CARD={bg:"#0f0a28",surface:"#18113e",line:"#44358f",fg:"#f1eeff",muted:"#c9c1ea",
+  lvl:{ALTO:["#ff6b6b","#3d1f3a"],MEDIO:["#fbbf24","#3a2c18"],BAJO:["#4ade80","#163a2c"]},
+  dot:{ok:"#4ade80",warn:"#fbbf24",bad:"#ff6b6b",na:"#8b84b8"}};
 function cardLines(ctx,text,maxW,maxLines){
   var words=String(text).split(/\s+/), lines=[], cur="";
   words.forEach(function(w){
@@ -2054,74 +2054,138 @@ function cardRound(ctx,x,y,w,h,r){
   ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
   ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
 }
-async function drawCard(r){
-  // Las fuentes de Google tardan en llegar: sin esperar, el canvas pintaría con la del sistema
-  try{ await Promise.all(["700 80px 'Bricolage Grotesque'","600 32px Figtree","400 28px Figtree","400 22px 'IBM Plex Mono'"].map(function(f){ return document.fonts.load(f); })); }catch(e){}
-  var W=1080, P=72, IW=W-2*P, FD="'Bricolage Grotesque','Segoe UI',sans-serif", FB="Figtree,'Segoe UI',sans-serif", FM="'IBM Plex Mono',Consolas,monospace";
-  var c=document.createElement("canvas"); c.width=W; c.height=2400;
-  var x=c.getContext("2d"), col=CARD.lvl[r.lvl]||CARD.lvl.MEDIO;
-  x.fillStyle=CARD.bg; x.fillRect(0,0,W,c.height);
-  x.fillStyle=col[0]; x.fillRect(0,0,W,10);
-  x.textBaseline="alphabetic";
-  x.fillStyle=CARD.muted; x.font="600 24px "+FB;
-  x.fillText("ESCÁNER DE WALLETS · SOLANA",P,P+28);
-  // La imagen del token viene de otro dominio y "ensuciaría" el canvas (no se podría exportar): van las iniciales
-  x.fillStyle=CARD.surface; x.beginPath(); x.arc(P+56,P+128,56,0,Math.PI*2); x.fill();
-  x.fillStyle=CARD.fg; x.font="700 40px "+FD; x.textAlign="center";
-  x.fillText(r.sym.slice(0,2).toUpperCase(),P+56,P+142); x.textAlign="left";
-  x.font="700 76px "+FD; x.fillText(cardFit(x,r.sym,IW-140),P+140,P+138);
-  if(r.name){ x.fillStyle=CARD.muted; x.font="400 30px "+FB; x.fillText(cardFit(x,r.name,IW-140),P+140,P+182); }
-  var y=P+240;
-  x.font="700 36px "+FD;
-  var lbl=LEVELS[r.lvl].label.toUpperCase(), pw=x.measureText(lbl).width+64;
-  x.fillStyle=col[1]; cardRound(x,P,y,pw,72,36); x.fill();
-  x.fillStyle=col[0]; x.fillText(lbl,P+32,y+49);
-  if(r.type&&TYPES[r.type]){ x.fillStyle=CARD.muted; x.font="500 28px "+FB; x.fillText(cardFit(x,TYPES[r.type].label,IW-pw-32),P+pw+28,y+47); }
-  // En una imagen que circula suelta es donde más importa que un "medio" sin señales no parezca una alerta
-  if(dataOnly(r)){ y+=112; x.fillStyle=col[0]; x.font="600 28px "+FB; x.fillText(cardFit(x,"Por falta de datos: falta comprobar "+missingText(r),IW),P,y); y+=60; }
-  else if(r.lvl==="ALTO"||r.lvl==="MEDIO"){
-    // Quien ve la imagen en X no tiene el contexto de la app: una línea dice qué pesa en el veredicto
-    var ws=cardWhy(r);
-    if(ws.length){
-      y+=112; x.fillStyle=col[0]; x.font="600 28px "+FB;
-      var wl=cardLines(x,"Sale "+LEVELS[r.lvl].label.toLowerCase()+" por: "+ws.join(" · "),IW,2);
-      wl.forEach(function(t,i){ x.fillText(t,P,y+i*38); });
-      y+=60+(wl.length-1)*38;
-    }else y+=128;
-  }
-  else y+=128;
-  // Todas las cifras de la línea en el mismo estilo: completas si caben, si no todas abreviadas
-  var par=r.par||{}, lq=(par.liquidity&&par.liquidity.usd)||0, vl=(par.volume&&par.volume.h24)||0;
-  function metaLine(f){
-    var m=["Liquidez "+f(lq),"Vol. 24 h "+f(vl)];
-    if(par.pairCreatedAt) m.push("Creado "+hace(par.pairCreatedAt));
-    return m.join("  ·  ");
-  }
-  x.fillStyle=CARD.fg; x.font="500 30px "+FB;
-  var ml=metaLine(usd);
-  if(x.measureText(ml).width>IW) ml=metaLine(usdShort);
-  x.fillText(cardFit(x,ml,IW),P,y);
-  y+=40; x.fillStyle=CARD.line; x.fillRect(P,y,IW,2); y+=44;
-  r.lights.forEach(function(l){
-    x.fillStyle=CARD.dot[l.s]||CARD.dot.na; x.beginPath(); x.arc(P+12,y+20,12,0,Math.PI*2); x.fill();
-    x.fillStyle=CARD.fg; x.font="600 32px "+FB; x.fillText(LKEYS[l.k],P+44,y+32);
-    x.fillStyle=CARD.muted; x.font="400 28px "+FB;
-    var ls=cardLines(x,l.t,IW-44,3);
-    ls.forEach(function(t,i){ x.fillText(t,P+44,y+74+i*38); });
-    y+=74+(ls.length-1)*38+46;
+// Fondo, logo y piezas comunes de las dos imágenes, con el aspecto de solflag.com
+var CF={D:"Fraunces,Georgia,serif",B:"Manrope,'Segoe UI',sans-serif",W:"'Barlow Condensed','Arial Narrow',sans-serif",M:"'IBM Plex Mono',Consolas,monospace"};
+function cardFonts(){
+  return Promise.all(["800 80px Fraunces","700 40px Fraunces","700 26px Manrope","400 22px Manrope","700 40px 'Barlow Condensed'","400 20px 'IBM Plex Mono'"]
+    .map(function(f){ return document.fonts.load(f); })).catch(function(){});
+}
+function cardBg(x,W,H,col){
+  var g=x.createLinearGradient(0,0,W*.35,H); g.addColorStop(0,"#1a1142"); g.addColorStop(.6,"#0f0a28"); g.addColorStop(1,"#0b071e");
+  x.fillStyle=g; x.fillRect(0,0,W,H);
+  [[W*.5,-H*.2,W*.6,"rgba(139,92,246,.5)"],[-W*.05,H*1.1,W*.45,"rgba(192,38,211,.2)"],[W*1.05,H*1.1,W*.45,"rgba(99,102,241,.2)"]].forEach(function(o){
+    var rg=x.createRadialGradient(o[0],o[1],0,o[0],o[1],o[2]); rg.addColorStop(0,o[3]); rg.addColorStop(1,"rgba(0,0,0,0)");
+    x.fillStyle=rg; x.fillRect(0,0,W,H);
   });
-  // El pie va pegado abajo aunque haya poco texto arriba
-  y=Math.max(y,1350-(2+46+38+(CARD_URL?38:0)+P));
-  x.fillStyle=CARD.line; x.fillRect(P,y,IW,2); y+=46;
-  x.fillStyle=CARD.muted; x.font="400 22px "+FM; x.fillText(cardFit(x,r.mint,IW),P,y);
-  y+=38; x.font="400 22px "+FB;
-  x.fillText(cardFit(x,"Analizado el "+new Date().toLocaleDateString("es-ES")+" · Datos on-chain, DexScreener y RugCheck · No es consejo financiero",IW),P,y);
-  if(CARD_URL){ y+=38; x.fillStyle=col[0]; x.font="600 24px "+FB; x.fillText(cardFit(x,CARD_URL,IW),P,y); }
-  y+=P;
-  // Recorte al alto real, sin bajar de 4:5 para que encaje en el móvil y en las redes
-  var H=Math.max(1350,y), out=document.createElement("canvas"); out.width=W; out.height=H;
-  var o=out.getContext("2d"); o.fillStyle=CARD.bg; o.fillRect(0,0,W,H); o.drawImage(c,0,0);
-  return out;
+  // una carretera de luz y unas burbujas, muy tenues, como el fondo de la web
+  x.save(); x.globalAlpha=.3;
+  x.beginPath(); x.moveTo(-40,H*.62); x.bezierCurveTo(W*.16,H*.51,W*.32,H*.71,W*.5,H*.62); x.bezierCurveTo(W*.68,H*.53,W*.82,H*.44,W+40,H*.53);
+  x.lineWidth=8; x.strokeStyle="rgba(255,247,224,.5)"; x.stroke(); x.lineWidth=4; x.strokeStyle="#5b3bb8"; x.stroke();
+  [[W*.95,H*.28,34],[W*.045,H*.33,22],[W*.6,H*.9,18]].forEach(function(b){
+    x.beginPath(); x.arc(b[0],b[1],b[2],0,Math.PI*2); x.fillStyle="rgba(255,255,255,.05)"; x.fill(); x.lineWidth=2; x.strokeStyle="rgba(255,255,255,.35)"; x.stroke();
+  });
+  x.restore();
+  x.fillStyle=col; x.fillRect(0,0,W,10);
+}
+function cardLogo(x,px,py,s){
+  // el círculo lila con los tres cubos, dibujado sobre una cuadrícula de 46
+  x.save(); x.translate(px,py); x.scale(s/46,s/46);
+  x.beginPath(); x.arc(23,23,22,0,Math.PI*2); x.fillStyle="#3a2a80"; x.fill(); x.lineWidth=2; x.strokeStyle="#a78bfa"; x.stroke();
+  x.strokeStyle="#fff"; x.lineWidth=1.6; x.lineJoin="round"; x.lineCap="round";
+  ["M23 10.5l4 2.3v4.6l-4 2.3-4-2.3v-4.6z","M19 12.8l4 2.3 4-2.3M23 15.1v4.6","M14 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z","M10 26.3l4 2.3 4-2.3M14 28.6v4.6",
+   "M32 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z","M28 26.3l4 2.3 4-2.3M32 28.6v4.6","M19 15.1l-4.6 2.6v6.3M27 15.1l4.6 2.6v6.3M18 30.9L23 33.8l5-2.9"]
+    .forEach(function(d){ x.stroke(new Path2D(d)); });
+  x.restore();
+}
+function cardBrand(x,px,py,s){
+  cardLogo(x,px,py-s*.78,s);
+  var tx=px+s+16; x.font="700 "+Math.round(s*.8)+"px "+CF.W;
+  x.fillStyle="#fff"; x.fillText("sol",tx,py); tx+=x.measureText("sol").width;
+  x.fillStyle="#c4b5fd"; x.fillText("flag",tx,py); tx+=x.measureText("flag").width;
+  x.fillStyle="#8ec5cf"; x.font="700 "+Math.round(s*.56)+"px "+CF.W; x.fillText(".com",tx,py);
+}
+function cardKick(x,t,px,py,size,align){
+  x.save(); x.font="700 "+size+"px "+CF.B; x.fillStyle="#8ec5cf";
+  if("letterSpacing" in x) x.letterSpacing=Math.round(size*.2)+"px";
+  x.textAlign=align||"left"; x.fillText(t,px,py); x.restore();
+}
+function cardBox(x,bx,by,bw,bh,r){ x.fillStyle="rgba(24,17,62,.92)"; cardRound(x,bx,by,bw,bh,r); x.fill(); x.lineWidth=1.5; x.strokeStyle="#44358f"; x.stroke(); }
+function cardRing(x,cx,cy,R,lw,col,fr,count){
+  x.beginPath(); x.arc(cx,cy,R,0,Math.PI*2); x.fillStyle="rgba(24,17,62,.6)"; x.fill();
+  x.lineWidth=lw; x.strokeStyle="#2a2350"; x.stroke();
+  x.beginPath(); x.arc(cx,cy,R,-Math.PI/2,-Math.PI/2+Math.PI*2*fr); x.strokeStyle=col; x.lineCap="round"; x.stroke(); x.lineCap="butt";
+  x.textAlign="center"; x.fillStyle=col; x.font="800 "+Math.round(R*.58)+"px "+CF.D; x.fillText(String(count),cx,cy+R*.14);
+  x.fillStyle="#ece8fd"; x.font="700 "+Math.round(R*.14)+"px "+CF.B;
+  if("letterSpacing" in x) x.letterSpacing="2px";
+  x.fillText("RED FLAGS",cx,cy+R*.42); if("letterSpacing" in x) x.letterSpacing="0px";
+  x.textAlign="left";
+}
+// Las cinco banderas de la imagen: las cuatro del motor y el lanzamiento (revisado o no)
+function cardFlags(r){
+  var ls=r.lights.map(function(l){ return {n:LKEYS[l.k],s:l.s,t:l.t}; });
+  var young=r.par&&r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<7*86400000;
+  ls.push(r.launch&&r.launch.s!=="na"?{n:"Lanzamiento",s:r.launch.s,t:r.launch.t}:{n:"Lanzamiento",s:"na",t:young?"Sin revisar todavía":"No aplica: mercado de más de 7 días"});
+  return ls;
+}
+function cardVerdict(r){ return dataOnly(r)?"Medio por falta de datos":LEVELS[r.lvl].label; }
+function cardReason(r){
+  if(dataOnly(r)) return "Falta comprobar "+missingText(r)+": lo que no se comprueba no se da por bueno.";
+  var ws=cardWhy(r);
+  if(r.launch&&r.launch.s==="bad") ws.unshift(r.launch.t.indexOf("lanzador en serie")>=0?"lanzador en serie":"bundle en el lanzamiento");
+  if(ws.length&&r.lvl!=="BAJO"){ var s=ws.slice(0,3).join(" · "); return s.charAt(0).toUpperCase()+s.slice(1)+"."; }
+  return String(TOKEN_TIP[r.lvl]||"").split(". ")[0].replace(/\.?$/,".");
+}
+function cardStats(r){
+  var par=r.par||{};
+  return [["Liquidez",usdShort((par.liquidity&&par.liquidity.usd)||0)],["Volumen 24 h",usdShort((par.volume&&par.volume.h24)||0)],
+    // En una memecoin el precio son muchos ceros que no caben ni se leen: la capitalización dice más
+    (par.marketCap||par.fdv)?["Cap. mercado",usdShort(par.marketCap||par.fdv)]:["Precio",par.priceUsd?priceUsd(Number(par.priceUsd)):"—"],
+    ["Edad",par.pairCreatedAt?ago(par.pairCreatedAt):"—"]];
+}
+function cardFitFont(x,t,weight,max,min,fam,w){
+  for(var fs=max;fs>min;fs-=2){ x.font=weight+" "+fs+"px "+fam; if(x.measureText(t).width<=w) return fs; }
+  x.font=weight+" "+min+"px "+fam; return min;
+}
+
+// Imagen para descargar: vertical 1080 de ancho (4:5 como mínimo), para Telegram, WhatsApp o Instagram
+async function drawCard(r){
+  await cardFonts();
+  var W=1080, P=72, IW=W-2*P, col=(CARD.lvl[r.lvl]||CARD.lvl.MEDIO)[0], fr={ALTO:.85,MEDIO:.55,BAJO:.25}[r.lvl]||.55;
+  var flags=cardFlags(r);
+  // primero se mide el alto de la lista de banderas para dibujar el fondo a la medida
+  var m=document.createElement("canvas").getContext("2d"), rowsH=0, rowLines=[];
+  m.font="400 23px "+CF.B;
+  flags.forEach(function(f){ var ls=cardLines(m,f.t,IW-62-300-28,2); rowLines.push(ls); rowsH+=Math.max(64,30+ls.length*31)+12; });
+  var H=Math.max(1350,640+rowsH+56+170);
+  var c=document.createElement("canvas"); c.width=W; c.height=H;
+  var x=c.getContext("2d"); x.textBaseline="alphabetic";
+  cardBg(x,W,H,col);
+  cardBrand(x,P,P+44,56);
+  cardKick(x,"ESCÁNER DE SOLANA",W-P,P+34,20,"right");
+  // aro con las red flags y, al lado, el token, el veredicto y el motivo
+  var cy=P+120+125;
+  cardRing(x,P+125,cy,112,22,col,fr,strongAlerts(r));
+  var tx=P+290, tw=W-P-tx;
+  x.fillStyle="#fff"; x.font="700 30px "+CF.B; x.fillText(cardFit(x,"$"+r.sym,tw),tx,cy-90);
+  x.fillStyle=col; cardFitFont(x,cardVerdict(r),"800",80,46,CF.D,tw); x.fillText(cardVerdict(r),tx,cy-6);
+  x.fillStyle="#ece8fd"; x.font="400 26px "+CF.B;
+  cardLines(x,cardReason(r),tw,3).forEach(function(t,i){ x.fillText(t,tx,cy+44+i*35); });
+  // cuatro cifras
+  var by=P+400, bw=(IW-3*14)/4;
+  cardStats(r).forEach(function(b,i){
+    var bx=P+i*(bw+14); cardBox(x,bx,by,bw,100,18);
+    x.fillStyle="#c9c1ea"; x.font="500 19px "+CF.B; x.fillText(b[0],bx+18,by+36);
+    x.fillStyle="#fff"; cardFitFont(x,b[1],"700",28,18,CF.B,bw-36); x.fillText(b[1],bx+18,by+76);
+  });
+  // las cinco banderas
+  var ly=by+130; cardBox(x,P,ly,IW,rowsH+24,24); ly+=24;
+  flags.forEach(function(f,i){
+    var rh=Math.max(64,30+rowLines[i].length*31);
+    x.fillStyle=CARD.dot[f.s]||CARD.dot.na; x.beginPath(); x.arc(P+38,ly+24,11,0,Math.PI*2); x.fill();
+    x.fillStyle="#fff"; x.font="700 25px "+CF.B; x.fillText(f.n,P+62,ly+33);
+    x.fillStyle="#d3cdef"; x.font="400 23px "+CF.B;
+    rowLines[i].forEach(function(t,k){ x.fillText(t,P+62+300,ly+33+k*31); });
+    ly+=rh+12;
+    if(i<flags.length-1){ x.fillStyle="#2e2268"; x.fillRect(P+24,ly-8,IW-48,2); }
+  });
+  // pie pegado abajo: dirección, fecha y marca
+  var fy=H-P-70;
+  x.fillStyle="#b4acdc"; x.font="400 19px "+CF.M; x.fillText(cardFit(x,r.mint,IW),P,fy);
+  x.fillStyle="rgba(196,181,253,.25)"; x.fillRect(P,fy+22,IW,2);
+  x.fillStyle="#8ec5cf"; x.font="700 26px "+CF.B; x.fillText("solflag.com",P,fy+64);
+  x.fillStyle="#c9c1ea"; x.font="400 20px "+CF.B; x.textAlign="right";
+  x.fillText(fdate(Date.now())+" · @elgatotradebtc · No es consejo financiero",W-P,fy+64); x.textAlign="left";
+  return c;
 }
 async function shareCard(mint,btn){
   var r=state.results.filter(function(x){ return x.mint===mint; })[0];
@@ -2147,91 +2211,66 @@ async function shareCard(mint,btn){
   }
 }
 
-// Imagen para X: apaisada (16:9), que es como X la enseña entera en el timeline. A la izquierda el token,
-// el veredicto, por qué, cuatro cifras y la gráfica; a la derecha los semáforos, con el del lanzamiento
+// Imagen para X: apaisada (16:9), que es como X la enseña entera en el timeline. Tres bandas:
+// marca arriba; aro, veredicto y gráfica con cifras en el centro; las cinco banderas abajo
 async function drawXCard(r){
-  try{ await Promise.all(["700 72px 'Bricolage Grotesque'","600 26px Figtree","400 21px Figtree","400 18px 'IBM Plex Mono'"].map(function(f){ return document.fonts.load(f); })); }catch(e){}
-  var W=1600, H=900, P=64, LW=820, RX=P+LW+48, RW=W-P-RX;
-  var FD="'Bricolage Grotesque','Segoe UI',sans-serif", FB="Figtree,'Segoe UI',sans-serif", FM="'IBM Plex Mono',Consolas,monospace";
+  await cardFonts();
+  var W=1600, H=900, P=64, col=(CARD.lvl[r.lvl]||CARD.lvl.MEDIO)[0], fr={ALTO:.85,MEDIO:.55,BAJO:.25}[r.lvl]||.55;
   var c=document.createElement("canvas"); c.width=W; c.height=H;
-  var x=c.getContext("2d"), col=CARD.lvl[r.lvl]||CARD.lvl.MEDIO;
-  x.fillStyle=CARD.bg; x.fillRect(0,0,W,H);
-  x.fillStyle=col[0]; x.fillRect(0,0,W,10);
-  x.textBaseline="alphabetic";
-  x.fillStyle=CARD.muted; x.font="600 22px "+FB; x.fillText("ESCÁNER DE WALLETS · SOLANA",P,P+16);
-  // Iniciales en vez del logo: la imagen del token viene de otro dominio y no dejaría exportar el canvas
-  x.fillStyle=CARD.surface; x.beginPath(); x.arc(P+46,P+96,46,0,Math.PI*2); x.fill();
-  x.fillStyle=CARD.fg; x.font="700 34px "+FD; x.textAlign="center"; x.fillText(r.sym.slice(0,2).toUpperCase(),P+46,P+108); x.textAlign="left";
-  x.font="700 68px "+FD; x.fillText(cardFit(x,r.sym,LW-120),P+116,P+112);
-  if(r.name){ x.fillStyle=CARD.muted; x.font="400 26px "+FB; x.fillText(cardFit(x,r.name,LW-120),P+118,P+150); }
-  // veredicto y recuento
-  var y=P+190, lbl=(dataOnly(r)?"Medio por falta de datos":LEVELS[r.lvl].label).toUpperCase();
-  x.font="700 32px "+FD; var pw=x.measureText(lbl).width+56;
-  x.fillStyle=col[1]; cardRound(x,P,y,pw,64,32); x.fill();
-  x.fillStyle=col[0]; x.fillText(lbl,P+28,y+44);
-  var bad=strongAlerts(r), warn=r.lights.filter(function(l){ return l.s==="warn"; }).length+(r.launch&&r.launch.s==="warn"?1:0);
-  var cnt=[]; if(bad) cnt.push(bad+(bad===1?" alerta fuerte":" alertas fuertes")); if(warn) cnt.push(warn+(warn===1?" aviso":" avisos"));
-  if(cnt.length){ x.fillStyle=CARD.fg; x.font="600 26px "+FB; x.fillText(cardFit(x,cnt.join(" · "),LW-pw-24),P+pw+24,y+42); }
-  y+=112;
-  if(!dataOnly(r)&&(r.lvl==="ALTO"||r.lvl==="MEDIO")){
-    var ws=cardWhy(r);
-    if(r.launch&&r.launch.s==="bad") ws.unshift(r.launch.t.indexOf("lanzador en serie")>=0?"lanzador en serie":"bundle en el lanzamiento");
-    if(ws.length){
-      x.fillStyle=col[0]; x.font="600 25px "+FB;
-      cardLines(x,"Sale "+LEVELS[r.lvl].label.toLowerCase()+" por: "+ws.slice(0,3).join(" · "),LW,2).forEach(function(t,i){ x.fillText(t,P,y+i*34); });
-    }
-  }
-  // cuatro cifras
-  var par=r.par||{}, box=[["Liquidez",usdShort((par.liquidity&&par.liquidity.usd)||0)],["Vol. 24 h",usdShort((par.volume&&par.volume.h24)||0)],
-    // En una memecoin el precio son muchos ceros que no caben ni se leen: la capitalización dice más
-    (par.marketCap||par.fdv)?["Capitalización",usdShort(par.marketCap||par.fdv)]:["Precio",par.priceUsd?priceUsd(Number(par.priceUsd)):"—"],
-    ["Creado",par.pairCreatedAt?hace(par.pairCreatedAt):"—"]];
-  y=P+390; var bw=(LW-3*16)/4;
-  box.forEach(function(b,i){
-    var bx=P+i*(bw+16);
-    x.fillStyle=CARD.surface; cardRound(x,bx,y,bw,104,18); x.fill();
-    x.fillStyle=CARD.muted; x.font="500 20px "+FB; x.fillText(b[0],bx+20,y+36);
-    // la cifra entera aunque sea larga ("492,69 M $", "hace 2,2 años"): letra más pequeña antes que cortarla
-    x.fillStyle=CARD.fg;
-    for(var fs=30;fs>20;fs-=2){ x.font="700 "+fs+"px "+FD; if(x.measureText(b[1]).width<=bw-40) break; }
-    x.fillText(cardFit(x,b[1],bw-40),bx+20,y+80);
-  });
-  // gráfica: la que ya se cargó en la página (el periodo elegido, o 24 h)
-  y+=128;
-  var pts=par.pairAddress&&(charts[par.pairAddress+"|"+state.ctf]||charts[par.pairAddress+"|d"]), ch=H-P-60-y;
-  x.fillStyle=CARD.surface; cardRound(x,P,y,LW,ch,18); x.fill();
+  var x=c.getContext("2d"); x.textBaseline="alphabetic";
+  cardBg(x,W,H,col);
+  cardBrand(x,P,P+30,50);
+  cardKick(x,"ESCÁNER DE SOLANA",W-P,P+22,19,"right");
+  // centro: aro
+  var cy=372;
+  cardRing(x,P+135,cy,124,22,col,fr,strongAlerts(r));
+  // centro: gráfica con las cuatro cifras, a la derecha
+  var gx0=W-P-400, gy0=208, gw0=400, gh0=330;
+  cardBox(x,gx0,gy0,gw0,gh0,24);
+  var par=r.par||{}, pts=par.pairAddress&&(charts[par.pairAddress+"|"+state.ctf]||charts[par.pairAddress+"|d"]);
+  var cx0=gx0+22, cw=gw0-44, ctop=gy0+56, chh=96;
   if(Array.isArray(pts)&&pts.length>=2){
     var tf=charts[par.pairAddress+"|"+state.ctf]===pts?state.ctf:"d", lo=Infinity, hi=-Infinity;
     pts.forEach(function(p){ lo=Math.min(lo,p[1]); hi=Math.max(hi,p[1]); });
-    var span=(hi-lo)||hi*0.02, t0=pts[0][0], t1=pts[pts.length-1][0], gx=P+20, gy=y+56, gw=LW-40, gh=ch-76;
+    var span=(hi-lo)||hi*0.02, t0=pts[0][0], t1=pts[pts.length-1][0];
     var chg=(pts[pts.length-1][1]/pts[0][1]-1)*100, lc=chg>=0?CARD.dot.ok:CARD.dot.bad;
-    x.fillStyle=CARD.muted; x.font="500 20px "+FB; x.fillText("Precio · "+CHART_TF[tf][3],gx,y+34);
-    x.fillStyle=lc; x.font="700 22px "+FB; x.textAlign="right"; x.fillText((chg>=0?"+":"")+fmtPct(chg),P+LW-20,y+34); x.textAlign="left";
+    x.fillStyle="#c9c1ea"; x.font="700 20px "+CF.B; x.fillText("Precio · "+CHART_TF[tf][3],cx0,gy0+38);
+    x.fillStyle=lc; x.font="700 25px "+CF.B; x.textAlign="right"; x.fillText((chg>=0?"+":"")+fmtPct(chg),gx0+gw0-22,gy0+38); x.textAlign="left";
     x.beginPath();
-    pts.forEach(function(p,i){ var px=gx+(p[0]-t0)/((t1-t0)||1)*gw, py=gy+(1-(p[1]-lo)/span)*gh; if(i) x.lineTo(px,py); else x.moveTo(px,py); });
-    x.strokeStyle=lc; x.lineWidth=3; x.lineJoin="round"; x.stroke();
-    x.lineTo(gx+gw,gy+gh); x.lineTo(gx,gy+gh); x.closePath(); x.globalAlpha=.14; x.fillStyle=lc; x.fill(); x.globalAlpha=1;
+    pts.forEach(function(p,i){ var px=cx0+(p[0]-t0)/((t1-t0)||1)*cw, py=ctop+(1-(p[1]-lo)/span)*chh; if(i) x.lineTo(px,py); else x.moveTo(px,py); });
+    x.strokeStyle="#8ec5cf"; x.lineWidth=3; x.lineJoin="round"; x.stroke();
+    x.lineTo(cx0+cw,ctop+chh); x.lineTo(cx0,ctop+chh); x.closePath(); x.globalAlpha=.14; x.fillStyle="#8ec5cf"; x.fill(); x.globalAlpha=1;
   }else{
-    x.fillStyle=CARD.muted; x.font="400 22px "+FB; x.fillText("Sin gráfica todavía: el mercado tiene muy pocas operaciones",P+20,y+ch/2+8);
+    x.fillStyle="#c9c1ea"; x.font="400 19px "+CF.B;
+    cardLines(x,"Sin gráfica todavía: el mercado tiene muy pocas operaciones",cw,2).forEach(function(t,i){ x.fillText(t,cx0,gy0+60+i*26); });
   }
-  // semáforos
-  var ry=P+16, rh=H-P-60-ry;
-  x.fillStyle=CARD.surface; cardRound(x,RX,ry,RW,rh,22); x.fill();
-  var ls=r.lights.map(function(l){ return {n:LKEYS[l.k],s:l.s,t:l.t}; });
-  if(r.launch&&r.launch.s!=="na") ls.push({n:"Lanzamiento",s:r.launch.s,t:r.launch.t});
-  var ly=ry+32, step=(rh-40)/ls.length;
-  ls.forEach(function(l){
-    x.fillStyle=CARD.dot[l.s]||CARD.dot.na; x.beginPath(); x.arc(RX+40,ly+16,11,0,Math.PI*2); x.fill();
-    x.fillStyle=CARD.fg; x.font="600 25px "+FB; x.fillText(l.n,RX+64,ly+25);
-    x.fillStyle=CARD.muted; x.font="400 20px "+FB;
-    cardLines(x,l.t,RW-88,Math.max(1,Math.floor((step-46)/27))).forEach(function(t,i){ x.fillText(t,RX+64,ly+56+i*27); });
-    ly+=step;
+  cardStats(r).forEach(function(b,i){
+    var bx=cx0+(i%2)*(cw/2+8), byy=gy0+196+Math.floor(i/2)*66;
+    x.fillStyle="#c9c1ea"; x.font="500 16px "+CF.B; x.fillText(b[0],bx,byy);
+    x.fillStyle="#fff"; cardFitFont(x,b[1],"700",23,15,CF.B,cw/2-14); x.fillText(b[1],bx,byy+28);
+  });
+  // centro: token, veredicto y motivo, entre el aro y la gráfica
+  var tx=P+270+48, tw=gx0-48-tx;
+  x.fillStyle="#fff"; x.font="700 30px "+CF.B;
+  var head="$"+r.sym, tl=r.type&&TYPES[r.type]?TYPES[r.type].label:"";
+  x.fillText(cardFit(x,head,tw),tx,cy-108);
+  if(tl){ var hw=x.measureText(head).width; x.fillStyle="#c9c1ea"; x.font="500 22px "+CF.B; x.fillText(cardFit(x," · "+tl,Math.max(0,tw-hw)),tx+hw,cy-108); }
+  x.fillStyle=col; cardFitFont(x,cardVerdict(r),"800",96,52,CF.D,tw); x.fillText(cardVerdict(r),tx,cy-6);
+  x.fillStyle="#ece8fd"; x.font="400 27px "+CF.B;
+  cardLines(x,cardReason(r),tw,3).forEach(function(t,i){ x.fillText(t,tx,cy+50+i*37); });
+  // abajo: las cinco banderas en fila, cada una con su color arriba
+  var flags=cardFlags(r), fy=610, fh=158, fw=(W-2*P-4*14)/5;
+  flags.forEach(function(f,i){
+    var fx=P+i*(fw+14), fc=CARD.dot[f.s]||CARD.dot.na;
+    cardBox(x,fx,fy,fw,fh,18);
+    x.save(); cardRound(x,fx,fy,fw,fh,18); x.clip(); x.fillStyle=fc; x.fillRect(fx,fy,fw,6); x.restore();
+    x.fillStyle="#fff"; x.font="700 21px "+CF.B; x.fillText(cardFit(x,f.n,fw-36),fx+18,fy+44);
+    x.fillStyle="#d3cdef"; x.font="400 18px "+CF.B;
+    cardLines(x,f.t,fw-36,4).forEach(function(t,k){ x.fillText(t,fx+18,fy+74+k*23); });
   });
   // pie
-  var site=(location.host+location.pathname).replace(/index\.html$/,"").replace(/\/$/,"");
-  x.fillStyle=col[0]; x.font="600 24px "+FB; x.fillText("@elgatotradebtc · "+site,P,H-P+8);
-  x.fillStyle=CARD.muted; x.font="400 20px "+FB; x.textAlign="right";
-  x.fillText(fdate(Date.now())+" · No es consejo financiero",W-P,H-P+8); x.textAlign="left";
+  x.fillStyle="#b4acdc"; x.font="400 19px "+CF.B; x.textAlign="center";
+  x.fillText(fdate(Date.now())+" · @elgatotradebtc · Herramienta orientativa, no es consejo financiero",W/2,H-36); x.textAlign="left";
   return c;
 }
 function btnSay(btn,html,ms){ var old=btn.innerHTML; btn.innerHTML=html; setTimeout(function(){ btn.innerHTML=old; },ms); }

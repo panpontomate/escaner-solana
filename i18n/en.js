@@ -46,6 +46,14 @@ export const CODE = [
 
 export const TEXT = {
   // ---------- SolFlag: cabecera, portada y pie (oct 2026) ----------
+  "Sin revisar todavía": "Not checked yet",
+  "No aplica: mercado de más de 7 días": "Not applicable: market older than 7 days",
+  "Falta comprobar ": "Still to check: ",
+  ": lo que no se comprueba no se da por bueno.": ". What is not checked is not taken as fine.",
+  "Cap. mercado": "Market cap",
+  "ESCÁNER DE SOLANA": "SOLANA SCANNER",
+  " · @elgatotradebtc · No es consejo financiero": " · @elgatotradebtc · Not financial advice",
+  " · @elgatotradebtc · Herramienta orientativa, no es consejo financiero": " · @elgatotradebtc · A guide, not financial advice",
   "<div><span>Personas</span><b>": "<div><span>People</span><b>",
   "<div><span>Pools y programas</span><b>": "<div><span>Pools and programs</span><b>",
   "</b><small>no son ballenas</small></div>": "</b><small>not whales</small></div>",
@@ -487,15 +495,6 @@ export const TEXT = {
   "<div class='more'>No hay tokens en esta categoría.</div>": "<div class='more'>No tokens in this category.</div>",
 
   // ---------- share image ----------
-  "ESCÁNER DE WALLETS · SOLANA": "WALLET SCANNER · SOLANA",
-  "Por falta de datos: falta comprobar ": "Due to missing data: still to check ",
-  "Sale ": "Rated ",
-  " por: ": " because: ",
-  "Liquidez ": "Liquidity ",
-  "Vol. 24 h ": "24h vol. ",
-  "Creado ": "Created ",
-  "Analizado el ": "Analysed on ",
-  " · Datos on-chain, DexScreener y RugCheck · No es consejo financiero": " · On-chain data, DexScreener and RugCheck · Not financial advice",
   "Generando…": "Generating…",
   "No se pudo generar": "Could not generate",
   "Descargada": "Downloaded",
@@ -704,7 +703,7 @@ export const TEXT = {
   "' target='_blank' rel='noopener' title='Te avisa en Telegram cuando el precio llegue a donde digas'>💲 Alerta de precio</a>": "' target='_blank' rel='noopener' title='Alerts you on Telegram when the price gets where you say'>💲 Price alert</a>",
   " alerta fuerte)": " strong alert)",
   " alertas fuertes)": " strong alerts)",
-  " según el Escáner de Wallets de @elgatotradebtc": " according to the Wallet Scanner by @elgatotradebtc",
+  " según SolFlag de @elgatotradebtc": " by SolFlag from @elgatotradebtc",
 
   // ---------- risk history ----------
   "<div class='pchart'><div class='pc-head'><b>Historial del riesgo</b></div>": "<div class='pchart'><div class='pc-head'><b>Risk history</b></div>",
@@ -739,14 +738,10 @@ export const TEXT = {
   "lanzador en serie": "serial launcher",
   "bundle en el lanzamiento": "launch bundle",
   "Liquidez": "Liquidity",
-  "Vol. 24 h": "24h vol.",
   "Precio": "Price",
-  "Capitalización": "Market cap",
-  "Creado": "Created",
   "Precio · ": "Price · ",
   "Sin gráfica todavía: el mercado tiene muy pocas operaciones": "No chart yet: the market has very few trades",
   "Lanzamiento": "Launch",
-  " · No es consejo financiero": " · Not financial advice",
   "📋 Imagen copiada: pégala en X con Ctrl+V": "📋 Image copied: paste it in X with Ctrl+V",
   "⬇️ Imagen descargada: adjúntala al post": "⬇️ Image downloaded: attach it to the post",
   " por lo que pasó en el lanzamiento (mira «Compras en el lanzamiento»).": " because of what happened at launch (see Launch buys).",
