@@ -1347,7 +1347,7 @@ function renderList(){
       return "<li"+(r.why.length?"":" class='ok'")+">"+esc(w)+"</li>";
     }).join("")+r.warn.map(function(w){ return "<li class='warn'>"+esc(w)+"</li>"; }).join("");
     var av=r.img?"<img src='"+esc(r.img)+"' alt='' loading='lazy' referrerpolicy='no-referrer' onerror=\"this.remove()\">":"";
-    if(r.lights) links+="<a href='#' data-card='"+esc(r.mint)+"' title='Download an image with the verdict to share it'>Image to share</a>";
+    if(r.lights) links+="<a href='#' data-card='"+esc(r.mint)+"' title='Download an image with the verdict to share it'>Download</a>";
     if(r.par&&!KNOWN[r.mint]) links+="<a href='"+esc(tgLink(r.mint))+"' target='_blank' rel='noopener' title='Alerts you on Telegram if risk rises, liquidity drops or the creator sells'>🔔 Watch on Telegram</a>"+
       "<a href='"+esc(tgPrice(r.mint,""))+"' target='_blank' rel='noopener' title='Alerts you on Telegram when the price gets where you say'>💲 Price alert</a>";
     return "<article class='tok lvl-"+L.cls+"'>"+

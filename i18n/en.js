@@ -402,7 +402,7 @@ export const TEXT = {
   "Valor <span class='v'>": "Value <span class='v'>",
   "<span>Edad <span class='v'>": "<span>Age <span class='v'>",
   "Sin señales de alerta en los chequeos": "No warning signs in the checks",
-  "' title='Descargar una imagen con el veredicto para compartirla'>Imagen para compartir</a>": "' title='Download an image with the verdict to share it'>Image to share</a>",
+  "' title='Descargar una imagen con el veredicto para compartirla'>Descargar</a>": "' title='Download an image with the verdict to share it'>Download</a>",
   "' target='_blank' rel='noopener' title='Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende'>🔔 Vigilar en Telegram</a>": "' target='_blank' rel='noopener' title='Alerts you on Telegram if risk rises, liquidity drops or the creator sells'>🔔 Watch on Telegram</a>",
   "' title='Seguir este token' aria-label='Seguir este token'>": "' title='Follow this token' aria-label='Follow this token'>",
   "' title='Copiar dirección del token'>copiar</button></span>": "' title='Copy token address'>copy</button></span>",
