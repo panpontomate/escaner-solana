@@ -456,6 +456,13 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 #hsummary .verdict,#nsummary .verdict{font-size:clamp(1.6rem,3vw,2.3rem);color:#f7f4ff}
 .hrow .rk{background:#2e2268}
 @media (max-width:860px){.tgrid{grid-template-columns:1fr}}
+/* banderas y gráfica a todo el ancho de la tarjeta, sin la columna del logo del token a la izquierda */
+.tgrid{margin-left:-58px}
+.tgrid .lt{align-items:flex-start}
+.tgrid .lt .ld{margin-top:.45em}
+/* la gráfica guarda la proporción: en el móvil, más baja en vez de estirada */
+.pc-body svg{height:auto;aspect-ratio:5/2;max-height:170px}
+@media (max-width:520px){.tgrid{margin-left:-50px}}
 @media (max-width:620px){.tsum{justify-content:center}#summary{padding:20px}.tsum-t{flex-basis:100%}}
 
 /* ballenas: resumen con 4 cifras; holders a la izquierda, grupos, creador y excluidas a la derecha */
