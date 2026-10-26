@@ -46,6 +46,7 @@ export const CODE = [
 
 export const TEXT = {
   // ---------- SolFlag: cabecera, portada y pie (oct 2026) ----------
+  "Blog · Avances": "Blog · Updates (Spanish)",
   "Sin revisar todavía": "Not checked yet",
   "No aplica: mercado de más de 7 días": "Not applicable: market older than 7 days",
   "Falta comprobar ": "Still to check: ",

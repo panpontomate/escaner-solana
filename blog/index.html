@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog · SolFlag</title>
+<meta name="description" content="Avances de SolFlag, el escáner de riesgo de tokens y wallets de Solana: novedades, pruebas con tokens reales y lo que vamos aprendiendo.">
+<meta property="og:title" content="Blog · SolFlag">
+<meta property="og:description" content="Avances de SolFlag: novedades, pruebas con tokens reales y lo que vamos aprendiendo.">
+<meta property="og:url" content="https://solflag.com/blog/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Manrope:wght@400;500;600;700&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
+<style>
+/* Mismo aspecto que solflag.com: lila oscuro, turquesa pastel y titulares con serifa */
+:root{--bg:#0e0926;--card:rgba(24,17,62,.96);--line:rgba(196,181,253,.3);--fg:#f1eeff;--muted:#c9c1ea;--soft:#ddd7f5;--kick:#8ec5cf;--accent:#7ab8c4;--alto:#ff6b6b;--bajo:#4ade80;--medio:#fbbf24;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--fg);font:17px/1.65 Manrope,'Segoe UI',system-ui,sans-serif;background:radial-gradient(1100px 720px at 88% -8%,rgba(139,92,246,.38),transparent 62%),radial-gradient(900px 640px at -12% 30%,rgba(192,38,211,.16),transparent 60%),linear-gradient(180deg,#140d33 0%,#0e0926 45%,#0a061c 100%) fixed;background-color:var(--bg);padding:0 16px 64px}
+a{color:var(--kick)}
+a:hover{color:#c3e2e7}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:780px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22)}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo svg{width:42px;height:42px;flex:none}
+.wm{font:700 30px/1 'Barlow Condensed','Arial Narrow',sans-serif}
+.wm-a{color:#fff}.wm-b{color:#c4b5fd}
+.back{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:700;text-decoration:none}
+.back:hover{color:#140e31;filter:brightness(1.06)}
+.intro{padding:52px 0 18px}
+.kick{margin:0;color:var(--kick);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+h1{font:800 clamp(2.4rem,6vw,3.6rem)/1.05 Fraunces,Georgia,serif;margin:14px 0 0;color:#f7f4ff;text-wrap:balance}
+.intro p{color:var(--soft);font-size:1.08rem;margin:16px 0 0;max-width:600px}
+.toc{display:flex;flex-direction:column;gap:2px;margin:28px 0 0;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:20px}
+.toc a{display:flex;gap:14px;padding:8px 0;text-decoration:none;color:var(--fg)}
+.toc a:hover b{color:var(--kick)}
+.toc time{color:var(--muted);font-size:.88rem;flex:none;width:92px;padding-top:2px}
+article{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:32px;scroll-margin-top:16px}
+article time{color:var(--muted);font-size:.9rem}
+article h2{font:700 clamp(1.6rem,4vw,2.2rem)/1.15 Fraunces,Georgia,serif;margin:8px 0 14px;color:#f7f4ff;text-wrap:balance}
+article h3{font-size:1.1rem;margin:24px 0 6px}
+article p{margin:0 0 14px;color:var(--soft)}
+article ul{margin:0 0 14px;padding-left:22px;color:var(--soft)}
+article li{margin:6px 0}
+article b{color:#fff}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.tags span{border:1px solid #5e4bb0;border-radius:999px;padding:3px 12px;font-size:.8rem;color:#ece8fd}
+.fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.fig div{background:#1d1550;border:1px solid #3a2c7a;border-radius:16px;padding:14px 16px}
+.fig b{display:block;font:800 1.8rem/1.1 Fraunces,Georgia,serif}
+.fig span{color:var(--muted);font-size:.88rem}
+.share{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;padding-top:16px;border-top:1px solid rgba(196,181,253,.22);font-size:.92rem}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid rgba(196,181,253,.22);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;color:var(--muted);font-size:.92rem}
+footer .wm{font-size:22px}
+footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
+@media (max-width:620px){
+  body{font-size:16px}
+  .logo svg{width:36px;height:36px}.wm{font-size:26px}
+  article{padding:22px 20px}
+  .toc time{width:78px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="/" title="SolFlag, ir al escáner">
+    <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="22" fill="#3a2a80" stroke="#a78bfa" stroke-width="2"/><g fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M23 10.5l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M19 12.8l4 2.3 4-2.3M23 15.1v4.6"/><path d="M14 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M10 26.3l4 2.3 4-2.3M14 28.6v4.6"/><path d="M32 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M28 26.3l4 2.3 4-2.3M32 28.6v4.6"/><path d="M19 15.1l-4.6 2.6v6.3M27 15.1l4.6 2.6v6.3M18 30.9L23 33.8l5-2.9"/></g></svg>
+    <span class="wm"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
+  </a>
+  <a class="back" href="/">Ir al escáner</a>
+</header>
+
+<section class="intro">
+  <p class="kick">Blog · Avances</p>
+  <h1>Lo que vamos construyendo.</h1>
+  <p>Novedades de SolFlag, pruebas con tokens reales y lo que aprendemos por el camino. Contado tal cual, también lo que sale mal.</p>
+  <nav class="toc" aria-label="Entradas">
+    <a href="#nace-solflag"><time datetime="2026-10-26">26 oct 2026</time><b>Nace SolFlag: nombre, dominio y diseño nuevos</b></a>
+    <a href="#falsa-alarma-rugcheck"><time datetime="2026-10-26">26 oct 2026</time><b>Una falsa alarma de RugCheck, filtrada</b></a>
+    <a href="#prueba-pumpfun"><time datetime="2026-10-25">25 oct 2026</time><b>Probamos el escáner con 100 tokens de Pump.fun</b></a>
+    <a href="#motor-open-source"><time datetime="2026-10-25">25 oct 2026</time><b>El motor de SolFlag, de código abierto</b></a>
+  </nav>
+</section>
+
+<!-- Para añadir un avance: copia un <article> y ponlo el primero, con su enlace en el índice de arriba -->
+
+<article id="nace-solflag">
+  <time datetime="2026-10-26">26 de octubre de 2026</time>
+  <h2>Nace SolFlag: nombre, dominio y diseño nuevos</h2>
+  <div class="tags"><span>Web</span><span>Marca</span></div>
+  <p>El escáner ya tiene nombre propio y casa propia: <b>SolFlag</b>, en <a href="https://solflag.com">solflag.com</a>. En cripto se habla de <i>red flags</i> y <i>green flags</i>, y eso es justo lo que hace: poner banderas a cada token, con el motivo de cada una.</p>
+  <h3>Qué cambia</h3>
+  <ul>
+    <li><b>Portada nueva</b>, con el escáner a mano y las 5 banderas explicadas: creador, concentración, liquidez, dependencia y lanzamiento.</li>
+    <li><b>Radar de red flags en tiempo real:</b> al entrar, SolFlag revisa los 10 últimos tokens lanzados en Solana y enseña los más peligrosos con su motivo.</li>
+    <li><b>Resultado más claro:</b> el veredicto con sus cifras arriba y, debajo, cada bandera marcada como <i>green flag</i>, <i>precaución</i> o <i>red flag</i>, al lado de la gráfica.</li>
+    <li><b>Ballenas en dos columnas:</b> los mayores holders a un lado y, al otro, las wallets que financió la misma cartera, el creador y las cuentas que no cuentan (bots, exchanges, pools).</li>
+    <li><b>Pensado para el móvil:</b> barra de secciones abajo, como una app.</li>
+    <li><b>Imágenes para compartir</b> rediseñadas, para X y para descargar.</li>
+    <li>El <b>bot de Telegram</b> también se llama ya SolFlag y enlaza cada análisis a la web.</li>
+  </ul>
+  <p>Todo sigue igual en lo importante: gratis, sin registro, sin conectar tu wallet y en español e inglés.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=Nace%20SolFlag%3A%20red%20flags%20de%20cualquier%20token%20de%20Solana%2C%20explicadas&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23nace-solflag" target="_blank" rel="noopener">Compartir en X</a><a href="#nace-solflag">Enlace a esta entrada</a></div>
+</article>
+
+<article id="falsa-alarma-rugcheck">
+  <time datetime="2026-10-26">26 de octubre de 2026</time>
+  <h2>Una falsa alarma de RugCheck, filtrada</h2>
+  <div class="tags"><span>Motor</span><span>Bot</span></div>
+  <p>El bot avisaba una y otra vez de que un token pasaba de riesgo medio a alto porque "solo el 0% de la liquidez está bloqueada", y a los 15 minutos de que volvía a medio. Al revisarlo, el fallo no era del token: <b>RugCheck respondía 0% en 5 de cada 40 consultas</b> para un pool bloqueado al 99%.</p>
+  <p>Desde la versión 0.3.2 del motor, cuando RugCheck da menos de un 60% bloqueado, SolFlag le pregunta hasta dos veces más y se queda con el valor más alto. Un pool que de verdad no está bloqueado sale bajo las tres veces, así que esa alerta sigue funcionando; solo desaparece la falsa.</p>
+  <p>Es un buen ejemplo de por qué no nos fiamos a ciegas de ningún dato de terceros: lo que no se puede comprobar no se da por bueno, y lo que llega raro se vuelve a mirar.</p>
+  <div class="share"><a href="#falsa-alarma-rugcheck">Enlace a esta entrada</a></div>
+</article>
+
+<article id="prueba-pumpfun">
+  <time datetime="2026-10-25">25 de octubre de 2026</time>
+  <h2>Probamos el escáner con 100 tokens de Pump.fun</h2>
+  <div class="tags"><span>Pruebas</span><span>Pump.fun</span></div>
+  <p>Pasamos por SolFlag 50 tokens con 10 minutos de vida, 25 todavía en la curva de Pump.fun y 25 ya graduados a PumpSwap. Ninguno dio error, y cada análisis tardó entre 0,3 y 5 segundos.</p>
+  <div class="fig">
+    <div><b>100</b><span>tokens revisados</span></div>
+    <div><b>0</b><span>errores</span></div>
+    <div><b>4</b><span>problemas encontrados y arreglados</span></div>
+  </div>
+  <h3>Lo que funcionó</h3>
+  <ul>
+    <li>Los 5 tokens que se hacían pasar por "SOL" salieron en riesgo alto.</li>
+    <li>El detector de lanzamiento marcó en rojo un token en el que <b>7 wallets se llevaron el 29,7% al nacer</b>, y otro con el 33,5%.</li>
+  </ul>
+  <h3>Lo que arreglamos</h3>
+  <ul>
+    <li><b>Falsa alarma de liquidez retirable</b> en los tokens de la curva: ahí nadie puede retirar la liquidez, la guarda el programa de Pump.fun. El aviso ya no sale en la curva y vuelve al graduarse.</li>
+    <li><b>Lanzadores en serie:</b> 50 tokens nuevos tenían solo 34 creadores, y una wallet lanzó 7 tokens con el mismo nombre en 10 minutos. Ahora SolFlag lo avisa. Algunas granjas pagan desde una wallet y ponen un creador distinto cada vez; la web también cuenta lo que lanzó quien pagó.</li>
+    <li><b>Tokens muy activos:</b> con miles de operaciones no se llegaba al momento del lanzamiento. Con una URL propia de Helius, ahora se leen hasta 25.000.</li>
+    <li><b>Impostores de "BTC" y "ETH":</b> añadidos a la lista de nombres famosos que se vigilan.</li>
+  </ul>
+  <h3>Lo que no salió</h3>
+  <p>Quisimos ver si los tokens marcados caían más a la hora, pero 52 minutos después casi todos seguían igual: nadie los había comprado. No se hundieron por estafa, nacieron muertos, así que no había nada que medir. La próxima prueba será con tokens que sí tienen compradores, mirados a las 24 horas.</p>
+  <div class="share"><a href="#prueba-pumpfun">Enlace a esta entrada</a></div>
+</article>
+
+<article id="motor-open-source">
+  <time datetime="2026-10-25">25 de octubre de 2026</time>
+  <h2>El motor de SolFlag, de código abierto</h2>
+  <div class="tags"><span>Código abierto</span></div>
+  <p>Todo lo que decide el riesgo en SolFlag está en una librería pública, <b>solana-risk-engine</b>, con licencia MIT: en <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">GitHub</a> y en <a href="https://www.npmjs.com/package/solana-risk-engine" target="_blank" rel="noopener">npm</a>. Cualquiera puede revisar cómo se calcula cada bandera, o usarla en su propio proyecto.</p>
+  <ul>
+    <li><b>90 pruebas automáticas</b> que cubren casi todo el código, con una blockchain simulada.</li>
+    <li>Reglas calibradas con <b>62 tokens reales</b>. Esa revisión destapó un fallo serio: tokens conocidos como ORCA salían en riesgo alto porque su emisión la controla un programa, no una persona. Ya está corregido.</li>
+    <li>Sin dependencias: funciona igual en el navegador que en un servidor, como en el bot de Telegram.</li>
+  </ul>
+  <div class="share"><a href="#motor-open-source">Enlace a esta entrada</a></div>
+</article>
+
+<footer>
+  <span class="wm"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
+  <a href="/">Escáner</a>
+  <a href="https://x.com/elgatotradebtc" target="_blank" rel="noopener">X @elgatotradebtc</a>
+  <a href="https://t.me/Chocolatevegano" target="_blank" rel="noopener">Telegram @Chocolatevegano</a>
+  <a href="https://t.me/panpontomate_escaner_bot" target="_blank" rel="noopener">Bot de avisos</a>
+  <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
+  <p>SolFlag es una herramienta orientativa, no consejo financiero.</p>
+</footer>
+</div>
+</body>
+</html>
