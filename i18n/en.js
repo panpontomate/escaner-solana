@@ -700,7 +700,7 @@ export const TEXT = {
   "Esa wallet ya estaba en el grupo.": "That wallet was in the group already.",
 
   // ---------- share on X, price alert menu ----------
-  "<details class='pmenu'><summary class='btn small'><span class='ic'>💲</span><span class='lb'>Alerta<span class='lg'> de</span> precio</span></summary><div class='pmenu-body'>": "<details class='pmenu'><summary class='btn small'><span class='ic'>💲</span><span class='lb'>Price alert</span></summary><div class='pmenu-body'>",
+  "<details class='pmenu'><summary class='btn small'><span class='ic'><svg viewBox='0 0 24 24' aria-hidden='true'><circle cx='12' cy='12' r='9.5'/><path d='M15 8.8c-.6-.8-1.7-1.3-3-1.3-1.8 0-3 .9-3 2.2 0 3 6 1.6 6 4.6 0 1.3-1.3 2.2-3 2.2-1.4 0-2.5-.5-3.1-1.4M12 5.8v1.7m0 9v1.7'/></svg></span><span class='lb'>Alerta<span class='lg'> de</span> precio</span></summary><div class='pmenu-body'>": "<details class='pmenu'><summary class='btn small'><span class='ic'><svg viewBox='0 0 24 24' aria-hidden='true'><circle cx='12' cy='12' r='9.5'/><path d='M15 8.8c-.6-.8-1.7-1.3-3-1.3-1.8 0-3 .9-3 2.2 0 3 6 1.6 6 4.6 0 1.3-1.3 2.2-3 2.2-1.4 0-2.5-.5-3.1-1.4M12 5.8v1.7m0 9v1.7'/></svg></span><span class='lb'>Price alert</span></summary><div class='pmenu-body'>",
   "'>📈 Si sube un 50%</a>": "'>📈 If it rises 50%</a>",
   "'>📉 Si baja un 30%</a>": "'>📉 If it drops 30%</a>",
   "'>↕️ Cada vez que se mueva un 20%</a>": "'>↕️ Every time it moves 20%</a>",
