@@ -52,14 +52,16 @@ export const TEXT = {
   // ---------- SolFlag: cabecera, portada y pie (oct 2026) ----------
   "Contamos visitas y análisis de forma anónima, sin cookies ni datos personales.": "We count visits and analyses anonymously, with no cookies and no personal data.",
   "Blog · Avances": "Blog · Updates (Spanish)",
+  "Contacto": "Contact",
+  "Creado por": "Created by",
   "Sin revisar todavía": "Not checked yet",
   "No aplica: mercado de más de 7 días": "Not applicable: market older than 7 days",
   "Falta comprobar ": "Still to check: ",
   ": lo que no se comprueba no se da por bueno.": ". What is not checked is not taken as fine.",
   "Cap. mercado": "Market cap",
   "ESCÁNER DE SOLANA": "SOLANA SCANNER",
-  " · @elgatotradebtc · No es consejo financiero": " · @elgatotradebtc · Not financial advice",
-  " · @elgatotradebtc · Herramienta orientativa, no es consejo financiero": " · @elgatotradebtc · A guide, not financial advice",
+  " · @solflagTeam · No es consejo financiero": " · @solflagTeam · Not financial advice",
+  " · @solflagTeam · Herramienta orientativa, no es consejo financiero": " · @solflagTeam · A guide, not financial advice",
   "<div><span>Personas</span><b>": "<div><span>People</span><b>",
   "<div><span>Pools y programas</span><b>": "<div><span>Pools and programs</span><b>",
   "</b><small>no son ballenas</small></div>": "</b><small>not whales</small></div>",
@@ -710,7 +712,7 @@ export const TEXT = {
   "' target='_blank' rel='noopener' title='Te avisa en Telegram cuando el precio llegue a donde digas'>💲 Alerta de precio</a>": "' target='_blank' rel='noopener' title='Alerts you on Telegram when the price gets where you say'>💲 Price alert</a>",
   " alerta fuerte)": " strong alert)",
   " alertas fuertes)": " strong alerts)",
-  " según SolFlag de @elgatotradebtc": " by SolFlag from @elgatotradebtc",
+  " según SolFlag (@solflagTeam)": " by SolFlag (@solflagTeam)",
 
   // ---------- risk history ----------
   "<div class='pchart'><div class='pc-head'><b>Historial del riesgo</b></div>": "<div class='pchart'><div class='pc-head'><b>Risk history</b></div>",

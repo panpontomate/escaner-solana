@@ -14,7 +14,7 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@elgatotradebtc">
+<meta name="twitter:site" content="@solflagTeam">
 <meta name="twitter:image" content="https://solflag.com/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -717,12 +717,14 @@ a.rdc{transition:transform .15s,border-color .15s}
     <p class="foot">Contamos visitas y análisis de forma anónima, sin cookies ni datos personales.</p>
     <p class="foot credits">
       <span class="wm"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
-      <a href="https://x.com/elgatotradebtc" target="_blank" rel="noopener">X @elgatotradebtc</a>
+      <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">X @solflagTeam</a>
       <a href="https://t.me/Chocolatevegano" target="_blank" rel="noopener">Telegram @Chocolatevegano</a>
       <a href="https://t.me/panpontomate_escaner_bot" target="_blank" rel="noopener">Bot de avisos</a>
       <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
       <a href="https://solflag.com/blog/">Blog · Avances</a>
+      <a href="mailto:solflag.team@gmail.com">Contacto</a>
     </p>
+    <p class="foot">Creado por <a href="https://x.com/elgatotradebtc" target="_blank" rel="noopener">El Gato Trade</a>.</p>
   </footer>
 </div>
 
@@ -1419,7 +1421,7 @@ function strongAlerts(r){
 function xText(r){
   var bad=strongAlerts(r);
   return "🔎 $"+r.sym+": "+(dataOnly(r)?"riesgo medio por falta de datos":LEVELS[r.lvl].label.toLowerCase())+
-    (bad?" ("+bad+(bad===1?" alerta fuerte)":" alertas fuertes)"):"")+" según SolFlag de @elgatotradebtc";
+    (bad?" ("+bad+(bad===1?" alerta fuerte)":" alertas fuertes)"):"")+" según SolFlag (@solflagTeam)";
 }
 function xIntent(r){ return "https://x.com/intent/post?text="+encodeURIComponent(xText(r))+"&url="+encodeURIComponent(tokenLink(r.mint)); }
 var X_ICON="<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>";
@@ -2226,7 +2228,7 @@ async function drawCard(r){
   x.fillStyle="rgba(196,181,253,.25)"; x.fillRect(P,fy+22,IW,2);
   x.fillStyle="#8ec5cf"; x.font="700 26px "+CF.B; x.fillText("solflag.com",P,fy+64);
   x.fillStyle="#c9c1ea"; x.font="400 20px "+CF.B; x.textAlign="right";
-  x.fillText(fdate(Date.now())+" · @elgatotradebtc · No es consejo financiero",W-P,fy+64); x.textAlign="left";
+  x.fillText(fdate(Date.now())+" · @solflagTeam · No es consejo financiero",W-P,fy+64); x.textAlign="left";
   return c;
 }
 async function shareCard(mint,btn){
@@ -2313,7 +2315,7 @@ async function drawXCard(r){
   });
   // pie
   x.fillStyle="#b4acdc"; x.font="400 19px "+CF.B; x.textAlign="center";
-  x.fillText(fdate(Date.now())+" · @elgatotradebtc · Herramienta orientativa, no es consejo financiero",W/2,H-36); x.textAlign="left";
+  x.fillText(fdate(Date.now())+" · @solflagTeam · Herramienta orientativa, no es consejo financiero",W/2,H-36); x.textAlign="left";
   return c;
 }
 function btnSay(btn,html,ms){ var old=btn.innerHTML; btn.innerHTML=html; setTimeout(function(){ btn.innerHTML=old; },ms); }
