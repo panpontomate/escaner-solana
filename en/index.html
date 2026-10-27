@@ -299,7 +299,8 @@ a{color:#a99fff}
 .btn.xs svg{width:14px;height:14px;flex:none;fill:currentColor}
 .btn.xs:disabled{opacity:.7;cursor:progress}
 details.pmenu{position:relative}
-details.pmenu>summary{list-style:none;display:inline-flex;align-items:center;cursor:pointer;background:#229ed9;color:#fff}
+details.pmenu>summary{list-style:none;display:inline-flex;align-items:center;cursor:pointer;background:#17834c;border-color:#17834c;color:#fff}
+details.pmenu>summary:hover{filter:brightness(1.1)}
 details.pmenu>summary::-webkit-details-marker{display:none}
 .pmenu-body{position:absolute;z-index:20;top:calc(100% + 6px);left:0;min-width:250px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 14px 40px rgba(5,6,20,.5);display:flex;flex-direction:column;gap:2px}
 .pmenu-body a{padding:9px 12px;border-radius:10px;color:var(--fg)}
@@ -320,11 +321,14 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 .pc-body>.hint{margin:4px 0 2px}
 #bundlebox{align-items:flex-start} #bundlebox .ld{margin-top:.35em}
 .pmenu-body{min-width:290px} .pmenu-body a{white-space:nowrap}
-/* botones del token: en el ordenador una fila normal; en el móvil, Descargar entero, X · Telegram · Alerta
+/* botones del token: en el ordenador Descargar · X · Telegram · Alerta en una fila y Copiar · Seguir · Ballenas debajo; en el móvil, Descargar entero, X · Telegram · Alerta
    en tres cuadrados y Copiar · Seguir · Ballenas en una barra con separadores */
 .btn .ic,.btn .lb{display:inline}
 .btn .ic+.lb{margin-left:6px}
 .trow,.tsub{display:contents}
+@media (min-width:521px){
+  .tsub{display:flex;flex-wrap:wrap;gap:10px;flex:0 0 100%;padding-top:12px;border-top:1px dashed var(--line)}
+}
 @media (max-width:520px){
   .tacts{display:flex;flex-direction:column;align-items:stretch;gap:10px}
   .tacts .lg{display:none}
