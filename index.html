@@ -307,6 +307,16 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 .pmenu-body a{padding:9px 12px;border-radius:10px;color:var(--fg)}
 .pmenu-body a:hover{background:var(--surface-2);text-decoration:none}
 .pmenu-body small{color:var(--muted);padding:6px 12px 4px;font-size:.8rem}
+.xdlg{border:1px solid var(--line);border-radius:22px;background:var(--surface);color:var(--fg);padding:0;width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);box-shadow:0 30px 80px rgba(5,4,20,.6)}
+.xdlg::backdrop{background:rgba(8,5,24,.72)}
+.xdlg>div{padding:22px}
+.xdlg h3{margin:0 0 14px;font-size:1.3rem}
+.xdlg img{display:block;width:100%;border-radius:12px;border:1px solid var(--line)}
+.xsteps{margin:16px 0 0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px;line-height:1.45}
+.xdlg kbd{font:700 .85em ui-monospace,monospace;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:2px 7px;white-space:nowrap}
+.xdlg-b{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.xdlg-b .btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.xdlg-b [data-xopen]{background:#000;color:#fff;border:1px solid #444}
 /* botones de segmento (gráfica, fuente de tokens nuevos) */
 .segs{display:inline-flex;gap:4px;padding:3px;background:var(--surface-2);border-radius:12px}
 .seg{border:0;background:transparent;color:var(--muted);border-radius:9px;padding:6px 11px;font-size:.84rem;font-weight:600;cursor:pointer}
@@ -2326,17 +2336,37 @@ async function shareX(mint,btn){
     }
     // En el ordenador X no acepta imágenes por enlace: se copia la imagen (se pega con Ctrl+V) y se abre X con el
     // texto. La copia se pide dentro del clic (Safari solo lo deja así) y X se abre en cuanto termina
+    // X se abre desde una ventanita que explica cómo pegar la imagen (antes el aviso quedaba en esta pestaña y no se veía)
     var copied=false;
     try{ if(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write){ await navigator.clipboard.write([new ClipboardItem({"image/png":blobP})]); copied=true; } }catch(e){}
-    if(!copied){
-      var b=await blobP, a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=name;
-      document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); },4000);
-    }
-    btnSay(btn,copied?"📋 Imagen copiada: pégala en X con Ctrl+V":"⬇️ Imagen descargada: adjúntala al post",8000);
-    openX(url);
+    xDialog(await blobP,copied,url,name);
   }catch(e){
     openX(url);
   }finally{ btn.disabled=false; }
+}
+// Ventana de compartir en X: la imagen, los pasos (pegar con Ctrl+V o, si no se pudo copiar, adjuntarla descargada)
+// y los botones. Pulsar fuera de la ventana la cierra
+var XD=null;
+function xDialog(blob,copied,url,name){
+  if(!XD){
+    XD=document.createElement("dialog"); XD.className="xdlg"; document.body.appendChild(XD);
+    XD.addEventListener("click",function(ev){
+      if(ev.target===XD||ev.target.closest("[data-xclose]")) XD.close();
+      else if(ev.target.closest("[data-xopen]")){ openX(XD.dataset.url); XD.close(); }
+    });
+    XD.addEventListener("close",function(){ URL.revokeObjectURL(XD.dataset.img); });
+  }
+  var src=URL.createObjectURL(blob), key=/Mac|iPhone|iPad/.test(navigator.platform)?"⌘ + V":"Ctrl + V";
+  XD.dataset.url=url; XD.dataset.img=src;
+  XD.innerHTML="<div><h3>Comparte la imagen en X</h3>"+
+    "<img alt='Imagen del análisis' src='"+src+"'>"+
+    "<ol class='xsteps'><li>Pulsa <b>Abrir X</b>: el texto y el enlace ya van escritos.</li>"+
+    (copied?"<li>La imagen ya está copiada: en el post pulsa <kbd>"+key+"</kbd> para pegarla.</li>"
+      :"<li>Pulsa <b>Descargar imagen</b> y adjúntala con el icono de foto de X.</li>")+"</ol>"+
+    "<div class='xdlg-b'><button class='btn' type='button' data-xopen>Abrir X</button>"+
+    "<a class='btn ghost' href='"+src+"' download='"+esc(name)+"'>Descargar imagen</a>"+
+    "<button class='btn ghost' type='button' data-xclose>Cerrar</button></div></div>";
+  XD.showModal();
 }
 // Si el navegador bloquea la ventana nueva, X se abre en esta misma pestaña
 function openX(url){
