@@ -732,7 +732,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="The scanner engine could not load from cdn.jsdelivr.net. Check your internet connection and reload the page."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.3.2/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.4.0/src/index.js";
 window.__escOk=true;
 (function(){
 "use strict";
@@ -2700,6 +2700,10 @@ function creatorHtml(c){
       "<span class='v' style='font-variant-numeric:tabular-nums'>"+pct(p)+" of the supply</span></div>";
   }).join("");
   var riskyOthers=0;
+  // Misma cuenta que la bandera del motor (CTL_CREATOR_HISTORY): de sus tokens de hace más de 24 h, cuántos
+  // se quedaron por debajo de 10.000 $ de capitalización
+  var oldT=c.others.filter(function(t){ var at=Date.parse(t.createdAt); return at&&Date.now()-at>=86400000&&typeof t.marketCap==="number"; });
+  var deadN=oldT.filter(function(t){ return t.marketCap<(SRE.CREATOR_DEAD_MCAP||10000); }).length;
   var othersHtml=c.others.slice(0,15).map(function(t){
     var s=c.riskMap[t.mint], tag;
     if(s===undefined) tag="<span class='tag seen'>not checked</span>";
@@ -2721,6 +2725,7 @@ function creatorHtml(c){
       "<button class='star' type='button' data-favw='"+esc(c.addr)+"' aria-pressed='"+(!!(lista.w[c.addr]&&lista.w[c.addr].fav))+"' title='Follow this wallet' aria-label='Follow this wallet'>"+((lista.w[c.addr]&&lista.w[c.addr].fav)?"★":"☆")+"</button>"+plusBtn(c.addr)+"</div></div>"+
     (c.others.length?
       "<details class='cdet'><summary>Created "+c.others.length+(c.others.length===1?" more token":" more tokens")+
+        (oldT.length>=3?" · "+deadN+" of "+oldT.length+" earlier ones never took off (under $10,000)":"")+
         (c.checked?" · "+riskyOthers+" of "+c.checked+" checked have risk signals":"")+"</summary>"+othersHtml+
         (c.others.length>15?"<p class='hint'>Showing the 15 most recent of "+c.others.length+".</p>":"")+
       "</details>":"<p class='hint' style='margin:8px 0 0'>No record of it creating other tokens.</p>")+

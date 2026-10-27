@@ -732,7 +732,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="No se pudo cargar el motor del escáner desde cdn.jsdelivr.net. Revisa tu conexión a internet y recarga la página."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.3.2/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.4.0/src/index.js";
 window.__escOk=true;
 (function(){
 "use strict";
@@ -2700,6 +2700,10 @@ function creatorHtml(c){
       "<span class='v' style='font-variant-numeric:tabular-nums'>"+pct(p)+" del supply</span></div>";
   }).join("");
   var riskyOthers=0;
+  // Misma cuenta que la bandera del motor (CTL_CREATOR_HISTORY): de sus tokens de hace más de 24 h, cuántos
+  // se quedaron por debajo de 10.000 $ de capitalización
+  var oldT=c.others.filter(function(t){ var at=Date.parse(t.createdAt); return at&&Date.now()-at>=86400000&&typeof t.marketCap==="number"; });
+  var deadN=oldT.filter(function(t){ return t.marketCap<(SRE.CREATOR_DEAD_MCAP||10000); }).length;
   var othersHtml=c.others.slice(0,15).map(function(t){
     var s=c.riskMap[t.mint], tag;
     if(s===undefined) tag="<span class='tag seen'>sin comprobar</span>";
@@ -2721,6 +2725,7 @@ function creatorHtml(c){
       "<button class='star' type='button' data-favw='"+esc(c.addr)+"' aria-pressed='"+(!!(lista.w[c.addr]&&lista.w[c.addr].fav))+"' title='Seguir esta wallet' aria-label='Seguir esta wallet'>"+((lista.w[c.addr]&&lista.w[c.addr].fav)?"★":"☆")+"</button>"+plusBtn(c.addr)+"</div></div>"+
     (c.others.length?
       "<details class='cdet'><summary>Ha creado "+c.others.length+(c.others.length===1?" token más":" tokens más")+
+        (oldT.length>=3?" · "+deadN+" de "+oldT.length+" anteriores no despegaron (menos de 10.000 $)":"")+
         (c.checked?" · "+riskyOthers+" de "+c.checked+" comprobados tienen señales de riesgo":"")+"</summary>"+othersHtml+
         (c.others.length>15?"<p class='hint'>Mostrando los 15 más recientes de "+c.others.length+".</p>":"")+
       "</details>":"<p class='hint' style='margin:8px 0 0'>No tiene constancia de que haya creado otros tokens.</p>")+
