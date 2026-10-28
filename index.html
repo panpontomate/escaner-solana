@@ -335,6 +335,9 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 .hsig{display:grid;gap:8px;margin:16px 0 4px}
 .hsig .lt{display:flex;align-items:flex-start;gap:10px} .hsig .lt>div{flex:1;min-width:0} .hsig .lt .ld{margin-top:.4em;flex:none}
 #bundlebox{align-items:flex-start} #bundlebox .ld{margin-top:.35em}
+.tag.kb{background:rgba(192,132,252,.16);color:#e9d5ff;border:1px solid rgba(192,132,252,.45)}
+.tag.kb-ex{background:rgba(226,232,240,.12);color:#e2e8f0;border-color:rgba(226,232,240,.4)}
+.tag.kb-warn{background:rgba(251,191,36,.12);color:#fcd34d;border-color:rgba(251,191,36,.45)}
 #bundlebox .sold{margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-size:.9rem}
 #bundlebox .sold-warn{background:var(--medio-bg)} #bundlebox .sold-bad{background:var(--alto-bg)}
 #bundlebox .face{margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--alto-bg);color:var(--fg);font-size:.9rem}
@@ -1885,6 +1888,22 @@ async function launchBuys(mint){
 function serialOthers(b,mint){
   return b&&b.serial?b.serial.mints.filter(function(m){ return m!==mint; }).length:0;
 }
+/* ---------- base de wallets de SolFlag ----------
+   Lo que el recolector va aprendiendo de cada wallet (datos/base.json, se actualiza solo): exchanges, granjas de
+   lanzamientos, repartidores y creadores en serie ya conocidos. Así se reconocen al instante, sin consultarlos */
+var wbase={data:null,at:0};
+async function loadBase(){
+  if(wbase.data&&Date.now()-wbase.at<600000) return wbase.data;
+  try{ var res=await fetch("/datos/base.json",{cache:"no-cache"}); wbase.data=res.ok?await res.json():null; }catch(e){ wbase.data=null; }
+  wbase.at=Date.now();
+  return wbase.data||{wallets:{}};
+}
+function baseType(a){ var w=wbase.data&&wbase.data.wallets&&wbase.data.wallets[a]; return w?w.t:null; }
+var BASE_TXT={"exchange":"Exchange conocido","granja":"Granja de lanzamientos","repartidor":"Repartidor conocido","creador en serie":"Creador en serie","sniper":"Sniper conocido"};
+function baseTag(a){
+  var t=baseType(a); if(!t) return "";
+  return "<span class='tag kb kb-"+(t==="exchange"?"ex":"warn")+"' title='Lo sabe la base de wallets de SolFlag, que se va llenando con cada lanzamiento revisado'>"+esc(BASE_TXT[t]||t)+"</span>";
+}
 /* ---------- caras conocidas ----------
    Lista que publica cada 30 minutos el recolector (tools/caras): wallets que pagaron, financiaron o crearon
    muchos tokens que no despegaron. Las granjas cambian de creador en cada lanzamiento, pero el dinero
@@ -2597,6 +2616,8 @@ async function holders(){
     var wal=b.uniq.filter(function(o){ return b.kind[o]==="wallet"; });
     var busy=await markBusy(b.kind,wal,function(c,n){ setProgress("Separando personas de bots y exchanges… "+c+"/"+n,0.65+0.15*c/Math.max(1,n)); });
     var hr=holderRows(b,busy), par=b.par;
+    await loadBase();
+    hr.rows.forEach(function(r){ if(r.kind==="wallet"&&baseType(r.owner)==="exchange") r.kind="activa"; });
     // Joven (menos de 14 días) o maduro: en los jóvenes casi todos los holders grandes mueven mucho y el reparto
     // del equipo se esconde entre ellos, así que también se busca el origen de las cuentas muy activas
     var created=(par&&par.pairCreatedAt)||null;
@@ -2613,8 +2634,9 @@ async function holders(){
       if(srcs.length){
         // un origen es un exchange si mueve más de 100 operaciones por hora (la regla de los bots, 200 en 2 días,
         // también pillaba a repartidores de ~50 por hora y escondía sus grupos)
-        var rates=await call(SRE.sourceRates(client(),srcs,function(c,n){ setProgress("Comprobando si el origen de cada grupo es un exchange… "+c+"/"+n,0.88+0.02*c/Math.max(1,n)); }));
-        var hot={}; srcs.forEach(function(f){ if(rates[f]>SRE.EXCHANGE_PER_HOUR) hot[f]=true; });
+        var hot={}, ask=srcs.filter(function(f){ if(baseType(f)==="exchange"){ hot[f]=true; return false; } return true; });
+        var rates=ask.length?await call(SRE.sourceRates(client(),ask,function(c,n){ setProgress("Comprobando si el origen de cada grupo es un exchange… "+c+"/"+n,0.88+0.02*c/Math.max(1,n)); })):{};
+        ask.forEach(function(f){ if(rates[f]>SRE.EXCHANGE_PER_HOUR) hot[f]=true; });
         hotGroups=srcs.filter(function(f){ return hot[f]; }).length;
         if(hotGroups) clusters=clusterByFunder(funders,hot);
       }
@@ -2992,7 +3014,7 @@ function renderHolders(keep){
   var side="<div class='card hcard'><p class='kick'>Grupos por financiador</p><h3 class='tgt'>Wallets que se mueven juntas</h3>"+
     (glist.length?glist.map(function(g){
       return "<div class='hgrp'><div class='hgrp-h'><b>Grupo "+esc(g.id)+"</b><b>"+esc(fmtPct(g.pct))+"</b></div>"+
-        "<p>"+g.n+" wallets financiadas por <a class='mono' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(g.funder)+"'>"+esc(short(g.funder))+"</a></p></div>";
+        "<p>"+g.n+" wallets financiadas por <a class='mono' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(g.funder)+"'>"+esc(short(g.funder))+"</a> "+baseTag(g.funder)+"</p></div>";
     }).join(""):"<p class='hint'>Ningún grupo con el mismo origen de fondos entre "+(h.mode==="young"?"las cuentas más grandes.":"las personas.")+"</p>")+
     "</div>"+
     creatorHtml(h.creator)+
@@ -3007,7 +3029,7 @@ function renderHolders(keep){
       "<div style='min-width:0'>"+
         "<div class='hl1'><span class='mono'>"+esc(short(r.owner))+"</span>"+
           "<button class='copy' type='button' data-copy='"+esc(r.owner)+"' title='Copiar dirección'>copiar</button>"+
-          "<span class='tag"+(isW?"":" p")+"'>"+(isW?"Persona (probable)":(r.kind==="activa"?"Muy activa":"Programa o pool"))+"</span>"+(r.kind==="activa"?"<span class='tag seen' title='Muchos movimientos en poco tiempo: típico de un bot, exchange o market maker'>200+ mov. en "+(r.busy<48?r.busy+" h":"2 días")+"</span>":"")+(clusters[r.owner]?"<a class='tag cluster' style='text-decoration:none' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(clusters[r.owner].funder)+"' title='Esta wallet y otras "+(clusters[r.owner].n-1)+" de la lista recibieron su primera transacción de la misma dirección ("+esc(short(clusters[r.owner].funder))+"): podrían ser la misma persona o equipo. Es una pista, no una prueba. Pulsa para ver el origen en Solscan'>Grupo "+esc(clusters[r.owner].id)+" · "+clusters[r.owner].n+" wallets ↗</a>":"")+(isW?seenTag(r.owner):"")+"</div>"+
+          "<span class='tag"+(isW?"":" p")+"'>"+(isW?"Persona (probable)":(r.kind==="activa"?"Muy activa":"Programa o pool"))+"</span>"+baseTag(r.owner)+(r.kind==="activa"&&r.busy?"<span class='tag seen' title='Muchos movimientos en poco tiempo: típico de un bot, exchange o market maker'>200+ mov. en "+(r.busy<48?r.busy+" h":"2 días")+"</span>":"")+(clusters[r.owner]?"<a class='tag cluster' style='text-decoration:none' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(clusters[r.owner].funder)+"' title='Esta wallet y otras "+(clusters[r.owner].n-1)+" de la lista recibieron su primera transacción de la misma dirección ("+esc(short(clusters[r.owner].funder))+"): podrían ser la misma persona o equipo. Es una pista, no una prueba. Pulsa para ver el origen en Solscan'>Grupo "+esc(clusters[r.owner].id)+" · "+clusters[r.owner].n+" wallets ↗</a>":"")+(isW?seenTag(r.owner):"")+"</div>"+
         "<div class='hbar'><i style='width:"+Math.max(2,r.pct/max*100)+"%'></i></div>"+
         "<div class='meta'><span>Saldo <span class='v'>"+esc(fmtNum(r.tokens))+"</span></span>"+
           (h.price?"<span>Valor <span class='v'>"+usd(r.value)+"</span></span>":"")+

@@ -483,6 +483,14 @@ export const TEXT = {
   "'><span class='ic'>🔗</span><span class='lb'><span class='lg'>Ver en </span>Solscan</span></a></div></div>": "'><span class='ic'>🔗</span><span class='lb'><span class='lg'>See on </span>Solscan</span></a></div></div>",
   "<div class='hint'>Último resultado estimado: ": "<div class='hint'>Last estimated result: ",
 
+  // ---------- wallet base ----------
+  "Exchange conocido": "Known exchange",
+  "Granja de lanzamientos": "Launch farm",
+  "Repartidor conocido": "Known distributor",
+  "Creador en serie": "Serial creator",
+  "Sniper conocido": "Known sniper",
+  "' title='Lo sabe la base de wallets de SolFlag, que se va llenando con cada lanzamiento revisado'>": "' title='Known to the SolFlag wallet base, which grows with every launch it checks'>",
+
   // ---------- sold since launch, whale modes ----------
   "El creador ya se ha deshecho de todo lo que compró al lanzarlo (": "The creator has already got rid of everything it bought at launch (",
   " del suministro).": " of the supply).",
