@@ -357,7 +357,7 @@ details.pmenu>summary::-webkit-details-marker{display:none}
   .tsub .ic{font-size:1.25rem;line-height:1}
   .tsub .ic+.lb{margin-left:0}
 }
-/* botones de la wallet: en el ordenador en una fila con el orden de siempre; en el móvil Estimar · Seguir · Confluencia enteros y Telegram · Copiar · Solscan en tres cuadrados */
+/* botones de la wallet: en el ordenador en una fila con el orden de siempre; en el móvil Ganancias · Seguir · Confluencia enteros y Telegram · Copiar · Solscan en tres cuadrados */
 .wrow{display:contents}
 .wsol{display:inline-flex;align-items:center}
 @media (min-width:521px){
@@ -649,7 +649,7 @@ a.rdc{transition:transform .15s,border-color .15s}
         <div>
           <label class="eyebrow" for="rpc">Your Helius URL (optional)</label>
           <input id="rpc" type="url" spellcheck="false" placeholder="https://mainnet.helius-rpc.com/?api-key=TU_CLAVE">
-          <small>It is stored only in this browser and only sent to Helius. If you leave it empty, free public services are used: everything works except “Estimate result”, but it is slower.</small>
+          <small>It is stored only in this browser and only sent to Helius. If you leave it empty, free public services are used: everything works except “See profit and loss”, but it is slower.</small>
         </div>
         <details class="guide">
           <summary>How to get a Helius URL (free, 2 minutes)</summary>
@@ -953,7 +953,7 @@ async function estimateOne(){
     box.innerHTML=pnlBoxHtml(r.pnl[addr],r);
   }catch(e){
     box.innerHTML="<div class='notice err' style='margin-top:14px'>"+friendlyError(e)+"</div>";
-  }finally{ btn.disabled=false; btn.textContent="Estimate result"; }
+  }finally{ btn.disabled=false; btn.textContent="See profit and loss"; }
 }
 
 /* ---------- Confluencia: tokens que tienen en común varias wallets ---------- */
@@ -1601,7 +1601,7 @@ function render(){
   var legend=ORDER.map(function(k){
     return "<span><i class='dot "+LEVELS[k].bar+"'></i>"+LEVELS[k].short+" <b>"+c[k]+"</b></span>";
   }).join("");
-  var tip = !n ? "There are no tokens to review, so this does not say whether the wallet can be trusted. If it is a token creator, what counts is what it did: press “Estimate result” to see its buys and sells, or check on Solscan where it moved the money." :
+  var tip = !n ? "There are no tokens to review, so this does not say whether the wallet can be trusted. If it is a token creator, what counts is what it did: press “See profit and loss” to see its buys and sells, or check on Solscan where it moved the money." :
             (c.ALTO>0 ? "Some tokens with a market have strong warning signs: review them below." : "No token with a market has strong warning signs.");
   if(c.SPAM>0) tip+=" There are also "+c.SPAM+" tokens that look like spam (no market and active authorities): do not sell them or visit websites under their name.";
   if(c["SIN DATOS"]>0) tip+=" "+c["SIN DATOS"]+(c["SIN DATOS"]===1?" token could not be checked because of a network error: analyse the wallet again to review it.":" tokens could not be checked because of a network error: analyse the wallet again to review them.");
@@ -1618,7 +1618,7 @@ function render(){
     "<h2 class='verdict'>"+esc(verdict(c))+"</h2>"+
     "<p class='sub'>"+esc(tip)+(split?" "+esc(split):"")+(state.hidden?(state.hidden===1?" 1 token worth under $1 is hidden.":" Hidden: "+state.hidden+" tokens worth under $1."):"")+"</p>"+
     (n?"<div class='bar' role='img' aria-label='Tokens by risk level'>"+segs+"</div><div class='legend'>"+legend+"</div>":"")+
-    "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>Estimate result</button>"+
+    "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>See profit and loss</button>"+
     "<button class='btn ghost small wfav' type='button' data-long data-favw='"+esc(state.wallet)+"' aria-pressed='"+(!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"'>"+starHtml("wallet",!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"</button>"+
     "<button class='btn ghost small wconf' type='button' data-long data-addc='"+esc(state.wallet)+"' aria-pressed='"+inCart(state.wallet)+"'>"+(inCart(state.wallet)?"✓ In Confluence":"⊕ To Confluence")+"</button>"+
     "<div class='wrow'>"+tgBtn(state.wallet,"Alerts you on Telegram about what this wallet buys or sells")+

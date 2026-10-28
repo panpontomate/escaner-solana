@@ -153,8 +153,8 @@ export const TEXT = {
     "Shows the largest accounts and keeps only the ones that look like people: it drops pools, programs and very active accounts (bots, exchanges, market makers). Then you can analyse each wallet.",
   "Ajustes": "Settings",
   "Tu URL de Helius (opcional)": "Your Helius URL (optional)",
-  "Se guarda solo en este navegador y solo se envía a Helius. Si lo dejas vacío se usan servicios públicos gratuitos: funciona todo menos «Estimar resultado», pero va más lento.":
-    "It is stored only in this browser and only sent to Helius. If you leave it empty, free public services are used: everything works except “Estimate result”, but it is slower.",
+  "Se guarda solo en este navegador y solo se envía a Helius. Si lo dejas vacío se usan servicios públicos gratuitos: funciona todo menos «Ver ganancias y pérdidas», pero va más lento.":
+    "It is stored only in this browser and only sent to Helius. If you leave it empty, free public services are used: everything works except “See profit and loss”, but it is slower.",
   "Cómo conseguir una URL de Helius (gratis, 2 minutos)": "How to get a Helius URL (free, 2 minutes)",
   "Entra en": "Go to",
   "y crea una cuenta gratuita. Si te preocupa la privacidad, usa un email secundario.": "and create a free account. If you care about privacy, use a secondary email.",
@@ -280,7 +280,7 @@ export const TEXT = {
   "<div style='margin-top:10px;font-size:.84rem'>Es una estimación: solo cuenta compras y ventas por swap de las últimas ~300 operaciones. No incluye tokens recibidos por transferencia ni airdrops, y lo comprado antes de ese periodo queda fuera.</div></div>":
     "<div style='margin-top:10px;font-size:.84rem'>This is an estimate: it only counts swap buys and sells from the last ~300 trades. It does not include tokens received by transfer or airdrops, and anything bought before that period is left out.</div></div>",
   "Calculando…": "Calculating…",
-  "Estimar resultado": "Estimate result",
+  "Ver ganancias y pérdidas": "See profit and loss",
 
   // ---------- confluence ----------
   "✓ En Confluencia": "✓ In Confluence",
@@ -462,8 +462,8 @@ export const TEXT = {
   " · Bajo: ": " · Low: ",
   " · Spam: ": " · Spam: ",
   " · Sin mercado: ": " · No market: ",
-  "No hay tokens que revisar, así que esto no dice si la wallet es de fiar. Si es el creador de un token, lo que cuenta es lo que ha hecho: pulsa «Estimar resultado» para ver sus compras y ventas, o mira en Solscan a dónde ha movido el dinero.":
-    "There are no tokens to review, so this does not say whether the wallet can be trusted. If it is a token creator, what counts is what it did: press “Estimate result” to see its buys and sells, or check on Solscan where it moved the money.",
+  "No hay tokens que revisar, así que esto no dice si la wallet es de fiar. Si es el creador de un token, lo que cuenta es lo que ha hecho: pulsa «Ver ganancias y pérdidas» para ver sus compras y ventas, o mira en Solscan a dónde ha movido el dinero.":
+    "There are no tokens to review, so this does not say whether the wallet can be trusted. If it is a token creator, what counts is what it did: press “See profit and loss” to see its buys and sells, or check on Solscan where it moved the money.",
   "Hay tokens con mercado y señales fuertes de alerta: revísalos abajo.": "Some tokens with a market have strong warning signs: review them below.",
   "Ningún token con mercado tiene señales fuertes de alerta.": "No token with a market has strong warning signs.",
   " Además hay ": " There are also ",
@@ -475,7 +475,7 @@ export const TEXT = {
   " Se han ocultado ": " Hidden: ",
   " tokens de menos de 1 $.": " tokens worth under $1.",
   "<div class='bar' role='img' aria-label='Reparto de tokens por nivel de riesgo'>": "<div class='bar' role='img' aria-label='Tokens by risk level'>",
-  "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>Estimar resultado</button>": "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>Estimate result</button>",
+  "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>Ver ganancias y pérdidas</button>": "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>See profit and loss</button>",
   "Seguir wallet": "Follow wallet",
   "<button class='btn small wcopy' id='copySum' type='button'><span class='ic'>📋</span><span class='lb'>Copiar<span class='lg'> resumen</span></span></button>": "<button class='btn small wcopy' id='copySum' type='button'><span class='ic'>📋</span><span class='lb'>Copy<span class='lg'> summary</span></span></button>",
   "'><span class='ic'>🔗</span><span class='lb'><span class='lg'>Ver en </span>Solscan</span></a></div></div>": "'><span class='ic'>🔗</span><span class='lb'><span class='lg'>See on </span>Solscan</span></a></div></div>",

@@ -357,7 +357,7 @@ details.pmenu>summary::-webkit-details-marker{display:none}
   .tsub .ic{font-size:1.25rem;line-height:1}
   .tsub .ic+.lb{margin-left:0}
 }
-/* botones de la wallet: en el ordenador en una fila con el orden de siempre; en el móvil Estimar · Seguir · Confluencia enteros y Telegram · Copiar · Solscan en tres cuadrados */
+/* botones de la wallet: en el ordenador en una fila con el orden de siempre; en el móvil Ganancias · Seguir · Confluencia enteros y Telegram · Copiar · Solscan en tres cuadrados */
 .wrow{display:contents}
 .wsol{display:inline-flex;align-items:center}
 @media (min-width:521px){
@@ -649,7 +649,7 @@ a.rdc{transition:transform .15s,border-color .15s}
         <div>
           <label class="eyebrow" for="rpc">Tu URL de Helius (opcional)</label>
           <input id="rpc" type="url" spellcheck="false" placeholder="https://mainnet.helius-rpc.com/?api-key=TU_CLAVE">
-          <small>Se guarda solo en este navegador y solo se envía a Helius. Si lo dejas vacío se usan servicios públicos gratuitos: funciona todo menos «Estimar resultado», pero va más lento.</small>
+          <small>Se guarda solo en este navegador y solo se envía a Helius. Si lo dejas vacío se usan servicios públicos gratuitos: funciona todo menos «Ver ganancias y pérdidas», pero va más lento.</small>
         </div>
         <details class="guide">
           <summary>Cómo conseguir una URL de Helius (gratis, 2 minutos)</summary>
@@ -953,7 +953,7 @@ async function estimateOne(){
     box.innerHTML=pnlBoxHtml(r.pnl[addr],r);
   }catch(e){
     box.innerHTML="<div class='notice err' style='margin-top:14px'>"+friendlyError(e)+"</div>";
-  }finally{ btn.disabled=false; btn.textContent="Estimar resultado"; }
+  }finally{ btn.disabled=false; btn.textContent="Ver ganancias y pérdidas"; }
 }
 
 /* ---------- Confluencia: tokens que tienen en común varias wallets ---------- */
@@ -1601,7 +1601,7 @@ function render(){
   var legend=ORDER.map(function(k){
     return "<span><i class='dot "+LEVELS[k].bar+"'></i>"+LEVELS[k].short+" <b>"+c[k]+"</b></span>";
   }).join("");
-  var tip = !n ? "No hay tokens que revisar, así que esto no dice si la wallet es de fiar. Si es el creador de un token, lo que cuenta es lo que ha hecho: pulsa «Estimar resultado» para ver sus compras y ventas, o mira en Solscan a dónde ha movido el dinero." :
+  var tip = !n ? "No hay tokens que revisar, así que esto no dice si la wallet es de fiar. Si es el creador de un token, lo que cuenta es lo que ha hecho: pulsa «Ver ganancias y pérdidas» para ver sus compras y ventas, o mira en Solscan a dónde ha movido el dinero." :
             (c.ALTO>0 ? "Hay tokens con mercado y señales fuertes de alerta: revísalos abajo." : "Ningún token con mercado tiene señales fuertes de alerta.");
   if(c.SPAM>0) tip+=" Además hay "+c.SPAM+" tokens que parecen spam (sin mercado y con autoridades activas): no los vendas ni entres en webs que aparezcan a su nombre.";
   if(c["SIN DATOS"]>0) tip+=" "+c["SIN DATOS"]+(c["SIN DATOS"]===1?" token no se pudo comprobar por un fallo de red: vuelve a analizar la wallet para revisarlo.":" tokens no se pudieron comprobar por un fallo de red: vuelve a analizar la wallet para revisarlos.");
@@ -1618,7 +1618,7 @@ function render(){
     "<h2 class='verdict'>"+esc(verdict(c))+"</h2>"+
     "<p class='sub'>"+esc(tip)+(split?" "+esc(split):"")+(state.hidden?(state.hidden===1?" Se ha ocultado 1 token de menos de 1 $.":" Se han ocultado "+state.hidden+" tokens de menos de 1 $."):"")+"</p>"+
     (n?"<div class='bar' role='img' aria-label='Reparto de tokens por nivel de riesgo'>"+segs+"</div><div class='legend'>"+legend+"</div>":"")+
-    "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>Estimar resultado</button>"+
+    "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>Ver ganancias y pérdidas</button>"+
     "<button class='btn ghost small wfav' type='button' data-long data-favw='"+esc(state.wallet)+"' aria-pressed='"+(!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"'>"+starHtml("wallet",!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"</button>"+
     "<button class='btn ghost small wconf' type='button' data-long data-addc='"+esc(state.wallet)+"' aria-pressed='"+inCart(state.wallet)+"'>"+(inCart(state.wallet)?"✓ En Confluencia":"⊕ A Confluencia")+"</button>"+
     "<div class='wrow'>"+tgBtn(state.wallet,"Te avisa en Telegram de lo que compra o vende esta wallet")+
