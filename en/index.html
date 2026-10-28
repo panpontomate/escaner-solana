@@ -309,17 +309,24 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 .pmenu-body .pm-i{display:block;width:100%;text-align:left;background:none;border:0;padding:9px 12px;border-radius:10px;color:var(--fg);font:inherit;cursor:pointer}
 .pmenu-body .pm-i:hover{background:var(--surface-2)}
 .pmenu-body a small{display:block;padding:2px 0 0}
-/* ordenador: una fila Seguir · Ballenas (turquesa de la marca) · Compartir ▾ · Avisos ▾; en el móvil, los botones de siempre */
-.tdesk{display:none}
-@media (min-width:521px){
-  .tacts{display:none}
-  .tdesk{display:flex}
-  .tdesk .btn.tfav{background:#a78bfa;color:#140e31;border:0}
-  .tdesk .btn.twh{background:var(--accent);color:var(--accent-fg);border:0}
-  .tdesk .tshare>summary{background:var(--surface-2);color:var(--fg)}
-  .tdesk .tavisos>summary{background:#229ed9;color:#fff}
-  .tdesk .btn .ic+.lb{margin-left:6px}
-  .tdesk .car{opacity:.7;font-size:.75em;margin-left:6px}
+/* botones del token: Seguir · Ballenas (turquesa de la marca) · Compartir ▾ · Avisos ▾. En el ordenador, una fila;
+   en el móvil, 2×2 con los menús como panel que sube desde abajo. Los botones grandes de antes (.tacts) ya no se ven */
+.tacts{display:none!important}
+.tdesk .btn.tfav{background:#a78bfa;color:#140e31;border:0}
+.tdesk .btn.twh{background:var(--accent);color:var(--accent-fg);border:0}
+.tdesk .tshare>summary{background:var(--surface-2);color:var(--fg)}
+.tdesk .tavisos>summary{background:#229ed9;color:#fff}
+.tdesk .btn .ic+.lb{margin-left:6px}
+.tdesk .car{opacity:.7;font-size:.75em;margin-left:6px}
+.tdesk .ds{display:none}
+@media (max-width:520px){
+  .tdesk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tdesk>.btn,.tdesk>details>summary{display:flex;width:100%;justify-content:center;align-items:center;border-radius:16px;padding:12px 8px;font-size:.95rem;font-weight:700;min-height:50px}
+  .tdesk>details{display:block}
+  .tdesk .dl{display:none} .tdesk .ds{display:inline}
+  .tdesk .pmenu-body{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:60;min-width:0;border-radius:22px 22px 0 0;padding:14px 12px calc(86px + env(safe-area-inset-bottom));box-shadow:0 -20px 60px rgba(5,3,18,.75)}
+  .tdesk .pmenu-body::before{content:"";display:block;width:42px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 8px}
+  .tdesk .pmenu-body a,.tdesk .pmenu-body .pm-i{padding:13px 12px;font-size:1rem;white-space:normal}
 }
 .pmenu-body small{color:var(--muted);padding:6px 12px 4px;font-size:.8rem}
 .xdlg{border:1px solid var(--line);border-radius:22px;background:var(--surface);color:var(--fg);padding:0;width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);box-shadow:0 30px 80px rgba(5,4,20,.6)}
@@ -1476,8 +1483,8 @@ function xText(r){
 }
 function xIntent(r){ return "https://x.com/intent/post?text="+encodeURIComponent(xText(r))+"&url="+encodeURIComponent(tokenLink(r.mint)); }
 var X_ICON="<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>";
-// Botones del token en el ordenador: Seguir · Buscar ballenas · Compartir ▾ · Avisos en Telegram ▾. Lo que se usa menos
-// va dentro de los dos menús; en el móvil siguen los botones grandes de siempre (.tacts)
+// Botones del token: Seguir · Buscar ballenas · Compartir ▾ · Avisos en Telegram ▾. Lo que se usa menos va dentro de
+// los dos menús. En el ordenador, en una fila; en el móvil, en 2×2 y los menús suben como un panel desde abajo
 function deskActions(r,fav){
   var share=(r.lights?"<button type='button' class='pm-i' data-card='"+esc(r.mint)+"'>⬇ Download image</button>":"")+
     (r.lights?"<button type='button' class='pm-i' data-xshare='"+esc(r.mint)+"'>𝕏 Share on X</button>":"")+
@@ -1489,9 +1496,9 @@ function deskActions(r,fav){
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,""))+"'>✏️ Another price (choose it in the bot)</a>":"";
   return "<div class='actions tdesk'>"+
     (r.par?"<button class='btn small tfav' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
-    "<button class='btn small twh' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'>Find whales</span></button>"+
+    "<button class='btn small twh' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'><span class='dl'>Find whales</span><span class='ds'>Whales</span></span></button>"+
     "<details class='pmenu tshare'><summary class='btn small'><span class='ic'>↗</span><span class='lb'>Share</span><span class='car'>▾</span></summary><div class='pmenu-body'>"+share+"</div></details>"+
-    (avisos?"<details class='pmenu tavisos'><summary class='btn small'><span class='ic'>🔔</span><span class='lb'>Telegram alerts</span><span class='car'>▾</span></summary><div class='pmenu-body'>"+avisos+"</div></details>":"")+
+    (avisos?"<details class='pmenu tavisos'><summary class='btn small'><span class='ic'>🔔</span><span class='lb'><span class='dl'>Telegram alerts</span><span class='ds'>Alerts</span></span><span class='car'>▾</span></summary><div class='pmenu-body'>"+avisos+"</div></details>":"")+
     "</div>";
 }
 function xBtn(r){

@@ -488,9 +488,9 @@ export const TEXT = {
   "'>𝕏 Compartir en X</button>": "'>𝕏 Share on X</button>",
   "'>🔗 Copiar enlace</button>": "'>🔗 Copy link</button>",
   "'>🔔 Vigilar este token<small>Si sube el riesgo, cae la liquidez o el creador vende</small></a>": "'>🔔 Watch this token<small>If the risk rises, liquidity drops or the creator sells</small></a>",
-  "'><span class='ic'>🐳</span><span class='lb'>Buscar ballenas</span></button>": "'><span class='ic'>🐳</span><span class='lb'>Find whales</span></button>",
+  "'><span class='ic'>🐳</span><span class='lb'><span class='dl'>Buscar ballenas</span><span class='ds'>Ballenas</span></span></button>": "'><span class='ic'>🐳</span><span class='lb'><span class='dl'>Find whales</span><span class='ds'>Whales</span></span></button>",
   "<details class='pmenu tshare'><summary class='btn small'><span class='ic'>↗</span><span class='lb'>Compartir</span><span class='car'>▾</span></summary><div class='pmenu-body'>": "<details class='pmenu tshare'><summary class='btn small'><span class='ic'>↗</span><span class='lb'>Share</span><span class='car'>▾</span></summary><div class='pmenu-body'>",
-  "<details class='pmenu tavisos'><summary class='btn small'><span class='ic'>🔔</span><span class='lb'>Avisos en Telegram</span><span class='car'>▾</span></summary><div class='pmenu-body'>": "<details class='pmenu tavisos'><summary class='btn small'><span class='ic'>🔔</span><span class='lb'>Telegram alerts</span><span class='car'>▾</span></summary><div class='pmenu-body'>",
+  "<details class='pmenu tavisos'><summary class='btn small'><span class='ic'>🔔</span><span class='lb'><span class='dl'>Avisos en Telegram</span><span class='ds'>Avisos</span></span><span class='car'>▾</span></summary><div class='pmenu-body'>": "<details class='pmenu tavisos'><summary class='btn small'><span class='ic'>🔔</span><span class='lb'><span class='dl'>Telegram alerts</span><span class='ds'>Alerts</span></span><span class='car'>▾</span></summary><div class='pmenu-body'>",
 
   // ---------- wallet base ----------
   "Exchange conocido": "Known exchange",
