@@ -1,0 +1,129 @@
+// Recolector de "caras conocidas". Lo ejecuta GitHub Actions cada 30 minutos (.github/workflows/caras.yml):
+//   1. apunta los tokens nuevos de GeckoTerminal con su creador (RugCheck), quien pagó la creación y quien financió al creador
+//   2. a las 24 h mira si despegaron (capitalización en DexScreener) o si RugCheck los marca como rug
+//   3. comprueba si las wallets que se repiten son exchanges o plataformas (muchas transacciones por hora) para no marcarlas
+//   4. escribe caras.json (lo que lee la web) y tools/caras/estado.json (lo que recuerda entre ejecuciones; no va en git,
+//      lo guarda la caché de Actions)
+//
+// Uso: node tools/caras/collect.mjs            (RPC en la variable SOLANA_RPC; si no, uno público)
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { DAY, INFRA_PER_HOUR, emptyState, addToken, resolveToken, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const STATE = path.join(HERE, "estado.json");
+const OUT = path.join(HERE, "..", "..", "caras.json");
+const RPC = process.env.SOLANA_RPC || "https://solana-rpc.publicnode.com";
+const MAX_NEW = +process.env.CARAS_MAX_NEW || 120;      // tokens nuevos por ejecución
+const MAX_INFRA = 40;                                    // comprobaciones de actividad por ejecución
+const QUOTES = ["So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"];
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const now = Date.now();
+
+async function rpc(method, params) {
+  for (let i = 0; i < 4; i++) {
+    try {
+      const r = await fetch(RPC, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) });
+      if (r.status === 429) { await sleep(1500 * (i + 1)); continue; }
+      const j = await r.json();
+      if (j.error) throw new Error(j.error.message);
+      return j.result;
+    } catch (e) { if (i === 3) throw e; await sleep(800 * (i + 1)); }
+  }
+  return null;
+}
+async function getJson(url) {
+  for (let i = 0; i < 3; i++) {
+    try {
+      const r = await fetch(url, { headers: { accept: "application/json" } });
+      if (r.status === 429) { await sleep(4000 * (i + 1)); continue; }
+      return r.ok ? await r.json() : null;
+    } catch (e) { await sleep(1500); }
+  }
+  return null;
+}
+// Firmantes de la primera transacción de una dirección; null si tiene más de 3000 (no se puede saber barato)
+async function firstSigners(addr) {
+  let before = null;
+  for (let i = 0; i < 3; i++) {
+    const page = await rpc("getSignaturesForAddress", [addr, before ? { limit: 1000, before } : { limit: 1000 }]);
+    if (!page || !page.length) return null;
+    if (page.length < 1000) {
+      const tx = await rpc("getTransaction", [page[page.length - 1].signature, { maxSupportedTransactionVersion: 1, encoding: "jsonParsed", commitment: "confirmed" }]);
+      const keys = tx && tx.transaction && tx.transaction.message.accountKeys;
+      return keys ? keys.filter((k) => k.signer).map((k) => k.pubkey) : null;
+    }
+    before = page[page.length - 1].signature;
+  }
+  return null;
+}
+
+// la primera vez (caché vacía) arranca con los tokens del estudio del 28/10
+const SEED = path.join(HERE, "semilla.json");
+const state = fs.existsSync(STATE) ? JSON.parse(fs.readFileSync(STATE, "utf8")) : fs.existsSync(SEED) ? JSON.parse(fs.readFileSync(SEED, "utf8")) : emptyState();
+prune(state, now);
+// tokens ya vistos (2 días) para no apuntar dos veces uno que ya se resolvió
+state.seen = state.seen || {};
+Object.keys(state.seen).forEach((m) => { if (now - state.seen[m] > 2 * DAY) delete state.seen[m]; });
+const log = { nuevos: 0, resueltos: 0, infra: 0, errores: 0 };
+
+// 1. tokens nuevos
+const fresh = [];
+for (let p = 1; p <= 5 && fresh.length < MAX_NEW; p++) {
+  const d = await getJson("https://api.geckoterminal.com/api/v2/networks/solana/new_pools?page=" + p);
+  if (!d || !d.data) break;
+  d.data.forEach((pool) => {
+    const id = pool.relationships && pool.relationships.base_token && pool.relationships.base_token.data.id;
+    const mint = id && id.replace(/^solana_/, "");
+    if (!mint || QUOTES.includes(mint) || state.tokens[mint] || state.seen[mint] || fresh.some((f) => f.mint === mint)) return;
+    fresh.push({ mint, t: Date.parse(pool.attributes.pool_created_at) || now, dex: pool.relationships.dex && pool.relationships.dex.data.id });
+  });
+  await sleep(2500);   // GeckoTerminal: 30 peticiones por minuto
+}
+for (const f of fresh.slice(0, MAX_NEW)) {
+  const t = { t: f.t, seen: now, dex: f.dex };
+  try {
+    const rc = await getJson("https://api.rugcheck.xyz/v1/tokens/" + f.mint + "/report");
+    await sleep(600);
+    if (rc) { t.creator = rc.creator || undefined; t.rug = !!rc.rugged; t.plat = (rc.launchpad && rc.launchpad.platform) || rc.deployPlatform || undefined; }
+    const ms = await firstSigners(f.mint);                  // quien pagó la creación del token
+    if (ms && ms[0]) t.payer = ms[0];
+    if (t.creator) {
+      const cs = await firstSigners(t.creator);             // quien pagó la primera transacción del creador
+      if (cs && cs[0] && cs[0] !== t.creator && cs[0] !== t.payer) t.funder = cs[0];
+    }
+  } catch (e) { log.errores++; }
+  addToken(state, f.mint, t); state.seen[f.mint] = now; log.nuevos++;
+}
+
+// 2. resultado a las 24 h (DexScreener acepta 30 tokens por petición)
+const due = Object.keys(state.tokens).filter((m) => now - state.tokens[m].t > DAY);
+for (let i = 0; i < due.length; i += 30) {
+  const part = due.slice(i, i + 30);
+  const pairs = await getJson("https://api.dexscreener.com/tokens/v1/solana/" + part.join(","));
+  if (!Array.isArray(pairs)) continue;                     // fallo de red: se reintenta en la siguiente ejecución
+  part.forEach((m) => {
+    const ps = pairs.filter((p) => p.baseToken && p.baseToken.address === m);
+    resolveToken(state, m, ps.reduce((s, p) => Math.max(s, p.marketCap || p.fdv || 0), 0));
+    log.resueltos++;
+  });
+  await sleep(400);
+}
+// 3. exchanges y plataformas
+for (const a of needInfraCheck(state).slice(0, MAX_INFRA)) {
+  try {
+    const sigs = await rpc("getSignaturesForAddress", [a, { limit: 1000 }]);
+    const ph = perHour(sigs);
+    state.infra[a] = { at: now, ph: Math.round(ph), infra: ph > INFRA_PER_HOUR };
+    log.infra++;
+  } catch (e) { log.errores++; }
+}
+
+// 4. guardar
+fs.writeFileSync(STATE, JSON.stringify(state));
+const list = buildList(state, now);
+// solo se reescribe si cambia algo, para no hacer un commit cada 30 minutos sin novedades
+const prev = fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, "utf8")) : {};
+if (JSON.stringify([prev.faces, prev.mints]) !== JSON.stringify([list.faces, list.mints])) fs.writeFileSync(OUT, JSON.stringify(list));
+console.log(JSON.stringify(Object.assign(log, { tokens: Object.keys(state.tokens).length, seguidas: Object.keys(state.faces).length, caras: Object.keys(list.faces).length, marcados: Object.keys(list.mints).length })));

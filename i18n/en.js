@@ -481,6 +481,19 @@ export const TEXT = {
   "'><span class='ic'>🔗</span><span class='lb'><span class='lg'>Ver en </span>Solscan</span></a></div></div>": "'><span class='ic'>🔗</span><span class='lb'><span class='lg'>See on </span>Solscan</span></a></div></div>",
   "<div class='hint'>Último resultado estimado: ": "<div class='hint'>Last estimated result: ",
 
+  // ---------- known faces ----------
+  "la wallet que pagó el lanzamiento": "the wallet that paid for the launch",
+  "la wallet que financió al creador": "the wallet that funded the creator",
+  "el creador": "the creator",
+  "Cara conocida: ": "Known face: ",
+  " está detrás de ": " is behind ",
+  " tokens que SolFlag ha seguido y ": " tokens SolFlag has tracked, and ",
+  " no despegaron (menos de 10.000 $ al día siguiente o rug). Suelen lanzar con un creador nuevo cada vez para que no se les reconozca.":
+    " never took off (under $10,000 a day later, or rugged). They usually launch with a fresh creator each time so they are not recognised.",
+  " · tokens suyos que no despegaron: ": " · its tokens that never took off: ",
+  "' title='Analizar este token'>": "' title='Analyse this token'>",
+  "cara conocida": "known face",
+
   // ---------- token cards ----------
   "Precio <span class='v'>": "Price <span class='v'>",
   "<span class='v'>Sin precio</span>": "<span class='v'>No price</span>",

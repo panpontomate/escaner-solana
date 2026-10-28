@@ -331,6 +331,7 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 .pc-body{position:relative;margin-top:8px}
 .pc-body>.hint{margin:4px 0 2px}
 #bundlebox{align-items:flex-start} #bundlebox .ld{margin-top:.35em}
+#bundlebox .face{margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--alto-bg);color:var(--fg);font-size:.9rem}
 .pmenu-body{min-width:290px} .pmenu-body a{white-space:nowrap}
 /* botones del token: en el ordenador Descargar · X · Telegram · Alerta en una fila y Copiar · Seguir · Ballenas debajo; en el móvil, Descargar entero, X · Telegram · Alerta
    en tres cuadrados y Copiar · Seguir · Ballenas en una barra con separadores */
@@ -1256,7 +1257,8 @@ async function assess(mint,par,valor,unchecked,noConc){
   return {
     mint:r.mint, sym:r.sym, name:r.name, pts:r.pts, sev:r.sev, lvl:SRE_LV[r.lvl]||r.lvl,
     why:lights?lightsWhy(lights):r.reasons.map(function(x){ return SRE.describe(x,"en"); }),
-    warn:[], lights:lights, type:SRE_TY[r.type]||null, valor:valor, par:r.pair, imp:r.impostor, img:r.img
+    warn:[], lights:lights, type:SRE_TY[r.type]||null, valor:valor, par:r.pair, imp:r.impostor, img:r.img,
+    cr:(r.creator&&r.creator.creator)||null
   };
 }
 
@@ -1872,6 +1874,50 @@ async function launchBuys(mint){
 function serialOthers(b,mint){
   return b&&b.serial?b.serial.mints.filter(function(m){ return m!==mint; }).length:0;
 }
+/* ---------- caras conocidas ----------
+   Lista que publica cada 30 minutos el recolector (tools/caras): wallets que pagaron, financiaron o crearon
+   muchos tokens que no despegaron. Las granjas cambian de creador en cada lanzamiento, pero el dinero
+   sale de la misma wallet: así se las reconoce aunque el creador sea nuevo */
+var caras={list:null,at:0};
+async function loadCaras(){
+  if(caras.list&&Date.now()-caras.at<600000) return caras.list;
+  try{ var res=await fetch("/caras.json",{cache:"no-cache"}); caras.list=res.ok?await res.json():null; }catch(e){ caras.list=null; }
+  caras.at=Date.now();
+  return caras.list||{faces:{},mints:{}};
+}
+// Quien pagó la primera transacción de una wallet nueva (los creadores de granja tienen pocas)
+async function firstPayer(addr){
+  var s=await rpc("getSignaturesForAddress",[addr,{limit:1000}]);
+  if(!s||!s.length||s.length>=1000) return null;
+  var tx=await rpc("getTransaction",[s[s.length-1].signature,{encoding:"jsonParsed",maxSupportedTransactionVersion:1,commitment:"confirmed"}]);
+  var k=tx&&tx.transaction&&tx.transaction.message.accountKeys.filter(function(k){ return k.signer; })[0];
+  return k?(k.pubkey||k):null;
+}
+// La peor cara conocida detrás de un token: el propio token en la lista, quien pagó el lanzamiento,
+// el creador o, si nada de eso sale, quien financió al creador
+async function knownFace(r,b){
+  var l=await loadCaras(), F=l.faces||{}, payer=b&&b.creator, cands=[];
+  if(l.mints&&l.mints[r.mint]) cands.push({a:l.mints[r.mint],role:null});
+  if(payer) cands.push({a:payer,role:"payer"});
+  if(r.cr) cands.push({a:r.cr,role:"creator"});
+  if(r.cr&&r.cr!==payer&&!cands.some(function(c){ return F[c.a]; })){
+    var fu=null;
+    try{ fu=await firstPayer(r.cr); }catch(e){ if(e.message==="cancelado") throw e; }
+    if(fu&&fu!==r.cr) cands.push({a:fu,role:"funder"});
+  }
+  var best=null;
+  cands.forEach(function(c){
+    var f=F[c.a]; if(!f) return;
+    if(!best||(f.lvl==="bad"&&best.f.lvl!=="bad")||(f.lvl===best.f.lvl&&f.dead>best.f.dead)) best={a:c.a,f:f,role:c.role};
+  });
+  if(best&&!best.role) best.role=Object.keys(best.f.roles||{}).sort(function(x,y){ return best.f.roles[y]-best.f.roles[x]; })[0]||"payer";
+  return best;
+}
+var FACE_ROLE={payer:"the wallet that paid for the launch",funder:"the wallet that funded the creator",creator:"the creator"};
+function faceText(fc){
+  return "Known face: "+FACE_ROLE[fc.role]+" is behind "+fc.f.done+" tokens SolFlag has tracked, and "+fc.f.dead+
+    " never took off (under $10,000 a day later, or rugged). They usually launch with a fresh creator each time so they are not recognised.";
+}
 function bundleVerdict(b){
   if(b.tooOld) return b.pages>4
     ?{s:"na",t:"Cannot be checked: it has more than 25,000 trades and the launch is too far back."}
@@ -1905,7 +1951,11 @@ async function paintBundle(){
   var b=bundles[r.mint];
   if(b===undefined){
     bundles[r.mint]="loading";
-    try{ bundles[r.mint]=await launchBuys(r.mint); }
+    try{
+      var lb=await launchBuys(r.mint);
+      try{ lb.face=await knownFace(r,lb); }catch(e){ if(e.message==="cancelado") throw e; }
+      bundles[r.mint]=lb;
+    }
     catch(e){ if(e.message==="cancelado"){ delete bundles[r.mint]; return; } bundles[r.mint]="err"; }
     return paintBundle();
   }
@@ -1916,9 +1966,15 @@ async function paintBundle(){
     var sS=nS>=SRE.SERIAL_BAD?"bad":"warn";
     v={s:v.s==="bad"||sS==="bad"?"bad":"warn",t:v.t+" The wallet that paid for the launch has launched "+nS+(b.serial.more?" or more":"")+" other tokens in the last 24 h: a serial launcher, who usually drops each token as soon as buyers arrive."};
   }
+  if(b.face){
+    var ft=faceText(b.face);
+    v={s:v.s==="bad"||b.face.f.lvl==="bad"?"bad":"warn",t:v.t+" "+ft,face:true,base:v.t};
+    extra+="<p class='face'>"+esc(ft)+"</p><p class='hint'>Wallet: <a href='#' class='mono' data-analyze='"+esc(b.face.a)+"' title='Analyse this wallet'>"+esc(short(b.face.a))+"</a>"+
+      (b.face.f.ex&&b.face.f.ex.length?" · its tokens that never took off: "+b.face.f.ex.map(function(m){ return "<a href='#' class='mono' data-analyze='"+esc(m)+"' title='Analyse this token'>"+esc(short(m))+"</a>"; }).join(", "):"")+"</p>";
+  }
   if(b.ws&&b.ws.length){
     var others=b.ws.filter(function(x){ return !x.creator; }).map(function(x){ return x.w; });
-    extra="<details class='cdet'><summary>See who bought ("+b.ws.length+")</summary>"+b.ws.map(function(x){
+    extra+="<details class='cdet'><summary>See who bought ("+b.ws.length+")</summary>"+b.ws.map(function(x){
       return "<div class='nm-row'><span class='mono'><a href='#' data-analyze='"+esc(x.w)+"' title='Analyse this wallet'>"+esc(short(x.w))+"</a>"+(x.creator?" · creator":"")+"</span><span class='v'>"+esc(fmtPct(x.pct))+"</span></div>";
     }).join("")+(b.capped?"<p class='hint'>The first 40 trades were checked.</p>":"")+
     (others.length>1?"<button class='btn ghost small' type='button' data-addnet='"+esc(others.join(" "))+"' style='margin-top:8px'>⊕ Compare in Confluence</button>":"")+"</details>";
@@ -1929,7 +1985,7 @@ async function paintBundle(){
   if(raiseByLaunch(r,v)||(first&&v.s==="bad")){ if(r.launchLvl) r.hist=histRecord(r); renderToken(true); return; }
   if(nS>=SRE.SERIAL_WARN) extra+="<p class='hint'>Wallet that paid for the launch: <a href='#' class='mono' data-analyze='"+esc(b.creator)+"' title='Analyse this wallet'>"+esc(short(b.creator))+"</a></p>";
   box.className="lt lt-"+v.s;
-  box.innerHTML="<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>"+esc(v.t)+"</span>"+extra+"</div>";
+  box.innerHTML="<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>"+esc(v.face?v.base:v.t)+"</span>"+extra+"</div>";
 }
 
 /* ---------- tokens nuevos (GeckoTerminal) ---------- */
@@ -2190,7 +2246,7 @@ function cardVerdict(r){ return dataOnly(r)?"Medium due to missing data":LEVELS[
 function cardReason(r){
   if(dataOnly(r)) return "Still to check: "+missingText(r)+". What is not checked is not taken as fine.";
   var ws=cardWhy(r);
-  if(r.launch&&r.launch.s==="bad") ws.unshift(r.launch.t.indexOf("serial launcher")>=0?"serial launcher":"launch bundle");
+  if(r.launch&&r.launch.s==="bad") ws.unshift(r.launch.face?"known face":r.launch.t.indexOf("serial launcher")>=0?"serial launcher":"launch bundle");
   if(ws.length&&r.lvl!=="BAJO"){ var s=ws.slice(0,3).join(" · "); return s.charAt(0).toUpperCase()+s.slice(1)+"."; }
   return String(TOKEN_TIP[r.lvl]||"").split(". ")[0].replace(/\.?$/,".");
 }
