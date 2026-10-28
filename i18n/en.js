@@ -475,10 +475,10 @@ export const TEXT = {
   " Se han ocultado ": " Hidden: ",
   " tokens de menos de 1 $.": " tokens worth under $1.",
   "<div class='bar' role='img' aria-label='Reparto de tokens por nivel de riesgo'>": "<div class='bar' role='img' aria-label='Tokens by risk level'>",
-  "<div class='actions'><button class='btn small' id='copySum' type='button'>Copiar resumen</button>": "<div class='actions'><button class='btn small' id='copySum' type='button'>Copy summary</button>",
+  "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>Estimar resultado</button>": "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>Estimate result</button>",
   "Seguir wallet": "Follow wallet",
-  "<button class='btn ghost small' type='button' id='estPnl'>Estimar resultado</button>": "<button class='btn ghost small' type='button' id='estPnl'>Estimate result</button>",
-  "'>Ver en Solscan</a></div>": "'>See on Solscan</a></div>",
+  "<button class='btn small wcopy' id='copySum' type='button'><span class='ic'>📋</span><span class='lb'>Copiar<span class='lg'> resumen</span></span></button>": "<button class='btn small wcopy' id='copySum' type='button'><span class='ic'>📋</span><span class='lb'>Copy<span class='lg'> summary</span></span></button>",
+  "'><span class='ic'>🔗</span><span class='lb'><span class='lg'>Ver en </span>Solscan</span></a></div></div>": "'><span class='ic'>🔗</span><span class='lb'><span class='lg'>See on </span>Solscan</span></a></div></div>",
   "<div class='hint'>Último resultado estimado: ": "<div class='hint'>Last estimated result: ",
 
   // ---------- token cards ----------
