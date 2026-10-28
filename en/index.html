@@ -330,7 +330,13 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 .pc-head .segs{margin-left:auto}
 .pc-body{position:relative;margin-top:8px}
 .pc-body>.hint{margin:4px 0 2px}
+.hmode{display:inline-block;margin-left:8px;border-radius:999px;padding:1px 9px;font-size:.72rem;letter-spacing:0;text-transform:none}
+.hmode.young{background:#3a2c18;color:#fbbf24} .hmode.mature{background:#163a2c;color:#4ade80}
+.hsig{display:grid;gap:8px;margin:16px 0 4px}
+.hsig .lt{display:flex;align-items:flex-start;gap:10px} .hsig .lt>div{flex:1;min-width:0} .hsig .lt .ld{margin-top:.4em;flex:none}
 #bundlebox{align-items:flex-start} #bundlebox .ld{margin-top:.35em}
+#bundlebox .sold{margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-size:.9rem}
+#bundlebox .sold-warn{background:var(--medio-bg)} #bundlebox .sold-bad{background:var(--alto-bg)}
 #bundlebox .face{margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--alto-bg);color:var(--fg);font-size:.9rem}
 .pmenu-body{min-width:290px} .pmenu-body a{white-space:nowrap}
 /* botones del token: en el ordenador Descargar · X · Telegram · Alerta en una fila y Copiar · Seguir · Ballenas debajo; en el móvil, Descargar entero, X · Telegram · Alerta
@@ -760,7 +766,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="The scanner engine could not load from cdn.jsdelivr.net. Check your internet connection and reload the page."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.4.1/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.4.3/src/index.js";
 window.__escOk=true;
 (function(){
 "use strict";
@@ -1250,8 +1256,8 @@ async function netBalances(mint,graph){
 }
 
 // Riesgo de un token con la forma de siempre: lvl ALTO/MEDIO..., semáforos {k:ctl|con|mkt|dep, s, t} y why en texto
-async function assess(mint,par,valor,unchecked,noConc){
-  var r=await call(SRE.assess(client(),mint,par,{value:valor,marketUnknown:unchecked,skipConcentration:noConc}));
+async function assess(mint,par,valor,unchecked,noConc,copies){
+  var r=await call(SRE.assess(client(),mint,par,{value:valor,marketUnknown:unchecked,skipConcentration:noConc,copies:!!copies}));
   if(!r) return null;   // NFT
   var lights=r.lights?r.lights.map(function(l){ return {k:SRE_LK[l.k],s:l.s,t:SRE.explainLight(l,"en")}; }):null;
   return {
@@ -1485,7 +1491,7 @@ async function checkToken(mint){
   if(!mkr.data[mint]&&!mkr.failed.length){ var gp=await gtPair(mint); if(gp) mkr.data[mint]=gp; }
   await fillLiquidity(mkr.data[mint]);
   setProgress("Reviewing the token…",0.45);
-  var r=await assess(mint,mkr.data[mint]||null,0,mkr.failed.length>0);
+  var r=await assess(mint,mkr.data[mint]||null,0,mkr.failed.length>0,false,true);
   if(!r){ showError("That address is an NFT, not a token. The scanner does not review NFTs."); return; }
   setProgress("Done",1);
   r.hist=histRecord(r);
@@ -1862,13 +1868,18 @@ async function launchBuys(mint){
     Object.keys(post).forEach(function(o){ var d=post[o]-(pre[o]||0); if(d>0&&SRE.isOnCurve(o)) got[o]=(got[o]||0)+d; });
   });
   var sup=(mi&&mi.supply)||0;
-  var ws=Object.keys(got).map(function(w){ return {w:w,pct:sup?got[w]/sup*100:0,creator:w===creator}; })
+  var ws=Object.keys(got).map(function(w){ return {w:w,raw:got[w],pct:sup?got[w]/sup*100:0,creator:w===creator}; })
     .filter(function(x){ return x.pct>=0.1||x.creator; }).sort(function(a,b){ return b.pct-a.pct; });
   // Las granjas de lanzamientos pagan todos desde una wallet pero ponen un "creador" nuevo cada vez, así que
   // RugCheck ve un token por creador: se cuenta en la cadena qué más lanzó quien pagó este
   var serial=null;
   if(creator){ try{ serial=await call(SRE.recentLaunches(client(),creator)); }catch(e){ if(e.message==="cancelado") throw e; } }
-  return {ws:ws,capped:capped,creator:creator,serial:serial};
+  var after=null;
+  if(ws.length){
+    try{ var now=await holdNow(mint,ws.map(function(x){ return x.w; })); after=ws.map(function(x){ return {w:x.w,creator:x.creator,raw:x.raw,now:now[x.w]||0}; }); }
+    catch(e){ if(e.message==="cancelado") throw e; }
+  }
+  return {ws:ws,capped:capped,creator:creator,serial:serial,after:after,supply:sup};
 }
 // Otros tokens que lanzó en 24 h la wallet que pagó este (el propio token también sale en la cuenta)
 function serialOthers(b,mint){
@@ -1918,6 +1929,99 @@ function faceText(fc){
   return "Known face: "+FACE_ROLE[fc.role]+" is behind "+fc.f.done+" tokens SolFlag has tracked, and "+fc.f.dead+
     " never took off (under $10,000 a day later, or rugged). They usually launch with a fresh creator each time so they are not recognised.";
 }
+/* ---------- ¿siguen teniendo lo que compraron al lanzar? ----------
+   El chequeo del lanzamiento sabe cuánto compró cada uno en el primer segundo; aquí se mira cuánto tiene hoy,
+   leyendo de una vez la cuenta del token de cada wallet (su dirección se calcula, no hace falta buscarla) */
+var B58A="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+var ATA_PROGRAM="ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
+function b58enc(bytes){
+  var n=0n, s="", i;
+  for(i=0;i<bytes.length;i++) n=n*256n+BigInt(bytes[i]);
+  while(n>0n){ s=B58A[Number(n%58n)]+s; n/=58n; }
+  for(i=0;i<bytes.length&&bytes[i]===0;i++) s="1"+s;
+  return s;
+}
+// Cuenta asociada de una wallet para un token: la dirección que se deriva de (wallet, programa del token, mint)
+async function ataOf(owner,tokenProgram,mint){
+  var seeds=[SRE.b58bytes(owner),SRE.b58bytes(tokenProgram),SRE.b58bytes(mint)], prog=SRE.b58bytes(ATA_PROGRAM);
+  var tail=new TextEncoder().encode("ProgramDerivedAddress");
+  for(var bump=255;bump>=0;bump--){
+    var parts=seeds.concat([[bump],prog,tail]), len=0, o=0;
+    parts.forEach(function(x){ len+=x.length; });
+    var buf=new Uint8Array(len);
+    parts.forEach(function(x){ buf.set(x,o); o+=x.length; });
+    var h=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",buf)));
+    if(!SRE.onCurve(h)) return b58enc(h);
+  }
+  return null;
+}
+// Lo que tiene hoy cada wallet del token (su cuenta asociada del Token Program y de Token-2022)
+async function holdNow(mint,owners){
+  var addrs=[], who=[], out={};
+  for(var i=0;i<owners.length;i++){
+    out[owners[i]]=0;
+    var a1=await ataOf(owners[i],TOKEN_PROGRAM,mint), a2=await ataOf(owners[i],TOKEN_2022,mint);
+    if(a1){ addrs.push(a1); who.push(owners[i]); }
+    if(a2){ addrs.push(a2); who.push(owners[i]); }
+  }
+  for(var k=0;k<addrs.length;k+=100){
+    var r=await rpc("getMultipleAccounts",[addrs.slice(k,k+100),{encoding:"jsonParsed"}]);
+    (r&&r.value||[]).forEach(function(v,j){
+      var t=v&&v.data&&v.data.parsed&&v.data.parsed.info&&v.data.parsed.info.tokenAmount;
+      if(t) out[who[k+j]]+=Number(t.amount);
+    });
+  }
+  return out;
+}
+// Cuánto de lo comprado al lanzar ya no tienen (vendido o movido): el creador por un lado, el resto por otro.
+// Si alguien tiene hoy más de lo que compró, cuenta como que lo conserva todo
+// Cuando el token tiene demasiadas operaciones para ver el lanzamiento, el creador se puede mirar igual: su
+// cuenta del token tiene pocas. Su primera operación dice cuánto recibió al principio y la cuenta, cuánto tiene hoy
+async function creatorSince(mint,creator){
+  for(var prog of [TOKEN_PROGRAM,TOKEN_2022]){
+    var ata=await ataOf(creator,prog,mint);
+    var sigs=await rpc("getSignaturesForAddress",[ata,{limit:1000}]);
+    if(!sigs||!sigs.length) continue;
+    if(sigs.length>=1000) return null;           // cuenta con mucho movimiento: no se adivina
+    var tx=await rpc("getTransaction",[sigs[sigs.length-1].signature,{encoding:"jsonParsed",maxSupportedTransactionVersion:1,commitment:"confirmed"}]);
+    var post=tx&&tx.meta&&(tx.meta.postTokenBalances||[]).filter(function(x){ return x.mint===mint&&x.owner===creator; })[0];
+    var raw=post?Number(post.uiTokenAmount.amount):0;
+    if(!raw) return null;
+    var now=(await holdNow(mint,[creator]))[creator]||0;
+    return {w:creator,creator:true,raw:raw,now:now};
+  }
+  return null;
+}
+function soldInfo(b,supply){
+  if(!b||!b.after||!b.after.length) return null;
+  function part(list){
+    var bought=0, kept=0, out=0;
+    list.forEach(function(x){ bought+=x.raw; kept+=Math.min(x.now,x.raw); if(x.now<x.raw*0.05) out++; });
+    return {n:list.length,bought:bought,gone:bought?1-kept/bought:0,pct:supply?bought/supply*100:0,out:out};
+  }
+  var cr=b.after.filter(function(x){ return x.creator&&x.raw>0; }), oth=b.after.filter(function(x){ return !x.creator&&x.raw>0; });
+  return {cr:cr.length?part(cr):null,oth:oth.length?part(oth):null};
+}
+// Un creador que ya se ha deshecho de lo que compró, o unos compradores del primer segundo que ya han salido,
+// es la señal más directa de que el token se está vaciando
+function soldVerdict(si){
+  if(!si) return null;
+  var c=si.cr, o=si.oth, s="ok", t=[];
+  if(c){
+    t.push(c.gone>=0.98?"The creator has already got rid of everything it bought at launch ("+fmtPct(c.pct)+" of the supply).":
+      c.gone>=0.1?"The creator has already got rid of "+fmtPct(c.gone*100)+" of what it bought at launch ("+fmtPct(c.pct)+" of the supply).":"The creator still holds what it bought at launch.");
+    if(c.pct>=2&&c.gone>=0.9) s="bad"; else if(c.pct>=1&&c.gone>=0.5) s="warn";
+  }
+  if(o){
+    var n=o.n+(o.n===1?" buyer":" buyers");
+    t.push(o.gone>=0.98?"The "+n+" from the first second have already got rid of everything they bought ("+fmtPct(o.pct)+" of the supply).":
+      o.gone>=0.1?"The "+n+" from the first second have already got rid of "+fmtPct(o.gone*100)+" of what they bought ("+fmtPct(o.pct)+" of the supply)"+(o.out?"; "+o.out+(o.out===1?" has fully left":" have fully left"):"")+".":
+      "The "+n+" from the first second still hold almost all they bought.");
+    if(o.pct>=10&&o.gone>=0.8) s="bad"; else if(s!=="bad"&&o.pct>=5&&o.gone>=0.5) s="warn";
+  }
+  if(!t.length) return null;
+  return {s:s,t:t.join(" ")+((c&&c.gone>=0.1)||(o&&o.gone>=0.1)?" Getting rid of it means selling it or moving it to another wallet.":"")};
+}
 function bundleVerdict(b){
   if(b.tooOld) return b.pages>4
     ?{s:"na",t:"Cannot be checked: it has more than 25,000 trades and the launch is too far back."}
@@ -1953,6 +2057,12 @@ async function paintBundle(){
     bundles[r.mint]="loading";
     try{
       var lb=await launchBuys(r.mint);
+      if(lb.tooOld&&r.cr){
+        try{
+          var cs=await creatorSince(r.mint,r.cr), mi0=cs?await getMint(r.mint):null;
+          if(cs){ lb.after=[cs]; lb.supply=(mi0&&mi0.supply)||0; lb.creatorOnly=true; }
+        }catch(e){ if(e.message==="cancelado") throw e; }
+      }
       try{ lb.face=await knownFace(r,lb); }catch(e){ if(e.message==="cancelado") throw e; }
       bundles[r.mint]=lb;
     }
@@ -1966,9 +2076,15 @@ async function paintBundle(){
     var sS=nS>=SRE.SERIAL_BAD?"bad":"warn";
     v={s:v.s==="bad"||sS==="bad"?"bad":"warn",t:v.t+" The wallet that paid for the launch has launched "+nS+(b.serial.more?" or more":"")+" other tokens in the last 24 h: a serial launcher, who usually drops each token as soon as buyers arrive."};
   }
+  var sv=b.after?soldVerdict(soldInfo(b,b.supply)):null;
+  if(sv){
+    var base0=v.base||v.t;
+    v={s:v.s==="bad"||sv.s==="bad"?"bad":(v.s==="warn"||sv.s==="warn"?"warn":v.s),t:v.t+" "+sv.t,face:v.face,base:base0,sold:sv.s};
+    extra+="<p class='sold sold-"+sv.s+"'>"+esc(sv.t)+"</p>";
+  }
   if(b.face){
     var ft=faceText(b.face);
-    v={s:v.s==="bad"||b.face.f.lvl==="bad"?"bad":"warn",t:v.t+" "+ft,face:true,base:v.t};
+    v={s:v.s==="bad"||b.face.f.lvl==="bad"?"bad":"warn",t:v.t+" "+ft,face:true,base:v.base||v.t,sold:v.sold};
     extra+="<p class='face'>"+esc(ft)+"</p><p class='hint'>Wallet: <a href='#' class='mono' data-analyze='"+esc(b.face.a)+"' title='Analyse this wallet'>"+esc(short(b.face.a))+"</a>"+
       (b.face.f.ex&&b.face.f.ex.length?" · its tokens that never took off: "+b.face.f.ex.map(function(m){ return "<a href='#' class='mono' data-analyze='"+esc(m)+"' title='Analyse this token'>"+esc(short(m))+"</a>"; }).join(", "):"")+"</p>";
   }
@@ -1985,7 +2101,7 @@ async function paintBundle(){
   if(raiseByLaunch(r,v)||(first&&v.s==="bad")){ if(r.launchLvl) r.hist=histRecord(r); renderToken(true); return; }
   if(nS>=SRE.SERIAL_WARN) extra+="<p class='hint'>Wallet that paid for the launch: <a href='#' class='mono' data-analyze='"+esc(b.creator)+"' title='Analyse this wallet'>"+esc(short(b.creator))+"</a></p>";
   box.className="lt lt-"+v.s;
-  box.innerHTML="<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>"+esc(v.face?v.base:v.t)+"</span>"+extra+"</div>";
+  box.innerHTML="<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>"+esc(v.base||v.t)+"</span>"+extra+"</div>";
 }
 
 /* ---------- tokens nuevos (GeckoTerminal) ---------- */
@@ -2246,7 +2362,7 @@ function cardVerdict(r){ return dataOnly(r)?"Medium due to missing data":LEVELS[
 function cardReason(r){
   if(dataOnly(r)) return "Still to check: "+missingText(r)+". What is not checked is not taken as fine.";
   var ws=cardWhy(r);
-  if(r.launch&&r.launch.s==="bad") ws.unshift(r.launch.face?"known face":r.launch.t.indexOf("serial launcher")>=0?"serial launcher":"launch bundle");
+  if(r.launch&&r.launch.s==="bad") ws.unshift(r.launch.face?"known face":r.launch.sold==="bad"?"launch buyers already sold":r.launch.t.indexOf("serial launcher")>=0?"serial launcher":"launch bundle");
   if(ws.length&&r.lvl!=="BAJO"){ var s=ws.slice(0,3).join(" · "); return s.charAt(0).toUpperCase()+s.slice(1)+"."; }
   return String(TOKEN_TIP[r.lvl]||"").split(". ")[0].replace(/\.?$/,".");
 }
@@ -2481,7 +2597,13 @@ async function holders(){
     var wal=b.uniq.filter(function(o){ return b.kind[o]==="wallet"; });
     var busy=await markBusy(b.kind,wal,function(c,n){ setProgress("Separating people from bots and exchanges… "+c+"/"+n,0.65+0.15*c/Math.max(1,n)); });
     var hr=holderRows(b,busy), par=b.par;
-    var personas=hr.rows.filter(function(r){ return r.kind==="wallet"; }).map(function(r){ return r.owner; });
+    // Joven (menos de 14 días) o maduro: en los jóvenes casi todos los holders grandes mueven mucho y el reparto
+    // del equipo se esconde entre ellos, así que también se busca el origen de las cuentas muy activas
+    var created=(par&&par.pairCreatedAt)||null;
+    if(!created){ try{ var rc0=await rugcheckReport(mint); if(rc0&&rc0.detectedAt) created=Date.parse(rc0.detectedAt)||null; }catch(e){ if(e.message==="cancelado") throw e; } }
+    var ageDays=created?Math.max(0,(Date.now()-created)/86400000):null;
+    var mode=ageDays!==null&&ageDays<SRE.YOUNG_DAYS?"young":"mature";
+    var personas=hr.rows.filter(function(r){ return r.kind==="wallet"||(mode==="young"&&r.kind==="activa"); }).map(function(r){ return r.owner; });
     var clusters={}, hotGroups=0;
     if(personas.length>=2){
       var funders=await findFunders(personas,function(c,n){ setProgress("Looking for wallets funded from the same source… "+c+"/"+n,0.8+0.08*c/Math.max(1,n)); });
@@ -2489,7 +2611,10 @@ async function holders(){
       var srcs=[], seenSrc={};
       Object.keys(clusters).forEach(function(a){ var f=clusters[a].funder; if(!seenSrc[f]){ seenSrc[f]=1; srcs.push(f); } });
       if(srcs.length){
-        var hot=await markBusy({},srcs,function(c,n){ setProgress("Checking whether each group’s source is an exchange… "+c+"/"+n,0.88+0.02*c/Math.max(1,n)); });
+        // un origen es un exchange si mueve más de 100 operaciones por hora (la regla de los bots, 200 en 2 días,
+        // también pillaba a repartidores de ~50 por hora y escondía sus grupos)
+        var rates=await call(SRE.sourceRates(client(),srcs,function(c,n){ setProgress("Checking whether each group’s source is an exchange… "+c+"/"+n,0.88+0.02*c/Math.max(1,n)); }));
+        var hot={}; srcs.forEach(function(f){ if(rates[f]>SRE.EXCHANGE_PER_HOUR) hot[f]=true; });
         hotGroups=srcs.filter(function(f){ return hot[f]; }).length;
         if(hotGroups) clusters=clusterByFunder(funders,hot);
       }
@@ -2515,8 +2640,12 @@ async function holders(){
         }
       }
     }catch(e){ if(e.message==="cancelado") throw e; }   // igual que RugCheck en general: nunca bloquea el resultado principal
-    state.showAllH=false;
-    state.hold={mint:mint,sym:(par&&par.baseToken&&par.baseToken.symbol)||short(mint),
+    var groups=SRE.groupList(clusters,hr.rows), signals=[];
+    var glim=mode==="young"?SRE.HOLD_GROUP_YOUNG:SRE.HOLD_GROUP_MATURE;
+    if(groups[0]&&groups[0].pct>glim) signals.push({code:"HOLD_GROUP",s:mode==="young"?"bad":"warn",data:{n:groups[0].members.length,pct:groups[0].pct,id:groups[0].id,funder:groups[0].funder}});
+    // si un grupo incluye cuentas activas, la lista las enseña desde el principio para que se vea
+    state.showAllH=Object.keys(clusters).some(function(a){ return hr.rows.some(function(r){ return r.owner===a&&r.kind!=="wallet"; }); });
+    state.hold={mode:mode,ageDays:ageDays,signals:signals,mint:mint,sym:(par&&par.baseToken&&par.baseToken.symbol)||short(mint),
       name:(par&&par.baseToken&&par.baseToken.name)||"",price:hr.price,rows:hr.rows,
       mintAuth:!!b.info.mintAuth,freezeAuth:!!b.info.freezeAuth,clusters:clusters,hotGroups:hotGroups,creator:creator};
     renderHolders(); track("whales");
@@ -2827,7 +2956,7 @@ function renderHolders(keep){
 
   $("#hsummary").innerHTML=
     "<div class='sum-head'>"+
-      "<div><div class='eyebrow'>Token</div><div style='margin-top:4px;font:700 1.15rem var(--f-display)'>"+esc(h.sym)+(h.name?"<span style='font:400 .9rem var(--f-body);color:var(--muted);margin-left:8px'>"+esc(h.name)+"</span>":"")+"</div>"+
+      "<div><div class='eyebrow'>Token"+(h.mode?" <span class='hmode "+h.mode+"'>"+(h.mode==="young"?"Young":"Mature")+(h.ageDays!==null?" · "+(h.ageDays<1?"under 1 day":Math.floor(h.ageDays)+(Math.floor(h.ageDays)===1?" day":" days")):"")+"</span>":"")+"</div><div style='margin-top:4px;font:700 1.15rem var(--f-display)'>"+esc(h.sym)+(h.name?"<span style='font:400 .9rem var(--f-body);color:var(--muted);margin-left:8px'>"+esc(h.name)+"</span>":"")+"</div>"+
       "<div class='mono' style='margin-top:4px;overflow-wrap:anywhere'>"+esc(h.mint)+"</div></div>"+
       "<div class='stats'>"+
         "<div class='stat'><div class='eyebrow'>Price</div><div class='v'>"+(h.price?priceUsd(h.price):"no price")+"</div></div>"+
@@ -2840,12 +2969,13 @@ function renderHolders(keep){
       "<div><span>Groups by funder</span><b>"+numGroups+"</b><small"+(numGroups?" class='warnc'":"")+">"+clusteredAddrs.length+" linked wallets</small></div>"+
       "<div><span>Excluded</span><b>"+bots.length+"</b><small>bots or exchanges</small></div>"+
     "</div>"+
+    ((h.signals||[]).length?"<div class='lights hsig'>"+h.signals.map(function(x){ return "<div class='lt lt-"+x.s+"'><i class='ld'></i><div><span>"+esc(SRE.describe(x,"en"))+"</span></div></div>"; }).join("")+"</div>":"")+
     "<h2 class='verdict'>"+(wallets.length?(wallets.length===1?"1 of the "+rows.length+" largest accounts looks like a person":wallets.length+" of the "+rows.length+" largest accounts look like people"):"None of the "+rows.length+" largest accounts looks like a person")+"</h2>"+
     "<p class='sub'>People hold "+esc(fmtPct(sumW))+" of the supply; bots, exchanges or very active accounts "+esc(fmtPct(bots.reduce(function(a,r){return a+r.pct;},0)))+" and pools or programs "+esc(fmtPct(progs.reduce(function(a,r){return a+r.pct;},0)))+"."+
       (auth.length?" Note: "+esc(auth.join(" and "))+".":"")+
       " “Looks like a person” is an estimate: a quiet wallet can be an exchange or a fund, so check Solscan before calling it a whale.</p>"+
-    (numGroups?"<p class='sub' style='color:var(--medio)'>"+clusteredAddrs.length+" of those that look like people are split across "+numGroups+(numGroups===1?" group":" groups")+" that share their funding source (the wallet that paid their first transaction): it could be one person or team splitting the supply to look more decentralised than it is. Take it as a lead, not proof: open the source on Solscan before drawing conclusions."+
-      (h.hotGroups?" Dismissed: "+h.hotGroups+(h.hotGroups===1?" possible group":" possible groups")+" whose source is an exchange or a very active account, because many unrelated people receive money from there.":"")+"</p>":
+    (numGroups?"<p class='sub' style='color:var(--medio)'>"+clusteredAddrs.length+(h.mode==="young"?" of the largest accounts are split across ":" of those that look like people are split across ")+numGroups+(numGroups===1?" group":" groups")+" that share their funding source (the wallet that paid their first transaction): it could be one person or team splitting the supply to look more decentralised than it is. Take it as a lead, not proof: open the source on Solscan before drawing conclusions."+
+      (h.hotGroups?" Dismissed: "+h.hotGroups+(h.hotGroups===1?" possible group":" possible groups")+" whose source is an exchange or a platform (over 100 transactions an hour), because many unrelated people receive money from there.":"")+"</p>":
       (h.hotGroups?"<p class='sub'>No group with the same funding source. Dismissed: "+h.hotGroups+(h.hotGroups===1?" match":" matches")+" because the source is an exchange or a very active account, where many unrelated people receive money from.</p>":""))+
     ((bots.length+progs.length)?"<label class='check' style='margin-top:12px'><input type='checkbox' id='showAllH'"+(state.showAllH?" checked":"")+"> Also show the "+(bots.length+progs.length)+" accounts that do not look like people</label>":"")+
     "<div class='actions'><button class='btn small' id='copyHold' type='button'>Copy top 5 for a post</button>"+
@@ -2863,7 +2993,7 @@ function renderHolders(keep){
     (glist.length?glist.map(function(g){
       return "<div class='hgrp'><div class='hgrp-h'><b>Group "+esc(g.id)+"</b><b>"+esc(fmtPct(g.pct))+"</b></div>"+
         "<p>"+g.n+" wallets funded by <a class='mono' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(g.funder)+"'>"+esc(short(g.funder))+"</a></p></div>";
-    }).join(""):"<p class='hint'>No group sharing the same source of funds among the people.</p>")+
+    }).join(""):"<p class='hint'>No group sharing the same source of funds among "+(h.mode==="young"?"the largest accounts.":"the people.")+"</p>")+
     "</div>"+
     creatorHtml(h.creator)+
     "<div class='card hcard'><p class='kick'>Excluded</p>"+
