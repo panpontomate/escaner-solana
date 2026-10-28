@@ -1,5 +1,5 @@
-# Caras conocidas: cada 30 minutos apunta tokens nuevos, mira cómo acabaron los de hace 24 h
-# y publica caras.json en solflag.com. La memoria entre ejecuciones va en la caché de Actions.
+# Caras conocidas y base de wallets: cada 30 minutos apunta tokens nuevos, mira cómo acabaron los de hace 24 h
+# y publica caras.json y datos/ en solflag.com. La memoria entre ejecuciones va en la caché de Actions.
 name: caras
 on:
   schedule:
@@ -33,11 +33,12 @@ jobs:
         with:
           path: tools/caras/estado.json
           key: caras-${{ github.run_id }}
-      - name: Publicar caras.json si ha cambiado
+      - name: Publicar caras.json y la base de wallets si han cambiado
         run: |
-          git diff --quiet -- caras.json && exit 0
+          git add -N datos 2>/dev/null || true
+          git diff --quiet -- caras.json datos && exit 0
           git config user.name "solflag-caras"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add caras.json
-          git commit -m "caras.json: actualizado"
+          git add caras.json datos
+          git commit -m "caras.json y base de wallets: actualizado"
           git pull --rebase -q && git push -q
