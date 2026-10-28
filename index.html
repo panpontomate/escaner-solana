@@ -306,6 +306,21 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 .pmenu-body{position:absolute;z-index:20;top:calc(100% + 6px);left:0;min-width:250px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 14px 40px rgba(5,6,20,.5);display:flex;flex-direction:column;gap:2px}
 .pmenu-body a{padding:9px 12px;border-radius:10px;color:var(--fg)}
 .pmenu-body a:hover{background:var(--surface-2);text-decoration:none}
+.pmenu-body .pm-i{display:block;width:100%;text-align:left;background:none;border:0;padding:9px 12px;border-radius:10px;color:var(--fg);font:inherit;cursor:pointer}
+.pmenu-body .pm-i:hover{background:var(--surface-2)}
+.pmenu-body a small{display:block;padding:2px 0 0}
+/* ordenador: una fila Seguir · Ballenas (turquesa de la marca) · Compartir ▾ · Avisos ▾; en el móvil, los botones de siempre */
+.tdesk{display:none}
+@media (min-width:521px){
+  .tacts{display:none}
+  .tdesk{display:flex}
+  .tdesk .btn.tfav{background:#a78bfa;color:#140e31;border:0}
+  .tdesk .btn.twh{background:var(--accent);color:var(--accent-fg);border:0}
+  .tdesk .tshare>summary{background:var(--surface-2);color:var(--fg)}
+  .tdesk .tavisos>summary{background:#229ed9;color:#fff}
+  .tdesk .btn .ic+.lb{margin-left:6px}
+  .tdesk .car{opacity:.7;font-size:.75em;margin-left:6px}
+}
 .pmenu-body small{color:var(--muted);padding:6px 12px 4px;font-size:.8rem}
 .xdlg{border:1px solid var(--line);border-radius:22px;background:var(--surface);color:var(--fg);padding:0;width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);box-shadow:0 30px 80px rgba(5,4,20,.6)}
 .xdlg::backdrop{background:rgba(8,5,24,.72)}
@@ -1461,6 +1476,24 @@ function xText(r){
 }
 function xIntent(r){ return "https://x.com/intent/post?text="+encodeURIComponent(xText(r))+"&url="+encodeURIComponent(tokenLink(r.mint)); }
 var X_ICON="<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>";
+// Botones del token en el ordenador: Seguir · Buscar ballenas · Compartir ▾ · Avisos en Telegram ▾. Lo que se usa menos
+// va dentro de los dos menús; en el móvil siguen los botones grandes de siempre (.tacts)
+function deskActions(r,fav){
+  var share=(r.lights?"<button type='button' class='pm-i' data-card='"+esc(r.mint)+"'>⬇ Descargar imagen</button>":"")+
+    (r.lights?"<button type='button' class='pm-i' data-xshare='"+esc(r.mint)+"'>𝕏 Compartir en X</button>":"")+
+    "<button type='button' class='pm-i' data-copy='"+esc(tokenLink(r.mint))+"'>🔗 Copiar enlace</button>";
+  var avisos=r.par?"<a target='_blank' rel='noopener' href='"+esc(tgLink(r.mint))+"'>🔔 Vigilar este token<small>Si sube el riesgo, cae la liquidez o el creador vende</small></a>"+
+    "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"a50"))+"'>📈 Si sube un 50%</a>"+
+    "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"b30"))+"'>📉 Si baja un 30%</a>"+
+    "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"m20"))+"'>↕️ Cada vez que se mueva un 20%</a>"+
+    "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,""))+"'>✏️ Otro precio (lo eliges en el bot)</a>":"";
+  return "<div class='actions tdesk'>"+
+    (r.par?"<button class='btn small tfav' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
+    "<button class='btn small twh' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'>Buscar ballenas</span></button>"+
+    "<details class='pmenu tshare'><summary class='btn small'><span class='ic'>↗</span><span class='lb'>Compartir</span><span class='car'>▾</span></summary><div class='pmenu-body'>"+share+"</div></details>"+
+    (avisos?"<details class='pmenu tavisos'><summary class='btn small'><span class='ic'>🔔</span><span class='lb'>Avisos en Telegram</span><span class='car'>▾</span></summary><div class='pmenu-body'>"+avisos+"</div></details>":"")+
+    "</div>";
+}
 function xBtn(r){
   if(!r.lights) return "";
   return "<button class='btn small xs' type='button' data-xshare='"+esc(r.mint)+"' title='Abre X con el texto escrito y una imagen con los datos del análisis'>"+"<span class='lb'>Compartir en</span>"+X_ICON+"</button>";
@@ -1561,7 +1594,7 @@ function renderToken(noScroll){
       "<div class='tsub'><button class='btn ghost small' type='button' data-copy='"+esc(tokenLink(r.mint))+"' title='Copia un enlace que abre directamente este análisis'><span class='ic'>🔗</span><span class='lb'>Copiar enlace</span></button>"+
       (r.par?"<button class='btn ghost small tfav' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
       "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'>Buscar ballenas</span></button></div>"+
-    "</div>";
+    "</div>"+deskActions(r,fav);
   $("#filters").style.display="none";
   renderList();
   state.shown.W=true;
@@ -3073,7 +3106,7 @@ document.addEventListener("click",function(ev){
   if(ns){ if(state.nsrc!==ns.getAttribute("data-nsrc")){ state.nsrc=ns.getAttribute("data-nsrc"); loadNew(); } return; }
   if(ev.target.id==="nreload"){ loadNew(); return; }
   // el menú de la alerta de precio se cierra al elegir una opción o al pulsar fuera
-  Array.prototype.forEach.call(document.querySelectorAll("details.pmenu[open]"),function(d){ if(!d.contains(ev.target)||ev.target.closest("a")) d.open=false; });
+  Array.prototype.forEach.call(document.querySelectorAll("details.pmenu[open]"),function(d){ if(!d.contains(ev.target)||ev.target.closest("a")||ev.target.closest(".pm-i")) d.open=false; });
   var chip=ev.target.closest&&ev.target.closest(".chip");
   if(chip){
     state.filter=chip.getAttribute("data-f");

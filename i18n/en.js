@@ -483,6 +483,15 @@ export const TEXT = {
   "'><span class='ic'>🔗</span><span class='lb'><span class='lg'>Ver en </span>Solscan</span></a></div></div>": "'><span class='ic'>🔗</span><span class='lb'><span class='lg'>See on </span>Solscan</span></a></div></div>",
   "<div class='hint'>Último resultado estimado: ": "<div class='hint'>Last estimated result: ",
 
+  // ---------- desktop token buttons ----------
+  "'>⬇ Descargar imagen</button>": "'>⬇ Download image</button>",
+  "'>𝕏 Compartir en X</button>": "'>𝕏 Share on X</button>",
+  "'>🔗 Copiar enlace</button>": "'>🔗 Copy link</button>",
+  "'>🔔 Vigilar este token<small>Si sube el riesgo, cae la liquidez o el creador vende</small></a>": "'>🔔 Watch this token<small>If the risk rises, liquidity drops or the creator sells</small></a>",
+  "'><span class='ic'>🐳</span><span class='lb'>Buscar ballenas</span></button>": "'><span class='ic'>🐳</span><span class='lb'>Find whales</span></button>",
+  "<details class='pmenu tshare'><summary class='btn small'><span class='ic'>↗</span><span class='lb'>Compartir</span><span class='car'>▾</span></summary><div class='pmenu-body'>": "<details class='pmenu tshare'><summary class='btn small'><span class='ic'>↗</span><span class='lb'>Share</span><span class='car'>▾</span></summary><div class='pmenu-body'>",
+  "<details class='pmenu tavisos'><summary class='btn small'><span class='ic'>🔔</span><span class='lb'>Avisos en Telegram</span><span class='car'>▾</span></summary><div class='pmenu-body'>": "<details class='pmenu tavisos'><summary class='btn small'><span class='ic'>🔔</span><span class='lb'>Telegram alerts</span><span class='car'>▾</span></summary><div class='pmenu-body'>",
+
   // ---------- wallet base ----------
   "Exchange conocido": "Known exchange",
   "Granja de lanzamientos": "Launch farm",
