@@ -10,7 +10,7 @@ Analiza el riesgo de los tokens de una wallet de Solana, o de un token suelto, y
 - **Confluencia:** tokens en común entre varias wallets, y wallets en común entre varios tokens.
 - **Seguimiento:** lista de wallets y tokens, cambios desde la última revisión y resultado estimado (PnL).
 
-El motor es la librería open-source [solana-risk-engine](https://github.com/panpontomate/solana-risk-engine) (npm: `solana-risk-engine`). Para recibir avisos en el móvil, usa el bot de Telegram [@panpontomate_escaner_bot](https://t.me/panpontomate_escaner_bot).
+El motor es la librería open-source [solana-risk-engine](https://github.com/panpontomate/solana-risk-engine) (npm: `solana-risk-engine`). Para recibir avisos en el móvil, usa el bot de Telegram [@SolFlagBot](https://t.me/SolFlagBot).
 
 *Es una herramienta heurística, no un consejo financiero. "Riesgo bajo" significa que no se encontraron las señales que busca, no que el token sea seguro.*
 

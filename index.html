@@ -645,7 +645,7 @@ a.rdc{transition:transform .15s,border-color .15s}
       <button type="button" class="tab" id="tabL" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Mi lista <span id="lcount"></span></span></button>
       <button type="button" class="tab" id="tabC" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg><span>Confluencia <span id="ccount"></span></span></button>
     </div>
-    <a class="botlink" href="https://t.me/panpontomate_escaner_bot" target="_blank" rel="noopener">Bot de Telegram</a>
+    <a class="botlink" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a>
     <a class="lang" href="https://solflag.com/en/" hreflang="en" title="English version">EN</a>
   </header>
 
@@ -764,7 +764,7 @@ a.rdc{transition:transform .15s,border-color .15s}
       <div class="card">
         <p class="kick">Bot de Telegram</p><h2>Que te avise el bot, no la pérdida.</h2>
         <div class="chat"><div class="me">/vigilar $TOKEN</div><div class="bot"><b>El creador está vendiendo</b><br>$TOKEN: riesgo medio → riesgo alto</div></div>
-        <a class="btn" href="https://t.me/panpontomate_escaner_bot" target="_blank" rel="noopener">Abrir el bot</a>
+        <a class="btn" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Abrir el bot</a>
       </div>
     </section>
   </div>
@@ -776,7 +776,7 @@ a.rdc{transition:transform .15s,border-color .15s}
       <span class="wm"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
       <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">X @solflagTeam</a>
       <a href="https://t.me/Chocolatevegano" target="_blank" rel="noopener">Telegram @Chocolatevegano</a>
-      <a href="https://t.me/panpontomate_escaner_bot" target="_blank" rel="noopener">Bot de avisos</a>
+      <a href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de avisos</a>
       <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
       <a href="https://solflag.com/blog/">Blog · Avances</a>
       <a href="mailto:solflag.team@gmail.com">Contacto</a>
@@ -1454,7 +1454,7 @@ function setUrl(mint){
 }
 function tokenLink(mint){ return location.origin+location.pathname+"?token="+mint; }
 // Abre el bot de Telegram y empieza a vigilar esa dirección: el bot recibe "/start <dirección>"
-var TG_BOT="panpontomate_escaner_bot";
+var TG_BOT="SolFlagBot";
 function tgLink(addr){ return "https://t.me/"+TG_BOT+"?start="+encodeURIComponent(addr); }
 function tgBtn(addr,title){
   return "<a class='btn small tg' target='_blank' rel='noopener' href='"+esc(tgLink(addr))+"' title='"+esc(title)+"'><span class='ic'>🔔</span><span class='lb'><span class='lg'>Vigilar en </span>Telegram</span></a>";
@@ -3258,7 +3258,7 @@ $("#goH").addEventListener("click",function(){
 });
 document.addEventListener("click",function(ev){
   if(ev.target.closest){
-    if(ev.target.closest("a[href*='t.me/panpontomate_escaner_bot']")) track("telegram");
+    if(ev.target.closest("a[href*='t.me/SolFlagBot']")) track("telegram");
     if(ev.target.closest(".rdc[data-analyze]")) track("radar");
   }
   var t=ev.target.closest&&ev.target.closest("[data-try]");
