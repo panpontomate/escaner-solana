@@ -1,5 +1,5 @@
-# Caras conocidas y base de wallets: cada 30 minutos apunta tokens nuevos, mira cómo acabaron los de hace 24 h
-# y publica caras.json y datos/ en solflag.com. La memoria entre ejecuciones va en la caché de Actions.
+# Caras conocidas, base de wallets y registro de tokens: cada 30 minutos apunta tokens nuevos, mira cómo acabaron
+# los de hace 24 h (y 7 días en el registro) y publica caras.json y datos/ en solflag.com. La memoria entre ejecuciones va en la caché de Actions.
 name: caras
 on:
   schedule:
@@ -13,12 +13,14 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Motor de SolFlag (para el registro de tokens)
+        run: npm ci --prefix tools/caras --no-audit --no-fund
       - uses: actions/cache/restore@v4
         with:
           path: tools/caras/estado.json
@@ -40,5 +42,5 @@ jobs:
           git config user.name "solflag-caras"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add caras.json datos
-          git commit -m "caras.json y base de wallets: actualizado"
+          git commit -m "caras.json, base de wallets y registro: actualizado"
           git pull --rebase -q && git push -q

@@ -4,7 +4,9 @@
 //   3. comprueba si las wallets que se repiten son exchanges o plataformas (muchas transacciones por hora) para no marcarlas
 //   4. va apuntando en la base de wallets de SolFlag todo lo que ve (quién paga, financia o crea lanzamientos, cuántas
 //      transacciones por hora hace cada wallet) y suma los aportes de estudios y pruebas (tools/caras/aportes)
-//   5. escribe caras.json y datos/base.json + datos/exchanges.json (lo que lee la web) y tools/caras/estado.json (lo que
+//   5. registro de tokens: analiza con el motor (como la web) hasta REG_MAX tokens nuevos y apunta cómo acabaron a las
+//      24 h y a los 7 días (datos/registro, ver registro.mjs)
+//   6. escribe caras.json y datos/base.json + datos/exchanges.json (lo que lee la web) y tools/caras/estado.json (lo que
 //      recuerda entre ejecuciones; no va en git, lo guarda la caché de Actions)
 //
 // Uso: node tools/caras/collect.mjs            (RPC en la variable SOLANA_RPC; si no, uno público)
@@ -13,6 +15,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DAY, INFRA_PER_HOUR, emptyState, addToken, resolveToken, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
 import { emptyBase, observe, mergeAporte, pruneBase, publishBase } from "./base.mjs";
+import { regEntry, regDue, regResolve, regPrune, regPublish, daySummary, mergeDay } from "./registro.mjs";
+import { createClient, analyzeToken } from "solana-risk-engine";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const STATE = path.join(HERE, "estado.json");
@@ -22,6 +26,8 @@ const APORTES = path.join(HERE, "aportes");
 const RPC = process.env.SOLANA_RPC || "https://solana-rpc.publicnode.com";
 const MAX_NEW = +process.env.CARAS_MAX_NEW || 120;      // tokens nuevos por ejecución
 const MAX_INFRA = 40;                                    // comprobaciones de actividad por ejecución
+const REG_MAX = +process.env.REG_MAX || 40;              // tokens nuevos analizados con el motor por ejecución
+const REG = path.join(DATOS, "registro");
 const QUOTES = ["So11111111111111111111111111111111111111112", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"];
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const now = Date.now();
@@ -71,7 +77,7 @@ prune(state, now);
 // tokens ya vistos (2 días) para no apuntar dos veces uno que ya se resolvió
 state.seen = state.seen || {};
 Object.keys(state.seen).forEach((m) => { if (now - state.seen[m] > 2 * DAY) delete state.seen[m]; });
-const log = { nuevos: 0, resueltos: 0, infra: 0, errores: 0, aportes: 0 };
+const log = { nuevos: 0, resueltos: 0, infra: 0, errores: 0, aportes: 0, registro: 0, regResueltos: 0 };
 // base de wallets: vive en el mismo estado; los aportes nuevos se suman una vez
 state.base = state.base || emptyBase();
 if (fs.existsSync(APORTES)) {
@@ -81,6 +87,12 @@ if (fs.existsSync(APORTES)) {
   });
 }
 pruneBase(state.base, now);
+state.reg = regPrune(state.reg || {}, now);
+state.regPub = state.regPub || {};
+// caras ya marcadas antes de esta ejecución: para apuntar si un token nuevo lo lanzó una
+const knownFaces = buildList(state, now).faces;
+const faceOf = (t) => ["payer", "funder", "creator"].map((k) => knownFaces[t[k]] && knownFaces[t[k]].lvl)
+  .reduce((w, l) => (l === "bad" || w === "bad" ? "bad" : l || w), null);
 
 // 1. tokens nuevos
 const fresh = [];
@@ -109,6 +121,15 @@ for (const f of fresh.slice(0, MAX_NEW)) {
     }
   } catch (e) { log.errores++; }
   addToken(state, f.mint, t); state.seen[f.mint] = now; log.nuevos++;
+  if (log.registro < REG_MAX) {
+    let r = null;
+    try {
+      // cada token con su propio límite de tiempo: uno que se atasque no se come la ejecución
+      r = await analyzeToken(createClient({ rpcUrl: RPC, signal: AbortSignal.timeout(45000) }), f.mint);
+    } catch (e) { log.errores++; }
+    state.reg[f.mint] = regEntry(f.mint, Object.assign({ plat: t.plat, dex: f.dex }, t), r, Date.now(), faceOf(t));
+    log.registro++;
+  }
   if (t.payer) observe(state.base, { addr: t.payer, role: "payer", token: f.mint, at: f.t }, now);
   if (t.funder) observe(state.base, { addr: t.funder, role: "funder", token: f.mint, at: f.t }, now);
   if (t.creator && t.creator !== t.payer) observe(state.base, { addr: t.creator, role: "creator", token: f.mint, at: f.t }, now);
@@ -127,6 +148,22 @@ for (let i = 0; i < due.length; i += 30) {
   });
   await sleep(400);
 }
+// resultados del registro: a las 24 h y a los 7 días
+const regDueNow = regDue(state.reg, now);
+for (const stage of ["h24", "d7"]) {
+  const list = regDueNow[stage];
+  for (let i = 0; i < list.length; i += 30) {
+    const part = list.slice(i, i + 30);
+    const pairs = await getJson("https://api.dexscreener.com/tokens/v1/solana/" + part.join(","));
+    if (!Array.isArray(pairs)) continue;                   // fallo de red: en la siguiente
+    part.forEach((m) => {
+      regResolve(state.reg[m], stage, pairs.filter((p) => p.baseToken && p.baseToken.address === m));
+      log.regResueltos++;
+    });
+    await sleep(400);
+  }
+}
+
 // 3. exchanges y plataformas
 for (const a of needInfraCheck(state).slice(0, MAX_INFRA)) {
   try {
@@ -151,5 +188,24 @@ if (!fs.existsSync(DATOS)) fs.mkdirSync(DATOS);
   const fp = path.join(DATOS, f), old = fs.existsSync(fp) ? JSON.parse(fs.readFileSync(fp, "utf8")) : {};
   if (JSON.stringify(old[key]) !== JSON.stringify(data[key])) fs.writeFileSync(fp, JSON.stringify(data));
 });
+// registro: un archivo por día de lanzamiento (dos veces: con 24 h y final) y un índice con el resumen de cada día
+const ready = regPublish(state.reg, state.regPub, now);
+if (ready.length) {
+  if (!fs.existsSync(REG)) fs.mkdirSync(REG, { recursive: true });
+  const ip = path.join(REG, "indice.json");
+  const index = fs.existsSync(ip) ? JSON.parse(fs.readFileSync(ip, "utf8")) : { v: 1, days: {} };
+  ready.forEach(({ day, final, entries }) => {
+    const fp = path.join(REG, day + ".json");
+    const file = mergeDay(fs.existsSync(fp) ? JSON.parse(fs.readFileSync(fp, "utf8")) : null, day, entries, now);
+    file.final = final;
+    fs.writeFileSync(fp, JSON.stringify(file));
+    index.days[day] = Object.assign(daySummary(file.tokens), { final: final });
+  });
+  index.updated = now;
+  fs.writeFileSync(ip, JSON.stringify(index));
+  fs.writeFileSync(STATE, JSON.stringify(state));
+  log.diasPublicados = ready.map((x) => x.day + (x.final ? " final" : " 24h")).join(", ");
+}
+log.pendientesRegistro = Object.keys(state.reg).length;
 log.base = Object.keys(state.base.wallets).length; log.conocidas = Object.keys(pub.base.wallets).length; log.exchanges = Object.keys(pub.exchanges.exchanges).length;
 console.log(JSON.stringify(Object.assign(log, { tokens: Object.keys(state.tokens).length, seguidas: Object.keys(state.faces).length, caras: Object.keys(list.faces).length, marcados: Object.keys(list.mints).length })));

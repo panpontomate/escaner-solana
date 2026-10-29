@@ -1,0 +1,9 @@
+{
+  "name": "solflag-caras",
+  "private": true,
+  "description": "Recolector de caras conocidas, base de wallets y registro de tokens de SolFlag (GitHub Actions)",
+  "type": "module",
+  "dependencies": {
+    "solana-risk-engine": "0.4.4"
+  }
+}
