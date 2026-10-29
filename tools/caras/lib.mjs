@@ -12,7 +12,10 @@
 export const DAY = 86400e3;
 export const DEAD_MCAP = 10000;        // igual que CREATOR_DEAD_MCAP del motor
 export const INFRA_PER_HOUR = 300;     // más transacciones por hora: exchange o plataforma, no una persona
-export const WARN_MIN = 3, WARN_PCT = 0.8, BAD_MIN = 10, BAD_PCT = 0.9;
+export const FUNDER_PER_HOUR = 100;    // quien solo financia creadores: a partir de aquí suele ser un exchange pequeño (estudio de 200 tokens, 28/10)
+// casi todo lo nuevo muere (86 % en la muestra del 28/10): el aviso es "lanza en serie y casi nada despega"
+// y el rojo, que sube el veredicto, pide 10 lanzamientos sin que despegue ninguno
+export const WARN_MIN = 3, WARN_PCT = 0.8, BAD_MIN = 10, BAD_PCT = 0.95;
 export const KEEP_DAYS = 30;           // una cara sin lanzamientos en 30 días se olvida
 export const SINGLE_DAYS = 3;          // y una que solo salió una vez, a los 3 días
 export const ROLES = ["payer", "funder", "creator"];
@@ -70,8 +73,9 @@ export function resolveToken(state, mint, mcap) {
 
 function counts(state, addr) {
   // solo cuentan las wallets ya comprobadas que no son exchanges ni plataformas
-  const i = state.infra[addr];
-  return !!i && !i.infra;
+  const i = state.infra[addr], r = state.faces[addr].roles || {};
+  if (!i || i.infra) return false;
+  return !(!r.payer && !r.creator && i.ph > FUNDER_PER_HOUR);
 }
 
 // Lista pública:

@@ -9,7 +9,9 @@ test("faceLevel uses the creator-history thresholds", () => {
   assert.equal(faceLevel(2, 2), null);
   assert.equal(faceLevel(3, 3), "warn");
   assert.equal(faceLevel(5, 3), null);       // 60% dead
-  assert.equal(faceLevel(10, 9), "bad");
+  assert.equal(faceLevel(10, 10), "bad");
+  assert.equal(faceLevel(10, 9), "warn");    // 90%: one took off, not red
+  assert.equal(faceLevel(20, 19), "bad");
   assert.equal(faceLevel(10, 8), "warn");
 });
 
@@ -42,6 +44,17 @@ test("a creator funded by a wallet with successful launches is not flagged", () 
   const s = emptyState(); s.infra = { F: ok };
   for (let i = 0; i < 5; i++) { addToken(s, "m" + i, { t: NOW - 2 * DAY, funder: "F", creator: "c" + i }); resolveToken(s, "m" + i, i < 3 ? 2000 : 80000); }
   assert.deepEqual(buildList(s, NOW).faces, {});      // 3 of 5 dead = 60%
+});
+
+test("funder-only wallets over 100 tx/h are small exchanges; payers keep the 300 limit", () => {
+  const s = emptyState();
+  s.infra = { F: { at: NOW, ph: 180, infra: false }, G: { at: NOW, ph: 60, infra: false }, P: { at: NOW, ph: 180, infra: false } };
+  for (let i = 0; i < 3; i++) {
+    addToken(s, "f" + i, { t: NOW - 2 * DAY, funder: "F", creator: "c" + i }); resolveToken(s, "f" + i, 0);
+    addToken(s, "g" + i, { t: NOW - 2 * DAY, funder: "G", creator: "d" + i }); resolveToken(s, "g" + i, 0);
+    addToken(s, "p" + i, { t: NOW - 2 * DAY, payer: "P", creator: "e" + i }); resolveToken(s, "p" + i, 0);
+  }
+  assert.deepEqual(Object.keys(buildList(s, NOW).faces).sort(), ["G", "P"]);
 });
 
 test("wallets not yet checked for activity never count", () => {
