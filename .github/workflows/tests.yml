@@ -1,0 +1,25 @@
+# En cada cambio de la web: tests del recolector y comprobar que en/index.html está al día con index.html
+# (build-en.js falla si falta una traducción o un CODE ya no coincide). Los commits de datos del recolector no lo lanzan.
+name: tests
+on:
+  push:
+    paths-ignore:
+      - caras.json
+      - datos/**
+  pull_request:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tests del recolector
+        run: node --test tools/caras/*.test.mjs
+      - name: Versión en inglés al día
+        run: |
+          node build-en.js
+          git diff --exit-code -- en || { echo "::error::en/index.html no coincide con index.html: ejecuta node build-en.js y haz commit"; exit 1; }

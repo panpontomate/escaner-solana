@@ -1,0 +1,53 @@
+# Vigila el recolector de caras: cancela ejecuciones atascadas en cola y, si lleva demasiado sin terminar bien,
+# abre un issue "Recolector parado" (GitHub avisa por email) y lo cierra solo cuando vuelve a funcionar.
+# Aviso por Telegram opcional: secrets AVISO_TELEGRAM_TOKEN y AVISO_TELEGRAM_CHAT.
+name: vigilante
+on:
+  schedule:
+    - cron: "50 * * * *"
+  workflow_dispatch:
+permissions:
+  actions: write
+  issues: write
+concurrency:
+  group: vigilante
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TG_TOKEN: ${{ secrets.AVISO_TELEGRAM_TOKEN }}
+      TG_CHAT: ${{ secrets.AVISO_TELEGRAM_CHAT }}
+      COLA_MAX_MIN: 60
+      PARADO_MAX_MIN: 150
+      TITULO: Recolector parado
+    steps:
+      - name: Cancelar ejecuciones atascadas en cola
+        run: |
+          now=$(date +%s)
+          gh run list -w caras.yml -s queued -L 20 --json databaseId,createdAt --jq '.[] | "\(.databaseId) \(.createdAt)"' |
+          while read -r id at; do
+            min=$(( (now - $(date -d "$at" +%s)) / 60 ))
+            if [ "$min" -ge "$COLA_MAX_MIN" ]; then echo "Cancelo $id (en cola $min min)"; gh run cancel "$id" || true; fi
+          done
+      - name: Comprobar la última ejecución buena
+        run: |
+          now=$(date +%s)
+          at=$(gh run list -w caras.yml -s success -L 1 --json updatedAt --jq '.[0].updatedAt // empty')
+          min=$([ -n "$at" ] && echo $(( (now - $(date -d "$at" +%s)) / 60 )) || echo 99999)
+          echo "Última ejecución buena: ${at:-ninguna} (hace $min min)"
+          issue=$(gh issue list --state open --search "in:title \"$TITULO\"" --json number --jq '.[0].number // empty')
+          avisar() { [ -n "$TG_TOKEN" ] && [ -n "$TG_CHAT" ] && curl -s -o /dev/null "https://api.telegram.org/bot$TG_TOKEN/sendMessage" --data-urlencode "chat_id=$TG_CHAT" --data-urlencode "text=$1" || true; }
+          enlace="https://github.com/$GH_REPO/actions/workflows/caras.yml"
+          if [ "$min" -ge "$PARADO_MAX_MIN" ]; then
+            [ -n "$issue" ] && { echo "Ya hay un issue abierto (#$issue)"; exit 0; }
+            texto="El recolector de caras lleva $min min sin terminar bien (última: ${at:-ninguna}). Mira $enlace"
+            gh issue create --title "$TITULO" --body "$texto"
+            avisar "⚠️ SolFlag: $texto"
+          elif [ -n "$issue" ]; then
+            gh issue close "$issue" --comment "Vuelve a funcionar: última ejecución buena $at."
+            avisar "✅ SolFlag: el recolector vuelve a funcionar ($at)."
+          fi
