@@ -737,14 +737,9 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
 #results.wmode .wacts .wrow>.wcopy,#results.wmode .wacts .wrow>.wsol{background:var(--surface-2);color:var(--fg);border:1px solid var(--line)}
 #results.wmode .wacts .ic{display:block!important;font-size:1.05rem;line-height:1}
 #results.wmode .wacts .ic+.lb{margin-left:0}
+@media (min-width:521px){#results.wmode .wacts{max-width:640px}}
 #results.wmode .wacts>.wconf{font-size:.62rem;letter-spacing:-.01em;padding-inline:1px}
 @media (min-width:1000px){
-  #results.wmode{max-width:1240px;display:grid;grid-template-columns:340px minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:20px;align-items:start}
-  #results.wmode>#summary{grid-column:1;grid-row:1/span 2;position:sticky;top:16px;padding:20px}
-  #results.wmode>#filters{grid-column:2;margin-top:0!important}
-  #results.wmode>#list{grid-column:2}
-  #results.wmode #summary .sum-head{display:block}
-  #results.wmode #summary .stats{margin-top:12px;gap:16px}
   #results.wmode .wt1{grid-template-columns:34px minmax(80px,1fr) 112px 100px minmax(110px,1.8fr) auto;grid-template-areas:"av n v p w a";gap:10px}
   #results.wmode .wv b{white-space:nowrap}
   #results.wmode .ww{font-size:.84rem}
