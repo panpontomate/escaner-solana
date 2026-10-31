@@ -13,7 +13,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { DAY, INFRA_PER_HOUR, emptyState, addToken, resolveToken, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
+import { DAY, INFRA_PER_HOUR, emptyState, addToken, resolveToken, onCurve, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
 import { emptyBase, observe, mergeAporte, pruneBase, publishBase } from "./base.mjs";
 import { regEntry, regDue, regResolve, regRecheck, regPrune, regPublish, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
@@ -103,12 +103,13 @@ for (let p = 1; p <= 5 && fresh.length < MAX_NEW; p++) {
     const id = pool.relationships && pool.relationships.base_token && pool.relationships.base_token.data.id;
     const mint = id && id.replace(/^solana_/, "");
     if (!mint || QUOTES.includes(mint) || state.tokens[mint] || state.seen[mint] || fresh.some((f) => f.mint === mint)) return;
-    fresh.push({ mint, t: Date.parse(pool.attributes.pool_created_at) || now, dex: pool.relationships.dex && pool.relationships.dex.data.id });
+    fresh.push({ mint, t: Date.parse(pool.attributes.pool_created_at) || now, dex: pool.relationships.dex && pool.relationships.dex.data.id,
+      liq: Math.round(parseFloat(pool.attributes.reserve_in_usd)) || undefined });
   });
   await sleep(2500);   // GeckoTerminal: 30 peticiones por minuto
 }
 for (const f of fresh.slice(0, MAX_NEW)) {
-  const t = { t: f.t, seen: now, dex: f.dex };
+  const t = { t: f.t, seen: now, dex: f.dex, liq: f.liq };
   try {
     const rc = await getJson("https://api.rugcheck.xyz/v1/tokens/" + f.mint + "/report");
     await sleep(600);
@@ -128,6 +129,7 @@ for (const f of fresh.slice(0, MAX_NEW)) {
       r = await analyzeToken(createClient({ rpcUrl: RPC, signal: AbortSignal.timeout(45000) }), f.mint);
     } catch (e) { log.errores++; }
     state.reg[f.mint] = regEntry(f.mint, Object.assign({ plat: t.plat, dex: f.dex }, t), r, Date.now(), faceOf(t));
+    if (state.reg[f.mint].liq) t.liq = state.reg[f.mint].liq;   // la liquidez del análisis, si la hay, es la buena
     log.registro++;
   }
   if (t.payer) observe(state.base, { addr: t.payer, role: "payer", token: f.mint, at: f.t }, now);
@@ -143,7 +145,8 @@ for (let i = 0; i < due.length; i += 30) {
   if (!Array.isArray(pairs)) continue;                     // fallo de red: se reintenta en la siguiente ejecución
   part.forEach((m) => {
     const ps = pairs.filter((p) => p.baseToken && p.baseToken.address === m);
-    resolveToken(state, m, ps.reduce((s, p) => Math.max(s, p.marketCap || p.fdv || 0), 0));
+    resolveToken(state, m, ps.reduce((s, p) => Math.max(s, p.marketCap || p.fdv || 0), 0),
+      ps.reduce((s, p) => Math.max(s, (p.liquidity && p.liquidity.usd) || 0), 0), onCurve(ps));
     log.resueltos++;
   });
   await sleep(400);

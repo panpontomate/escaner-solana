@@ -5,12 +5,14 @@
 // pero el dinero sale de la misma wallet: así se las reconoce aunque el creador sea nuevo.
 //
 // Estado entre ejecuciones:
-//   tokens: tokens de menos de 24 h esperando resultado { t, seen, payer, funder, creator, rug }
+//   tokens: tokens de menos de 24 h esperando resultado { t, seen, payer, funder, creator, rug, liq }
 //   faces:  contadores por wallet { n, done, dead, roles: {payer, funder, creator}, last, ex: [{m, t}] }
 //   infra:  wallets comprobadas { at, ph (transacciones por hora), infra (exchange o plataforma) }
 
 export const DAY = 86400e3;
 export const DEAD_MCAP = 10000;        // igual que CREATOR_DEAD_MCAP del motor
+export const PULL_MIN_LIQ = 1000;     // liquidez mínima al verlo para que cuente si se la quitan
+export const PULL_DROP = 0.95;        // la liquidez cayó más de esto: le quitaron el pool aunque quede capitalización
 export const INFRA_PER_HOUR = 300;     // más transacciones por hora: exchange o plataforma, no una persona
 export const FUNDER_PER_HOUR = 100;    // quien solo financia creadores: a partir de aquí suele ser un exchange pequeño (estudio de 200 tokens, 28/10)
 // casi todo lo nuevo muere (86 % en la muestra del 28/10): el aviso es "lanza en serie y casi nada despega"
@@ -30,9 +32,21 @@ export function faceLevel(done, dead) {
   return null;
 }
 
-// Un token "no despegó" si a las 24 h su capitalización no llega a 10.000 $ o RugCheck lo marca como rug
+// Le quitaron la liquidez: tenía al menos PULL_MIN_LIQ y le queda menos del 5 %. En la curva de Pump.fun
+// no se mira, porque DexScreener da 0 $ de liquidez aunque el token siga vivo
+export function isPulled(liq0, liq, curve) {
+  return !curve && liq0 >= PULL_MIN_LIQ && (liq || 0) < liq0 * (1 - PULL_DROP);
+}
+
+// Todos los pares de DexScreener del token siguen en la curva de Pump.fun
+export function onCurve(pairs) {
+  return !!(pairs && pairs.length && pairs.every(function (p) { return /^pump-?fun$/.test(p.dexId || ""); }));
+}
+
+// Un token "no despegó" si a las 24 h su capitalización no llega a 10.000 $, RugCheck lo marca como rug
+// o le quitaron la liquidez
 export function isDead(t) {
-  return !!t.rug || !(t.mcap >= DEAD_MCAP);
+  return !!t.rug || !(t.mcap >= DEAD_MCAP) || isPulled(t.liq, t.liqNow, t.cv);
 }
 
 // Wallets de un token, cada una con su papel (sin repetir: el creador que se pagó su lanzamiento cuenta como pagador)
@@ -57,10 +71,10 @@ export function addToken(state, mint, t) {
 }
 
 // Resultado a las 24 h: se suma a sus caras y el token se olvida
-export function resolveToken(state, mint, mcap) {
+export function resolveToken(state, mint, mcap, liq, curve) {
   const t = state.tokens[mint];
   if (!t) return;
-  t.mcap = mcap;
+  t.mcap = mcap; t.liqNow = liq; t.cv = !!curve;
   const dead = isDead(t);
   facesOf(t).forEach(function (f) {
     const a = state.faces[f.addr];

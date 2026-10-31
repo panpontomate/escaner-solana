@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { faceLevel, isDead, facesOf, emptyState, addToken, resolveToken, buildList, prune, needInfraCheck, perHour, DAY } from "./lib.mjs";
+import { faceLevel, isDead, onCurve, facesOf, emptyState, addToken, resolveToken, buildList, prune, needInfraCheck, perHour, DAY } from "./lib.mjs";
 
 const NOW = 1e12;
 const ok = { at: NOW, infra: false };
@@ -20,6 +20,12 @@ test("isDead: under $10k, no market or rug", () => {
   assert.equal(isDead({}), true);
   assert.equal(isDead({ mcap: 50000 }), false);
   assert.equal(isDead({ mcap: 50000, rug: true }), true);
+  // the pool was pulled ($23k -> $5) even if the market cap still reads $12.5k
+  assert.equal(isDead({ mcap: 12550, liq: 23217, liqNow: 5 }), true);
+  assert.equal(isDead({ mcap: 50000, liq: 20000, liqNow: 2000 }), false);   // a 90 % drop is not enough
+  assert.equal(isDead({ mcap: 50000, liq: 900, liqNow: 0 }), false);        // too little at the start to tell
+  assert.equal(isDead({ mcap: 40000, liq: 5000, liqNow: 0, cv: true }), false);   // still on the Pump.fun curve
+  assert.equal(isDead({ mcap: 50000 }), false);                             // no starting liquidity known: as before
 });
 
 test("facesOf keeps one role per wallet", () => {
@@ -78,4 +84,15 @@ test("prune forgets one-off faces after 3 days, others after 30, stale tokens an
 test("perHour", () => {
   assert.equal(perHour([{ blockTime: 7200 }, { blockTime: 3600 }, { blockTime: 0 }]), 1.5);
   assert.equal(perHour([]), 0);
+});
+
+test("a face counts the launches whose pool was pulled as dead", () => {
+  const s = emptyState();
+  addToken(s, "r", { t: NOW - 2 * DAY, payer: "P", liq: 48052 });
+  resolveToken(s, "r", 67433, 51, false);
+  addToken(s, "c", { t: NOW - 2 * DAY, payer: "P", liq: 5000 });
+  resolveToken(s, "c", 40000, 0, onCurve([{ dexId: "pumpfun" }]));
+  assert.deepEqual([s.faces.P.done, s.faces.P.dead], [2, 1]);
+  assert.equal(onCurve([{ dexId: "pumpfun" }, { dexId: "pumpswap" }]), false);
+  assert.equal(onCurve([]), false);
 });
