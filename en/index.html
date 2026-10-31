@@ -3,6 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+// Idioma: quien llega a la portada en español con el navegador en otro idioma va a la versión en inglés,
+// salvo que ya eligiera idioma con el botón ES/EN (se recuerda). Los buscadores ven siempre la página pedida
+(function(){
+  try{
+    var K="esc.lang";
+    document.addEventListener("click",function(ev){
+      var a=ev.target.closest&&ev.target.closest("a.lang");
+      if(a) try{ localStorage.setItem(K,a.getAttribute("hreflang")); }catch(e){}
+    },true);
+    if(document.documentElement.lang!=="es"||/bot|crawl|spider|slurp|preview|facebookexternalhit/i.test(navigator.userAgent)) return;
+    var l=localStorage.getItem(K);
+    if(!l){
+      var ls=navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||""];
+      l=ls.some(function(x){ return /^es(-|$)/i.test(x); })?"es":"en";
+    }
+    if(l==="en") location.replace("/en/"+location.search+location.hash);
+  }catch(e){}
+})();
+</script>
 <title>SolFlag · Solana risk scanner</title>
 <meta name="description" content="Paste any Solana token or wallet and see its red flags: creator control, concentration, liquidity and launch. Free, no sign-up and open source.">
 <meta property="og:type" content="website">
