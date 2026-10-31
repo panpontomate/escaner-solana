@@ -101,7 +101,7 @@ export const TEXT = {
   "Escáner": "Scanner",
   "Bot de Telegram": "Telegram bot",
   "Mira las banderas antes de comprar": "Check the flags before you buy",
-  "Una segunda mirada antes de dar el salto.": "A second look before you jump in.",
+  "Una segunda mirada antes de dar el salto": "A second look before you jump in",
   "SolFlag analiza cualquier token o wallet de Solana y te explica sus red flags con palabras claras: el creador, quién lo tiene, la liquidez y cómo se lanzó.": "SolFlag checks any Solana token or wallet and explains its red flags in plain words: the creator, who holds it, the liquidity and how it launched.",
   "Gratis": "Free",
   "Sin registro": "No sign-up",
