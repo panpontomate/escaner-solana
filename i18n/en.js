@@ -412,7 +412,7 @@ export const TEXT = {
   // ---------- token verdict ----------
   "Tiene señales fuertes de alerta. Lee los semáforos antes de comprar.": "It has strong warning signs. Read the lights before buying.",
   "Sin alertas graves, pero con puntos a vigilar.": "No serious alerts, but some points to watch.",
-  "Los chequeos no han encontrado señales de alerta. Ningún análisis es una garantía: revisa siempre antes de invertir.": "The checks found no warning signs. No analysis is a guarantee: always do your own checks before investing.",
+  "Los chequeos no han encontrado señales de alerta.": "The checks found no warning signs.",
   "No tiene mercado y el creador conserva el control: parece spam. No lo vendas ni entres en webs que aparezcan a su nombre.": "No market and the creator keeps control: it looks like spam. Do not sell it or visit websites that appear under its name.",
   "No tiene mercado en DexScreener, así que no se puede comprar ni vender de forma normal.": "It has no market on DexScreener, so it cannot be bought or sold normally.",
   "No se pudo consultar su mercado por un fallo de red. Vuelve a analizarlo.": "Its market could not be checked because of a network error. Analyse it again.",
