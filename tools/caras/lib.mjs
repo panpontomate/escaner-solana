@@ -70,10 +70,10 @@ export function addToken(state, mint, t) {
   return true;
 }
 
-// Resultado a las 24 h: se suma a sus caras y el token se olvida
+// Resultado a las 24 h: se suma a sus caras y el token se olvida. Devuelve si murió (undefined si no estaba)
 export function resolveToken(state, mint, mcap, liq, curve) {
   const t = state.tokens[mint];
-  if (!t) return;
+  if (!t) return undefined;
   t.mcap = mcap; t.liqNow = liq; t.cv = !!curve;
   const dead = isDead(t);
   facesOf(t).forEach(function (f) {
@@ -83,6 +83,7 @@ export function resolveToken(state, mint, mcap, liq, curve) {
     if (dead) { a.dead++; a.ex.unshift({ m: mint, t: t.t || 0 }); a.ex = a.ex.slice(0, 3); }
   });
   delete state.tokens[mint];
+  return dead;
 }
 
 function counts(state, addr) {

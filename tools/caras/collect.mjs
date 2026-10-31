@@ -17,6 +17,7 @@ import { DAY, INFRA_PER_HOUR, emptyState, addToken, resolveToken, onCurve, build
 import { emptyBase, observe, mergeAporte, pruneBase, publishBase } from "./base.mjs";
 import { regEntry, regDue, regResolve, regRecheck, regPrune, regPublish, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
+import { emptyQueue, queueLaunch, queueBuyers, buyerCandidates, trimQueue, d1Config, flush } from "./plano.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const STATE = path.join(HERE, "estado.json");
@@ -56,21 +57,24 @@ async function getJson(url) {
   }
   return null;
 }
-// Firmantes de la primera transacción de una dirección; null si tiene más de 3000 (no se puede saber barato)
-async function firstSigners(addr) {
+async function signersOf(sig) {
+  const tx = await rpc("getTransaction", [sig, { maxSupportedTransactionVersion: 1, encoding: "jsonParsed", commitment: "confirmed" }]);
+  const keys = tx && tx.transaction && tx.transaction.message.accountKeys;
+  return keys ? keys.filter((k) => k.signer).map((k) => k.pubkey) : null;
+}
+// Firmantes de la primera transacción de una dirección y la página de firmas más antigua (la que trae la creación);
+// null si tiene más de 3000 (no se puede saber barato)
+async function earliest(addr) {
   let before = null;
   for (let i = 0; i < 3; i++) {
     const page = await rpc("getSignaturesForAddress", [addr, before ? { limit: 1000, before } : { limit: 1000 }]);
     if (!page || !page.length) return null;
-    if (page.length < 1000) {
-      const tx = await rpc("getTransaction", [page[page.length - 1].signature, { maxSupportedTransactionVersion: 1, encoding: "jsonParsed", commitment: "confirmed" }]);
-      const keys = tx && tx.transaction && tx.transaction.message.accountKeys;
-      return keys ? keys.filter((k) => k.signer).map((k) => k.pubkey) : null;
-    }
+    if (page.length < 1000) return { signers: await signersOf(page[page.length - 1].signature), page };
     before = page[page.length - 1].signature;
   }
   return null;
 }
+async function firstSigners(addr) { const e = await earliest(addr); return e && e.signers; }
 
 // la primera vez (caché vacía) arranca con los tokens del estudio del 28/10
 const SEED = path.join(HERE, "semilla.json");
@@ -91,6 +95,9 @@ if (fs.existsSync(APORTES)) {
 pruneBase(state.base, now);
 state.reg = regPrune(state.reg || {}, now);
 state.regPub = state.regPub || {};
+// plano del dinero (plano.mjs): enlaces de cada lanzamiento pendientes de subir a Cloudflare D1
+const D1 = d1Config();
+state.planoQ = D1 ? state.planoQ || emptyQueue() : undefined;
 // caras ya marcadas antes de esta ejecución: para apuntar si un token nuevo lo lanzó una
 const knownFaces = buildList(state, now).faces;
 const faceOf = (t) => ["payer", "funder", "creator"].map((k) => knownFaces[t[k]] && knownFaces[t[k]].lvl)
@@ -116,8 +123,17 @@ for (const f of fresh.slice(0, MAX_NEW)) {
     const rc = await getJson("https://api.rugcheck.xyz/v1/tokens/" + f.mint + "/report");
     await sleep(600);
     if (rc) { t.creator = rc.creator || undefined; t.rug = !!rc.rugged; t.plat = (rc.launchpad && rc.launchpad.platform) || rc.deployPlatform || undefined; }
-    const ms = await firstSigners(f.mint);                  // quien pagó la creación del token
-    if (ms && ms[0]) t.payer = ms[0];
+    const me = await earliest(f.mint);                      // quien pagó la creación del token
+    if (me && me.signers && me.signers[0]) t.payer = me.signers[0];
+    // compradores de los primeros bloques, solo en los que se analizan (cada uno es una petición más)
+    if (D1 && me && log.registro < REG_MAX) {
+      const buyers = [];
+      for (const b of buyerCandidates(me.page)) {
+        try { const s = await signersOf(b.sig); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
+      }
+      queueBuyers(state.planoQ, f.mint, buyers);
+      log.compras = (log.compras || 0) + buyers.length;
+    }
     if (t.creator) {
       const cs = await firstSigners(t.creator);             // quien pagó la primera transacción del creador
       if (cs && cs[0] && cs[0] !== t.creator && cs[0] !== t.payer) t.funder = cs[0];
@@ -134,6 +150,8 @@ for (const f of fresh.slice(0, MAX_NEW)) {
     if (state.reg[f.mint].liq) t.liq = state.reg[f.mint].liq;   // la liquidez del análisis, si la hay, es la buena
     log.registro++;
   }
+  if (D1) queueLaunch(state.planoQ, { m: f.mint, t: f.t, plat: t.plat, dex: f.dex, py: t.payer, cr: t.creator, fu: t.funder, liq: t.liq,
+    lvl: state.reg[f.mint] && state.reg[f.mint].l, cara: faceOf(t) || undefined });
   if (t.payer) observe(state.base, { addr: t.payer, role: "payer", token: f.mint, at: f.t }, now);
   if (t.funder) observe(state.base, { addr: t.funder, role: "funder", token: f.mint, at: f.t }, now);
   if (t.creator && t.creator !== t.payer) observe(state.base, { addr: t.creator, role: "creator", token: f.mint, at: f.t }, now);
@@ -146,9 +164,12 @@ for (let i = 0; i < due.length; i += 30) {
   const pairs = await getJson("https://api.dexscreener.com/tokens/v1/solana/" + part.join(","));
   if (!Array.isArray(pairs)) continue;                     // fallo de red: se reintenta en la siguiente ejecución
   part.forEach((m) => {
-    const ps = pairs.filter((p) => p.baseToken && p.baseToken.address === m);
-    resolveToken(state, m, ps.reduce((s, p) => Math.max(s, p.marketCap || p.fdv || 0), 0),
-      ps.reduce((s, p) => Math.max(s, (p.liquidity && p.liquidity.usd) || 0), 0), onCurve(ps));
+    const ps = pairs.filter((p) => p.baseToken && p.baseToken.address === m), t = state.tokens[m];
+    const mc = ps.reduce((s, p) => Math.max(s, p.marketCap || p.fdv || 0), 0);
+    const dead = resolveToken(state, m, mc, ps.reduce((s, p) => Math.max(s, (p.liquidity && p.liquidity.usd) || 0), 0), onCurve(ps));
+    // la fila entera otra vez: así también entran los que ya estaban pendientes antes de existir el plano
+    if (D1 && t && dead !== undefined) queueLaunch(state.planoQ, { m, t: t.t, plat: t.plat, dex: t.dex, py: t.payer, cr: t.creator, fu: t.funder,
+      liq: t.liq, dead24: dead, mc24: Math.round(mc) });
     log.resueltos++;
   });
   await sleep(400);
@@ -181,6 +202,12 @@ for (const a of needInfraCheck(state).slice(0, MAX_INFRA)) {
     observe(state.base, { addr: a, ph: ph }, now);
     log.infra++;
   } catch (e) { log.errores++; }
+}
+
+// plano del dinero: subir a D1 lo pendiente; si falla, se queda en la cola para la siguiente ejecución
+if (D1) {
+  try { const up = await flush(D1, state.planoQ, now); log.plano = up.lanz + " lanzamientos, " + up.compras + " compras"; }
+  catch (e) { log.plano = "D1 falló (" + e.message.slice(0, 120) + "), se reintenta"; trimQueue(state.planoQ); }
 }
 
 // 4. guardar (at: cuándo se guardó, para elegir la copia más nueva entre la caché y Cloudflare, ver nube.mjs)
