@@ -6,6 +6,11 @@ on:
   schedule:
     - cron: "50 * * * *"
   workflow_dispatch:
+    inputs:
+      prueba:
+        description: "Enviar un mensaje de prueba a Telegram"
+        type: boolean
+        default: false
 permissions:
   actions: write
   issues: write
@@ -25,6 +30,12 @@ jobs:
       PARADO_MAX_MIN: 150
       TITULO: Recolector parado
     steps:
+      - name: Mensaje de prueba a Telegram
+        if: ${{ inputs.prueba }}
+        run: |
+          if [ -z "$TG_TOKEN" ] || [ -z "$TG_CHAT" ]; then echo "::error::Faltan los secrets AVISO_TELEGRAM_TOKEN y/o AVISO_TELEGRAM_CHAT"; exit 1; fi
+          r=$(curl -s "https://api.telegram.org/bot$TG_TOKEN/sendMessage" --data-urlencode "chat_id=$TG_CHAT" --data-urlencode "text=🔔 SolFlag: prueba del vigilante. Si ves esto, los avisos funcionan.")
+          echo "$r" | grep -q '"ok":true' && echo "::notice::Mensaje de prueba enviado a Telegram" || { echo "::error::Telegram no aceptó el mensaje: $(echo "$r" | grep -o '"description":"[^"]*"')"; exit 1; }
       - name: Cancelar ejecuciones atascadas en cola
         run: |
           now=$(date +%s)
