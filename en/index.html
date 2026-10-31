@@ -204,6 +204,10 @@ details.guide .mono{overflow-wrap:anywhere}
 .hint{color:var(--muted);font-size:.88rem;margin:10px 0 0}
 .hrow{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
 .hrow.prog{opacity:.7}
+.hrow.prog.big{opacity:1}
+.hbig{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:var(--alto-bg);color:var(--alto)}
+.hbig b{color:inherit}
+.hside .exn{margin-top:4px;font-size:.78rem;color:var(--muted)}
 .rk{width:32px;height:32px;border-radius:9px;background:var(--surface-2);display:grid;place-items:center;font:700 .9rem var(--f-display);font-variant-numeric:tabular-nums}
 .hl1{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
 .hl1 .mono{overflow-wrap:anywhere}
@@ -3267,7 +3271,11 @@ function renderHolders(keep){
   var wallets=rows.filter(function(r){return r.kind==="wallet";});
   var bots=rows.filter(function(r){return r.kind==="activa";});
   var progs=rows.filter(function(r){return r.kind==="programa";});
-  var shown=state.showAllH?rows:wallets;
+  // Una cuenta "muy activa" con mucho supply no se esconde: la etiqueta puede fallar (p. ej. una wallet
+  // que solo recibe repartos de comisiones) y, aunque sea un bot, tener tanto ya es un riesgo
+  var bigAct=bots.filter(function(r){return r.pct>=10;});
+  var shown=state.showAllH?rows:rows.filter(function(r){return r.kind==="wallet"||bigAct.indexOf(r)>=0;});
+  var hiddenN=bots.length+progs.length-bigAct.length;
   var sumAll=rows.reduce(function(s,r){return s+r.pct;},0);
   var sumW=wallets.reduce(function(s,r){return s+r.pct;},0);
   var max=rows.length?rows[0].pct:1;
@@ -3291,6 +3299,7 @@ function renderHolders(keep){
       "<div><span>Excluded</span><b>"+bots.length+"</b><small>bots or exchanges</small></div>"+
     "</div>"+
     ((h.signals||[]).length?"<div class='lights hsig'>"+h.signals.map(function(x){ return "<div class='lt lt-"+x.s+"'><i class='ld'></i><div><span>"+esc(SRE.describe(x,"en"))+"</span></div></div>"; }).join("")+"</div>":"")+
+    (bigAct.length?"<p class='hbig'>"+(bigAct.length===1?"A single account flagged as very active holds <b>"+esc(fmtPct(bigAct[0].pct))+"</b> of the supply. Looking like a bot or an exchange does not make it harmless":bigAct.length+" accounts flagged as very active hold "+bigAct.map(function(r){ return "<b>"+esc(fmtPct(r.pct))+"</b>"; }).join(", ")+" of the supply. Looking like bots or exchanges does not make them harmless")+": if they sell, the price moves all the same. Open them with Analyse or on Solscan before you trust them.</p>":"")+
     "<h2 class='verdict'>"+(wallets.length?(wallets.length===1?"1 of the "+rows.length+" largest accounts looks like a person":wallets.length+" of the "+rows.length+" largest accounts look like people"):"None of the "+rows.length+" largest accounts looks like a person")+"</h2>"+
     "<p class='sub'>People hold "+esc(fmtPct(sumW))+" of the supply; bots, exchanges or very active accounts "+esc(fmtPct(bots.reduce(function(a,r){return a+r.pct;},0)))+" and pools or programs "+esc(fmtPct(progs.reduce(function(a,r){return a+r.pct;},0)))+"."+
       (auth.length?" Note: "+esc(auth.join(" and "))+".":"")+
@@ -3298,7 +3307,7 @@ function renderHolders(keep){
     (numGroups?"<p class='sub' style='color:var(--medio)'>"+clusteredAddrs.length+(h.mode==="young"?" of the largest accounts are split across ":" of those that look like people are split across ")+numGroups+(numGroups===1?" group":" groups")+" that share their funding source (the wallet that paid their first transaction): it could be one person or team splitting the supply to look more decentralised than it is. Take it as a lead, not proof: open the source on Solscan before drawing conclusions."+
       (h.hotGroups?" Dismissed: "+h.hotGroups+(h.hotGroups===1?" possible group":" possible groups")+" whose source is an exchange or a platform (over 100 transactions an hour), because many unrelated people receive money from there.":"")+"</p>":
       (h.hotGroups?"<p class='sub'>No group with the same funding source. Dismissed: "+h.hotGroups+(h.hotGroups===1?" match":" matches")+" because the source is an exchange or a very active account, where many unrelated people receive money from.</p>":""))+
-    ((bots.length+progs.length)?"<label class='check' style='margin-top:12px'><input type='checkbox' id='showAllH'"+(state.showAllH?" checked":"")+"> Also show the "+(bots.length+progs.length)+" accounts that do not look like people</label>":"")+
+    (hiddenN>0?"<label class='check' style='margin-top:12px'><input type='checkbox' id='showAllH'"+(state.showAllH?" checked":"")+"> Also show "+(bigAct.length?"the other ":"the ")+hiddenN+(hiddenN===1?" account that does not look like a person":" accounts that do not look like people")+"</label>":"")+
     "<div class='actions'><button class='btn small' id='copyHold' type='button'>Copy top 5 for a post</button>"+
     (wallets.length?"<button class='btn small ghost' id='addAllH' type='button'>⊕ Add the "+wallets.length+" people to Confluence</button>":"")+
     "<a class='btn ghost small' style='text-decoration:none;display:inline-flex;align-items:center' target='_blank' rel='noopener' href='https://solscan.io/token/"+esc(h.mint)+"'>Ver en Solscan</a></div>";
@@ -3322,8 +3331,8 @@ function renderHolders(keep){
       "<div class='hex'><span>"+progs.length+" pools or programs</span><b>"+esc(fmtPct(progs.reduce(function(a,r){return a+r.pct;},0)))+"</b></div>"+
     "</div>";
   $("#hlist").innerHTML="<div class='hgrid'><div class='hmain'><h3 class='tgt'>Top holders</h3>"+(shown.length?"":"<div class='more'>No wallets of people among the 20 largest accounts. Tick the box above to see the rest.</div>")+shown.map(function(r){
-    var isW=r.kind==="wallet";
-    return "<article class='hrow"+(isW?"":" prog")+"'>"+
+    var isW=r.kind==="wallet", isA=r.kind==="activa", isEx=baseType(r.owner)==="exchange";
+    return "<article class='hrow"+(isW?"":" prog")+(bigAct.indexOf(r)>=0?" big":"")+"'>"+
       "<div class='rk'>"+r.rank+"</div>"+
       "<div style='min-width:0'>"+
         "<div class='hl1'><span class='mono'>"+esc(short(r.owner))+"</span>"+
@@ -3335,7 +3344,7 @@ function renderHolders(keep){
           "<a href='https://solscan.io/account/"+esc(r.owner)+"' target='_blank' rel='noopener'>Solscan</a></div>"+
       "</div>"+
       "<div class='hside'><div class='pc'>"+esc(fmtPct(r.pct))+"</div>"+
-        (isW?"<div class='hp'><button class='btn small ghost' type='button' data-analyze='"+esc(r.owner)+"'>Analyse</button><button class='star' type='button' data-favw='"+esc(r.owner)+"' aria-pressed='"+(!!(lista.w[r.owner]&&lista.w[r.owner].fav))+"' title='Follow this wallet' aria-label='Follow this wallet'>"+((lista.w[r.owner]&&lista.w[r.owner].fav)?"★":"☆")+"</button>"+plusBtn(r.owner)+"</div>":"")+
+        ((isW||isA)?"<div class='hp'><button class='btn small ghost' type='button' data-analyze='"+esc(r.owner)+"'"+(isEx?" title='This is an exchange: the analysis may take a long time'":"")+">Analyse</button><button class='star' type='button' data-favw='"+esc(r.owner)+"' aria-pressed='"+(!!(lista.w[r.owner]&&lista.w[r.owner].fav))+"' title='Follow this wallet' aria-label='Follow this wallet'>"+((lista.w[r.owner]&&lista.w[r.owner].fav)?"★":"☆")+"</button>"+plusBtn(r.owner)+"</div>"+(isEx?"<div class='exn'>exchange: the analysis may take a while</div>":""):"")+
       "</div></article>";
   }).join("")+"</div><aside class='hside2'>"+side+"</aside></div>";
   state.shown.H=true;
