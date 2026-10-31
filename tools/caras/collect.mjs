@@ -15,7 +15,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DAY, INFRA_PER_HOUR, emptyState, addToken, resolveToken, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
 import { emptyBase, observe, mergeAporte, pruneBase, publishBase } from "./base.mjs";
-import { regEntry, regDue, regResolve, regPrune, regPublish, daySummary, mergeDay } from "./registro.mjs";
+import { regEntry, regDue, regResolve, regRecheck, regPrune, regPublish, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -163,6 +163,9 @@ for (const stage of ["h24", "d7"]) {
     await sleep(400);
   }
 }
+
+// los resultados ya guardados se vuelven a juzgar, por si cambió la regla de «muerto»
+Object.keys(state.reg).forEach((m) => { regRecheck(state.reg[m], "h24"); regRecheck(state.reg[m], "d7"); });
 
 // 3. exchanges y plataformas
 for (const a of needInfraCheck(state).slice(0, MAX_INFRA)) {

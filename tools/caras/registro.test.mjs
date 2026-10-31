@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { regEntry, regDue, regResolve, regDone, daySummary, mergeDay, regPrune, regPublish, dayOf } from "./registro.mjs";
+import { regEntry, regDue, regResolve, regRecheck, regDone, daySummary, mergeDay, regPrune, regPublish, dayOf } from "./registro.mjs";
 import { DAY } from "./lib.mjs";
 
 const NOW = Date.UTC(2026, 9, 29, 12);
@@ -34,6 +34,24 @@ test("results at 24 h and 7 days, dead under $10k or rug", () => {
   assert.equal(regDone(reg.c), false);
   regResolve(reg.c, "d7", []);
   assert.equal(regDone(reg.c), true);
+});
+
+test("dead when the liquidity is pulled, but not on a Pump.fun curve", () => {
+  // the pool went from $23k to $5: a rug even if the market cap still reads $12.5k
+  assert.deepEqual(regResolve({ liq: 23217 }, "h24", [{ dexId: "meteora", marketCap: 12550, liquidity: { usd: 5 } }]).h24,
+    { mc: 12550, liq: 5, dead: true, pull: true });
+  // a 90 % drop is not enough
+  assert.equal(regResolve({ liq: 20000 }, "h24", [{ marketCap: 50000, liquidity: { usd: 2000 } }]).h24.dead, false);
+  // too little liquidity at the start to tell
+  assert.equal(regResolve({ liq: 900 }, "h24", [{ marketCap: 50000, liquidity: { usd: 1 } }]).h24.dead, false);
+  // still on the curve: DexScreener says $0 liquidity, the token is alive
+  assert.deepEqual(regResolve({ liq: 5000 }, "h24", [{ dexId: "pumpfun", marketCap: 40000, liquidity: { usd: 0 } }]).h24,
+    { mc: 40000, liq: 0, cv: true, dead: false });
+  // an old result is judged again with the new rule, and repeating it changes nothing
+  const old = { liq: 48052, h24: { mc: 67433, liq: 51, dead: false } };
+  regRecheck(old, "h24"); regRecheck(old, "h24");
+  assert.deepEqual(old.h24, { mc: 67433, liq: 51, dead: true, pull: true });
+  assert.equal(regRecheck({ liq: 100 }, "d7").d7, undefined);
 });
 
 test("day summary by starting level, and merging into the published day", () => {

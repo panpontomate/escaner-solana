@@ -13,11 +13,14 @@
 //   f señales que no son ok («CODIGO:b» rojo, «CODIGO:w» amarillo, «CODIGO:n» sin comprobar)
 //   liq liquidez · mc capitalización · w1 / w10 % de la mayor wallet y de las 10 mayores (personas)
 //   py pagador · fu financiador · cr creador · rug marcado como rug por RugCheck · cara nivel de cara conocida
-//   h24 / d7 resultado: { mc, liq, dead } (dead = no llega a DEAD_MCAP o rug)
+//   h24 / d7 resultado: { mc, liq, dead, cv?, pull? } (dead = no llega a DEAD_MCAP, rug o le quitaron la
+//   liquidez; cv = sigue en la curva de Pump.fun; pull = muerto porque la liquidez cayó más de un 95 %)
 
 import { DAY, DEAD_MCAP } from "./lib.mjs";
 
 export const REG_DAYS = 7;          // último resultado: a los 7 días
+export const PULL_MIN_LIQ = 1000;   // liquidez mínima al analizarlo para que cuente si se la quitan
+export const PULL_DROP = 0.95;      // la liquidez cayó más de esto: le quitaron el pool aunque quede capitalización
 export const LEVEL_ORDER = ["HIGH", "MEDIUM", "LOW", "SPAM", "NO_DATA", "NO_MARKET"];
 
 const round = (x, d) => (typeof x === "number" && isFinite(x) ? Math.round(x * Math.pow(10, d || 0)) / Math.pow(10, d || 0) : undefined);
@@ -71,7 +74,20 @@ export function regResolve(e, stage, pairs) {
     mc = Math.max(mc, p.marketCap || p.fdv || 0);
     liq = Math.max(liq, (p.liquidity && p.liquidity.usd) || 0);
   });
-  e[stage] = { mc: Math.round(mc), liq: Math.round(liq), dead: !!e.rug || !(mc >= DEAD_MCAP) };
+  const r = { mc: Math.round(mc), liq: Math.round(liq) };
+  // en la curva de Pump.fun DexScreener da liquidez 0 aunque el token siga vivo
+  if (pairs && pairs.length && pairs.every(function (p) { return /^pump-?fun$/.test(p.dexId || ""); })) r.cv = true;
+  e[stage] = r;
+  return regRecheck(e, stage);
+}
+
+// Muerto o no según el resultado guardado. Se puede repetir: sirve también para corregir resultados antiguos
+export function regRecheck(e, stage) {
+  const r = e[stage];
+  if (!r) return e;
+  const pull = !r.cv && e.liq >= PULL_MIN_LIQ && r.liq < e.liq * (1 - PULL_DROP);
+  r.dead = !!e.rug || !(r.mc >= DEAD_MCAP) || pull;
+  if (pull && r.mc >= DEAD_MCAP) r.pull = true; else delete r.pull;
   return e;
 }
 
