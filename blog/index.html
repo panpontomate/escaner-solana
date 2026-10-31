@@ -81,6 +81,9 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
   <h1>Lo que vamos construyendo.</h1>
   <p>Novedades de SolFlag, pruebas con tokens reales y lo que aprendemos por el camino. Contado tal cual, también lo que sale mal.</p>
   <nav class="toc" aria-label="Entradas">
+    <a href="#movil-mi-lista"><time datetime="2026-10-31">31 oct 2026</time><b>SolFlag en el móvil: más claro y más rápido</b></a>
+    <a href="#primeros-numeros"><time datetime="2026-10-31">31 oct 2026</time><b>Primeros números: casi todo lo que se lanza muere en un día</b></a>
+    <a href="#caras-marcas-bot"><time datetime="2026-10-29">29 oct 2026</time><b>Caras conocidas, marcas falsas y un bot nuevo</b></a>
     <a href="#nace-solflag"><time datetime="2026-10-26">26 oct 2026</time><b>Nace SolFlag: nombre, dominio y diseño nuevos</b></a>
     <a href="#falsa-alarma-rugcheck"><time datetime="2026-10-26">26 oct 2026</time><b>Una falsa alarma de RugCheck, filtrada</b></a>
     <a href="#prueba-pumpfun"><time datetime="2026-10-25">25 oct 2026</time><b>Probamos el escáner con 100 tokens de Pump.fun</b></a>
@@ -89,6 +92,60 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
 </section>
 
 <!-- Para añadir un avance: copia un <article> y ponlo el primero, con su enlace en el índice de arriba -->
+
+<article id="movil-mi-lista">
+  <time datetime="2026-10-31">31 de octubre de 2026</time>
+  <h2>SolFlag en el móvil: más claro y más rápido</h2>
+  <div class="tags"><span>Web</span><span>Móvil</span></div>
+  <p>La mayoría de vosotros entra desde el móvil, así que hemos revisado SolFlag pantalla a pantalla en un teléfono. Lo que hemos cambiado:</p>
+  <ul>
+    <li><b>El escáner, nada más entrar.</b> Antes había que bajar para encontrar dónde pegar la dirección. Ahora está en la primera pantalla.</li>
+    <li><b>Lo rojo, primero.</b> Las banderas salen en orden: rojo, amarillo y verde. En el móvil las verdes se pliegan en una línea («3 banderas en verde») que se abre al tocarla.</li>
+    <li><b>Cómo se lanzó, antes que la gráfica.</b> Si un token sube a riesgo alto por su lanzamiento (compras agrupadas, un lanzador en serie), lo ves justo después de las banderas.</li>
+    <li><b>Sin repetir.</b> Fuera la segunda tarjeta con el mismo precio y la misma liquidez, y los enlaces que ya estaban en «Compartir» y «Avisos».</li>
+    <li><b>El logo del token</b> junto al veredicto, y el nombre solo si dice algo distinto del ticker.</li>
+  </ul>
+  <h3>Mi lista, ahora útil de verdad</h3>
+  <p>Los tokens que sigues enseñan ahora su <b>precio de este momento</b> y cuánto ha cambiado desde que los revisaste. Si a uno le han quitado más de la mitad de la liquidez, o ya no tiene mercado, te lo dice en rojo. Además puedes volver a analizarlo con un toque y lo demás (copiar, Solscan, DexScreener) está en un menú «⋯».</p>
+  <p>Todo esto también se nota en el ordenador. Si algo no te encaja, escríbenos en X a <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%20en%20el%20m%C3%B3vil%3A%20el%20esc%C3%A1ner%20nada%20m%C3%A1s%20entrar%20y%20las%20red%20flags%20primero&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23movil-mi-lista" target="_blank" rel="noopener">Compartir en X</a><a href="#movil-mi-lista">Enlace a esta entrada</a></div>
+</article>
+
+<article id="primeros-numeros">
+  <time datetime="2026-10-31">31 de octubre de 2026</time>
+  <h2>Primeros números: casi todo lo que se lanza muere en un día</h2>
+  <div class="tags"><span>Datos</span><span>Motor</span></div>
+  <p>Desde el 29 de octubre, SolFlag analiza cada media hora decenas de tokens recién lanzados en Solana, igual que lo haría la web, y apunta qué pasó con ellos a las 24 horas y a los 7 días. Cada día se publica en abierto en <a href="https://solflag.com/datos/registro/indice.json">solflag.com/datos/registro</a>.</p>
+  <p>Primer día completo, <b>320 tokens</b>:</p>
+  <ul>
+    <li>De los que SolFlag marcó en <b>riesgo alto</b> (246), el <b>97%</b> estaba muerto a las 24 horas (menos de 10.000 $ de capitalización o sin liquidez).</li>
+    <li>De los de <b>riesgo medio</b> (71), el 96%.</li>
+    <li>Ninguno salió en riesgo bajo.</li>
+  </ul>
+  <p>Lo contamos tal cual: <b>casi todo lo que se lanza muere</b>, así que en tokens de un día el rojo todavía no se distingue del amarillo, y sin tokens en verde no podemos medir lo contrario. Hacen falta los resultados a 7 días y varias semanas de datos. Los iremos publicando.</p>
+  <h3>Lo que ya hemos corregido gracias a estos datos</h3>
+  <ul>
+    <li><b>Quitar la liquidez es morir.</b> Un token al que le retiran la liquidez podía seguir mostrando una capitalización alta y parecer vivo. Ahora cuenta como muerto.</li>
+    <li><b>Aviso de copia más fino.</b> «Hay otro token con el mismo nombre» salía en casi dos de cada tres tokens nuevos: las granjas relanzan el mismo nombre muchas veces al día y el «original» era otra copia muerta. Ahora solo avisa si el token copiado tiene mercado de verdad. En tokens recién lanzados ha pasado del 68% al 5%, y los que quedan son copias reales.</li>
+  </ul>
+  <div class="share"><a href="https://x.com/intent/post?text=Primeros%20n%C3%BAmeros%20de%20SolFlag%3A%20de%20320%20tokens%20nuevos%2C%20el%2097%25%20de%20los%20marcados%20en%20rojo%20muri%C3%B3%20en%2024%20h&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23primeros-numeros" target="_blank" rel="noopener">Compartir en X</a><a href="#primeros-numeros">Enlace a esta entrada</a></div>
+</article>
+
+<article id="caras-marcas-bot">
+  <time datetime="2026-10-29">29 de octubre de 2026</time>
+  <h2>Caras conocidas, marcas falsas y un bot nuevo</h2>
+  <div class="tags"><span>Motor</span><span>Web</span><span>Bot</span></div>
+  <p>Unos días con muchas novedades. Las más importantes:</p>
+  <ul>
+    <li><b>Historial del creador.</b> Si el creador de un token ha lanzado otros antes, SolFlag mira cuántos se quedaron por debajo de 10.000 $. Muchos lanzamientos y casi ninguno despegó: bandera.</li>
+    <li><b>Caras conocidas.</b> Las granjas cambian de wallet creadora en cada token, pero suelen pagar desde la misma. SolFlag recuerda qué wallets pagan o financian lanzamientos que mueren y te avisa cuando vuelven a lanzar, aunque usen un creador nuevo.</li>
+    <li><b>Marcas falsas y copias.</b> Un token que se llama exactamente como una empresa real (Spotify, Shopify…) sale en riesgo alto, igual que uno que dice tener cien veces más liquidez de la que hay.</li>
+    <li><b>Acciones tokenizadas y tokens oficiales.</b> Tesla, NVIDIA o el S&amp;P 500 tokenizados, el SOL en staking de exchanges (bnSOL…) o los tokens de aficionados de clubes salían en rojo porque su emisor puede crear más. Ahora SolFlag reconoce al emisor y los deja en riesgo medio: «lo controla su emisor».</li>
+    <li><b>Ballenas, jóvenes y maduros.</b> En tokens de menos de 14 días se miran también las wallets muy activas, porque en el primer día casi todo son bots. Y en «Compras en el lanzamiento» ves si el creador ya se ha deshecho de lo que compró al lanzarlo.</li>
+    <li><b>Bot nuevo: <a href="https://t.me/SolFlagBot" target="_blank" rel="noopener">@SolFlagBot</a>.</b> El bot de avisos ya tiene el nombre de SolFlag. Si usabas el antiguo, te lleva al nuevo y tus vigilancias siguen igual.</li>
+  </ul>
+  <div class="share"><a href="#caras-marcas-bot">Enlace a esta entrada</a></div>
+</article>
 
 <article id="nace-solflag">
   <time datetime="2026-10-26">26 de octubre de 2026</time>
