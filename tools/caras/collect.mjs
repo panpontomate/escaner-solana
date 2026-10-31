@@ -7,7 +7,7 @@
 //   5. registro de tokens: analiza con el motor (como la web) hasta REG_MAX tokens nuevos y apunta cómo acabaron a las
 //      24 h y a los 7 días (datos/registro, ver registro.mjs)
 //   6. escribe caras.json y datos/base.json + datos/exchanges.json (lo que lee la web) y tools/caras/estado.json (lo que
-//      recuerda entre ejecuciones; no va en git, lo guarda la caché de Actions)
+//      recuerda entre ejecuciones; no va en git, lo guardan Cloudflare KV y la caché de Actions, ver nube.mjs)
 //
 // Uso: node tools/caras/collect.mjs            (RPC en la variable SOLANA_RPC; si no, uno público)
 import fs from "node:fs";
@@ -181,7 +181,8 @@ for (const a of needInfraCheck(state).slice(0, MAX_INFRA)) {
   } catch (e) { log.errores++; }
 }
 
-// 4. guardar
+// 4. guardar (at: cuándo se guardó, para elegir la copia más nueva entre la caché y Cloudflare, ver nube.mjs)
+state.at = Date.now();
 fs.writeFileSync(STATE, JSON.stringify(state));
 const list = buildList(state, now);
 // solo se reescribe si cambia algo, para no hacer un commit cada 30 minutos sin novedades

@@ -1,5 +1,6 @@
 # Caras conocidas, base de wallets y registro de tokens: cada 30 minutos apunta tokens nuevos, mira cómo acabaron
-# los de hace 24 h (y 7 días en el registro) y publica caras.json y datos/ en solflag.com. La memoria entre ejecuciones va en la caché de Actions.
+# los de hace 24 h (y 7 días en el registro) y publica caras.json y datos/ en solflag.com. La memoria entre ejecuciones va en Cloudflare KV
+# (tools/caras/nube.mjs) con la caché de Actions de respaldo.
 name: caras
 on:
   schedule:
@@ -26,6 +27,13 @@ jobs:
           path: tools/caras/estado.json
           key: caras-${{ github.run_id }}
           restore-keys: caras-
+      - name: Memoria desde Cloudflare (si es más nueva que la de la caché)
+        continue-on-error: true
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_KV_ID: ${{ secrets.CF_KV_ID }}
+        run: node tools/caras/nube.mjs bajar
       - name: Recolectar
         env:
           SOLANA_RPC: ${{ secrets.SOLANA_RPC }}
@@ -35,6 +43,14 @@ jobs:
         with:
           path: tools/caras/estado.json
           key: caras-${{ github.run_id }}
+      - name: Guardar la memoria en Cloudflare
+        if: always()
+        continue-on-error: true
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_KV_ID: ${{ secrets.CF_KV_ID }}
+        run: node tools/caras/nube.mjs subir
       - name: Publicar caras.json y la base de wallets si han cambiado
         run: |
           git add -N datos 2>/dev/null || true
