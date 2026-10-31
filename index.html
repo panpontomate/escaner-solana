@@ -630,6 +630,69 @@ a.rdc{transition:transform .15s,border-color .15s}
   #landing{gap:40px}
   .lsect.two>.card{padding:22px}
 }
+
+/* ---------- móvil (31/10): el escáner en la primera pantalla, lo rojo primero, sin repetir ---------- */
+.okfold{margin-top:10px}
+.okfold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:18px;background:#1d1550;border:1px solid #3a2c7a;color:#d3cdef;font-size:.92rem;font-weight:600}
+.okfold>summary::-webkit-details-marker{display:none}
+.okfold>summary i{width:10px;height:10px;border-radius:50%;background:var(--bajo);flex:none}
+.okfold>summary::after{content:"";margin-left:auto;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);opacity:.7}
+.okfold[open]>summary::after{transform:rotate(-135deg)}
+.okfold>.lights{margin-top:10px}
+@media (max-width:520px){
+  .hero{gap:18px}
+  .hero-txt h1{font-size:2rem;margin-top:10px}
+  .hero-txt .kick{font-size:.68rem}
+  .trust,.motto{display:none}
+  .hero-sub{font-size:.98rem;line-height:1.45;margin-top:12px}
+  .scan .sk,.scan .scan-t{display:none}
+  .tryw{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .tryw::-webkit-scrollbar{display:none}
+  .tryw .chip,.tryw>span{flex:none;white-space:nowrap}
+  body:not(.landing) #setup{display:none}
+  .rdgrid{margin-top:18px;gap:10px}
+  .rdc{padding:14px 16px;min-height:0;gap:6px;border-radius:16px}
+  .rdw{-webkit-line-clamp:2;line-clamp:2;font-size:.92rem}
+  .flags5{margin-top:18px;grid-template-columns:1fr;gap:10px}
+  .f5{display:grid;grid-template-columns:44px 1fr;column-gap:14px;align-items:center;text-align:left;padding:14px 16px;border-radius:16px}
+  .f5 svg{grid-row:span 2;width:44px;height:44px;padding:11px}
+  .f5 h3{margin:0 0 2px;font-size:1rem}
+  .f5 p{font-size:.9rem;line-height:1.4}
+  .tok.one{padding:14px}
+}
+/* token suelto (móvil y ordenador): nombre, precio y enlaces ya están en el resumen y en los menús */
+.tok.one{display:block}
+.tok.one>.av,.tok.one .head,.tok.one .meta,.tok.one .links .dup{display:none}
+.tok.one .tgrid{margin-left:0;margin-top:0}
+.pchart.pc-empty{display:none}
+/* logo del token: la imagen encima de las iniciales (si no carga, quedan las iniciales) */
+.lav{position:relative;width:38px;height:38px;border-radius:50%;display:inline-grid;place-items:center;flex:none;overflow:hidden;background:#2e2268;color:#e9e3ff;font:700 .8rem var(--f-display)}
+.lav img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tidr{display:flex;align-items:center;gap:12px}
+.tidr .lav{width:46px;height:46px;font-size:.95rem}
+.tidr .verdict{min-width:0}
+
+/* ---------- Mi lista (31/10): título, tokens primero con precio de ahora, botones ordenados ---------- */
+body[data-m=L] #hero{display:none}
+.lhd{margin:0 0 16px}
+.lhd h2{font:700 clamp(1.8rem,3.4vw,2.4rem)/1.1 var(--f-display);margin:0;color:#f7f4ff}
+.lhd p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
+#llist .lsec+.lsec{margin-top:14px}
+.lrow .hl1{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap}
+.lrow a.nm{color:var(--fg);font-weight:700;font-size:1.05rem;text-decoration:none}
+.lrow a.nm:hover{text-decoration:underline}
+.lnm{color:var(--muted);font-size:.88rem}
+.lchg{font-weight:700}
+.lchg.up{color:var(--bajo)}
+.lchg.dn{color:var(--alto)}
+.lwhy{color:var(--muted);font-size:.88rem;margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ldrop{margin-top:8px;color:var(--alto);font-weight:600;font-size:.9rem}
+details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1px solid var(--line);min-width:42px;letter-spacing:.08em}
+@media (min-width:521px){.lmore .pmenu-body{left:auto;right:0;min-width:210px}}
+@media (max-width:520px){
+  .lrow .acts{width:100%}
+  .lrow .acts>.btn{flex:1;white-space:nowrap}
+}
 </style>
 </head>
 <body>
@@ -881,7 +944,7 @@ function toggleToken(mint){
   lista.t[mint]=snap(r); saveList(); return true;
 }
 function snap(r){
-  return {sym:r.sym,name:r.name,lvl:r.lvl,pts:r.pts,type:r.type||"",why:r.why.slice(0,3),
+  return {sym:r.sym,name:r.name,img:r.img||"",lvl:r.lvl,pts:r.pts,type:r.type||"",why:r.why.slice(0,3),
     price:Number((r.par&&r.par.priceUsd)||0),liq:(r.par&&r.par.liquidity&&r.par.liquidity.usd)||0,
     pair:(r.par&&r.par.pairAddress)||"",ts:Date.now()};
 }
@@ -903,15 +966,17 @@ function walletRow(addr,e){
   var meta=e.ts?["Analizada "+hace(e.ts),e.n+(e.n===1?" token":" tokens"),usd(e.total||0)+" en tokens",
      (e.alto?e.alto+" con riesgo alto":"sin riesgo alto")+(e.spam?" · "+e.spam+" spam":"")]:["Todavía sin analizar"];
   return "<div class='lrow'><div class='main'><div class='hl1'>"+
-      (e.name?"<span class='nm'>"+esc(e.name)+"</span>":"")+
-      "<span class='mono'>"+esc(short(addr))+"</span><button class='copy' type='button' data-copy='"+esc(addr)+"' title='Copiar dirección'>copiar</button>"+
-      "<a href='https://solscan.io/account/"+esc(addr)+"' target='_blank' rel='noopener' style='font-size:.88rem'>Solscan</a></div>"+
+      "<a href='#' class='nm' data-analyze='"+esc(addr)+"' title='Abrir el análisis de esta wallet'>"+esc(e.name||short(addr))+"</a>"+
+      (e.name?"<span class='mono'>"+esc(short(addr))+"</span>":"")+"</div>"+
       "<div class='meta'>"+meta.map(function(m){return "<span>"+esc(m)+"</span>";}).join("")+(e.pnl?pnlTag(e.pnl):"")+"</div></div>"+
     "<div class='acts'><button class='btn small ghost' type='button' data-analyze='"+esc(addr)+"'>"+(e.ts?"Analizar otra vez":"Analizar")+"</button>"+
     "<button class='star' type='button' data-favw='"+esc(addr)+"' aria-pressed='"+(!!e.fav)+"' title='Seguir / dejar de seguir' aria-label='Seguir esta wallet'>"+(e.fav?"★":"☆")+"</button>"+plusBtn(addr)+
-    "<button class='copy' type='button' data-name='"+esc(addr)+"'>"+(e.name?"cambiar nombre":"poner nombre")+"</button>"+
-    (!e.fav?"<button class='copy' type='button' data-del='"+esc(addr)+"'>quitar</button>":"")+
-    "</div></div>";
+    "<details class='pmenu lmore'><summary class='btn small' aria-label='Más opciones'>⋯</summary><div class='pmenu-body'>"+
+      "<button class='pm-i' type='button' data-copy='"+esc(addr)+"'>Copiar dirección</button>"+
+      "<a href='https://solscan.io/account/"+esc(addr)+"' target='_blank' rel='noopener'>Ver en Solscan</a>"+
+      "<button class='pm-i' type='button' data-name='"+esc(addr)+"'>"+(e.name?"Cambiar nombre":"Poner nombre")+"</button>"+
+      (!e.fav?"<button class='pm-i' type='button' data-del='"+esc(addr)+"'>Quitar de la lista</button>":"")+
+    "</div></details></div></div>";
 }
 function renderLista(){
   var ws=Object.keys(lista.w).map(function(k){ var e=lista.w[k]; e.addr=k; return e; });
@@ -920,27 +985,81 @@ function renderLista(){
   var hist=ws.filter(function(e){return !e.fav&&(e.ts||e.name);}).sort(byTs);
   var toks=Object.keys(lista.t).map(function(k){ var t=lista.t[k]; t.mint=k; return t; })
     .sort(function(a,b){ return ORDER.indexOf(a.lvl)-ORDER.indexOf(b.lvl)||(a.sym>b.sym?1:-1); });
-  var h=storageWarningHtml();
-  h+="<div class='lsec'><div class='eyebrow'>Wallets que sigo · "+favs.length+"</div>"+
-    (favs.length?favs.map(function(e){return walletRow(e.addr,e);}).join("")+"<div class='actions' style='margin-top:12px'><button class='btn small' type='button' id='chgBtnL'>Revisar cambios de las que sigo</button></div>":"<div class='lempty'>Aún no sigues ninguna. Analiza una wallet y pulsa «Seguir wallet», o usa la estrella en la lista de ballenas.</div>")+"</div>";
-  if(state.chg&&state.chg.target==="L") h+=chgHtml(state.chg);
+  var h="<div class='lhd'><h2>Mi lista</h2><p>"+toks.length+(toks.length===1?" token":" tokens")+" y "+favs.length+(favs.length===1?" wallet":" wallets")+" que sigues. Se guarda solo en este navegador.</p></div>"+storageWarningHtml();
   h+="<div class='lsec'><div class='eyebrow'>Tokens que sigo · "+toks.length+"</div>"+
     (toks.length?toks.map(function(t){
       var L=LEVELS[t.lvl]||LEVELS["SIN MERCADO"];
-      return "<div class='lrow lvl-"+L.cls+"'><div class='main'><div class='hl1'><span class='nm'>"+esc(t.sym)+"</span>"+
-        (t.name?"<span style='color:var(--muted);font-size:.88rem'>"+esc(t.name)+"</span>":"")+"<span class='pill'>"+L.label+"</span></div>"+
-        "<div class='meta'>"+(t.type&&TYPES[t.type]?"<span class='tag typ' title='"+esc(TYPES[t.type].note)+"'>"+esc(TYPES[t.type].label)+"</span>":"")+"<span class='mono'>"+esc(short(t.mint))+"</span><button class='copy' type='button' data-copy='"+esc(t.mint)+"'>copiar</button>"+
-        (t.price?"<span>Precio <span class='v'>"+esc(priceUsd(t.price))+"</span></span>":"")+
-        "<span>Liquidez <span class='v'>"+usd(t.liq||0)+"</span></span><span>Revisado "+esc(hace(t.ts))+"</span></div>"+
-        (t.why&&t.why.length?"<div class='meta' style='margin-top:6px'>"+esc(t.why[0])+"</div>":"")+"</div>"+
-        "<div class='acts'><a href='https://solscan.io/token/"+esc(t.mint)+"' target='_blank' rel='noopener' style='font-size:.88rem'>Solscan</a>"+
-        (t.pair?"<a href='https://dexscreener.com/solana/"+esc(t.pair)+"' target='_blank' rel='noopener' style='font-size:.88rem'>DexScreener</a>":"")+
-        "<button class='btn small ghost' type='button' data-hold='"+esc(t.mint)+"'>Ver ballenas</button>"+
-        "<button class='star' type='button' data-favt='"+esc(t.mint)+"' aria-pressed='true' title='Dejar de seguir' aria-label='Dejar de seguir este token'>★</button></div></div>";
-    }).join(""):"<div class='lempty'>Aún no sigues ningún token. Pulsa la estrella en la tarjeta de un token tras analizar una wallet. Se actualiza cada vez que lo vuelves a ver en un análisis.</div>")+"</div>";
+      return "<div class='lrow lvl-"+L.cls+"'><div class='main'><div class='hl1'>"+tokAv(t.img,t.sym,t.mint)+"<a href='#' class='nm' data-analyze='"+esc(t.mint)+"' title='Abrir el análisis de este token'>"+esc(t.sym)+"</a>"+
+        (sameName(t.name,t.sym)?"":"<span class='lnm'>"+esc(t.name)+"</span>")+"<span class='pill'>"+L.label+"</span></div>"+
+        "<div class='meta'><span>Precio <span class='v' data-lp='"+esc(t.mint)+"'>"+(t.price?esc(priceUsd(t.price)):"—")+"</span></span><span class='lchg' data-lc='"+esc(t.mint)+"'></span>"+
+        "<span>Liquidez <span class='v' data-ll='"+esc(t.mint)+"'>"+usd(t.liq||0)+"</span></span><span>Revisado "+esc(hace(t.ts))+"</span></div>"+
+        (t.why&&t.why.length?"<div class='lwhy'>"+esc(t.why[0])+"</div>":"")+
+        "<div class='ldrop' data-ld='"+esc(t.mint)+"' hidden></div></div>"+
+        "<div class='acts'><button class='btn small ghost' type='button' data-analyze='"+esc(t.mint)+"'>Analizar</button>"+
+        "<button class='btn small ghost' type='button' data-hold='"+esc(t.mint)+"'>Ballenas</button>"+
+        "<button class='star' type='button' data-favt='"+esc(t.mint)+"' aria-pressed='true' title='Dejar de seguir' aria-label='Dejar de seguir este token'>★</button>"+
+        "<details class='pmenu lmore'><summary class='btn small' aria-label='Más opciones'>⋯</summary><div class='pmenu-body'>"+
+          "<button class='pm-i' type='button' data-copy='"+esc(t.mint)+"'>Copiar dirección</button>"+
+          "<a href='https://solscan.io/token/"+esc(t.mint)+"' target='_blank' rel='noopener'>Ver en Solscan</a>"+
+          (t.pair?"<a href='https://dexscreener.com/solana/"+esc(t.pair)+"' target='_blank' rel='noopener'>Ver en DexScreener</a>":"")+
+        "</div></details></div></div>";
+    }).join(""):"<div class='lempty'>Aún no sigues ningún token. Analiza uno y pulsa «Seguir token»: aquí verás cómo cambian su precio y su liquidez.</div>")+"</div>";
+  h+="<div class='lsec'><div class='eyebrow'>Wallets que sigo · "+favs.length+"</div>"+
+    (favs.length?favs.map(function(e){return walletRow(e.addr,e);}).join("")+"<div class='actions' style='margin-top:12px'><button class='btn small' type='button' id='chgBtnL'>Revisar cambios de las que sigo</button></div>":"<div class='lempty'>Aún no sigues ninguna. Analiza una wallet y pulsa «Seguir wallet», o usa la estrella en la lista de ballenas.</div>")+"</div>";
+  if(state.chg&&state.chg.target==="L") h+=chgHtml(state.chg);
   if(hist.length) h+="<div class='lsec'><div class='eyebrow'>Wallets analizadas · "+hist.length+"</div>"+hist.map(function(e){return walletRow(e.addr,e);}).join("")+"</div>";
   h+=backupHtml();
   $("#llist").innerHTML=h;
+  listaLive(toks);
+}
+// Precio y liquidez de ahora de los tokens que sigues (DexScreener, 30 por petición; se guarda 2 minutos)
+var llive={ts:0,d:{}};
+async function listaLive(toks){
+  var ms=toks.map(function(t){ return t.mint; });
+  if(!ms.length) return;
+  if(Date.now()-llive.ts>120000||ms.some(function(m){ return !(m in llive.d); })){
+    var d={};
+    for(var i=0;i<ms.length;i+=30){
+      try{
+        var ps=await jfetch(DEX+ms.slice(i,i+30).join(","));
+        ms.slice(i,i+30).forEach(function(m){ d[m]=null; });
+        (Array.isArray(ps)?ps:[]).forEach(function(p){
+          var m=p.baseToken&&p.baseToken.address, lq=(p.liquidity&&p.liquidity.usd)||0;
+          var cv=/pump/i.test(p.dexId||"")&&!lq;
+          if(m in d&&(!d[m]||lq>d[m].liq||(d[m].cv&&!cv))) d[m]={price:Number(p.priceUsd||0),liq:lq,cv:cv,img:(p.info&&p.info.imageUrl)||(d[m]&&d[m].img)||""};
+          else if(m in d&&d[m]&&!d[m].img&&p.info&&p.info.imageUrl) d[m].img=p.info.imageUrl;
+        });
+      }catch(e){ return; }
+    }
+    llive={ts:Date.now(),d:d};
+  }
+  toks.forEach(function(t){
+    var now=llive.d[t.mint], q=function(a,m){ return document.querySelector("["+a+"='"+m+"']"); };
+    var lp=q("data-lp",t.mint), lc=q("data-lc",t.mint), ll=q("data-ll",t.mint), ld=q("data-ld",t.mint);
+    if(!lp) return;
+    if(now===null){ ld.hidden=false; ld.textContent="Ya no tiene mercado en DexScreener."; return; }
+    if(!now) return;
+    // los tokens guardados antes de que la lista apuntara el logo lo cogen ahora
+    if(now.img&&!t.img&&lista.t[t.mint]){ lista.t[t.mint].img=now.img; saveList(); var av=q("data-av",t.mint); if(av) av.outerHTML=tokAv(now.img,t.sym,t.mint); }
+    if(now.price) lp.textContent=priceUsd(now.price);
+    if(!now.cv) ll.textContent=usd(now.liq);
+    if(t.price&&now.price){
+      var ch=(now.price/t.price-1)*100;
+      if(Math.abs(ch)>=1){ lc.textContent=(ch>0?"+":"")+fmtPct(ch); lc.className="lchg "+(ch>0?"up":"dn"); lc.title="Desde que lo revisaste"; }
+    }
+    if(!now.cv&&t.liq>=1000&&now.liq<t.liq*0.5){ ld.hidden=false; ld.textContent="La liquidez ha caído un "+Math.round((1-now.liq/t.liq)*100)+" % desde que lo revisaste."; }
+  });
+}
+// Logo del token (o sus iniciales si no tiene o no carga)
+function tokAv(img,sym,mint){
+  var ini=String(sym||"?").replace(/^\$/,"").slice(0,2).toUpperCase();
+  return "<span class='lav' aria-hidden='true'"+(mint?" data-av='"+esc(mint)+"'":"")+">"+esc(ini)+
+    (img?"<img src='"+esc(img)+"' alt='' loading='lazy' referrerpolicy='no-referrer' onerror=\"this.remove()\">":"")+"</span>";
+}
+// «BONK Bonk» dice lo mismo dos veces: el nombre solo se enseña si aporta algo
+function sameName(name,sym){
+  var n=function(x){ return String(x||"").toLowerCase().replace(/[^a-z0-9]/g,""); };
+  return !name||n(name)===n(sym);
 }
 function walletHint(){
   var v=$("#wallet").value.trim(), e=lista.w[v], el=$("#whint");
@@ -1609,8 +1728,8 @@ function renderToken(noScroll){
   $("#summary").innerHTML=
     "<div class='tsum'>"+ringHtml(r)+
     "<div class='tsum-t'><p class='kick'>Token"+(r.type?" · "+esc(TYPES[r.type].label):"")+"</p>"+
-    "<div class='mono tmint'>"+esc(r.mint)+"</div>"+
-    "<h2 class='verdict'>"+esc(r.sym)+": "+esc((dataOnly(r)?"riesgo medio por falta de datos":L.label).toLowerCase())+"</h2>"+
+    "<div class='mono tmint'>"+esc(r.mint)+" <button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copiar dirección del token'>copiar</button></div>"+
+    "<div class='tidr'>"+tokAv(r.img,r.sym)+"<h2 class='verdict'>"+esc(r.sym)+": "+esc((dataOnly(r)?"riesgo medio por falta de datos":L.label).toLowerCase())+"</h2></div>"+
     "<p class='sub'>"+esc(tip)+"</p>"+
     (chips.length?"<div class='tchips'>"+chips.map(function(c){ return "<span>"+esc(c[0])+" <b>"+esc(c[1])+"</b></span>"; }).join("")+"</div>":"")+
     "</div></div>"+
@@ -1740,18 +1859,23 @@ function renderList(){
       return "<li"+(r.why.length?"":" class='ok'")+">"+esc(w)+"</li>";
     }).join("")+r.warn.map(function(w){ return "<li class='warn'>"+esc(w)+"</li>"; }).join("");
     var av=r.img?"<img src='"+esc(r.img)+"' alt='' loading='lazy' referrerpolicy='no-referrer' onerror=\"this.remove()\">":"";
-    if(r.lights) links+="<a href='#' data-card='"+esc(r.mint)+"' title='Descargar una imagen con el veredicto para compartirla'>Descargar</a>";
-    if(r.par&&!KNOWN[r.mint]) links+="<a href='"+esc(tgLink(r.mint))+"' target='_blank' rel='noopener' title='Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende'>🔔 Vigilar en Telegram</a>"+
-      "<a href='"+esc(tgPrice(r.mint,""))+"' target='_blank' rel='noopener' title='Te avisa en Telegram cuando el precio llegue a donde digas'>💲 Alerta de precio</a>";
-    return "<article class='tok lvl-"+L.cls+"'>"+
+    if(r.lights) links+="<a class='dup' href='#' data-card='"+esc(r.mint)+"' title='Descargar una imagen con el veredicto para compartirla'>Descargar</a>";
+    if(r.par&&!KNOWN[r.mint]) links+="<a class='dup' href='"+esc(tgLink(r.mint))+"' target='_blank' rel='noopener' title='Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende'>🔔 Vigilar en Telegram</a>"+
+      "<a class='dup' href='"+esc(tgPrice(r.mint,""))+"' target='_blank' rel='noopener' title='Te avisa en Telegram cuando el precio llegue a donde digas'>💲 Alerta de precio</a>";
+    return "<article class='tok lvl-"+L.cls+(state.token===r?" one":"")+"'>"+
       "<div class='av' aria-hidden='true'>"+(av||esc(r.sym.slice(0,2).toUpperCase()))+"</div>"+
       "<div style='min-width:0'>"+
         "<div class='head'><h3>"+esc(r.sym)+(r.name?"<span>"+esc(r.name)+"</span>":"")+"</h3><span class='hp'><span class='pill'>"+esc(lvlLabel(r))+"</span><button class='star' type='button' data-favt='"+esc(r.mint)+"' aria-pressed='"+(!!lista.t[r.mint])+"' title='Seguir este token' aria-label='Seguir este token'>"+(lista.t[r.mint]?"★":"☆")+"</button></span></div>"+
         "<div class='meta'>"+meta.join("")+"</div>"+
         (function(){
-          var lh=r.lights?"<div class='lights'>"+r.lights.map(function(l){
-            return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div><b>"+LKEYS[l.k]+" <em class='lfl'>"+esc(FLAGTXT[l.s]||"")+"</em></b><span>"+esc(l.t)+"</span></div></div>";
-          }).join("")+"</div>"+(r.type&&r.type!=="ABIERTO"?"<p class='tnote'>"+esc(TYPES[r.type].note)+"</p>":"")
+          var ORD={bad:0,warn:1,na:2,ok:3};
+          function ltHtml(l){ return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div><b>"+LKEYS[l.k]+" <em class='lfl'>"+esc(FLAGTXT[l.s]||"")+"</em></b><span>"+esc(l.t)+"</span></div></div>"; }
+          var sorted=r.lights?r.lights.slice().sort(function(a,b){ return (ORD[a.s]==null?2:ORD[a.s])-(ORD[b.s]==null?2:ORD[b.s]); }):[];
+          var oks=sorted.filter(function(l){ return l.s==="ok"; }), rest=sorted.filter(function(l){ return l.s!=="ok"; });
+          // en el móvil, si hay algo que no está en verde, las verdes van plegadas en una línea
+          var fold=state.token===r&&rest.length&&oks.length&&window.matchMedia&&matchMedia("(max-width:520px)").matches;
+          var lh=r.lights?(fold?"<div class='lights'>"+rest.map(ltHtml).join("")+"</div><details class='okfold'><summary><i></i>"+(oks.length===1?"1 bandera en verde":oks.length+" banderas en verde")+"</summary><div class='lights'>"+oks.map(ltHtml).join("")+"</div></details>"
+            :"<div class='lights'>"+sorted.map(ltHtml).join("")+"</div>")+(r.type&&r.type!=="ABIERTO"?"<p class='tnote'>"+esc(TYPES[r.type].note)+"</p>":"")
           :"<ul class='why'>"+why+"</ul>";
           // Un token suelto: banderas a la izquierda y gráfica, lanzamiento e historial a la derecha
           if(state.token!==r) return lh;
@@ -1789,9 +1913,8 @@ function haceMin(ts){
 function tokenExtrasHtml(r){
   // El lanzamiento solo se puede revisar en tokens jóvenes: en los viejos queda detrás de miles de operaciones
   var young=r.par&&r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<7*86400000;
-  return chartHtml(r)+
-    (young?"<div class='lights' style='margin-top:10px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>":"")+
-    histHtml(r);
+  return (young?"<div class='lights' style='margin-bottom:10px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>":"")+
+    chartHtml(r)+histHtml(r);
 }
 function fillTokenExtras(){ paintChart(); paintBundle(); }
 
@@ -1853,6 +1976,8 @@ async function paintChart(){
   }
   if(c==="loading") return;
   state.cpts=null;
+  var pc=box.closest&&box.closest(".pchart");
+  if(pc) pc.classList.toggle("pc-empty",c!=="err"&&c.length<2&&!!r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<2*86400000);
   if(c==="err"||c.length<2){
     box.innerHTML="<p class='hint'>"+(c==="err"?"No se pudo cargar la gráfica: GeckoTerminal no responde o todavía no tiene este mercado.":"Todavía no hay operaciones suficientes para dibujar la gráfica.")+"</p>";
     $("#pcchg").textContent=""; return;
@@ -3106,6 +3231,7 @@ function renderHolders(keep){
 
 function setMode(m){
   state.mode=m;
+  document.body.setAttribute("data-m",m);
   $("#form").hidden=(m!=="W"); $("#hform").hidden=(m!=="H");
   $("#tabL").setAttribute("aria-selected",String(m==="L"));
   $("#tabC").setAttribute("aria-selected",String(m==="C"));
