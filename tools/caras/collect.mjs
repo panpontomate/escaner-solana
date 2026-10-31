@@ -6,7 +6,7 @@
 //      transacciones por hora hace cada wallet) y suma los aportes de estudios y pruebas (tools/caras/aportes)
 //   5. registro de tokens: analiza con el motor (como la web) hasta REG_MAX tokens nuevos y apunta cómo acabaron a las
 //      24 h y a los 7 días (datos/registro, ver registro.mjs)
-//   6. escribe caras.json y datos/base.json + datos/exchanges.json (lo que lee la web) y tools/caras/estado.json (lo que
+//   6. escribe caras.json y datos/base.json + datos/exchanges.json (lo que lee la web; van en la rama "datos") y tools/caras/estado.json (lo que
 //      recuerda entre ejecuciones; no va en git, lo guardan Cloudflare KV y la caché de Actions, ver nube.mjs)
 //
 // Uso: node tools/caras/collect.mjs            (RPC en la variable SOLANA_RPC; si no, uno público)
@@ -20,8 +20,10 @@ import { createClient, analyzeToken } from "solana-risk-engine";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const STATE = path.join(HERE, "estado.json");
-const OUT = path.join(HERE, "..", "..", "caras.json");
-const DATOS = path.join(HERE, "..", "..", "datos");
+// lo publicado (caras.json y datos/) vive en la rama "datos", que el workflow saca en PUB_DIR; en local, la raíz del repo
+const PUB = process.env.PUB_DIR ? path.resolve(process.env.PUB_DIR) : path.join(HERE, "..", "..");
+const OUT = path.join(PUB, "caras.json");
+const DATOS = path.join(PUB, "datos");
 const APORTES = path.join(HERE, "aportes");
 const RPC = process.env.SOLANA_RPC || "https://solana-rpc.publicnode.com";
 const MAX_NEW = +process.env.CARAS_MAX_NEW || 120;      // tokens nuevos por ejecución

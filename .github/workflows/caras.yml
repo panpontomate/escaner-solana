@@ -1,6 +1,7 @@
 # Caras conocidas, base de wallets y registro de tokens: cada 30 minutos apunta tokens nuevos, mira cómo acabaron
-# los de hace 24 h (y 7 días en el registro) y publica caras.json y datos/ en solflag.com. La memoria entre ejecuciones va en Cloudflare KV
-# (tools/caras/nube.mjs) con la caché de Actions de respaldo.
+# los de hace 24 h (y 7 días en el registro) y publica caras.json y datos/ en solflag.com: van en la rama "datos" y
+# pages.yml los junta con la web, así no llenan de commits la rama main. La memoria entre ejecuciones va en
+# Cloudflare KV (tools/caras/nube.mjs) con la caché de Actions de respaldo.
 name: caras
 on:
   schedule:
@@ -15,8 +16,14 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    outputs:
+      cambios: ${{ steps.pub.outputs.cambios }}
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          ref: datos
+          path: _pub
       - uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -38,6 +45,7 @@ jobs:
       - name: Recolectar
         env:
           SOLANA_RPC: ${{ secrets.SOLANA_RPC }}
+          PUB_DIR: _pub
         run: node tools/caras/collect.mjs
       - uses: actions/cache/save@v6
         if: always()
@@ -52,12 +60,22 @@ jobs:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CF_KV_ID: ${{ secrets.CF_KV_ID }}
         run: node tools/caras/nube.mjs subir
-      - name: Publicar caras.json y la base de wallets si han cambiado
+      - name: Subir caras.json, la base de wallets y el registro a la rama datos si han cambiado
+        id: pub
+        working-directory: _pub
         run: |
-          git add -N datos 2>/dev/null || true
-          git diff --quiet -- caras.json datos && exit 0
+          git add -A
+          git diff --cached --quiet && exit 0
           git config user.name "solflag-caras"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add caras.json datos
-          git commit -m "caras.json, base de wallets y registro: actualizado"
+          git commit -q -m "caras.json, base de wallets y registro: actualizado"
           git pull --rebase -q && git push -q
+          echo "cambios=1" >> "$GITHUB_OUTPUT"
+  pages:
+    needs: collect
+    if: needs.collect.outputs.cambios == '1'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/pages.yml

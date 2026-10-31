@@ -3,9 +3,7 @@
 name: tests
 on:
   push:
-    paths-ignore:
-      - caras.json
-      - datos/**
+    branches: [main]      # los datos del recolector van en la rama datos y no lo lanzan
   pull_request:
   workflow_dispatch:
 jobs:

@@ -1,0 +1,47 @@
+# Publica solflag.com en GitHub Pages juntando el código (rama main) con los datos del recolector (rama datos:
+# caras.json y datos/). Se lanza al subir algo a main y lo llama el recolector (caras.yml) cuando cambian los datos,
+# así los commits de datos no llenan el historial de main. Las direcciones de la web no cambian.
+name: pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  deploy:
+    concurrency:            # en el trabajo y no arriba, para que valga también cuando lo llama caras.yml
+      group: pages
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.dep.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          path: web
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          ref: datos
+          path: rama-datos
+          persist-credentials: false
+      - name: Montar la web (código + datos)
+        run: |
+          mkdir _site
+          rsync -a --exclude .git --exclude .github web/ _site/
+          cp rama-datos/caras.json _site/
+          cp -r rama-datos/datos _site/
+          test -s _site/index.html && test -s _site/en/index.html && test -s _site/caras.json && test -s _site/datos/base.json
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - id: dep
+        uses: actions/deploy-pages@v5
