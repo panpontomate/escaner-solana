@@ -939,7 +939,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="The scanner engine could not load from cdn.jsdelivr.net. Check your internet connection and reload the page."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.4.6/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.4.7/src/index.js";
 window.__escOk=true;
 (function(){
 "use strict";
@@ -3337,7 +3337,7 @@ function renderHolders(keep){
       "<div style='min-width:0'>"+
         "<div class='hl1'><span class='mono'>"+esc(short(r.owner))+"</span>"+
           "<button class='copy' type='button' data-copy='"+esc(r.owner)+"' title='Copy address'>copy</button>"+
-          "<span class='tag"+(isW?"":" p")+"'>"+(isW?"Person (likely)":(r.kind==="activa"?"Very active":"Program or pool"))+"</span>"+baseTag(r.owner)+(r.kind==="activa"&&r.busy?"<span class='tag seen' title='Many moves in little time: typical of a bot, exchange or market maker'>200+ moves in "+(r.busy<48?r.busy+" h":"2 days")+"</span>":"")+(clusters[r.owner]?"<a class='tag cluster' style='text-decoration:none' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(clusters[r.owner].funder)+"' title='This wallet and "+(clusters[r.owner].n-1)+" others in the list got their first transaction from the same address ("+esc(short(clusters[r.owner].funder))+"): they could be the same person or team. It is a lead, not proof. Press to see the source on Solscan'>Group "+esc(clusters[r.owner].id)+" · "+clusters[r.owner].n+" wallets ↗</a>":"")+(isW?seenTag(r.owner):"")+"</div>"+
+          "<span class='tag"+(isW?"":" p")+"'>"+(isW?"Person (likely)":(r.kind==="activa"?"Very active":"Program or pool"))+"</span>"+baseTag(r.owner)+(r.kind==="activa"&&r.busy?"<span class='tag seen' title='Many moves in little time: typical of a bot, exchange or market maker'>200+ moves in "+(r.busy<48?r.busy+" h":"2 days")+"</span>":"")+(r.passive?"<span class='tag seen' title='It shows up in many transactions, but it signed none of those checked: it only receives (fee shares, airdrops). It does not behave like a bot'>many transactions, only receives</span>":"")+(clusters[r.owner]?"<a class='tag cluster' style='text-decoration:none' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(clusters[r.owner].funder)+"' title='This wallet and "+(clusters[r.owner].n-1)+" others in the list got their first transaction from the same address ("+esc(short(clusters[r.owner].funder))+"): they could be the same person or team. It is a lead, not proof. Press to see the source on Solscan'>Group "+esc(clusters[r.owner].id)+" · "+clusters[r.owner].n+" wallets ↗</a>":"")+(isW?seenTag(r.owner):"")+"</div>"+
         "<div class='hbar'><i style='width:"+Math.max(2,r.pct/max*100)+"%'></i></div>"+
         "<div class='meta'><span>Balance <span class='v'>"+esc(fmtNum(r.tokens))+"</span></span>"+
           (h.price?"<span>Value <span class='v'>"+usd(r.value)+"</span></span>":"")+

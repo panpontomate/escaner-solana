@@ -939,7 +939,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="No se pudo cargar el motor del escáner desde cdn.jsdelivr.net. Revisa tu conexión a internet y recarga la página."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.4.6/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.4.7/src/index.js";
 window.__escOk=true;
 (function(){
 "use strict";
@@ -3337,7 +3337,7 @@ function renderHolders(keep){
       "<div style='min-width:0'>"+
         "<div class='hl1'><span class='mono'>"+esc(short(r.owner))+"</span>"+
           "<button class='copy' type='button' data-copy='"+esc(r.owner)+"' title='Copiar dirección'>copiar</button>"+
-          "<span class='tag"+(isW?"":" p")+"'>"+(isW?"Persona (probable)":(r.kind==="activa"?"Muy activa":"Programa o pool"))+"</span>"+baseTag(r.owner)+(r.kind==="activa"&&r.busy?"<span class='tag seen' title='Muchos movimientos en poco tiempo: típico de un bot, exchange o market maker'>200+ mov. en "+(r.busy<48?r.busy+" h":"2 días")+"</span>":"")+(clusters[r.owner]?"<a class='tag cluster' style='text-decoration:none' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(clusters[r.owner].funder)+"' title='Esta wallet y otras "+(clusters[r.owner].n-1)+" de la lista recibieron su primera transacción de la misma dirección ("+esc(short(clusters[r.owner].funder))+"): podrían ser la misma persona o equipo. Es una pista, no una prueba. Pulsa para ver el origen en Solscan'>Grupo "+esc(clusters[r.owner].id)+" · "+clusters[r.owner].n+" wallets ↗</a>":"")+(isW?seenTag(r.owner):"")+"</div>"+
+          "<span class='tag"+(isW?"":" p")+"'>"+(isW?"Persona (probable)":(r.kind==="activa"?"Muy activa":"Programa o pool"))+"</span>"+baseTag(r.owner)+(r.kind==="activa"&&r.busy?"<span class='tag seen' title='Muchos movimientos en poco tiempo: típico de un bot, exchange o market maker'>200+ mov. en "+(r.busy<48?r.busy+" h":"2 días")+"</span>":"")+(r.passive?"<span class='tag seen' title='Aparece en muchas transacciones, pero en las revisadas no firmó ninguna: solo recibe (repartos de comisiones, airdrops). No se comporta como un bot'>muchos movimientos, solo recibe</span>":"")+(clusters[r.owner]?"<a class='tag cluster' style='text-decoration:none' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(clusters[r.owner].funder)+"' title='Esta wallet y otras "+(clusters[r.owner].n-1)+" de la lista recibieron su primera transacción de la misma dirección ("+esc(short(clusters[r.owner].funder))+"): podrían ser la misma persona o equipo. Es una pista, no una prueba. Pulsa para ver el origen en Solscan'>Grupo "+esc(clusters[r.owner].id)+" · "+clusters[r.owner].n+" wallets ↗</a>":"")+(isW?seenTag(r.owner):"")+"</div>"+
         "<div class='hbar'><i style='width:"+Math.max(2,r.pct/max*100)+"%'></i></div>"+
         "<div class='meta'><span>Saldo <span class='v'>"+esc(fmtNum(r.tokens))+"</span></span>"+
           (h.price?"<span>Valor <span class='v'>"+usd(r.value)+"</span></span>":"")+

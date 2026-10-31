@@ -634,6 +634,7 @@ export const TEXT = {
   " coincidencias": " matches",
   " porque el origen es un exchange o una cuenta muy activa, desde donde reciben dinero muchas personas sin relación entre sí.</p>": " because the source is an exchange or a very active account, where many unrelated people receive money from.</p>",
   "> Mostrar también ": "> Also show ",
+  "<span class='tag seen' title='Aparece en muchas transacciones, pero en las revisadas no firmó ninguna: solo recibe (repartos de comisiones, airdrops). No se comporta como un bot'>muchos movimientos, solo recibe</span>": "<span class='tag seen' title='It shows up in many transactions, but it signed none of those checked: it only receives (fee shares, airdrops). It does not behave like a bot'>many transactions, only receives</span>",
   "las otras ": "the other ",
   "las ": "the ",
   " cuenta que no parece persona": " account that does not look like a person",
