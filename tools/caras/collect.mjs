@@ -208,6 +208,8 @@ for (const a of needInfraCheck(state).slice(0, MAX_INFRA)) {
 if (D1) {
   try { const up = await flush(D1, state.planoQ, now); log.plano = up.lanz + " lanzamientos, " + up.compras + " compras"; }
   catch (e) { log.plano = "D1 falló (" + e.message.slice(0, 120) + "), se reintenta"; trimQueue(state.planoQ); }
+  // en Actions, como aviso visible en la ejecución (se lee sin iniciar sesión, a diferencia del registro)
+  if (process.env.GITHUB_ACTIONS) console.log((log.plano.startsWith("D1") ? "::warning::" : "::notice::") + "Plano del dinero: " + log.plano);
 }
 
 // 4. guardar (at: cuándo se guardó, para elegir la copia más nueva entre la caché y Cloudflare, ver nube.mjs)
