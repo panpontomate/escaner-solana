@@ -855,6 +855,17 @@ export const TEXT = {
   "Liquidez <span class='v'>": "Liquidity <span class='v'>",
   "Vol. 24 h <span class='v'>": "24h vol. <span class='v'>",
   "'>Ver análisis completo</a>": "'>See full analysis</a>",
+  // wallet (31/10): lo importante y filas cortas
+  "Y ": "And ",
+  " más con riesgo alto o medio: míralos abajo.": " more with high or medium risk: see them below.",
+  " token parece spam": " token looks like spam",
+  " tokens parecen spam": " tokens look like spam",
+  ": no los vendas ni entres en webs que aparezcan a su nombre.": ": do not sell them or visit websites that use their name.",
+  "Nada preocupante": "Nothing worrying",
+  "Lo importante": "What matters",
+  "% de la wallet</small></div>": "% of the wallet</small></div>",
+  "<button class='btn small ghost' type='button' data-wfl aria-expanded='false'>Banderas <span aria-hidden='true'>▾</span></button>": "<button class='btn small ghost' type='button' data-wfl aria-expanded='false'>Flags <span aria-hidden='true'>▾</span></button>",
+  "><summary>Otros tokens · ": "><summary>Other tokens · ",
   // Mi lista y logo (31/10)
   "' title='Abrir el análisis de esta wallet'>": "' title='Open the analysis of this wallet'>",
   "'>Copiar dirección</button>": "'>Copy address</button>",

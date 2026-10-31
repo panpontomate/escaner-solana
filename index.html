@@ -693,6 +693,72 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
   .lrow .acts{width:100%}
   .lrow .acts>.btn{flex:1;white-space:nowrap}
 }
+
+/* ---------- wallet (31/10): lo importante arriba, una fila corta por token ---------- */
+.take{margin:14px 0 6px;background:#2a1838;border:1px solid #6b2f4a;border-radius:14px;padding:10px 14px;font-size:.92rem;color:var(--fg)}
+.take>b{color:#fecaca}
+.take.ok{background:#14301f;border-color:#2c6b45}
+.take.ok>b{color:#bbf7d0}
+.take ul{margin:4px 0 0;padding-left:18px}
+.take li{margin:3px 0}
+.tok.wt{display:block;padding:11px 12px;border-left:4px solid var(--line)}
+.tok.wt.lvl-alto{border-left-color:var(--alto)}
+.tok.wt.lvl-medio{border-left-color:var(--medio)}
+.tok.wt.lvl-bajo{border-left-color:var(--bajo)}
+.wt1{display:grid;grid-template-columns:38px minmax(0,1fr) auto;grid-template-areas:"av n v" "w w w" "a a a";gap:4px 10px;align-items:center}
+.wt1>.lav{grid-area:av}
+.wn{grid-area:n;min-width:0}
+.wn>b{display:block;font-size:1rem;overflow-wrap:anywhere}
+.wn small{color:var(--muted);font-size:.8rem}
+.wnm{margin-right:6px}
+.wv{grid-area:v;text-align:right}
+.wv b{display:block;font-size:.95rem}
+.wv small{color:var(--muted);font-size:.76rem}
+.wp{grid-area:p;display:none}
+.ww{grid-area:w;font-size:.88rem;color:var(--fg);margin-top:4px}
+.ww.ok{display:none}
+.wa{grid-area:a;display:flex;gap:8px;margin-top:6px}
+.wa .btn{white-space:nowrap}
+.wa .wan{flex:1;background:var(--accent);color:var(--accent-fg);border:0}
+.wa .star{flex:none;width:42px;border:1px solid var(--line);border-radius:11px;background:var(--surface-2);color:var(--fg);font-size:1.15rem}
+.wa .star[aria-pressed="true"]{background:#a78bfa;color:#140e31;border-color:#a78bfa}
+.tok.wt .wfl{margin-top:10px}
+.tok.wt .wfl[hidden]{display:none}
+.wrest{margin-top:6px}
+.wrest>summary{cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:11px 14px;font-weight:600}
+.wrest[open]>summary{margin-bottom:10px}
+/* botones del resumen de la wallet: «Ver ganancias y pérdidas» entero y el resto en casillas */
+#results.wmode .wacts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-items:stretch}
+#results.wmode .wacts .wrow{display:contents}
+#results.wmode .wacts .wbr{display:none}
+#results.wmode .wacts .lg{display:none}
+#results.wmode .wacts>.btn,#results.wmode .wacts .wrow>.btn{order:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:auto;min-height:60px;margin:0;padding:6px 2px;border-radius:12px;font-size:.7rem;font-weight:700;text-align:center;line-height:1.2}
+#results.wmode .wacts>.wmain{order:-1;grid-column:1/-1;min-height:48px;font-size:.98rem;border-radius:14px;background:var(--accent);color:var(--accent-fg);border:0}
+#results.wmode .wacts .wrow>.wcopy,#results.wmode .wacts .wrow>.wsol{background:var(--surface-2);color:var(--fg);border:1px solid var(--line)}
+#results.wmode .wacts .ic{display:block!important;font-size:1.05rem;line-height:1}
+#results.wmode .wacts .ic+.lb{margin-left:0}
+#results.wmode .wacts>.wconf{font-size:.62rem;letter-spacing:-.01em;padding-inline:1px}
+@media (min-width:1000px){
+  #results.wmode{max-width:1240px;display:grid;grid-template-columns:340px minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:20px;align-items:start}
+  #results.wmode>#summary{grid-column:1;grid-row:1/span 2;position:sticky;top:16px;padding:20px}
+  #results.wmode>#filters{grid-column:2;margin-top:0!important}
+  #results.wmode>#list{grid-column:2}
+  #results.wmode #summary .sum-head{display:block}
+  #results.wmode #summary .stats{margin-top:12px;gap:16px}
+  #results.wmode .wt1{grid-template-columns:34px minmax(80px,1fr) 112px 100px minmax(110px,1.8fr) auto;grid-template-areas:"av n v p w a";gap:10px}
+  #results.wmode .wv b{white-space:nowrap}
+  #results.wmode .ww{font-size:.84rem}
+  #results.wmode .wa{gap:6px}
+  #results.wmode .wa .btn{padding:7px 10px}
+  #results.wmode .wa .star{width:38px}
+  #results.wmode .wp{display:block}
+  #results.wmode .wn .pill{display:none}
+  #results.wmode .ww{margin-top:0}
+  #results.wmode .ww.ok{display:block;color:var(--muted)}
+  #results.wmode .wa{margin-top:0}
+  #results.wmode .wa .wan{flex:none}
+  #results.wmode .tok.wt .wfl{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
 </style>
 </head>
 <body>
@@ -1725,6 +1791,7 @@ function renderToken(noScroll){
     chips.push(["Volumen 24 h",usd((par.volume&&par.volume.h24)||0)]);
     if(par.pairCreatedAt) chips.push(["Edad",ago(par.pairCreatedAt)]);
   }
+  $("#results").classList.remove("wmode");
   $("#summary").innerHTML=
     "<div class='tsum'>"+ringHtml(r)+
     "<div class='tsum-t'><p class='kick'>Token"+(r.type?" · "+esc(TYPES[r.type].label):"")+"</p>"+
@@ -1780,6 +1847,48 @@ function splitText(){
   if(s.top&&s.top.valor/s.tot>0.5) t+=" Un solo token, "+s.top.sym+", es el "+fmtPct(s.top.valor/s.tot*100)+" del valor.";
   return t;
 }
+// El motivo principal de un token: su peor bandera (roja y si no amarilla)
+function wtWhy(r){
+  if(r.lights){
+    var b=r.lights.filter(function(l){ return l.s==="bad"; })[0]||r.lights.filter(function(l){ return l.s==="warn"; })[0];
+    if(b) return b.t;
+  }
+  return (r.why&&r.why[0])||"Sin señales de alerta en los chequeos";
+}
+// «Lo importante»: los tokens de riesgo alto o medio con su motivo y su dinero, el spam y cómo se reparte el valor
+function takeHtml(c,hid){
+  var risky=state.results.filter(function(r){ return r.lvl==="ALTO"||r.lvl==="MEDIO"; })
+    .sort(function(a,b){ return ORDER.indexOf(a.lvl)-ORDER.indexOf(b.lvl)||b.valor-a.valor; });
+  var li=risky.slice(0,3).map(function(r){ return "<b>"+esc(r.sym)+"</b> ("+usd(r.valor)+"): "+esc(wtWhy(r)); });
+  if(risky.length>3) li.push("Y "+(risky.length-3)+" más con riesgo alto o medio: míralos abajo.");
+  if(c.SPAM>0) li.push(c.SPAM+(c.SPAM===1?" token parece spam":" tokens parecen spam")+": no los vendas ni entres en webs que aparezcan a su nombre.");
+  if(c["SIN DATOS"]>0) li.push(esc(c["SIN DATOS"]+(c["SIN DATOS"]===1?" token no se pudo comprobar por un fallo de red: vuelve a analizar la wallet para revisarlo.":" tokens no se pudieron comprobar por un fallo de red: vuelve a analizar la wallet para revisarlos.")));
+  // el reparto del valor solo si hay más de un nivel; si no, basta con decir si un token es casi todo
+  var sp=splitText(), vs=valueSplit(), lv=["ALTO","MEDIO","BAJO"].filter(function(k){ return vs.v[k]>0; }).length;
+  if(sp&&lv<2){ var k=sp.indexOf(". "); sp=k<0?"":sp.slice(k+2); }
+  if(sp) li.push(esc(sp));
+  if(hid) li.push(esc(hid.trim()));
+  var ok=!risky.length&&!c.SPAM;
+  return "<div class='take"+(ok?" ok":"")+"'><b>"+(ok?"Nada preocupante":"Lo importante")+"</b><ul>"+li.map(function(x){ return "<li>"+x+"</li>"; }).join("")+"</ul></div>";
+}
+// Fila corta de un token en la wallet: logo, nombre, valor y % de la wallet, riesgo, motivo, Analizar, Banderas y estrella
+function wtokRow(r,L){
+  var tot=state.results.reduce(function(s,x){ return s+x.valor; },0)||1;
+  var risky=r.lvl==="ALTO"||r.lvl==="MEDIO", fav=!!lista.t[r.mint];
+  var ORD={bad:0,warn:1,na:2,ok:3};
+  var lh=r.lights?r.lights.slice().sort(function(a,b){ return (ORD[a.s]==null?2:ORD[a.s])-(ORD[b.s]==null?2:ORD[b.s]); }).map(function(l){
+    return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div><b>"+LKEYS[l.k]+" <em class='lfl'>"+esc(FLAGTXT[l.s]||"")+"</em></b><span>"+esc(l.t)+"</span></div></div>";
+  }).join(""):"";
+  return "<article class='tok wt lvl-"+L.cls+"'><div class='wt1'>"+tokAv(r.img,r.sym)+
+    "<div class='wn'><b>"+esc(r.sym)+"</b><small>"+(sameName(r.name,r.sym)?"":"<span class='wnm'>"+esc(r.name)+"</span>")+"<span class='pill'>"+esc(lvlLabel(r))+"</span></small></div>"+
+    "<div class='wv'><b>"+usd(r.valor)+"</b><small>"+Math.round(r.valor/tot*100)+"% de la wallet</small></div>"+
+    "<div class='wp'><span class='pill'>"+esc(lvlLabel(r))+"</span></div>"+
+    "<div class='ww"+(risky?"":" ok")+"'>"+esc(wtWhy(r))+"</div>"+
+    "<div class='wa'><button class='btn small wan' type='button' data-analyze='"+esc(r.mint)+"'>Analizar</button>"+
+      (lh?"<button class='btn small ghost' type='button' data-wfl aria-expanded='false'>Banderas <span aria-hidden='true'>▾</span></button>":"")+
+      "<button class='star' type='button' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"' title='Seguir este token' aria-label='Seguir este token'>"+(fav?"★":"☆")+"</button></div>"+
+    "</div>"+(lh?"<div class='lights wfl' hidden>"+lh+"</div>":"")+"</article>";
+}
 function summaryText(){
   var c=counts(), total=state.results.reduce(function(s,r){return s+r.valor;},0);
   return "Escáner de wallet "+short(state.wallet)+"\n"+
@@ -1800,6 +1909,8 @@ function render(){
   if(c.SPAM>0) tip+=" Además hay "+c.SPAM+" tokens que parecen spam (sin mercado y con autoridades activas): no los vendas ni entres en webs que aparezcan a su nombre.";
   if(c["SIN DATOS"]>0) tip+=" "+c["SIN DATOS"]+(c["SIN DATOS"]===1?" token no se pudo comprobar por un fallo de red: vuelve a analizar la wallet para revisarlo.":" tokens no se pudieron comprobar por un fallo de red: vuelve a analizar la wallet para revisarlos.");
   var split=splitText();
+  $("#results").classList.add("wmode");
+  var hid=state.hidden?(state.hidden===1?" Se ha ocultado 1 token de menos de 1 $.":" Se han ocultado "+state.hidden+" tokens de menos de 1 $."):"";
   $("#summary").innerHTML=
     "<div class='sum-head'>"+
       "<div><div class='eyebrow'>Wallet</div><div class='mono' style='margin-top:4px;overflow-wrap:anywhere'>"+esc(state.wallet)+"</div></div>"+
@@ -1810,7 +1921,7 @@ function render(){
       "</div>"+
     "</div>"+
     "<h2 class='verdict'>"+esc(verdict(c))+"</h2>"+
-    "<p class='sub'>"+esc(tip)+(split?" "+esc(split):"")+(state.hidden?(state.hidden===1?" Se ha ocultado 1 token de menos de 1 $.":" Se han ocultado "+state.hidden+" tokens de menos de 1 $."):"")+"</p>"+
+    (n?takeHtml(c,hid):"<p class='sub'>"+esc(tip)+esc(hid)+"</p>")+
     (n?"<div class='bar' role='img' aria-label='Reparto de tokens por nivel de riesgo'>"+segs+"</div><div class='legend'>"+legend+"</div>":"")+
     "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>Ver ganancias y pérdidas</button>"+
     "<button class='btn ghost small wfav' type='button' data-long data-favw='"+esc(state.wallet)+"' aria-pressed='"+(!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"'>"+starHtml("wallet",!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"</button>"+
@@ -1841,8 +1952,10 @@ function ago(ts){
 function renderList(){
   var f=state.filter;
   var items=state.results.filter(function(r){ return f==="TODOS"||r.lvl===f; });
+  if(!state.token) items.sort(function(a,b){ return ORDER.indexOf(a.lvl)-ORDER.indexOf(b.lvl)||b.valor-a.valor; });
   var html=items.map(function(r){
     var L=LEVELS[r.lvl];
+    if(state.token!==r&&!/^(SIN MERCADO|SPAM|SIN DATOS)$/.test(r.lvl)) return wtokRow(r,L);
     var links="<a href='https://solscan.io/token/"+esc(r.mint)+"' target='_blank' rel='noopener'>Solscan</a>"+
               (r.par?"<a href='https://dexscreener.com/solana/"+esc(r.par.pairAddress||r.mint)+"' target='_blank' rel='noopener'>DexScreener</a>":"");
     var copy="<button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copiar dirección del token'>copiar</button>";
@@ -1893,9 +2006,15 @@ function renderList(){
                "<span class='links'><a href='https://solscan.io/token/"+esc(r.mint)+"' target='_blank' rel='noopener'>Solscan</a></span></div>";
       }).join("")+"</div>";
   }
-  html+=group(items.filter(function(r){return r.lvl==="SPAM";})," token que parece spam"," tokens que parecen spam","sin mercado y el creador puede crear más o congelar cuentas. No interactúes con ellos.");
-  html+=group(items.filter(function(r){return r.lvl==="SIN DATOS";})," token sin comprobar"," tokens sin comprobar","no se pudo consultar su mercado por un fallo de red al conectar con DexScreener. No es que esté mal, es que no se ha podido ver: vuelve a analizar la wallet.");
-  html+=group(items.filter(function(r){return r.lvl==="SIN MERCADO";})," token sin mercado"," tokens sin mercado","suelen ser tokens muertos o airdrops sin peligro claro. No interactúes con ellos.");
+  var gh="";
+  gh+=group(items.filter(function(r){return r.lvl==="SPAM";})," token que parece spam"," tokens que parecen spam","sin mercado y el creador puede crear más o congelar cuentas. No interactúes con ellos.");
+  gh+=group(items.filter(function(r){return r.lvl==="SIN DATOS";})," token sin comprobar"," tokens sin comprobar","no se pudo consultar su mercado por un fallo de red al conectar con DexScreener. No es que esté mal, es que no se ha podido ver: vuelve a analizar la wallet.");
+  gh+=group(items.filter(function(r){return r.lvl==="SIN MERCADO";})," token sin mercado"," tokens sin mercado","suelen ser tokens muertos o airdrops sin peligro claro. No interactúes con ellos.");
+  if(gh&&!state.token){
+    var oc=counts();
+    gh="<details class='wrest'"+(f!=="TODOS"?" open":"")+"><summary>Otros tokens · "+["SPAM","SIN DATOS","SIN MERCADO"].filter(function(k){ return oc[k]>0; }).map(function(k){ return LEVELS[k].short+" "+oc[k]; }).join(" · ")+"</summary>"+gh+"</details>";
+  }
+  html+=gh;
   $("#list").innerHTML=html||"<div class='more'>No hay tokens en esta categoría.</div>";
   if(state.token&&state.results[0]===state.token) fillTokenExtras();
 }
@@ -3347,6 +3466,8 @@ document.addEventListener("click",function(ev){
     var b2=$("#addAllH"); if(b2) b2.textContent=r2.added?"✓ Añadidas "+r2.added+" a Confluencia":(r2.full?"El grupo está lleno ("+CMAX+")":"Ya estaban todas en Confluencia");
     return;
   }
+  var wf=ev.target.closest&&ev.target.closest("[data-wfl]");
+  if(wf){ var wb=wf.closest(".tok").querySelector(".wfl"); wb.hidden=!wb.hidden; wf.setAttribute("aria-expanded",String(!wb.hidden)); wf.lastChild.textContent=wb.hidden?"▾":"▴"; return; }
   var an=ev.target.closest&&ev.target.closest("[data-analyze]");
   if(an){ ev.preventDefault(); setMode("W"); $("#wallet").value=an.getAttribute("data-analyze"); analyze(); }
 });
