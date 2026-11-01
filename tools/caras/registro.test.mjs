@@ -41,19 +41,41 @@ test("results at 24 h and 7 days, dead under $10k or rug", () => {
 test("dead when the liquidity is pulled, but not on a Pump.fun curve", () => {
   // the pool went from $23k to $5: a rug even if the market cap still reads $12.5k
   assert.deepEqual(regResolve({ liq: 23217 }, "h24", [{ dexId: "meteora", marketCap: 12550, liquidity: { usd: 5 } }]).h24,
-    { mc: 12550, liq: 5, dead: true, pull: true });
+    { mc: 12550, liq: 5, dead: true, pull: true, dx: "meteora" });
   // a 90 % drop is not enough
   assert.equal(regResolve({ liq: 20000 }, "h24", [{ marketCap: 50000, liquidity: { usd: 2000 } }]).h24.dead, false);
   // too little liquidity at the start to tell
   assert.equal(regResolve({ liq: 900 }, "h24", [{ marketCap: 50000, liquidity: { usd: 1 } }]).h24.dead, false);
   // still on the curve: DexScreener says $0 liquidity, the token is alive
   assert.deepEqual(regResolve({ liq: 5000 }, "h24", [{ dexId: "pumpfun", marketCap: 40000, liquidity: { usd: 0 } }]).h24,
-    { mc: 40000, liq: 0, cv: true, dead: false });
+    { mc: 40000, liq: 0, cv: true, dead: false, dx: "pumpfun" });
   // an old result is judged again with the new rule, and repeating it changes nothing
   const old = { liq: 48052, h24: { mc: 67433, liq: 51, dead: false } };
   regRecheck(old, "h24"); regRecheck(old, "h24");
   assert.deepEqual(old.h24, { mc: 67433, liq: 51, dead: true, pull: true });
   assert.equal(regRecheck({ liq: 100 }, "d7").d7, undefined);
+});
+
+test("graduation: born on the Pump.fun curve and now with a market outside it", () => {
+  const born = () => ({ m: "g", d: "pump-fun", liq: 2100 });
+  // still on the curve: not graduated
+  const a = regResolve(born(), "h24", [{ dexId: "pumpfun", marketCap: 9000, liquidity: { usd: 0 } }]).h24;
+  assert.deepEqual([a.dx, a.cv, a.gr], ["pumpfun", true, undefined]);
+  // graduated to PumpSwap (the curve pair can still be listed): main market = the most liquid one
+  const b = regResolve(born(), "h24", [{ dexId: "pumpfun", marketCap: 70000, liquidity: { usd: 0 } }, { dexId: "pumpswap", marketCap: 71000, liquidity: { usd: 24000 } }]).h24;
+  assert.deepEqual([b.dx, b.cv, b.gr, b.dead], ["pumpswap", undefined, true, false]);
+  // graduated and then died: both are recorded
+  const c = regResolve(born(), "d7", [{ dexId: "pumpswap", marketCap: 3000, liquidity: { usd: 900 } }]).d7;
+  assert.deepEqual([c.gr, c.dead], [true, true]);
+  // no market at all: neither
+  assert.deepEqual(regResolve(born(), "h24", []).h24, { mc: 0, liq: 0, dead: true });
+  // born outside the curve (Meteora, LaunchLab...): gr is only about Pump.fun, dx is still kept
+  const d = regResolve({ m: "x", d: "meteora-dbc" }, "h24", [{ dexId: "meteora", marketCap: 50000, liquidity: { usd: 9000 } }]).h24;
+  assert.deepEqual([d.dx, d.gr], ["meteora", undefined]);
+  // day summary: curve tokens, how many have a graduation result and how many graduated
+  const tokens = { a: Object.assign(born(), { l: "HIGH", h24: a }), b: Object.assign(born(), { l: "HIGH", h24: b, d7: c }),
+    old: { d: "pump-fun", l: "HIGH", h24: { mc: 1, liq: 0, dead: true } }, x: { d: "meteora-dbc", l: "MEDIUM", h24: d } };
+  assert.deepEqual(daySummary(tokens).curve, { n: 3, h24: 2, gr24: 1, d7: 1, gr7: 1 });   // "old" was resolved before dx existed
 });
 
 test("day summary by starting level, and merging into the published day", () => {

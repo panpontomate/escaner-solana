@@ -13,8 +13,10 @@
 //   f señales que no son ok («CODIGO:b» rojo, «CODIGO:w» amarillo, «CODIGO:n» sin comprobar)
 //   liq liquidez · mc capitalización · w1 / w10 % de la mayor wallet y de las 10 mayores (personas)
 //   py pagador · fu financiador · cr creador · rug marcado como rug por RugCheck · cara nivel de cara conocida
-//   h24 / d7 resultado: { mc, liq, dead, cv?, pull? } (dead = no llega a DEAD_MCAP, rug o le quitaron la
-//   liquidez; cv = sigue en la curva de Pump.fun; pull = muerto porque la liquidez cayó más de un 95 %)
+//   h24 / d7 resultado: { mc, liq, dead, cv?, pull?, dx?, gr? } (dead = no llega a DEAD_MCAP, rug o le quitaron
+//   la liquidez; cv = sigue en la curva de Pump.fun; pull = muerto porque la liquidez cayó más de un 95 %;
+//   dx = dex de su mercado principal en ese momento; gr = salió en la curva de Pump.fun y ya tiene mercado
+//   fuera de ella: graduó. Desde el 1/11/2026, para estudiar qué tokens de la curva llegan a graduar)
 
 import { DAY, DEAD_MCAP, isPulled, onCurve } from "./lib.mjs";
 
@@ -67,16 +69,24 @@ export function regDue(reg, now) {
   return out;
 }
 
+// Salió en la curva de Pump.fun (el dex que dio GeckoTerminal al verlo nacer)
+export function fromCurve(e) { return /^pump-?fun$/.test((e && e.d) || ""); }
+
 // Resultado de una etapa (pairs = pares de DexScreener de ese token; sin pares, el token no tiene mercado)
 export function regResolve(e, stage, pairs) {
-  let mc = 0, liq = 0;
+  let mc = 0, liq = 0, best = null, bestLiq = -1;
   (pairs || []).forEach(function (p) {
+    const l = (p.liquidity && p.liquidity.usd) || 0;
     mc = Math.max(mc, p.marketCap || p.fdv || 0);
-    liq = Math.max(liq, (p.liquidity && p.liquidity.usd) || 0);
+    liq = Math.max(liq, l);
+    if (l > bestLiq) { best = p; bestLiq = l; }
   });
   const r = { mc: Math.round(mc), liq: Math.round(liq) };
+  if (best && best.dexId) r.dx = best.dexId;
   // en la curva de Pump.fun DexScreener da liquidez 0 aunque el token siga vivo
   if (onCurve(pairs)) r.cv = true;
+  // graduó: nació en la curva y ya tiene algún mercado fuera de ella (PumpSwap, Raydium, Meteora…)
+  if (fromCurve(e) && (pairs || []).some(function (p) { return p.dexId && !/^pump-?fun$/.test(p.dexId); })) r.gr = true;
   e[stage] = r;
   return regRecheck(e, stage);
 }
@@ -116,9 +126,15 @@ export function regPublish(reg, pub, now) {
 
 // Resumen de un día: por nivel inicial, cuántos hay, cuántos tienen ya resultado y cuántos murieron
 export function daySummary(tokens) {
-  const by = {};
+  const by = {}, cur = { n: 0, h24: 0, gr24: 0, d7: 0, gr7: 0 };
   Object.keys(tokens).forEach(function (m) {
     const e = tokens[m], k = e.l || "ERROR";
+    // tokens nacidos en la curva de Pump.fun y cuántos graduaron (solo los resueltos desde el 1/11 tienen gr/dx)
+    if (fromCurve(e)) {
+      cur.n++;
+      if (e.h24 && e.h24.dx !== undefined) { cur.h24++; if (e.h24.gr) cur.gr24++; }
+      if (e.d7 && e.d7.dx !== undefined) { cur.d7++; if (e.d7.gr) cur.gr7++; }
+    }
     const s = by[k] || (by[k] = { n: 0, h24: 0, dead24: 0, d7: 0, dead7: 0 });
     s.n++;
     if (e.h24) { s.h24++; if (e.h24.dead) s.dead24++; }
@@ -126,7 +142,9 @@ export function daySummary(tokens) {
   });
   const levels = {};
   LEVEL_ORDER.concat(["ERROR"]).forEach(function (k) { if (by[k]) levels[k] = by[k]; });
-  return { n: Object.keys(tokens).length, levels: levels };
+  const out = { n: Object.keys(tokens).length, levels: levels };
+  if (cur.n) out.curve = cur;
+  return out;
 }
 
 // Une lo que hay publicado de un día con las entradas nuevas o actualizadas
