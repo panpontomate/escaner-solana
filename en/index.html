@@ -2086,7 +2086,9 @@ async function paintChart(){
     charts[key]="loading";
     var tf=CHART_TF[state.ctf];
     try{
-      var j=await jfetch(GT+"pools/"+r.par.pairAddress+"/ohlcv/"+tf[0]+"?aggregate="+tf[1]+"&limit="+tf[2]+"&currency=usd");
+      // token=: el precio de ESTE token. Sin él GeckoTerminal da el de su token base del pool, que puede ser el otro
+      // (USDC/SOL en DexScreener es SOL/USDC en GeckoTerminal: la gráfica de USDC salía a ~95 $)
+      var j=await jfetch(GT+"pools/"+r.par.pairAddress+"/ohlcv/"+tf[0]+"?aggregate="+tf[1]+"&limit="+tf[2]+"&currency=usd&token="+encodeURIComponent(r.mint));
       var l=(j&&j.data&&j.data.attributes&&j.data.attributes.ohlcv_list)||[];
       charts[key]=l.map(function(v){ return [v[0]*1000,Number(v[4])]; }).filter(function(p){ return p[1]>0; }).sort(function(a,b){ return a[0]-b[0]; });
     }catch(e){ charts[key]="err"; }
