@@ -1013,6 +1013,13 @@ function snap(r){
     price:Number((r.par&&r.par.priceUsd)||0),liq:(r.par&&r.par.liquidity&&r.par.liquidity.usd)||0,
     pair:(r.par&&r.par.pairAddress)||"",ts:Date.now()};
 }
+// Un token que sigues se queda con lo último que se vio de él: al analizarlo solo (no solo dentro de una
+// wallet) y cuando el lanzamiento le sube el nivel. Antes Mi lista seguía mostrando el veredicto antiguo.
+function keepSnap(r){
+  var old=lista.t[r.mint]; if(!old) return;
+  var s=snap(r); if(!s.img&&old.img) s.img=old.img;
+  lista.t[r.mint]=s; saveList();
+}
 function recordWallet(){
   var c=counts(), total=state.results.reduce(function(s,r){return s+r.valor;},0);
   var e=lista.w[state.wallet]||(lista.w[state.wallet]={fav:false,name:""});
@@ -1741,7 +1748,7 @@ async function checkToken(mint){
   var r=await assess(mint,mkr.data[mint]||null,0,mkr.failed.length>0,false,true);
   if(!r){ showError("Esa dirección es un NFT, no un token. El escáner no revisa NFTs."); return; }
   setProgress("Listo",1);
-  r.hist=histRecord(r);
+  r.hist=histRecord(r); keepSnap(r);
   state.results=[r]; state.token=r; state.filter="TODOS";
   setUrl(mint);
   renderToken();
@@ -2422,7 +2429,7 @@ async function paintBundle(){
   // Un lanzamiento en rojo cuenta como una alerta fuerte más (el círculo y el post de X la cuentan); si además
   // sube el veredicto se guarda en el historial. Se repinta una sola vez: la segunda pasada ya tiene r.launch
   var first=!r.launch; r.launch=v;
-  if(raiseByLaunch(r,v)||(first&&v.s==="bad")){ if(r.launchLvl) r.hist=histRecord(r); renderToken(true); return; }
+  if(raiseByLaunch(r,v)||(first&&v.s==="bad")){ if(r.launchLvl){ r.hist=histRecord(r); keepSnap(r); } renderToken(true); return; }
   if(nS>=SRE.SERIAL_WARN) extra+="<p class='hint'>Wallet que pagó el lanzamiento: <a href='#' class='mono' data-analyze='"+esc(b.creator)+"' title='Analizar esta wallet'>"+esc(short(b.creator))+"</a></p>";
   box.className="lt lt-"+v.s;
   box.innerHTML="<i class='ld'></i><div style='min-width:0;flex:1'><b>Compras en el lanzamiento</b><span>"+esc(v.base||v.t)+"</span>"+extra+"</div>";
