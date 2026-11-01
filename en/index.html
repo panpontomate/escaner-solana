@@ -980,6 +980,135 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
   .cf-mbar .s{font-size:.74rem}.cf-mbar .s b{font-size:.84rem}
   .cf-mbar .btn{padding:11px 14px}
 }
+
+/* ===== Mi lista (diseño de la plantilla maquetas/milista) ===== */
+#lresults .card{margin-top:16px}
+.ml-head{padding:26px 0 2px}
+#lresults .ml-h1{display:block;font:800 clamp(2rem,4.4vw,3rem)/1.05 var(--f-display);letter-spacing:-.015em;margin:12px 0 0;color:#f7f4ff}
+.ml-h1 em{font-style:normal;color:var(--kick)}
+.ml-sub{margin:10px 0 0;color:#ddd7f5;font-size:1rem}
+.ml-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:20px}
+.ml-tile{background:rgba(34,26,82,.7);border:1px solid rgba(196,181,253,.2);border-radius:18px;padding:14px 16px;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:0;cursor:pointer;color:var(--fg)}
+.ml-tile b{font:800 1.7rem/1.1 var(--f-display)}
+.ml-tile span{color:var(--muted);font-size:.84rem}
+.ml-tile.alto b{color:var(--alto)}.ml-tile.chg b{color:var(--medio)}
+.ml-tile[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+#lresults .ml-card h2{font:700 1.3rem/1.2 var(--f-display);margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#lresults .ml-card h2 small{font:600 .9rem var(--f-body);color:#9a91c9}
+.ml-hrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.ml-ts{font-size:.8rem;color:#9a91c9}
+.ml-alerts{display:grid;gap:8px;margin-top:14px}
+.ml-al{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:var(--surface-2);border-left:4px solid var(--c)}
+.ml-al.red{--c:var(--alto)}.ml-al.yel{--c:var(--medio)}.ml-al.grn{--c:var(--bajo)}
+.ml-alogo{position:relative;width:40px;height:40px;flex:none}
+.ml-lg{position:absolute;inset:0;border-radius:13px;overflow:hidden;display:grid;place-items:center;font:800 .8rem var(--f-body);color:#140e31}
+.ml-lg img,.ml-logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--surface)}
+.ml-bd{position:absolute;right:-6px;bottom:-6px;width:20px;height:20px;border-radius:50%;background:var(--c);color:#140e31;font:900 .62rem/1 var(--f-body);display:grid;place-items:center;border:2px solid var(--surface-2)}
+.ml-al .t{min-width:0;display:flex;flex-direction:column;gap:3px}
+.ml-al .l1{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;min-width:0;font-size:.94rem;line-height:1.3}
+.ml-al .l1 b{font-family:var(--f-display);font-size:1rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ml-al .t small{color:#9a91c9;font-size:.78rem;line-height:1.3}
+.ml-p-alto{background:var(--alto-bg);color:var(--alto)}.ml-p-medio{background:var(--medio-bg);color:var(--medio)}.ml-p-bajo{background:var(--bajo-bg);color:var(--bajo)}
+.ml-p-nm,.ml-p-spam{background:var(--nm-bg);color:var(--nm)}
+.ml-filters{display:flex;gap:6px;flex-wrap:wrap}
+.ml-chip{border:0;background:var(--surface-2);border-radius:99px;padding:7px 12px;font-size:.84rem;font-weight:700;color:var(--muted);min-height:36px;cursor:pointer}
+.ml-chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+.ml-chip i{font-style:normal;opacity:.7;margin-left:4px}
+.ml-tlist{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-top:14px}
+.ml-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;background:rgba(14,9,38,.55);border:1px solid rgba(196,181,253,.2);border-left:4px solid var(--c,var(--line));border-radius:18px;padding:12px 14px}
+.ml-row.lvl-alto,.ml-row.lvl-spam{--c:var(--alto)}.ml-row.lvl-medio{--c:var(--medio)}.ml-row.lvl-bajo{--c:var(--bajo)}.ml-row.lvl-nm{--c:var(--nm)}
+.ml-tl{display:flex;align-items:center;gap:12px;min-width:0}
+.ml-logo{position:relative;overflow:hidden;width:42px;height:42px;border-radius:14px;flex:none;display:grid;place-items:center;font:800 .88rem var(--f-body);color:#140e31}
+.ml-tn{min-width:0}
+.ml-tn .l1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ml-tn .l1 a{font:700 1.08rem var(--f-display);color:var(--fg);text-decoration:none;overflow-wrap:anywhere}
+.ml-tn .l1 a:hover{text-decoration:underline}
+.ml-tn .nm2{color:#9a91c9;font-size:.82rem}
+.ml-tn .why{display:block;color:var(--muted);font-size:.84rem;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ml-flag{display:inline-flex;gap:6px;align-items:center;margin:6px 6px 0 0;font-size:.78rem;font-weight:700;padding:3px 9px;border-radius:99px;background:rgba(251,191,36,.12);color:#fcd77a}
+.ml-flag.red{background:rgba(255,107,107,.12);color:#ff9b9b}.ml-flag.grn{background:rgba(74,222,128,.12);color:#86efac}
+.ml-px{text-align:right;min-width:0}
+.ml-px .p{font-weight:800;white-space:nowrap}
+.ml-px .c{font-size:.8rem;font-weight:800;margin-left:6px;white-space:nowrap}
+.ml-px .c.up{color:var(--bajo)}.ml-px .c.dn{color:var(--alto)}
+.ml-px small{display:block;color:#9a91c9;font-size:.76rem}
+.ml-acts{display:flex;gap:6px;align-items:center}
+.ml-acts .btn,.ml-wact .btn{min-height:38px}
+.ml-acts .star,.ml-wact .star{width:38px;height:38px}
+.ml-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.ml-wgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.ml-w{background:rgba(14,9,38,.55);border:1px solid rgba(196,181,253,.2);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ml-wtop{display:flex;align-items:center;gap:12px;min-width:0}
+.ml-wtop .cf-ava{width:40px;height:40px;font-size:.8rem}
+.ml-wtop .t{flex:1;min-width:0;line-height:1.2;display:flex;flex-direction:column}
+.ml-wtop .t a{font-weight:700;color:var(--fg);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ml-wtop .t a:hover{text-decoration:underline}
+.ml-wtop .t span{font-family:var(--f-mono);font-size:.76rem;color:#9a91c9}
+.ml-wst{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.ml-wst div{background:var(--surface-2);border-radius:12px;padding:8px 10px;min-width:0}
+.ml-wst b{display:block;font-weight:800;white-space:nowrap}
+.ml-wst span{font-size:.74rem;color:#9a91c9}
+.ml-wst .r b{color:var(--alto)}
+.ml-wact{display:flex;gap:6px;align-items:center}
+.ml-grow{flex:1}
+.ml-ico{width:34px;height:34px;border-radius:11px;display:inline-grid;place-items:center;background:rgba(139,92,246,.22);color:#c4b5fd;flex:none}
+details.ml-fold{margin-top:16px;background:rgba(24,17,62,.7);border:1px solid rgba(196,181,253,.22);border-radius:20px}
+details.ml-fold>summary{list-style:none;cursor:pointer;padding:16px 18px;display:flex;align-items:center;gap:10px;font-weight:700}
+details.ml-fold>summary::-webkit-details-marker{display:none}
+details.ml-fold>summary::after{content:"▾";margin-left:auto;color:#9a91c9;transition:transform .2s}
+details.ml-fold[open]>summary::after{transform:rotate(180deg)}
+details.ml-fold>summary small{color:#9a91c9;font-weight:600}
+details.ml-fold .in{padding:0 18px 12px}
+details.ml-fold .lsec{background:none;border:0;box-shadow:none;padding:0;margin:0}
+details.ml-fold .lsec>.eyebrow{display:none}
+details.ml-fold .star{width:38px;height:38px}
+.ml-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.ml-steps div{background:var(--surface-2);border-radius:16px;padding:14px}
+.ml-steps b{display:block;margin:8px 0 2px}
+.ml-steps span:not(.ml-ico){color:var(--muted);font-size:.86rem}
+@media (max-width:760px){
+  .ml-head{padding-top:14px}
+  #lresults .ml-h1{font-size:1.75rem;margin-top:8px}
+  .ml-sub{font-size:.92rem}
+  .ml-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
+  .ml-tile{padding:10px 12px;border-radius:16px}
+  .ml-tile b{font-size:1.4rem}
+  .ml-tile span{font-size:.78rem}
+  #lresults .ml-card{padding:14px;border-radius:22px}
+  #lresults .ml-card h2{font-size:1.15rem}
+  .ml-al{padding:9px 10px;gap:10px;grid-template-columns:auto minmax(0,1fr)}
+  .ml-go{display:none}
+  .ml-filters{flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;margin-right:-14px;padding-bottom:2px;scrollbar-width:none}
+  .ml-filters::-webkit-scrollbar{display:none}
+  .ml-chip{flex:none}
+  .ml-row{grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:12px}
+  .ml-row .ml-tl{grid-column:1/-1}
+  .ml-px{text-align:left}
+  .ml-px small{display:none}
+  .ml-tn .why{white-space:normal}
+  .ml-logo{width:38px;height:38px;border-radius:12px;font-size:.8rem}
+  .ml-wgrid,.ml-steps{grid-template-columns:minmax(0,1fr)}
+  details.ml-fold>summary small{display:none}
+  .ml-px .c{display:block;margin-left:0}
+  .ml-wtop .t a{white-space:normal;overflow-wrap:anywhere}
+  .ml-row.ml-long .ml-px{grid-column:1/-1}
+  .ml-row.ml-long .ml-px .c{display:inline;margin-left:6px}
+  .ml-row.ml-long .ml-acts{grid-column:1/-1;justify-content:flex-end}
+}
+@media (max-width:360px){
+  .ml-tiles{gap:6px}
+  .ml-tile b{font-size:1.25rem}
+  .ml-wst{grid-template-columns:1fr 1fr}
+  .ml-wst div:first-child{grid-column:1/-1}
+  .ml-px .c{display:block;margin-left:0}
+}
+@media (max-width:340px){
+  .ml-row .ml-px,.ml-row .ml-acts{grid-column:1/-1}
+  .ml-row .ml-acts .btn{flex:1}
+  .ml-px .c{display:inline;margin-left:6px}
+  .ml-al .l1{flex-wrap:wrap;gap:4px 8px}
+  .ml-al .l1 b{overflow:visible}
+}
 </style>
 </head>
 <body>
@@ -1237,16 +1366,20 @@ function snap(r){
 }
 // Un token que sigues se queda con lo último que se vio de él: al analizarlo solo (no solo dentro de una
 // wallet) y cuando el lanzamiento le sube el nivel. Antes Mi lista seguía mostrando el veredicto antiguo.
-function keepSnap(r){
+function keepSnap(r,noSave,sameRun){
   var old=lista.t[r.mint]; if(!old) return;
   var s=snap(r); if(!s.img&&old.img) s.img=old.img;
-  lista.t[r.mint]=s; saveList();
+  // el riesgo anterior, para avisar en Mi lista de que ha cambiado (se avisa durante ML_DAYS días)
+  if(sameRun){ if(old.prev) s.prev=old.prev; if(s.prev&&s.prev.lvl===s.lvl) delete s.prev; }
+  else if(old.lvl&&old.lvl!==s.lvl) s.prev={lvl:old.lvl,ts:Date.now()};
+  else if(old.prev) s.prev=old.prev;
+  lista.t[r.mint]=s; if(!noSave) saveList();
 }
 function recordWallet(){
   var c=counts(), total=state.results.reduce(function(s,r){return s+r.valor;},0);
   var e=lista.w[state.wallet]||(lista.w[state.wallet]={fav:false,name:""});
   e.ts=Date.now(); e.n=state.results.length; e.total=total; e.alto=c.ALTO; e.spam=c.SPAM; e.sol=state.sol;
-  state.results.forEach(function(r){ if(lista.t[r.mint]) lista.t[r.mint]=snap(r); });
+  state.results.forEach(function(r){ if(lista.t[r.mint]) keepSnap(r,true); });
   var old=Object.keys(lista.w).filter(function(k){return !lista.w[k].fav&&!lista.w[k].name;})
     .sort(function(a,b){return (lista.w[b].ts||0)-(lista.w[a].ts||0);});
   old.slice(60).forEach(function(k){ delete lista.w[k]; });
@@ -1272,77 +1405,196 @@ function walletRow(addr,e){
       (!e.fav?"<button class='pm-i' type='button' data-del='"+esc(addr)+"'>Remove from list</button>":"")+
     "</div></details></div></div>";
 }
-function renderLista(){
+// ---------- Mi lista (diseño de maquetas/milista) ----------
+// Cuánto pesa cada nivel para saber si un cambio es a peor o a mejor
+var ML_RANK={ALTO:4,SPAM:4,MEDIO:3,"SIN DATOS":2,"SIN MERCADO":2,BAJO:1};
+var ML_DAYS=7;   // un cambio de riesgo se avisa durante 7 días
+var ML_SHOW=8;   // tokens a la vista antes de «Ver los restantes»
+// Lo que ha cambiado en un token que sigues: su riesgo (al volver a analizarlo), su liquidez o su mercado
+function mlChanges(t){
+  var out=[], now=llive.d[t.mint];
+  if(t.prev&&t.prev.lvl&&t.prev.lvl!==t.lvl&&Date.now()-(t.prev.ts||0)<ML_DAYS*864e5)
+    out.push({k:"lvl",worse:(ML_RANK[t.lvl]||0)>(ML_RANK[t.prev.lvl]||0),from:t.prev.lvl});
+  if(now===null) out.push({k:"gone"});
+  else if(now&&!now.cv&&t.liq>=1000&&now.liq<t.liq*0.5) out.push({k:"liq",pct:Math.round((1-now.liq/t.liq)*100),from:t.liq,to:now.liq});
+  return out;
+}
+function mlLogo(t,cls){
+  var ini=String(t.sym||"?").replace(/^\$/,"").slice(0,2).toUpperCase();
+  return "<span class='"+cls+"' style='background:"+cfCol(t.mint)+"' aria-hidden='true'>"+esc(ini)+
+    (t.img?"<img src='"+esc(t.img)+"' alt='' loading='lazy' referrerpolicy='no-referrer' onerror=\"this.remove()\">":"")+"</span>";
+}
+function mlLvlLabel(l){ return (LEVELS[l]||LEVELS["SIN MERCADO"]).label; }
+// Un aviso de «Desde la última vez»
+function mlAlert(t,c){
+  var col, badge, pill, small;
+  if(c.k==="lvl"){
+    var L=LEVELS[t.lvl]||LEVELS["SIN MERCADO"];
+    col=c.worse?"red":"grn"; badge=c.worse?"▲":"✓";
+    pill="<span class='pill ml-p-"+L.cls+"'>"+badge+" "+esc(L.label)+"</span>";
+    small="Was "+esc(mlLvlLabel(c.from).toLowerCase())+" · checked "+esc(hace(t.ts))+(t.why&&t.why.length&&c.worse?" · "+esc(String(t.why[0]).split(". ")[0]):"");
+  }else if(c.k==="liq"){
+    col="yel"; badge="▼";
+    pill="<span class='pill ml-p-medio'>▼ Liquidity −"+c.pct+" %</span>";
+    small="From "+usd(c.from)+" a "+usd(c.to)+" since you checked it";
+  }else{
+    col="red"; badge="✕";
+    pill="<span class='pill ml-p-alto'>✕ No market</span>";
+    small="It no longer has a market on DexScreener";
+  }
+  return "<div class='ml-al "+col+"'><span class='ml-alogo'>"+mlLogo(t,"ml-lg")+"<span class='ml-bd'>"+badge+"</span></span>"+
+    "<span class='t'><span class='l1'><b>"+esc(t.sym)+"</b>"+pill+"</span><small>"+small+"</small></span>"+
+    "<button class='btn small ghost ml-go' type='button' data-analyze='"+esc(t.mint)+"'>Analizar</button></div>";
+}
+function mlFlag(c){
+  if(c.k==="lvl") return "<span class='ml-flag "+(c.worse?"red":"grn")+"'>"+(c.worse?"▲":"✓")+" was "+esc(mlLvlLabel(c.from))+"</span>";
+  if(c.k==="liq") return "<span class='ml-flag'>▼ liquidity has fallen "+c.pct+" %</span>";
+  return "<span class='ml-flag red'>✕ no market any more</span>";
+}
+function mlRow(t){
+  var L=LEVELS[t.lvl]||LEVELS["SIN MERCADO"], now=llive.d[t.mint], ch=mlChanges(t);
+  var price=(now&&now.price)||t.price, liq=now&&!now.cv?now.liq:t.liq, pc="";
+  if(now&&now.price&&t.price){ var p=(now.price/t.price-1)*100; if(Math.abs(p)>=1) pc="<span class='c "+(p>0?"up":"dn")+"' title='Since you checked it'>"+(p>0?"+":"")+fmtPct(p)+"</span>"; }
+  // en el móvil un precio largo (tokens de 0,000001 $) va en su propia línea para no chocar con los botones
+  var ps=price?priceUsd(price):"—";
+  return "<article class='ml-row lvl-"+L.cls+(ps.length>=10?" ml-long":"")+"'><div class='ml-tl'>"+mlLogo(t,"ml-logo")+"<div class='ml-tn'>"+
+      "<div class='l1'><a href='#' data-analyze='"+esc(t.mint)+"' title='Open the analysis of this token'>"+esc(t.sym)+"</a>"+
+        (sameName(t.name,t.sym)?"":"<span class='nm2'>"+esc(t.name)+"</span>")+"<span class='pill'>"+L.label+"</span></div>"+
+      (t.why&&t.why.length?"<span class='why' title='"+esc(t.why[0])+"'>"+esc(String(t.why[0]).split(". ")[0])+"</span>":"")+ch.map(mlFlag).join("")+"</div></div>"+
+    "<div class='ml-px'><span class='p'>"+esc(ps)+"</span>"+pc+
+      "<small>liq. "+usd(liq||0)+" · checked "+esc(hace(t.ts))+"</small></div>"+
+    "<div class='ml-acts'><button class='btn small ghost' type='button' data-analyze='"+esc(t.mint)+"'>Analyse</button>"+
+      "<button class='star' type='button' data-favt='"+esc(t.mint)+"' aria-pressed='true' title='Unfollow' aria-label='Unfollow this token'>★</button>"+
+      "<details class='pmenu lmore'><summary class='btn small' aria-label='More options'>⋯</summary><div class='pmenu-body'>"+
+        "<button class='pm-i' type='button' data-hold='"+esc(t.mint)+"'>Find whales</button>"+
+        "<button class='pm-i' type='button' data-copy='"+esc(t.mint)+"'>Copy address</button>"+
+        "<a href='https://solscan.io/token/"+esc(t.mint)+"' target='_blank' rel='noopener'>View on Solscan</a>"+
+        (t.pair?"<a href='https://dexscreener.com/solana/"+esc(t.pair)+"' target='_blank' rel='noopener'>View on DexScreener</a>":"")+
+      "</div></details></div></article>";
+}
+function mlWallet(e){
+  var a=e.addr, on=inCart(a);
+  return "<div class='ml-w'><div class='ml-wtop'>"+cfAva(a)+"<span class='t'><a href='#' data-analyze='"+esc(a)+"' title='Open the analysis of this wallet'>"+esc(e.name||short(a))+"</a>"+
+      "<span>"+(e.name?esc(short(a)):"no name")+"</span></span>"+cfPnlBadge(e.pnl&&e.pnl.st?e.pnl:null)+"</div>"+
+    (e.ts?"<div class='ml-wst'><div><b>"+usd(e.total||0)+"</b><span>in tokens</span></div><div><b>"+(e.n||0)+"</b><span>tokens</span></div>"+
+      "<div"+(e.alto?" class='r'":"")+"><b>"+(e.alto||0)+"</b><span>high risk</span></div></div>":"<p class='hint' style='margin:0'>Not analysed yet</p>")+
+    "<div class='ml-wact'><button class='btn small ghost ml-grow' type='button' data-analyze='"+esc(a)+"'>"+(e.ts?"Analyse · "+esc(hace(e.ts)):"Analyse")+"</button>"+
+      "<button class='star' type='button' data-favw='"+esc(a)+"' aria-pressed='true' title='Unfollow' aria-label='Unfollow this wallet'>★</button>"+
+      "<details class='pmenu lmore'><summary class='btn small' aria-label='More options'>⋯</summary><div class='pmenu-body'>"+
+        "<button class='pm-i' type='button' data-long data-addc='"+esc(a)+"' aria-pressed='"+on+"'>"+(on?"✓ In Confluence":"⊕ To Confluence")+"</button>"+
+        "<button class='pm-i' type='button' data-copy='"+esc(a)+"'>Copy address</button>"+
+        "<a href='https://solscan.io/account/"+esc(a)+"' target='_blank' rel='noopener'>View on Solscan</a>"+
+        "<button class='pm-i' type='button' data-name='"+esc(a)+"'>"+(e.name?"Rename":"Add a name")+"</button>"+
+      "</div></details></div></div>";
+}
+function renderLista(noLive){
   var ws=Object.keys(lista.w).map(function(k){ var e=lista.w[k]; e.addr=k; return e; });
   function byTs(a,b){ return (b.ts||0)-(a.ts||0); }
   var favs=ws.filter(function(e){return e.fav;}).sort(byTs);
   var hist=ws.filter(function(e){return !e.fav&&(e.ts||e.name);}).sort(byTs);
   var toks=Object.keys(lista.t).map(function(k){ var t=lista.t[k]; t.mint=k; return t; })
     .sort(function(a,b){ return ORDER.indexOf(a.lvl)-ORDER.indexOf(b.lvl)||(a.sym>b.sym?1:-1); });
-  var h="<div class='lhd'><h2>My list</h2><p>"+toks.length+(toks.length===1?" token":" tokens")+" and "+favs.length+(favs.length===1?" wallet":" wallets")+" you follow. Saved only in this browser.</p></div>"+storageWarningHtml();
-  h+="<div class='lsec'><div class='eyebrow'>Tokens I follow · "+toks.length+"</div>"+
-    (toks.length?toks.map(function(t){
-      var L=LEVELS[t.lvl]||LEVELS["SIN MERCADO"];
-      return "<div class='lrow lvl-"+L.cls+"'><div class='main'><div class='hl1'>"+tokAv(t.img,t.sym,t.mint)+"<a href='#' class='nm' data-analyze='"+esc(t.mint)+"' title='Open the analysis of this token'>"+esc(t.sym)+"</a>"+
-        (sameName(t.name,t.sym)?"":"<span class='lnm'>"+esc(t.name)+"</span>")+"<span class='pill'>"+L.label+"</span></div>"+
-        "<div class='meta'><span>Price <span class='v' data-lp='"+esc(t.mint)+"'>"+(t.price?esc(priceUsd(t.price)):"—")+"</span></span><span class='lchg' data-lc='"+esc(t.mint)+"'></span>"+
-        "<span>Liquidity <span class='v' data-ll='"+esc(t.mint)+"'>"+usd(t.liq||0)+"</span></span><span>Checked "+esc(hace(t.ts))+"</span></div>"+
-        (t.why&&t.why.length?"<div class='lwhy'>"+esc(t.why[0])+"</div>":"")+
-        "<div class='ldrop' data-ld='"+esc(t.mint)+"' hidden></div></div>"+
-        "<div class='acts'><button class='btn small ghost' type='button' data-analyze='"+esc(t.mint)+"'>Analyse</button>"+
-        "<button class='btn small ghost' type='button' data-hold='"+esc(t.mint)+"'>Whales</button>"+
-        "<button class='star' type='button' data-favt='"+esc(t.mint)+"' aria-pressed='true' title='Unfollow' aria-label='Unfollow this token'>★</button>"+
-        "<details class='pmenu lmore'><summary class='btn small' aria-label='More options'>⋯</summary><div class='pmenu-body'>"+
-          "<button class='pm-i' type='button' data-copy='"+esc(t.mint)+"'>Copy address</button>"+
-          "<a href='https://solscan.io/token/"+esc(t.mint)+"' target='_blank' rel='noopener'>View on Solscan</a>"+
-          (t.pair?"<a href='https://dexscreener.com/solana/"+esc(t.pair)+"' target='_blank' rel='noopener'>View on DexScreener</a>":"")+
-        "</div></details></div></div>";
-    }).join(""):"<div class='lempty'>You do not follow any token yet. Analyse one and press Follow token: here you will see how its price and liquidity change.</div>")+"</div>";
-  h+="<div class='lsec'><div class='eyebrow'>Wallets I follow · "+favs.length+"</div>"+
-    (favs.length?favs.map(function(e){return walletRow(e.addr,e);}).join("")+"<div class='actions' style='margin-top:12px'><button class='btn small' type='button' id='chgBtnL'>Check what they changed</button></div>":"<div class='lempty'>You do not follow any yet. Analyse a wallet and press “Follow wallet”, or use the star in the whale list.</div>")+"</div>";
+  var chg=toks.filter(function(t){ return mlChanges(t).length; });
+  var cnt={ALTO:0,MEDIO:0,BAJO:0}; toks.forEach(function(t){ if(cnt[t.lvl]!==undefined) cnt[t.lvl]++; });
+  var lf=state.lf||"all";
+  var h=storageWarningHtml()+"<header class='ml-head'><p class='kick'>My list</p><h2 class='ml-h1'>What you follow, <em>at a glance</em></h2>"+
+    "<p class='ml-sub'>Your tokens and wallets, with what has changed since last time. Saved only in this browser.</p>";
+  if(toks.length||favs.length) h+="<div class='ml-tiles'>"+
+    "<button class='ml-tile' type='button' data-lf='all' aria-pressed='"+(lf==="all")+"'><b>"+toks.length+"</b><span>"+(toks.length===1?"token you follow":"tokens you follow")+"</span></button>"+
+    "<button class='ml-tile' type='button' data-lgo='w'><b>"+favs.length+"</b><span>"+(favs.length===1?"wallet you follow":"wallets you follow")+"</span></button>"+
+    "<button class='ml-tile alto' type='button' data-lf='ALTO' aria-pressed='"+(lf==="ALTO")+"'><b>"+cnt.ALTO+"</b><span>at high risk</span></button>"+
+    "<button class='ml-tile chg' type='button' data-lf='chg' aria-pressed='"+(lf==="chg")+"'><b>"+chg.length+"</b><span>with changes</span></button></div>";
+  h+="</header>";
+  if(!toks.length&&!favs.length){
+    h+="<section class='card ml-card'><h2>How to start</h2><div class='ml-steps'>"+
+      "<div><span class='ml-ico'>☆</span><b>Follow a token</b><span>Analyse it and press Follow token. You will see its price, its liquidity and whether its risk changes.</span></div>"+
+      "<div><span class='ml-ico'>◎</span><b>Follow a wallet</b><span>Analyse it and press Follow wallet, or use the ★ in Whales.</span></div>"+
+      "<div><span class='ml-ico'>⇪</span><b>Coming from another device?</b><span>Import your backup below.</span></div></div></section>";
+  }
+  // lo que ha cambiado, primero
+  if(chg.length){
+    var items=[]; chg.forEach(function(t){ mlChanges(t).forEach(function(c){ items.push(mlAlert(t,c)); }); });
+    h+="<section class='card ml-card'><div class='ml-hrow'><h2>Since last time</h2>"+
+      "<span class='ml-ts'>"+(llive.ts?"prices as of "+esc(ftime(llive.ts)):"")+"</span></div>"+
+      "<div class='ml-alerts'>"+items.slice(0,6).join("")+"</div>"+
+      (items.length>6?"<p class='hint'>Y "+(items.length-6)+" more changes: filter by Changed.</p>":"")+"</section>";
+  }
+  // tokens
+  if(toks.length){
+    var shown=toks.filter(function(t){ return lf==="all"||(lf==="chg"?mlChanges(t).length:t.lvl===lf); });
+    var vis=state.lallT?shown:shown.slice(0,ML_SHOW), re=state.lre;
+    h+="<section class='card ml-card'><div class='ml-hrow'><h2>Tokens I follow <small>"+toks.length+"</small></h2><div class='ml-filters'>"+
+      [["all","All",toks.length],["ALTO","High",cnt.ALTO],["MEDIO","Medium",cnt.MEDIO],["BAJO","Low",cnt.BAJO],["chg","Changed",chg.length]].map(function(f){
+        return "<button class='ml-chip' type='button' data-lf='"+f[0]+"' aria-pressed='"+(lf===f[0])+"'>"+f[1]+"<i>"+f[2]+"</i></button>";
+      }).join("")+"</div></div>"+
+      "<div class='ml-tlist'>"+(vis.length?vis.map(mlRow).join(""):"<p class='hint'>No tokens with this filter.</p>")+"</div>"+
+      "<div class='ml-bar'><button class='btn small ghost' type='button' id='lreall'"+(re?" disabled":"")+">"+
+        (re?"Analysing "+re.done+" of "+re.n+"…":"⟳ Analyse again "+(toks.length===1?"the token":"all "+toks.length))+"</button>"+
+        (shown.length>vis.length?"<button class='btn small ghost' type='button' id='lallt'>See the other "+(shown.length-vis.length)+"</button>":"")+"</div></section>";
+  }else if(favs.length){
+    h+="<section class='card ml-card'><h2>Tokens I follow</h2><p class='hint'>You do not follow any token yet. Analyse one and press Follow token: here you will see how its price, liquidity and risk change.</p></section>";
+  }
+  // wallets
+  if(favs.length){
+    h+="<section class='card ml-card' id='mlw'><div class='ml-hrow'><h2>Wallets I follow <small>"+favs.length+"</small></h2><div class='ml-bar' style='margin:0'>"+
+      "<button class='btn small ghost' type='button' id='chgBtnL'>⟳ Check for changes</button>"+
+      "<button class='btn small ghost' type='button' id='lconf'>⊕ Compare in Confluence</button></div></div>"+
+      "<div class='ml-wgrid'>"+favs.map(mlWallet).join("")+"</div></section>";
+  }else if(toks.length){
+    h+="<section class='card ml-card' id='mlw'><h2>Wallets I follow</h2><p class='hint'>You do not follow any wallet yet. Analyse a wallet and press Follow wallet, or use the star in the whales list.</p></section>";
+  }
   if(state.chg&&state.chg.target==="L") h+=chgHtml(state.chg);
-  if(hist.length) h+="<div class='lsec'><div class='eyebrow'>Analysed wallets · "+hist.length+"</div>"+hist.map(function(e){return walletRow(e.addr,e);}).join("")+"</div>";
-  h+=backupHtml();
+  if(hist.length) h+="<details class='ml-fold'><summary><span class='ml-ico'>◷</span>Analysed wallets <small>· "+hist.length+" in the history</small></summary>"+
+    "<div class='in'>"+hist.map(function(e){return walletRow(e.addr,e);}).join("")+"</div></details>";
+  h+="<details class='ml-fold'"+(!toks.length&&!favs.length?" open":"")+"><summary><span class='ml-ico'>⇪</span>Backup <small>· for another device or in case you clear the browser</small></summary>"+
+    "<div class='in'>"+backupHtml()+"</div></details>";
   $("#llist").innerHTML=h;
-  listaLive(toks);
+  if(!noLive) listaLive(toks);
 }
-// Precio y liquidez de ahora de los tokens que sigues (DexScreener, 30 por petición; se guarda 2 minutos)
+// Pone al día todos los tokens que sigues, uno detrás de otro (es lo mismo que analizarlos uno a uno)
+async function reanalyzeList(){
+  var ms=Object.keys(lista.t); if(!ms.length||state.lre) return;
+  state.rpc=$("#rpc").value.trim()||PUBLIC_RPC; state.cancel=false;
+  state.lre={done:0,n:ms.length}; renderLista(true);
+  await pool(ms,2,async function(m){
+    try{
+      var mkr=await getMarkets([m],function(){});
+      if(!mkr.data[m]&&!mkr.failed.length){ var gp=await gtPair(m); if(gp) mkr.data[m]=gp; }
+      await fillLiquidity(mkr.data[m]);
+      var r=await assess(m,mkr.data[m]||null,0,mkr.failed.length>0,false,true);
+      if(r){ r.hist=histRecord(r); keepSnap(r); }
+    }catch(e){ if(e.message==="cancelado") throw e; }
+    state.lre.done++; var b=$("#lreall"); if(b) b.textContent="Analysing "+state.lre.done+" of "+state.lre.n+"…";
+  }).catch(function(){});
+  state.lre=null; llive.ts=0;
+  if(state.mode==="L") renderLista();
+}
+// Precio y liquidez de ahora de los tokens que sigues (DexScreener, 30 por petición; se guarda 2 minutos).
+// Al llegar, se vuelve a pintar la lista con ellos (avisos de liquidez y de mercado incluidos)
 var llive={ts:0,d:{}};
 async function listaLive(toks){
   var ms=toks.map(function(t){ return t.mint; });
   if(!ms.length) return;
-  if(Date.now()-llive.ts>120000||ms.some(function(m){ return !(m in llive.d); })){
-    var d={};
-    for(var i=0;i<ms.length;i+=30){
-      try{
-        var ps=await jfetch(DEX+ms.slice(i,i+30).join(","));
-        ms.slice(i,i+30).forEach(function(m){ d[m]=null; });
-        (Array.isArray(ps)?ps:[]).forEach(function(p){
-          var m=p.baseToken&&p.baseToken.address, lq=(p.liquidity&&p.liquidity.usd)||0;
-          var cv=/pump/i.test(p.dexId||"")&&!lq;
-          if(m in d&&(!d[m]||lq>d[m].liq||(d[m].cv&&!cv))) d[m]={price:Number(p.priceUsd||0),liq:lq,cv:cv,img:(p.info&&p.info.imageUrl)||(d[m]&&d[m].img)||""};
-          else if(m in d&&d[m]&&!d[m].img&&p.info&&p.info.imageUrl) d[m].img=p.info.imageUrl;
-        });
-      }catch(e){ return; }
-    }
-    llive={ts:Date.now(),d:d};
+  if(!(Date.now()-llive.ts>120000||ms.some(function(m){ return !(m in llive.d); }))) return;
+  var d={};
+  for(var i=0;i<ms.length;i+=30){
+    try{
+      var ps=await jfetch(DEX+ms.slice(i,i+30).join(","));
+      ms.slice(i,i+30).forEach(function(m){ d[m]=null; });
+      (Array.isArray(ps)?ps:[]).forEach(function(p){
+        var m=p.baseToken&&p.baseToken.address, lq=(p.liquidity&&p.liquidity.usd)||0;
+        var cv=/pump/i.test(p.dexId||"")&&!lq;
+        if(m in d&&(!d[m]||lq>d[m].liq||(d[m].cv&&!cv))) d[m]={price:Number(p.priceUsd||0),liq:lq,cv:cv,img:(p.info&&p.info.imageUrl)||(d[m]&&d[m].img)||""};
+        else if(m in d&&d[m]&&!d[m].img&&p.info&&p.info.imageUrl) d[m].img=p.info.imageUrl;
+      });
+    }catch(e){ return; }
   }
-  toks.forEach(function(t){
-    var now=llive.d[t.mint], q=function(a,m){ return document.querySelector("["+a+"='"+m+"']"); };
-    var lp=q("data-lp",t.mint), lc=q("data-lc",t.mint), ll=q("data-ll",t.mint), ld=q("data-ld",t.mint);
-    if(!lp) return;
-    if(now===null){ ld.hidden=false; ld.textContent="It no longer has a market on DexScreener."; return; }
-    if(!now) return;
-    // los tokens guardados antes de que la lista apuntara el logo lo cogen ahora
-    if(now.img&&!t.img&&lista.t[t.mint]){ lista.t[t.mint].img=now.img; saveList(); var av=q("data-av",t.mint); if(av) av.outerHTML=tokAv(now.img,t.sym,t.mint); }
-    if(now.price) lp.textContent=priceUsd(now.price);
-    if(!now.cv) ll.textContent=usd(now.liq);
-    if(t.price&&now.price){
-      var ch=(now.price/t.price-1)*100;
-      if(Math.abs(ch)>=1){ lc.textContent=(ch>0?"+":"")+fmtPct(ch); lc.className="lchg "+(ch>0?"up":"dn"); lc.title="Since you checked it"; }
-    }
-    if(!now.cv&&t.liq>=1000&&now.liq<t.liq*0.5){ ld.hidden=false; ld.textContent="Liquidity has dropped "+Math.round((1-now.liq/t.liq)*100)+"% since you checked it."; }
-  });
+  llive={ts:Date.now(),d:d};
+  // los tokens guardados antes de que la lista apuntara el logo lo cogen ahora
+  var got=false;
+  toks.forEach(function(t){ var n=d[t.mint]; if(n&&n.img&&lista.t[t.mint]&&!lista.t[t.mint].img){ lista.t[t.mint].img=n.img; got=true; } });
+  if(got) saveList();
+  if(state.mode==="L") renderLista(true);
 }
 // Logo del token (o sus iniciales si no tiene o no carga)
 function tokAv(img,sym,mint){
@@ -2731,7 +2983,7 @@ async function paintBundle(){
   // Un lanzamiento en rojo cuenta como una alerta fuerte más (el círculo y el post de X la cuentan); si además
   // sube el veredicto se guarda en el historial. Se repinta una sola vez: la segunda pasada ya tiene r.launch
   var first=!r.launch; r.launch=v;
-  if(raiseByLaunch(r,v)||(first&&v.s==="bad")){ if(r.launchLvl){ r.hist=histRecord(r); keepSnap(r); } renderToken(true); return; }
+  if(raiseByLaunch(r,v)||(first&&v.s==="bad")){ if(r.launchLvl){ r.hist=histRecord(r); keepSnap(r,false,true); } renderToken(true); return; }
   if(nS>=SRE.SERIAL_WARN) extra+="<p class='hint'>Wallet that paid for the launch: <a href='#' class='mono' data-analyze='"+esc(b.creator)+"' title='Analyse this wallet'>"+esc(short(b.creator))+"</a></p>";
   box.className="lt lt-"+v.s;
   box.innerHTML="<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>"+esc(v.base||v.t)+"</span>"+extra+"</div>";
@@ -3759,6 +4011,14 @@ document.addEventListener("click",function(ev){
   if(cpf){ conf.pf=cpf.getAttribute("data-cpf"); saveConf(); renderConf(); return; }
   var cfw=ev.target.closest&&ev.target.closest("[data-cfw]");
   if(cfw){ var wl=cfw.closest(".cf-row").querySelector(".cf-wl"); wl.hidden=!wl.hidden; cfw.setAttribute("aria-expanded",String(!wl.hidden)); cfw.textContent=wl.hidden?"See wallets":"Hide wallets"; return; }
+  var lfb=ev.target.closest&&ev.target.closest("[data-lf]");
+  if(lfb){ state.lf=lfb.getAttribute("data-lf"); state.lallT=false; renderLista(true); return; }
+  if(ev.target.closest&&ev.target.closest("[data-lgo]")){ var mw=$("#mlw"); if(mw) mw.scrollIntoView({behavior:"smooth",block:"start"}); return; }
+  if(ev.target.id==="lreall"){ reanalyzeList(); return; }
+  if(ev.target.id==="lallt"){ state.lallT=true; renderLista(true); return; }
+  if(ev.target.id==="lconf"){ var fv=Object.keys(lista.w).filter(function(k){ return lista.w[k].fav; }), rc=addAddrs(fv.join(" "));
+    state.cmsg=rc.added?"Added "+rc.added+" wallets you follow.":(rc.full?"The group is full ("+CMAX+" wallets).":"The wallets you follow were already in the group.");
+    setMode("C"); window.scrollTo(0,0); return; }
   if(ev.target.id==="chgBtnL"){ checkChanges(Object.keys(lista.w).filter(function(k){return lista.w[k].fav;}),"L"); return; }
   if(ev.target.id==="cchg"){ if(conf.cart.length) checkChanges(conf.cart.slice(),"conf"); return; }
   if(ev.target.id==="chgcopy"){ copyText(chgText(state.chg),ev.target); return; }
