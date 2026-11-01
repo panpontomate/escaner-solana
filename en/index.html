@@ -758,6 +758,228 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
   #results.wmode .wa .wan{flex:none}
   #results.wmode .tok.wt .wfl{grid-template-columns:repeat(4,minmax(0,1fr))}
 }
+
+/* ===== Confluencia (diseño de la plantilla maquetas/confluencia) ===== */
+#cresults .card{margin-top:16px}
+.cf-hero{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:center;padding:28px 0 4px}
+.cf-hero .kick{display:flex;align-items:center;gap:8px}
+.cf-vmini{display:none;width:40px;height:30px}
+#cresults .cf-h1{display:block;font:800 clamp(2rem,4.4vw,3.1rem)/1.05 var(--f-display);letter-spacing:-.015em;margin:14px 0 0;color:#f7f4ff}
+.cf-h1 em{font-style:normal;color:var(--kick)}
+.cf-sub{margin:16px 0 0;color:#ddd7f5;font-size:1.06rem;max-width:520px}
+.cf-venn{max-width:340px;width:100%;justify-self:center;aspect-ratio:1.25}
+.cf-venn svg{width:100%;height:100%;overflow:visible}
+.cf-venn .mid{font:800 15px var(--f-display);fill:#140e31}
+@keyframes cfFloat{50%{transform:translateY(-6px)}}
+.cf-venn circle.w{animation:cfFloat 6s ease-in-out infinite}
+.cf-venn circle.w:nth-of-type(2){animation-delay:-2s}.cf-venn circle.w:nth-of-type(3){animation-delay:-4s}
+@media (prefers-reduced-motion:reduce){.cf-venn circle.w{animation:none}}
+.cf-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0 6px;padding:0;list-style:none;counter-reset:cfs}
+.cf-steps li{background:rgba(34,26,82,.6);border:1px solid rgba(196,181,253,.18);border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:center}
+.cf-steps li::before{counter-increment:cfs;content:counter(cfs);flex:none;width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font:800 1rem var(--f-display);background:linear-gradient(135deg,#8b5cf6,#7ab8c4);color:#140e31}
+.cf-steps li.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.cf-steps b{display:block;font-size:.95rem}
+.cf-steps span{color:var(--muted);font-size:.85rem}
+#cresults h2{font:700 1.35rem/1.2 var(--f-display);margin:0;display:flex;align-items:center;gap:8px}
+.cf-hrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.cf-cap{display:flex;align-items:center;gap:10px;font-size:.9rem;color:var(--muted)}
+.cf-cap b{color:var(--fg)}
+.cf-bar{width:120px;height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.cf-bar i{display:block;height:100%;background:linear-gradient(90deg,#8b5cf6,#7ab8c4);border-radius:99px}
+.cf-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.cf-chip{position:relative;display:flex;align-items:center;gap:10px;padding:7px 8px 7px 7px;border-radius:999px;background:var(--surface-2);border:1px solid transparent;min-width:0}
+/* toda la ficha abre el análisis de la wallet; la × queda por encima */
+.cf-chip .t a::after{content:"";position:absolute;inset:0;border-radius:inherit}
+.cf-x{position:relative;z-index:1}
+.cf-chip:hover{border-color:rgba(196,181,253,.4)}
+.cf-ava{width:34px;height:34px;border-radius:50%;flex:none;display:inline-grid;place-items:center;font:800 .78rem var(--f-body);color:#140e31;box-shadow:0 0 0 2px rgba(14,9,38,.9);vertical-align:middle}
+.cf-chip .t{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.cf-chip .t a{font-size:.9rem;font-weight:700;color:var(--fg);text-decoration:none;white-space:nowrap}
+.cf-chip .t a:hover{text-decoration:underline}
+.cf-chip .t span{font-family:var(--f-mono);font-size:.74rem;color:#9a91c9;white-space:nowrap}
+.cf-pnl{font-size:.74rem;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.cf-pnl.up{background:var(--bajo-bg);color:var(--bajo)}.cf-pnl.dn{background:var(--alto-bg);color:var(--alto)}.cf-pnl.na{background:#2a2350;color:#9a91c9}
+.cf-x{background:transparent;border:0;color:#9a91c9;width:28px;height:28px;border-radius:50%;font-size:1rem;line-height:1;cursor:pointer;flex:none}
+.cf-x:hover{background:rgba(255,107,107,.15);color:var(--alto)}
+.cf-more{display:none}
+.cf-empty{text-align:center;padding:22px 10px 6px}
+.cf-empty .ill{font-size:2.2rem;color:var(--muted)}
+.cf-empty p{margin:6px 0 0}
+.cf-adder{display:flex;gap:8px;margin-top:14px}
+.cf-adder input{flex:1;min-width:0}
+.cf-quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.cf-q{background:rgba(196,181,253,.08);border:1px solid rgba(196,181,253,.22);border-radius:12px;padding:8px 12px;font-size:.88rem;font-weight:600;color:#e4dffa;cursor:pointer;display:flex;gap:6px;align-items:center;min-height:38px}
+.cf-q small{color:#9a91c9;font-weight:600}
+.cf-q:disabled{opacity:.5;cursor:default}
+.cf-clear{margin-left:auto;color:#9a91c9}
+.cf-set{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-top:20px;padding-top:18px;border-top:1px solid rgba(196,181,253,.16)}
+.cf-slider label{font-weight:700;font-size:.95rem;display:block}
+.cf-val{font:800 1.6rem/1 var(--f-display);color:var(--kick);margin:8px 0 2px}
+.cf-val small{font:600 .9rem var(--f-body);color:var(--muted)}
+#cmin{width:100%;accent-color:var(--accent);margin:10px 0 0;height:30px;padding:0;background:transparent}
+.cf-dots{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.cf-dots i{width:14px;height:14px;border-radius:50%;background:var(--surface-2);border:1px solid rgba(196,181,253,.25)}
+.cf-dots i.on{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px rgba(122,184,196,.6)}
+.cf-toggles{display:grid;gap:12px;align-content:start}
+.cf-tg{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.92rem}
+.cf-tg small{display:block;color:#9a91c9;font-size:.8rem}
+.cf-tgw{flex-wrap:wrap}
+.cf-sw{width:48px;height:28px;border-radius:99px;background:var(--surface-2);position:relative;flex:none;border:0;cursor:pointer;padding:0}
+.cf-sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#b4acdc;transition:left .2s}
+.cf-sw[aria-checked="true"]{background:var(--accent)}.cf-sw[aria-checked="true"]::after{left:23px;background:#140e31}
+.cf-seg{display:inline-flex;background:var(--surface-2);border-radius:14px;padding:3px;gap:2px;flex-wrap:wrap}
+.cf-seg button{border:0;background:transparent;padding:7px 12px;border-radius:11px;font-weight:700;font-size:.85rem;color:var(--muted);cursor:pointer;min-height:34px}
+.cf-seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+.cf-seg button:disabled{opacity:.45;cursor:default}
+.cf-go{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:20px;padding-top:18px;border-top:1px solid rgba(196,181,253,.16)}
+.cf-save{display:flex;gap:8px;flex:1 1 300px;min-width:0}
+.cf-save input{flex:1;min-width:0}
+.cf-big{font-size:1.05rem;padding:15px 26px;box-shadow:0 10px 30px rgba(122,184,196,.28)}
+.cf-big:disabled{box-shadow:none}
+.cf-mbar{display:none}
+.cf-rhead{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;align-items:center;margin-top:10px}
+.cf-n{font:800 3rem/1 var(--f-display);color:#fff}
+.cf-n small{font:700 1rem var(--f-body);color:var(--muted);margin-left:6px}
+.cf-riskbar{display:flex;height:14px;border-radius:99px;overflow:hidden;margin-top:12px;gap:3px}
+.cf-riskbar i{display:block}
+.cf-legend{display:flex;gap:14px;margin-top:8px;font-size:.84rem;color:var(--muted);flex-wrap:wrap}
+.cf-legend b{color:var(--fg)}
+.cf-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.cf-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cf-stat{background:var(--surface-2);border-radius:16px;padding:12px;min-width:0}
+.cf-stat b{display:block;font:800 1.3rem var(--f-display);overflow-wrap:anywhere}
+.cf-stat span{font-size:.8rem;color:var(--muted)}
+.cf-res .sub{color:var(--muted);font-size:.86rem;margin:14px 0 0}
+.cf-tlist{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:16px}
+.cf-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;background:rgba(24,17,62,.96);border:1px solid rgba(196,181,253,.24);border-left:4px solid var(--c,var(--line));border-radius:20px;padding:14px 16px}
+.cf-row.lvl-alto{--c:var(--alto)}.cf-row.lvl-medio{--c:var(--medio)}.cf-row.lvl-bajo{--c:var(--bajo)}
+.cf-rank{font:800 1.1rem var(--f-display);color:#9a91c9;width:22px;text-align:center}
+.cf-mid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:center;min-width:0}
+.cf-tl{display:flex;align-items:center;gap:12px;min-width:0}
+.cf-logo{position:relative;width:42px;height:42px;border-radius:14px;flex:none;display:grid;place-items:center;font:800 .9rem var(--f-body);color:#140e31;overflow:hidden}
+.cf-logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--surface-2)}
+.cf-tn{min-width:0}
+.cf-tn b{font:700 1.1rem var(--f-display);overflow-wrap:anywhere}
+.cf-tn .pill{display:inline-block;margin-left:8px;vertical-align:2px}
+.cf-tn .why{display:block;color:var(--muted);font-size:.85rem;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cf-ov{display:flex;flex-direction:column;gap:6px;min-width:0}
+.cf-meter{display:flex;gap:4px}
+.cf-meter i{flex:1;height:10px;border-radius:4px;background:var(--surface-2);border:0;box-shadow:none;width:auto}
+.cf-meter i.on{background:linear-gradient(180deg,#9fd3dc,#7ab8c4)}
+.cf-meter.bar{height:10px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.cf-meter.bar i{flex:none;display:block;height:100%;background:linear-gradient(180deg,#9fd3dc,#7ab8c4)}
+.cf-ovt{font-size:.84rem;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cf-ovt b{color:var(--fg)}
+.cf-stack{display:inline-flex}
+.cf-stack .cf-ava{width:26px;height:26px;font-size:.6rem;margin-left:-7px}
+.cf-stack .cf-ava:first-child{margin-left:0}
+.cf-plus{background:var(--surface-2)!important;color:var(--fg)!important}
+.cf-tr{text-align:right;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.cf-tr .v{font-weight:700}
+.cf-tr small{color:#9a91c9;font-size:.78rem}
+.cf-tact{display:flex;gap:6px}
+.cf-wl{grid-column:1/-1;border-top:1px solid rgba(196,181,253,.16);padding-top:6px}
+.cf-wl .cf-ava{width:24px;height:24px;font-size:.6rem;margin-right:4px}
+.cf-wl .links{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:8px;font-size:.88rem}
+.cf-share{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.cf-warn{margin-top:14px;padding:12px 14px;border-radius:16px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);font-size:.86rem;color:#f5dfa8}
+.cf-two{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.cf-ico{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:rgba(139,92,246,.22);color:#c4b5fd;font-size:1.1rem;flex:none}
+.cf-saved{display:grid;gap:10px;margin-top:14px}
+.cf-sv{display:flex;align-items:center;gap:12px;background:var(--surface-2);border-radius:18px;padding:12px 14px}
+.cf-sv .t{flex:1;min-width:0}
+.cf-sv .t b{display:block;overflow-wrap:anywhere}
+.cf-sv .t span{color:#9a91c9;font-size:.82rem}
+.cf-tag{font-size:.72rem;font-weight:800;padding:3px 8px;border-radius:99px;background:rgba(122,184,196,.16);color:var(--kick);white-space:nowrap}
+.cf-tag.off{background:rgba(196,181,253,.12);color:#9a91c9}
+.cf-svb{display:flex;gap:6px;align-items:center}
+.cf-svb .copy{min-height:36px;padding:0 10px}
+.cf-disc textarea{width:100%;margin-top:12px}
+.cf-dgo{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:10px}
+@media (max-width:760px){
+  .cf-hero{grid-template-columns:1fr;padding-top:14px;gap:0}
+  .cf-venn{display:none}
+  .cf-vmini{display:inline-block}
+  #cresults .cf-h1{font-size:1.85rem;margin-top:10px}
+  .cf-sub{font-size:.95rem;margin-top:10px}
+  .cf-steps{gap:6px;margin:16px 0 4px}
+  .cf-steps li{padding:8px;gap:6px;border-radius:14px;flex-direction:column;text-align:center}
+  .cf-steps li::before{width:26px;height:26px;border-radius:9px;font-size:.85rem}
+  .cf-steps b{font-size:.76rem;line-height:1.2}
+  .cf-steps span{display:none}
+  #cresults .card{padding:16px;border-radius:22px}
+  #cresults h2{font-size:1.2rem}
+  .cf-chips{gap:8px;margin-top:12px;padding:7px 7px 0 0}
+  .cf-chip{flex:1 1 calc(50% - 8px);position:relative;padding:6px 12px 6px 6px;gap:8px}
+  .cf-chip .t{flex:1}
+  .cf-chip .t a,.cf-chip .t span{overflow:hidden;text-overflow:ellipsis}
+  .cf-chip .t a{font-size:.84rem}
+  .cf-chip .cf-pnl{display:none}
+  .cf-chip .cf-ava{width:30px;height:30px;font-size:.7rem;box-shadow:0 0 0 2px rgba(14,9,38,.9),0 0 0 4px var(--ring,transparent)}
+  .cf-chip.up .cf-ava{--ring:var(--bajo)}.cf-chip.dn .cf-ava{--ring:var(--alto)}
+  .cf-x{position:absolute;top:-7px;right:-5px;width:22px;height:22px;font-size:.8rem;background:#2f2566;border:1px solid rgba(196,181,253,.35);color:#e4dffa;display:grid;place-items:center;padding:0}
+  .cf-x::after{content:"";position:absolute;inset:-9px -4px -9px -9px}
+  .cf-chips.fold .cf-chip:nth-of-type(n+6){display:none}
+  .cf-more{display:block;flex:1 1 calc(50% - 8px);border:0;background:rgba(196,181,253,.1);border-radius:999px;padding:9px;font-weight:700;color:#c4b5fd;font-size:.86rem;cursor:pointer}
+  .cf-chips:not(.fold) .cf-more,.cf-chips.few .cf-more{display:none}
+  .cf-adder{flex-direction:column}
+  .cf-quick{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-right:-16px}
+  .cf-quick::-webkit-scrollbar{display:none}
+  .cf-q{flex:none}
+  .cf-clear{margin-left:0}
+  .cf-set,.cf-rhead,.cf-two{grid-template-columns:1fr}
+  .cf-set{gap:16px}
+  .cf-sw{width:52px;height:32px}.cf-sw::after{width:26px;height:26px}.cf-sw[aria-checked="true"]::after{left:23px}
+  .cf-seg button{min-height:36px}
+  .cf-go{margin-top:14px;padding-top:14px}
+  .cf-big{display:none}
+  .cf-save{flex:1 1 100%}
+  body[data-m=C]{padding-bottom:96px}
+  body[data-m=C] .cf-mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px 14px calc(10px + env(safe-area-inset-bottom));gap:10px;align-items:center;background:rgba(14,9,38,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(196,181,253,.2)}
+  .cf-mbar .s{flex:1;min-width:0;font-size:.8rem;color:var(--muted);line-height:1.25}
+  .cf-mbar .s b{display:block;color:var(--fg);font-size:.92rem}
+  .cf-mbar .btn{flex:none;min-height:44px;box-shadow:0 8px 24px rgba(122,184,196,.3)}
+  .cf-n{font-size:2.4rem}
+  .cf-stats{gap:6px}
+  .cf-stat{padding:10px;border-radius:14px}
+  .cf-stat b{font-size:1.05rem}
+  .cf-stat span{font-size:.72rem}
+  .cf-row{grid-template-columns:minmax(0,1fr);gap:10px;padding:12px 14px}
+  .cf-rank{display:none}
+  .cf-mid{grid-template-columns:minmax(0,1fr);gap:10px}
+  .cf-tn .why{white-space:normal}
+  .cf-tr{flex-direction:row;flex-wrap:wrap;justify-content:space-between;align-items:center;text-align:left;gap:8px}
+  .cf-tr small{display:none}
+  .cf-tact{margin-left:auto}
+  .cf-tact .btn{min-height:38px}
+  .cf-sv{display:grid;grid-template-columns:auto 1fr auto;column-gap:10px;row-gap:6px}
+  .cf-sv .cf-stack{grid-row:1/span 2}
+  .cf-sv .t{grid-column:2;grid-row:1}
+  .cf-sv .cf-tag{grid-column:2;grid-row:2;justify-self:start}
+  .cf-svb{grid-column:3;grid-row:1/span 2;flex-direction:column}
+}
+/* hasta 700 px la web lleva las pestañas fijas abajo (71 px): la barra de comparar va justo encima */
+@media (max-width:700px){
+  body[data-m=C]{padding-bottom:196px}
+  body[data-m=C] .cf-mbar{bottom:calc(71px + env(safe-area-inset-bottom));padding-bottom:10px;border-bottom:1px solid rgba(196,181,253,.14)}
+}
+/* cifras del resultado: la cantidad en dólares en su propia línea para que no se parta */
+@media (max-width:420px){
+  .cf-stats{grid-template-columns:1fr 1fr}
+  .cf-stat:last-child{grid-column:1/-1}
+  .cf-stat b{white-space:nowrap}
+}
+@media (max-width:380px){ .cf-chip .t a{font-size:.78rem;letter-spacing:-.02em} .cf-chip{gap:7px} }
+@media (max-width:340px){
+  .cf-chip,.cf-more{flex-basis:100%}
+  .cf-chips.fold .cf-chip:nth-of-type(n+4){display:none}
+  .cf-chips.fold.few .cf-more{display:block}
+  #cresults .cf-h1{font-size:1.65rem}
+  .cf-steps b{font-size:.7rem}
+  body[data-m=C] .cf-mbar{padding-left:12px;padding-right:12px;gap:8px}
+  .cf-mbar .s{font-size:.74rem}.cf-mbar .s b{font-size:.84rem}
+  .cf-mbar .btn{padding:11px 14px}
+}
 </style>
 </head>
 <body>
@@ -1239,96 +1461,174 @@ function addAddrs(text){
   return {added:added,bad:bad,full:full};
 }
 function confPct(n){ return Math.round(n)+"%"; }
+// Cada wallet tiene su color (sale de la dirección): la misma wallet se reconoce en el grupo y en el resultado
+var CF_COL=["#a78bfa","#7ab8c4","#f0abfc","#fbbf24","#86efac","#fda4af","#93c5fd","#c4b5fd","#fcd34d","#5eead4"];
+function cfCol(a){ var h=0; for(var i=0;i<a.length;i++) h=(h*31+a.charCodeAt(i))>>>0; return CF_COL[h%CF_COL.length]; }
+function cfIni(a){
+  var e=lista.w[a], nm=e&&e.name?e.name.replace(/[^0-9A-Za-zÀ-ÿ ]/g," ").trim():"";
+  if(!nm) return a.slice(0,2);
+  var p=nm.split(/\s+/);
+  return (p.length>1?p[0].charAt(0)+p[1].charAt(0):nm.slice(0,2)).toUpperCase();
+}
+function cfAva(a){ return "<span class='cf-ava' style='background:"+cfCol(a)+"' aria-hidden='true'>"+esc(cfIni(a))+"</span>"; }
+function cfPnl(a){ var p=(state.cres&&state.cres.pnl&&state.cres.pnl[a])||(lista.w[a]&&lista.w[a].pnl); return p&&p.st?p:null; }
+function cfPnlBadge(p){
+  if(!p) return "";
+  if(p.st==="unk") return "<span class='cf-pnl na'>little data</span>";
+  var pc=Math.abs(Math.round((p.ret||0)*100)).toLocaleString("en-US");
+  var c=p.st==="win"?"up":(p.st==="lose"?"dn":"na");
+  return "<span class='cf-pnl "+c+"' title='Estimate from its latest swap buys and sells'>"+(c==="up"?"+":(c==="dn"?"−":""))+pc+"%</span>";
+}
+function cfChip(a){
+  var e=lista.w[a], p=cfPnl(a), nm=e&&e.name;
+  return "<div class='cf-chip"+(p&&p.st==="win"?" up":(p&&p.st==="lose"?" dn":""))+"'>"+cfAva(a)+
+    "<span class='t'><a href='#' data-analyze='"+esc(a)+"' title='Open the analysis of this wallet'>"+esc(nm||short(a))+"</a>"+
+    "<span>"+(nm?esc(short(a)):"no name")+"</span></span>"+cfPnlBadge(p)+
+    "<button class='cf-x' type='button' data-delc='"+esc(a)+"' title='Remove from the group' aria-label='Remove from the group'>×</button></div>";
+}
+function cfMinTxt(k,n){ return k+" of "+n+" <small>wallets ("+Math.round(k/n*100)+" %)</small>"; }
+function cfDots(k,n){ var s=""; for(var i=0;i<n;i++) s+="<i"+(i<k?" class='on'":"")+"></i>"; return s; }
+function cfSw(id,on,label,sub){
+  return "<div class='cf-tg'><span>"+label+(sub?"<small>"+sub+"</small>":"")+"</span>"+
+    "<button class='cf-sw' type='button' id='"+id+"' role='switch' aria-checked='"+(!!on)+"' aria-label='"+label+"'></button></div>";
+}
+function cfVenn(center){
+  return "<div class='cf-venn' aria-hidden='true'><svg viewBox='0 0 300 240'><defs>"+
+    "<radialGradient id='cfg1' cx='50%' cy='40%'><stop offset='0' stop-color='#a78bfa' stop-opacity='.75'/><stop offset='1' stop-color='#7c3aed' stop-opacity='.35'/></radialGradient>"+
+    "<radialGradient id='cfg2' cx='50%' cy='40%'><stop offset='0' stop-color='#9fd3dc' stop-opacity='.7'/><stop offset='1' stop-color='#3b8796' stop-opacity='.3'/></radialGradient>"+
+    "<radialGradient id='cfg3' cx='50%' cy='40%'><stop offset='0' stop-color='#f0abfc' stop-opacity='.6'/><stop offset='1' stop-color='#a21caf' stop-opacity='.3'/></radialGradient></defs>"+
+    "<circle class='w' cx='112' cy='100' r='72' fill='url(#cfg1)' stroke='#c4b5fd' stroke-opacity='.5'/>"+
+    "<circle class='w' cx='188' cy='100' r='72' fill='url(#cfg2)' stroke='#9fd3dc' stroke-opacity='.5'/>"+
+    "<circle class='w' cx='150' cy='160' r='72' fill='url(#cfg3)' stroke='#f0abfc' stroke-opacity='.45'/>"+
+    "<circle cx='150' cy='122' r='25' fill='#7ab8c4'/><text class='mid' x='150' y='128' text-anchor='middle'>"+esc(String(center))+"</text></svg></div>";
+}
+var CF_MINI="<svg class='cf-vmini' viewBox='0 0 40 30' aria-hidden='true'><circle cx='14' cy='12' r='10' fill='#8b5cf6' fill-opacity='.7'/><circle cx='26' cy='12' r='10' fill='#7ab8c4' fill-opacity='.7'/><circle cx='20' cy='20' r='10' fill='#d946ef' fill-opacity='.55'/></svg>";
 function renderConf(){
-  var n=conf.cart.length;
-  var minN=Math.max(2,Math.ceil(conf.pct/100*n));
-  var h=storageWarningHtml()+"<div class='card'>"+
-    "<div class='eyebrow'>Current group · "+n+(n===1?" wallet":" wallets")+" (up to "+CMAX+")</div>"+
-    (n?"<div style='margin-top:6px'>"+conf.cart.map(function(a){
-      return "<div class='lrow' style='padding:8px 0'><div class='main'><div class='hl1'>"+
-        (lista.w[a]&&lista.w[a].name?"<span class='nm'>"+esc(lista.w[a].name)+"</span>":"")+
-        (lista.w[a]&&lista.w[a].name?"":wlink(a,'mono'))+(lista.w[a]&&lista.w[a].name?"<a href='#' data-analyze='"+esc(a)+"' class='mono' style='text-decoration:underline dotted;color:inherit'>"+esc(short(a))+"</a>":"")+"<a href='https://solscan.io/account/"+esc(a)+"' target='_blank' rel='noopener' style='font-size:.88rem'>Solscan</a>"+
-        (lista.w[a]&&lista.w[a].pnl?pnlTag(lista.w[a].pnl):"")+"</div></div>"+
-        "<div class='acts'><button class='copy' type='button' data-delc='"+esc(a)+"'>remove</button></div></div>";
-    }).join("")+"</div>":"<p class='lempty'>The group is empty. Use the ⊕ button next to each wallet, paste addresses below or add the ones you follow.</p>")+
-    "<form id='cform' autocomplete='off' style='margin-top:12px'><div class='row'>"+
+  var n=conf.cart.length, minN=Math.max(2,Math.ceil(conf.pct/100*n)), done=!!state.cres;
+  var nfav=Object.keys(lista.w).filter(function(k){ return lista.w[k].fav; }).length;
+  var h=storageWarningHtml()+
+    "<header class='cf-hero'><div><p class='kick'>"+CF_MINI+"Confluence</p>"+
+      "<h2 class='cf-h1'>Which tokens do your wallets have <em>in common</em>?</h2>"+
+      "<p class='cf-sub'>Put together the wallets you care about (whales, traders you follow, the ones that got into a token early) and see where they overlap. Every token comes with its risk, just like in the scanner.</p></div>"+
+      cfVenn(done?state.cres.rows.filter(function(r){ return conf.showAll||!(r.known||r.type==="STABLE"); }).length:"?")+"</header>"+
+    "<ol class='cf-steps'>"+
+      "<li"+(n>=2?" class='on'":"")+"><div><b>Gather the wallets</b><span>From 2 to "+CMAX+", from anywhere</span></div></li>"+
+      "<li"+(n>=2?" class='on'":"")+"><div><b>Choose what counts</b><span>How many must overlap, and which ones</span></div></li>"+
+      "<li"+(done?" class='on'":"")+"><div><b>See what they share</b><span>Tokens in common, with their risk</span></div></li></ol>";
+  // el grupo
+  h+="<section class='card cf-group'><div class='cf-hrow'><h2>Your group</h2>"+
+    "<div class='cf-cap'><span><b>"+n+"</b> of "+CMAX+" wallets</span><span class='cf-bar'><i style='width:"+Math.round(n/CMAX*100)+"%'></i></span></div></div>"+
+    (n?"<div class='cf-chips"+(state.cfAll?"":" fold")+(n<=5?" few":"")+"'>"+conf.cart.map(cfChip).join("")+
+        (n>3?"<button class='cf-more' type='button' id='cfmore'>See all "+n+"</button>":"")+"</div>":
+      "<div class='cf-empty'><div class='ill' aria-hidden='true'>◎ ◎</div><p><b>No wallets yet</b></p>"+
+      "<p class='hint'>Paste addresses below, add the ones you follow, or bring them from Whales with the ⊕ button.</p></div>")+
+    "<form id='cform' class='cf-adder' autocomplete='off'>"+
       "<input id='cadd' type='text' spellcheck='false' placeholder='Paste one or more addresses (separated by spaces or commas)'>"+
-      "<button class='btn ghost' type='submit'>Add</button></div></form>"+
-    "<div class='actions' style='margin-top:12px'><button class='btn small ghost' type='button' id='caddfav'>Add the wallets I follow</button>"+
-      (n?"<button class='btn small ghost' type='button' id='cchg'>Check what the group changed</button><button class='btn small ghost' type='button' id='cclear'>Empty group</button>":"")+"</div>"+
-    "<div style='display:grid;gap:12px;margin-top:18px'>"+
-      "<label class='check' style='flex-wrap:wrap'>Show tokens held by at least "+
-        "<input id='cpct' type='number' min='5' max='100' step='5' value='"+conf.pct+"' style='width:76px;padding:8px 10px'> % of the wallets"+
-        "<span style='color:var(--muted)'>"+(n>=2?"(with "+n+" wallets, at least "+minN+(conf.pnl&&conf.pf!=="all"?" if all are compared; fewer if the result filter leaves some out":"")+")":"(at least 2 wallets)")+"</span></label>"+
-      "<label class='check'><input id='cshow' type='checkbox'"+(conf.showAll?" checked":"")+"> Also show SOL, stablecoins and well-known tokens</label>"+
-      "<label class='check' style='flex-wrap:wrap'><input id='cpnl' type='checkbox'"+(conf.pnl?" checked":"")+"> Estimate whether each wallet wins or loses (uses Helius history; slower)</label>"+
-      "<label class='check' style='flex-wrap:wrap'>Wallets to compare: "+
-        "<select id='cpf'"+(conf.pnl?"":" disabled")+"><option value='all'"+(conf.pf==="all"?" selected":"")+">All</option><option value='win'"+(conf.pf==="win"?" selected":"")+">Only winners</option><option value='lose'"+(conf.pf==="lose"?" selected":"")+">Only losers</option></select></label>"+
-    "</div>"+
-    "<div class='row' style='margin-top:16px'>"+
-      "<input id='cname' type='text' placeholder='Name to save this group (for example: TAO whales)' value='"+esc(state.cname||"")+"'>"+
-      "<button class='btn ghost' type='button' id='csave'>Save group</button>"+
-      "<button class='btn' type='button' id='cgo'"+(n<2?" disabled":"")+">Compare</button></div>"+
-    "<p class='hint' id='cmsg'>"+esc(state.cmsg||"")+"</p></div>";
-  var ids=Object.keys(conf.saved).sort(function(a,b){ return (conf.saved[b].ts||0)-(conf.saved[a].ts||0); });
-  h+="<div class='lsec'><div class='eyebrow'>Saved confluences · "+ids.length+"</div>"+
-    (ids.length?ids.map(function(id){
-      var c=conf.saved[id];
-      return "<div class='lrow'><div class='main'><div class='nm'>"+esc(c.name)+(conf.cur===id?" <span class='tag seen'>open</span>":"")+"</div>"+
-        "<div class='meta'><span>"+c.wallets.length+" wallets</span><span>saved "+hace(c.ts)+"</span>"+
-        (c.res?"<span>"+c.res.rows.length+" tokens in common</span>":"<span>not compared yet</span>")+"</div></div>"+
-        "<div class='acts'><button class='btn small ghost' type='button' data-copen='"+esc(id)+"'>Open</button>"+
-        "<button class='copy' type='button' data-cdel='"+esc(id)+"'>delete</button></div></div>";
-    }).join(""):"<div class='lempty'>You have not saved any group yet. Name it and press “Save group” to repeat the comparison later.</div>")+"</div>";
+      "<button class='btn ghost' type='submit'>Add</button></form>"+
+    "<div class='cf-quick'><button class='cf-q' type='button' id='caddfav'>★ Wallets I follow"+(nfav?" <small>"+nfav+"</small>":"")+"</button>"+
+      "<button class='cf-q' type='button' id='cgoh'>🐳 From the Whales of a token</button>"+
+      (n?"<button class='cf-q' type='button' id='cchg'>⟳ Check the group for changes</button><button class='cf-q cf-clear' type='button' id='cclear'>Clear</button>":"")+"</div>"+
+    "<p class='hint' id='cmsg'>"+esc(state.cmsg||"")+"</p>";
+  // ajustes
+  if(n>=2){
+    h+="<div class='cf-set'><div class='cf-slider'><label for='cmin'>How many must overlap?</label>"+
+        "<div class='cf-val' id='cminv'>"+cfMinTxt(minN,n)+"</div>"+
+        "<input id='cmin' type='range' min='2' max='"+n+"' step='1' value='"+minN+"'>"+
+        "<div class='cf-dots' id='cdots' aria-hidden='true'>"+cfDots(minN,n)+"</div>"+
+        (conf.pnl&&conf.pf!=="all"?"<p class='hint'>With the result filter only the wallets that pass it count, so the minimum can go down.</p>":"")+"</div>"+
+      "<div class='cf-toggles'>"+
+        cfSw("cpnl",conf.pnl,"Estimate whether each wallet wins or loses","Slower: uses the Helius history")+
+        cfSw("cshow",conf.showAll,"Include SOL, stablecoins and very well-known tokens","")+
+        "<div class='cf-tg cf-tgw'><span>Compare only</span><div class='cf-seg' role='group' aria-label='Wallets to include in the comparison'>"+
+          [["all","All"],["win","Winners"],["lose","Losers"]].map(function(o){
+            return "<button type='button' data-cpf='"+o[0]+"' aria-pressed='"+(conf.pf===o[0])+"'"+(conf.pnl?"":" disabled")+">"+o[1]+"</button>";
+          }).join("")+"</div></div></div></div>";
+  }
+  h+="<div class='cf-go'><div class='cf-save'>"+
+      "<input id='cname' type='text' placeholder='Name to save the group (for example: TAO whales)' value='"+esc(state.cname||"")+"'>"+
+      "<button class='btn ghost' type='button' id='csave'>Save</button></div>"+
+    "<button class='btn cf-big' type='button' id='cgo'"+(n<2?" disabled":"")+">"+(n<2?"Add at least 2 wallets":"Compare "+n+" wallets →")+"</button></div></section>";
+  // en el móvil, el botón de comparar va fijo abajo
+  h+="<div class='cf-mbar'><div class='s'>"+(n>=2?"<b>"+n+" wallets in the group</b>minimum overlap: <span id='cmbk'>"+minN+"</span>":
+      "<b>"+(n?"1 more wallet needed":"The group is empty")+"</b>add at least 2 wallets")+"</div>"+
+    "<button class='btn' type='button' id='cgo2'"+(n<2?" disabled":"")+">Compare →</button></div>";
   if(state.chg&&state.chg.target==="conf") h+=chgHtml(state.chg);
-  h+="<div class='lsec'><details id='ddet'"+(state.dopen?" open":"")+"><summary class='eyebrow' style='cursor:pointer'>Discover wallets shared by several tokens</summary>"+
-    "<p class='hint' style='margin:8px 0'>Paste 2 to 6 Solana token addresses. I look for people among the top holders of several of them at once. Only the 20 largest accounts of each token are visible, so matches are rare and therefore valuable.</p>"+
-    "<textarea id='dmints' rows='3' spellcheck='false' placeholder='One token address per line'>"+esc(state.dmints||"")+"</textarea>"+
-    "<div class='actions' style='margin:10px 0'><label class='check'>Shared by at least <input id='dmin' type='number' min='2' max='6' value='"+(state.dmin||2)+"' style='width:64px;padding:8px 10px'> tokens</label>"+
-    "<button class='btn small' type='button' id='dgo'>Find matches</button></div>"+
-    (state.disc?discHtml(state.disc):"")+"</details></div>";
   h+="<div id='cres'>"+(state.cres?confResultHtml(state.cres):"")+"</div>";
+  // guardados y descubrir
+  var ids=Object.keys(conf.saved).sort(function(a,b){ return (conf.saved[b].ts||0)-(conf.saved[a].ts||0); });
+  h+="<div class='cf-two'><section class='card'><h2><span class='cf-ico' aria-hidden='true'>▤</span>Saved groups</h2>"+
+    (ids.length?"<div class='cf-saved'>"+ids.map(function(id){
+      var c=conf.saved[id], ws=c.wallets||[];
+      return "<div class='cf-sv'><span class='cf-stack'>"+ws.slice(0,3).map(cfAva).join("")+"</span>"+
+        "<span class='t'><b>"+esc(c.name)+(conf.cur===id?" <span class='tag seen'>open</span>":"")+"</b><span>"+ws.length+" wallets · saved "+hace(c.ts)+"</span></span>"+
+        "<span class='cf-tag"+(c.res?"":" off")+"'>"+(c.res?c.res.rows.length+" in common":"not compared")+"</span>"+
+        "<span class='cf-svb'><button class='btn small ghost' type='button' data-copen='"+esc(id)+"'>Open</button>"+
+        "<button class='copy' type='button' data-cdel='"+esc(id)+"'>delete</button></span></div>";
+    }).join("")+"</div>":"<p class='hint'>You have not saved any group yet. Give it a name and press Save to repeat the comparison later.</p>")+"</section>"+
+    "<section class='card cf-disc'><h2><span class='cf-ico' aria-hidden='true'>⌕</span>Discover wallets</h2>"+
+      "<p class='hint'>Paste 2 to 6 Solana token addresses. I look for people who are among the largest holders of several of them at once. Only the 20 largest accounts of each token are visible, so matches are rare and therefore valuable.</p>"+
+      "<textarea id='dmints' rows='3' spellcheck='false' placeholder='One token address per line'>"+esc(state.dmints||"")+"</textarea>"+
+      "<div class='cf-dgo'><label class='check'>Matching in at least <input id='dmin' type='number' min='2' max='6' value='"+(state.dmin||2)+"' style='width:64px;padding:8px 10px'> tokens</label>"+
+      "<button class='btn small' type='button' id='dgo'>Find matches</button></div>"+
+      (state.disc?discHtml(state.disc):"")+"</section></div>";
   $("#clist").innerHTML=h;
+}
+// La razón principal de su riesgo en una línea: la primera bandera roja o amarilla
+function cfWhy(r){
+  if(r.known) return "Well-known token";
+  var l=(r.lights||[]).filter(function(x){ return x.s==="bad"; })[0]||(r.lights||[]).filter(function(x){ return x.s==="warn"; })[0];
+  return l?String(l.t).split(". ")[0]:"No warning signs";
+}
+function cfRow(r,i,res){
+  var L=LEVELS[r.lvl]||LEVELS["SIN MERCADO"];
+  var img=r.img?"<img src='"+esc(r.img)+"' alt='' loading='lazy' referrerpolicy='no-referrer' onerror=\"this.remove()\">":"";
+  var cells=res.wallets<=12?"<div class='cf-meter'>"+cfDots(r.n,res.wallets)+"</div>":
+    "<div class='cf-meter bar'><i style='width:"+Math.round(r.n/res.wallets*100)+"%'></i></div>";
+  var stack=r.hs.slice(0,6).map(function(x){ return cfAva(x.a); }).join("")+(r.hs.length>6?"<span class='cf-ava cf-plus'>+"+(r.hs.length-6)+"</span>":"");
+  return "<article class='cf-row lvl-"+L.cls+"'><div class='cf-rank'>"+(i+1)+"</div><div class='cf-mid'>"+
+      "<div class='cf-tl'><div class='cf-logo' style='background:"+cfCol(r.mint)+"'><span>"+esc(r.sym.slice(0,2).toUpperCase())+"</span>"+img+"</div>"+
+        "<div class='cf-tn'><b>"+esc(r.sym)+"</b><span class='pill'>"+L.label+"</span><span class='why'>"+esc(cfWhy(r))+"</span></div></div>"+
+      "<div class='cf-ov'>"+cells+"<div class='cf-ovt'><b>"+r.n+" of "+res.wallets+"</b> wallets <span class='cf-stack'>"+stack+"</span></div></div></div>"+
+    "<div class='cf-tr'><span class='v'>"+usd(r.total)+"</span><small>across all · liq. "+usd(r.liq||0)+"</small>"+
+      "<div class='cf-tact'><button class='btn small ghost' type='button' data-analyze='"+esc(r.mint)+"'>Analyse</button>"+
+      "<button class='btn small ghost' type='button' data-cfw aria-expanded='false'>See wallets</button></div></div>"+
+    "<div class='cf-wl' hidden>"+r.hs.map(function(x){
+        return "<div class='lrow' style='padding:8px 0'><div class='main'>"+cfAva(x.a)+" "+wlink(x.a,'mono')+" "+(res.pnl&&res.pnl[x.a]?pnlTag(res.pnl[x.a]):"")+" "+
+          "<a href='https://solscan.io/account/"+esc(x.a)+"' target='_blank' rel='noopener' style='font-size:.88rem;margin-left:8px'>Solscan</a></div>"+
+          "<div class='acts'><span class='v' style='font-variant-numeric:tabular-nums'>"+usd(x.v)+"</span>"+
+          "<button class='btn small ghost' type='button' data-analyze='"+esc(x.a)+"'>Analyse</button></div></div>";
+      }).join("")+
+      "<div class='links'><span class='mono'>"+esc(short(r.mint))+"</span><button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copy token address'>copy</button>"+
+      "<a href='https://solscan.io/token/"+esc(r.mint)+"' target='_blank' rel='noopener'>Solscan</a>"+
+      (r.pair?"<a href='https://dexscreener.com/solana/"+esc(r.pair)+"' target='_blank' rel='noopener'>DexScreener</a>":"")+"</div></div></article>";
 }
 function confResultHtml(res){
   var rows=res.rows.filter(function(r){ return conf.showAll||!(r.known||r.type==="STABLE"); });
   var hid=res.rows.length-rows.length;
   var c={ALTO:0,MEDIO:0,BAJO:0}; rows.forEach(function(r){ if(c[r.lvl]!==undefined) c[r.lvl]++; });
-  var h="<div class='card' style='margin-top:20px'><div class='eyebrow'>Result · "+hace(res.ts)+"</div>"+
-    "<h2 class='verdict'>"+(rows.length?rows.length+(rows.length===1?" token in common":" tokens in common"):"No token in common")+"</h2>"+
-    "<p class='sub'>Tokens with a market held by at least "+res.minN+" of the "+res.wallets+" wallets "+(res.pf==="win"?"that win":(res.pf==="lose"?"that lose":"read"))+" ("+confPct(res.pct)+" or more). "+
+  var total=rows.reduce(function(s,r){ return s+r.total; },0);
+  var win=res.pnl?Object.keys(res.pnl).filter(function(k){ return res.pnl[k].st==="win"; }).length:null;
+  var h="<section class='card cf-res'><div class='eyebrow'>Result · "+hace(res.ts)+"</div><div class='cf-rhead'><div>"+
+      "<div class='cf-n'>"+rows.length+"<small>"+(rows.length===1?"token in common":"tokens in common")+"</small></div>"+
+      (rows.length?"<div class='cf-riskbar' aria-hidden='true'>"+
+          (c.ALTO?"<i style='flex:"+c.ALTO+";background:var(--alto)'></i>":"")+(c.MEDIO?"<i style='flex:"+c.MEDIO+";background:var(--medio)'></i>":"")+
+          (c.BAJO?"<i style='flex:"+c.BAJO+";background:var(--bajo)'></i>":"")+"</div>"+
+        "<div class='cf-legend'><span><i style='background:var(--alto)'></i><b>"+c.ALTO+"</b> high risk</span>"+
+          "<span><i style='background:var(--medio)'></i><b>"+c.MEDIO+"</b> medium</span><span><i style='background:var(--bajo)'></i><b>"+c.BAJO+"</b> low</span></div>":"")+
+    "</div><div class='cf-stats'><div class='cf-stat'><b>"+res.wallets+"</b><span>wallets compared</span></div>"+
+      (win!==null?"<div class='cf-stat'><b>"+win+"</b><span>make money</span></div>":"<div class='cf-stat'><b>"+res.minN+"</b><span>minimum to overlap</span></div>")+
+      "<div class='cf-stat'><b>"+usd(total)+"</b><span>in shared tokens</span></div></div></div>"+
+    "<p class='sub'>Tokens with a market held by at least "+res.minN+" of the "+res.wallets+" wallets "+(res.pf==="win"?"that win":(res.pf==="lose"?"that lose":"read"))+" ("+confPct(res.minN/res.wallets*100)+" or more). "+
       (res.pf&&res.pf!=="all"?"Left out "+(res.allWallets-res.wallets)+" of the "+res.allWallets+" wallets that did not pass the result filter. ":"")+(res.pnlNote||"")+
-      (rows.length?"High "+c.ALTO+" · Medium "+c.MEDIO+" · Low "+c.BAJO+". ":"")+
       (hid?hid+(hid===1?" well-known token or stablecoin hidden. ":" well-known tokens or stablecoins hidden. "):"")+
       (res.noMkt?res.noMkt+(res.noMkt===1?" token without a market skipped. ":" tokens without a market skipped. "):"")+
       (res.mktFailed?res.mktFailed+(res.mktFailed===1?" token could not be checked on DexScreener because of a network error (compare again to include it). ":" tokens could not be checked on DexScreener because of a network error (compare again to include them). "):"")+
-      (res.failed?res.failed+(res.failed===1?" wallet could not be read.":" wallets could not be read."):"")+"</p>"+
-    "<div class='actions'><button class='btn small' type='button' id='ccopy'>Copy top 5 for a post</button></div>"+
-    "<p class='hint'>Sharing a token is not a recommendation: it can be an airdrop, wallets with the same owner, or bots and exchanges that were not filtered out.</p></div>";
-  h+="<div class='list' style='margin-top:14px'>"+rows.map(function(r){
-    var L=LEVELS[r.lvl]||LEVELS["SIN MERCADO"];
-    var av=r.img?"<img src='"+esc(r.img)+"' alt='' loading='lazy' referrerpolicy='no-referrer' onerror=\"this.remove()\">":"";
-    var meta=[].concat(r.type&&TYPES[r.type]?["<span class='tag typ' title='"+esc(TYPES[r.type].note)+"'>"+esc(TYPES[r.type].label)+"</span>"]:[],[
-      "<span>In <span class='v'>"+r.n+" of "+res.wallets+"</span> wallets ("+confPct(r.n/res.wallets*100)+")</span>",
-      "<span>Total value <span class='v'>"+usd(r.total)+"</span></span>",
-      "<span>Liquidity <span class='v'>"+usd(r.liq||0)+"</span></span>",
-      "<span class='mono'>"+esc(short(r.mint))+"</span><button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copy token address'>copy</button>"]);
-    return "<article class='tok lvl-"+L.cls+"'><div class='av' aria-hidden='true'>"+(av||esc(r.sym.slice(0,2).toUpperCase()))+"</div><div style='min-width:0'>"+
-      "<div class='head'><h3>"+esc(r.sym)+(r.name?"<span>"+esc(r.name)+"</span>":"")+"</h3><span class='pill'>"+L.label+"</span></div>"+
-      "<div class='meta'>"+meta.join("")+"</div>"+
-      (r.lights?"<div class='lights'>"+r.lights.map(function(l){
-        return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div><b>"+LKEYS[l.k]+"</b><span>"+esc(l.t)+"</span></div></div>";
-      }).join("")+"</div>":"<ul class='why'><li class='ok'>Well-known token</li></ul>")+
-      "<details class='cdet'><summary>See the "+r.n+" wallets that hold it</summary>"+r.hs.map(function(x){
-        return "<div class='lrow' style='padding:8px 0'><div class='main'>"+wlink(x.a,'mono')+" "+(res.pnl&&res.pnl[x.a]?pnlTag(res.pnl[x.a]):"")+" "+
-          "<a href='https://solscan.io/account/"+esc(x.a)+"' target='_blank' rel='noopener' style='font-size:.88rem;margin-left:8px'>Solscan</a></div>"+
-          "<div class='acts'><span class='v' style='font-variant-numeric:tabular-nums'>"+usd(x.v)+"</span>"+
-          "<button class='btn small ghost' type='button' data-analyze='"+esc(x.a)+"'>Analyse</button></div></div>";
-      }).join("")+"</details>"+
-      "<div class='links'><a href='https://solscan.io/token/"+esc(r.mint)+"' target='_blank' rel='noopener'>Solscan</a>"+
-      (r.pair?"<a href='https://dexscreener.com/solana/"+esc(r.pair)+"' target='_blank' rel='noopener'>DexScreener</a>":"")+"</div>"+
-      "</div></article>";
-  }).join("")+"</div>";
+      (res.failed?res.failed+(res.failed===1?" wallet could not be read.":" wallets could not be read."):"")+"</p>";
+  var show=state.cfRows?rows:rows.slice(0,10);
+  h+="<div class='cf-tlist'>"+show.map(function(r,i){ return cfRow(r,i,res); }).join("")+"</div>";
+  h+="<div class='cf-share'><button class='btn small ghost' type='button' id='ccopy'>Copy top 5 for a post</button>"+
+    (rows.length>show.length?"<button class='btn small ghost' type='button' id='cfrows'>See the other "+(rows.length-show.length)+"</button>":"")+"</div>"+
+    "<div class='cf-warn'>Sharing a token is not a recommendation: it can be an airdrop, wallets with the same owner, or bots and exchanges that were not filtered out.</div></section>";
   return h;
 }
 function confText(res){
@@ -1342,7 +1642,7 @@ async function compare(){
   $("#error").hidden=true;
   state.rpc=$("#rpc").value.trim()||PUBLIC_RPC; state.cancel=false;
   store("esc.rpc",$("#rpc").value.trim());
-  $("#cgo").disabled=true; $("#progress").hidden=false;
+  $("#cgo").disabled=true; var cg2=$("#cgo2"); if(cg2) cg2.disabled=true; $("#progress").hidden=false;
   try{
     var wallets=conf.cart.slice(), data={}, failed=0, d=0;
     await pool(wallets,3,async function(a){
@@ -1394,6 +1694,7 @@ async function compare(){
       else if(a) out.push({mint:r.mint,sym:a.sym,name:a.name,lvl:a.lvl,sev:a.sev,type:a.type,lights:a.lights,known:false,n:r.n,total:r.total,liq:(r.par.liquidity&&r.par.liquidity.usd)||0,pair:r.par.pairAddress||"",img:a.img,hs:r.hs});
     });
     out.sort(function(x,y){ return y.n-x.n||y.total-x.total; });
+    state.cfRows=false;
     state.cres={ts:Date.now(),wallets:ok.length,failed:failed,minN:minN,pct:conf.pct,noMkt:noMkt,mktFailed:mktFailed,rows:out,allWallets:okAll.length,pf:conf.pf,pnl:pnlSnap,pnlNote:pnlNote};
     if(conf.cur&&conf.saved[conf.cur]){ conf.saved[conf.cur].res=state.cres; conf.saved[conf.cur].ts=Date.now(); conf.saved[conf.cur].wallets=conf.cart.slice(); conf.saved[conf.cur].pct=conf.pct; }
     saveConf();
@@ -1403,6 +1704,7 @@ async function compare(){
     if(e.message!=="cancelado") showError(friendlyError(e));
   }finally{
     var g=$("#cgo"); if(g) g.disabled=conf.cart.length<2;
+    var g2b=$("#cgo2"); if(g2b) g2b.disabled=conf.cart.length<2;
     $("#progress").hidden=true;
   }
 }
@@ -3447,7 +3749,16 @@ document.addEventListener("click",function(ev){
   }
   var cd=ev.target.closest&&ev.target.closest("[data-cdel]");
   if(cd){ var id0=cd.getAttribute("data-cdel"); delete conf.saved[id0]; if(conf.cur===id0) conf.cur=null; saveConf(); renderConf(); return; }
-  if(ev.target.id==="cgo"){ compare(); return; }
+  if(ev.target.id==="cgo"||ev.target.id==="cgo2"){ compare(); return; }
+  if(ev.target.id==="cfmore"){ state.cfAll=true; renderConf(); return; }
+  if(ev.target.id==="cfrows"){ state.cfRows=true; renderConf(); return; }
+  if(ev.target.id==="cgoh"){ setMode("H"); window.scrollTo(0,0); return; }
+  if(ev.target.id==="cpnl"){ conf.pnl=!conf.pnl; if(!conf.pnl) conf.pf="all"; saveConf(); renderConf(); return; }
+  if(ev.target.id==="cshow"){ conf.showAll=!conf.showAll; saveConf(); renderConf(); return; }
+  var cpf=ev.target.closest&&ev.target.closest("[data-cpf]");
+  if(cpf){ conf.pf=cpf.getAttribute("data-cpf"); saveConf(); renderConf(); return; }
+  var cfw=ev.target.closest&&ev.target.closest("[data-cfw]");
+  if(cfw){ var wl=cfw.closest(".cf-row").querySelector(".cf-wl"); wl.hidden=!wl.hidden; cfw.setAttribute("aria-expanded",String(!wl.hidden)); cfw.textContent=wl.hidden?"See wallets":"Hide wallets"; return; }
   if(ev.target.id==="chgBtnL"){ checkChanges(Object.keys(lista.w).filter(function(k){return lista.w[k].fav;}),"L"); return; }
   if(ev.target.id==="cchg"){ if(conf.cart.length) checkChanges(conf.cart.slice(),"conf"); return; }
   if(ev.target.id==="chgcopy"){ copyText(chgText(state.chg),ev.target); return; }
@@ -3518,18 +3829,16 @@ document.addEventListener("input",function(ev){
   if(ev.target.id==="cname") state.cname=ev.target.value;
   if(ev.target.id==="dmints") state.dmints=ev.target.value;
   if(ev.target.id==="dmin") state.dmin=ev.target.value;
+  if(ev.target.id==="cmin"){ var k=+ev.target.value, nn=conf.cart.length; $("#cminv").innerHTML=cfMinTxt(k,nn); $("#cdots").innerHTML=cfDots(k,nn); var mbk=$("#cmbk"); if(mbk) mbk.textContent=k; }
 });
-document.addEventListener("toggle",function(ev){ if(ev.target.id==="ddet") state.dopen=ev.target.open; },true);
 document.addEventListener("change",function(ev){
   if(ev.target.id==="bkpick"&&ev.target.files&&ev.target.files[0]){
     var rd=new FileReader(); rd.onload=function(){ importText(rd.result); }; rd.readAsText(ev.target.files[0]);
   }
 });
 document.addEventListener("change",function(ev){
-  if(ev.target.id==="cpct"){ var v=Math.round(Number(ev.target.value)); conf.pct=(v>=5&&v<=100)?v:30; saveConf(); renderConf(); }
-  if(ev.target.id==="cshow"){ conf.showAll=ev.target.checked; saveConf(); renderConf(); }
-  if(ev.target.id==="cpnl"){ conf.pnl=ev.target.checked; if(!conf.pnl) conf.pf="all"; saveConf(); renderConf(); }
-  if(ev.target.id==="cpf"){ conf.pf=ev.target.value; saveConf(); }
+  // k de n wallets se guarda como porcentaje a medio paso (k-0,5), para que Math.ceil devuelva justo k
+  if(ev.target.id==="cmin"){ var k2=+ev.target.value, n2=conf.cart.length; if(n2>=2){ conf.pct=Math.round((k2-0.5)/n2*10000)/100; saveConf(); } }
 });
 $("#wallet").addEventListener("input",walletHint);
 // Portada: «Buscar ballenas» usa la misma dirección; «Prueba con» rellena y analiza
