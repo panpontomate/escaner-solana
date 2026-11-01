@@ -27,8 +27,10 @@ const S = { bad: "b", warn: "w", na: "n" };
 export function dayOf(ms) { return new Date(ms).toISOString().slice(0, 10); }
 
 // Entrada nueva a partir del resultado del motor (analyzeToken) y de lo que el colector sabe del lanzamiento
-export function regEntry(mint, launch, r, now, face) {
+// ev: engine version that judged it (from 0.4.9 on), so accuracy per level can be split by version
+export function regEntry(mint, launch, r, now, face, ev) {
   const e = { m: mint, t: launch.t || now, a: now };
+  if (ev) e.ev = ev;
   if (launch.dex) e.d = launch.dex;
   if (launch.plat) e.p = launch.plat;
   if (r) {
@@ -38,7 +40,7 @@ export function regEntry(mint, launch, r, now, face) {
     (r.lights || []).forEach(function (l) {
       (l.items || []).forEach(function (i) {
         if (S[i.s]) f.push(i.code + ":" + S[i.s]);
-        if (i.code === "CON_OK" || i.code === "CON_HIGH") { e.w1 = round(i.data && i.data.w1, 1); e.w10 = round(i.data && i.data.w10, 1); }
+        if (i.code === "CON_OK" || i.code === "CON_HIGH" || i.code === "CON_ISSUER") { e.w1 = round(i.data && i.data.w1, 1); e.w10 = round(i.data && i.data.w10, 1); }
       });
     });
     if (f.length) e.f = f;

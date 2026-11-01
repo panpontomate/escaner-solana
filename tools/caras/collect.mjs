@@ -26,6 +26,8 @@ const PUB = process.env.PUB_DIR ? path.resolve(process.env.PUB_DIR) : path.join(
 const OUT = path.join(PUB, "caras.json");
 const DATOS = path.join(PUB, "datos");
 const APORTES = path.join(HERE, "aportes");
+// version of the engine, pinned exactly in package.json: written in each registry entry
+const ENGINE_V = JSON.parse(fs.readFileSync(path.join(HERE, "package.json"), "utf8")).dependencies["solana-risk-engine"];
 const RPC = process.env.SOLANA_RPC || "https://solana-rpc.publicnode.com";
 const MAX_NEW = +process.env.CARAS_MAX_NEW || 120;      // tokens nuevos por ejecución
 const MAX_INFRA = 40;                                    // comprobaciones de actividad por ejecución
@@ -146,7 +148,7 @@ for (const f of fresh.slice(0, MAX_NEW)) {
       // cada token con su propio límite de tiempo: uno que se atasque no se come la ejecución
       r = await analyzeToken(createClient({ rpcUrl: RPC, signal: AbortSignal.timeout(45000) }), f.mint);
     } catch (e) { log.errores++; }
-    state.reg[f.mint] = regEntry(f.mint, Object.assign({ plat: t.plat, dex: f.dex }, t), r, Date.now(), faceOf(t));
+    state.reg[f.mint] = regEntry(f.mint, Object.assign({ plat: t.plat, dex: f.dex }, t), r, Date.now(), faceOf(t), ENGINE_V);
     if (state.reg[f.mint].liq) t.liq = state.reg[f.mint].liq;   // la liquidez del análisis, si la hay, es la buena
     log.registro++;
   }

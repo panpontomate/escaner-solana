@@ -20,6 +20,8 @@ test("an entry keeps the verdict, the signals that are not ok and the launch wal
   assert.deepEqual(e, { m: "M1", t: NOW - 600e3, a: NOW, d: "pump-fun", p: "pump_fun", s: "CATBOT", l: "MEDIUM", v: 2, ty: "OPEN",
     f: ["COPYCAT:w", "MKT_LIQ_VERY_LOW:b", "MKT_NEW:w", "CON_UNAVAILABLE:n"], w1: 0.1, w10: 0.7, liq: 900, mc: 47055,
     py: "P", fu: "F", cr: "C", cara: "warn" });
+  // with the engine version
+  assert.equal(regEntry("M1", { t: NOW }, result, NOW, null, "0.4.9").ev, "0.4.9");
   // the engine failed: the launch is still recorded
   assert.deepEqual(regEntry("M2", { t: NOW, rug: true }, null, NOW), { m: "M2", t: NOW, a: NOW, l: "ERROR", rug: true });
 });
