@@ -331,6 +331,7 @@ export const TEXT = {
     "<div class='notice err' style='margin-bottom:16px'><b>Changes could not be saved in this browser</b> (storage full or blocked). What you see on screen may not be saved. Download a backup before closing the tab.</div>",
 
   // confluence v2 (nov 2026): hero, wallet chips, slider, switches, result rows
+  "<p class='cf-key'>Para el PnL hace falta tu URL de Helius (gratis). <a href='#' id='cfkey'>Añadirla en Ajustes</a></p>": "<p class='cf-key'>PnL needs your Helius URL (free). <a href='#' id='cfkey'>Add it in Settings</a></p>",
   "</b> de ": "</b> of ",
   "<span class='cf-pnl na'>pocos datos</span>": "<span class='cf-pnl na'>little data</span>",
   "sin nombre": "no name",

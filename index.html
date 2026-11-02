@@ -119,6 +119,9 @@ input::placeholder,textarea::placeholder{color:var(--muted);opacity:.8}
 .btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
 .btn.small{padding:8px 14px;min-height:0;font-size:.9rem}
 details.adv{margin-top:14px}
+/* en Confluencia los ajustes sobran: la clave solo hace falta para el PnL, y se pide junto a su interruptor */
+body[data-m=C] #adv,body[data-m=C] #setup,body[data-m=C] .card.scan:has(#error[hidden]){display:none}
+.cf-key{margin:6px 0 0;font-size:.86rem;color:var(--muted)}
 details.adv summary{cursor:pointer;color:var(--muted);font-size:.9rem;width:fit-content}
 .adv-body{display:grid;gap:14px;margin-top:12px}
 .adv-body small{display:block;color:var(--muted);margin-top:6px}
@@ -1788,6 +1791,7 @@ function renderConf(){
         (conf.pnl&&conf.pf!=="all"?"<p class='hint'>Con el filtro de resultado solo cuentan las wallets que lo cumplen, así que el mínimo puede bajar.</p>":"")+"</div>"+
       "<div class='cf-toggles'>"+
         cfSw("cpnl",conf.pnl,"Estimar si cada wallet gana o pierde","Más lento: usa el historial de Helius")+
+        (conf.pnl&&!heliusKey()?"<p class='cf-key'>Para el PnL hace falta tu URL de Helius (gratis). <a href='#' id='cfkey'>Añadirla en Ajustes</a></p>":"")+
         cfSw("cshow",conf.showAll,"Incluir SOL, stablecoins y tokens muy conocidos","")+
         "<div class='cf-tg cf-tgw'><span>Comparar solo</span><div class='cf-seg' role='group' aria-label='Wallets a incluir en la comparación'>"+
           [["all","Todas"],["win","Las que ganan"],["lose","Las que pierden"]].map(function(o){
@@ -4003,6 +4007,7 @@ document.addEventListener("click",function(ev){
   if(ev.target.id==="cfmore"){ state.cfAll=true; renderConf(); return; }
   if(ev.target.id==="cfrows"){ state.cfRows=true; renderConf(); return; }
   if(ev.target.id==="cgoh"){ setMode("H"); window.scrollTo(0,0); return; }
+  if(ev.target.id==="cfkey"){ ev.preventDefault(); setMode("W"); $("#adv").open=true; $("#rpc").focus(); return; }
   if(ev.target.id==="cpnl"){ conf.pnl=!conf.pnl; if(!conf.pnl) conf.pf="all"; saveConf(); renderConf(); return; }
   if(ev.target.id==="cshow"){ conf.showAll=!conf.showAll; saveConf(); renderConf(); return; }
   var cpf=ev.target.closest&&ev.target.closest("[data-cpf]");
