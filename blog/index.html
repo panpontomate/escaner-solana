@@ -48,6 +48,7 @@ article p{margin:0 0 14px;color:var(--soft)}
 article ul{margin:0 0 14px;padding-left:22px;color:var(--soft)}
 article li{margin:6px 0}
 article b{color:#fff}
+article p.nota{border-left:3px solid var(--medio);background:rgba(251,191,36,.08);border-radius:0 12px 12px 0;padding:10px 14px;font-size:.95rem}
 .tags{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
 .tags span{border:1px solid #5e4bb0;border-radius:999px;padding:3px 12px;font-size:.8rem;color:#ece8fd}
 .fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
@@ -81,6 +82,7 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
   <h1>Lo que vamos construyendo.</h1>
   <p>Novedades de SolFlag, pruebas con tokens reales y lo que aprendemos por el camino. Contado tal cual, también lo que sale mal.</p>
   <nav class="toc" aria-label="Entradas">
+    <a href="#estables-lista-confluencia"><time datetime="2026-11-02">2 nov 2026</time><b>USDC en verde, y Mi lista y Confluencia nuevas</b></a>
     <a href="#movil-mi-lista"><time datetime="2026-10-31">31 oct 2026</time><b>SolFlag en el móvil: más claro y más rápido</b></a>
     <a href="#primeros-numeros"><time datetime="2026-10-31">31 oct 2026</time><b>Primeros números: casi todo lo que se lanza muere en un día</b></a>
     <a href="#caras-marcas-bot"><time datetime="2026-10-29">29 oct 2026</time><b>Caras conocidas, marcas falsas y un bot nuevo</b></a>
@@ -92,6 +94,30 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
 </section>
 
 <!-- Para añadir un avance: copia un <article> y ponlo el primero, con su enlace en el índice de arriba -->
+
+<article id="estables-lista-confluencia">
+  <time datetime="2026-11-02">2 de noviembre de 2026</time>
+  <h2>USDC en verde, y Mi lista y Confluencia nuevas</h2>
+  <div class="tags"><span>Motor</span><span>Web</span></div>
+  <p>Si analizabas USDC o USDT en SolFlag, salían en rojo como si fueran una copia de sí mismos. Era un fallo nuestro y ya está corregido, junto con otras cosas que hemos cambiado este fin de semana.</p>
+  <h3>Emisores de confianza, en verde</h3>
+  <ul>
+    <li><b>USDC, USDT, PYUSD, USDG, EURC y las acciones de xStocks</b> salen ahora en riesgo bajo. SolFlag comprueba que la dirección del token y sus llaves son las del emisor oficial (Circle, Tether, Paxos, xStocks), no solo que el nombre coincida.</li>
+    <li>Un token que <b>copia el nombre</b> de uno de ellos sigue saliendo como copia.</li>
+    <li>Ojo: estos emisores pueden congelar fondos. Es normal en una moneda estable, y SolFlag te lo sigue enseñando.</li>
+  </ul>
+  <h3>Menos falsas alarmas</h3>
+  <ul>
+    <li><b>Pools de liquidez concentrada</b> (Meteora DLMM, Raydium CLMM, Orca Whirlpool): ya no avisamos de «liquidez sin bloquear», porque en estos pools no hay nada que bloquear. Algunos tokens han bajado de riesgo medio a bajo por esto.</li>
+    <li><b>La gráfica de precio</b> de USDC enseñaba el precio de SOL (unos 95 $). Ahora cada gráfica usa las velas del propio token.</li>
+  </ul>
+  <h3>Mi lista, rehecha</h3>
+  <p>Arriba tienes un resumen (cuántos tokens y wallets sigues, cuántos están en riesgo alto) y un apartado <b>«Desde la última vez»</b> que te avisa si un token ha cambiado de nivel de riesgo o ha perdido liquidez. Los tokens salen con su logo, puedes filtrarlos por nivel y volver a analizarlos todos con un solo botón.</p>
+  <h3>Confluencia, más fácil</h3>
+  <p>Confluencia busca los tokens que tienen en común varias wallets. Ahora las wallets salen como fichas con su color y su resultado, eliges con un deslizador cuántas tienen que coincidir («al menos 3 de 8») y el resultado sale ordenado, con el riesgo de cada token a la vista. En el móvil, el botón de comparar se queda siempre abajo.</p>
+  <p>Y seguimos apuntando datos: el registro guarda ya si cada token de Pump.fun llega a graduarse. Con un par de semanas de datos os contaremos qué señales lo anticipan. Cualquier cosa, en X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20USDC%20y%20USDT%20ya%20salen%20en%20verde%2C%20y%20Mi%20lista%20y%20Confluencia%20son%20nuevas&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23estables-lista-confluencia" target="_blank" rel="noopener">Compartir en X</a><a href="#estables-lista-confluencia">Enlace a esta entrada</a></div>
+</article>
 
 <article id="movil-mi-lista">
   <time datetime="2026-10-31">31 de octubre de 2026</time>
@@ -118,17 +144,18 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
   <p>Desde el 29 de octubre, SolFlag analiza cada media hora decenas de tokens recién lanzados en Solana, igual que lo haría la web, y apunta qué pasó con ellos a las 24 horas y a los 7 días. Cada día se publica en abierto en <a href="https://solflag.com/datos/registro/indice.json">solflag.com/datos/registro</a>.</p>
   <p>Primer día completo, <b>320 tokens</b>:</p>
   <ul>
-    <li>De los que SolFlag marcó en <b>riesgo alto</b> (246), el <b>97%</b> estaba muerto a las 24 horas (menos de 10.000 $ de capitalización o sin liquidez).</li>
-    <li>De los de <b>riesgo medio</b> (71), el 96%.</li>
+    <li>De los que SolFlag marcó en <b>riesgo alto</b> (246), el <b>99,6%</b> estaba muerto a las 24 horas (menos de 10.000 $ de capitalización o sin liquidez).</li>
+    <li>De los de <b>riesgo medio</b> (71), el 97%.</li>
     <li>Ninguno salió en riesgo bajo.</li>
   </ul>
+  <p class="nota"><b>Corrección del 2 de noviembre:</b> al principio pusimos 97% y 96%. Algunos tokens sin liquidez contaban como vivos porque DexScreener les daba una capitalización enorme (uno, 434 millones de dólares con 0 $ de liquidez). Ahora, fuera de la curva de Pump.fun, un token con menos de 1.000 $ de liquidez cuenta como muerto, y hemos rehecho los números con esa regla.</p>
   <p>Lo contamos tal cual: <b>casi todo lo que se lanza muere</b>, así que en tokens de un día el rojo todavía no se distingue del amarillo, y sin tokens en verde no podemos medir lo contrario. Hacen falta los resultados a 7 días y varias semanas de datos. Los iremos publicando.</p>
   <h3>Lo que ya hemos corregido gracias a estos datos</h3>
   <ul>
     <li><b>Quitar la liquidez es morir.</b> Un token al que le retiran la liquidez podía seguir mostrando una capitalización alta y parecer vivo. Ahora cuenta como muerto.</li>
     <li><b>Aviso de copia más fino.</b> «Hay otro token con el mismo nombre» salía en casi dos de cada tres tokens nuevos: las granjas relanzan el mismo nombre muchas veces al día y el «original» era otra copia muerta. Ahora solo avisa si el token copiado tiene mercado de verdad. En tokens recién lanzados ha pasado del 68% al 5%, y los que quedan son copias reales.</li>
   </ul>
-  <div class="share"><a href="https://x.com/intent/post?text=Primeros%20n%C3%BAmeros%20de%20SolFlag%3A%20de%20320%20tokens%20nuevos%2C%20el%2097%25%20de%20los%20marcados%20en%20rojo%20muri%C3%B3%20en%2024%20h&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23primeros-numeros" target="_blank" rel="noopener">Compartir en X</a><a href="#primeros-numeros">Enlace a esta entrada</a></div>
+  <div class="share"><a href="https://x.com/intent/post?text=Primeros%20n%C3%BAmeros%20de%20SolFlag%3A%20de%20320%20tokens%20nuevos%2C%20el%2099%2C6%25%20de%20los%20marcados%20en%20rojo%20muri%C3%B3%20en%2024%20h&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23primeros-numeros" target="_blank" rel="noopener">Compartir en X</a><a href="#primeros-numeros">Enlace a esta entrada</a></div>
 </article>
 
 <article id="caras-marcas-bot">
