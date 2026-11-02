@@ -13,6 +13,9 @@ export const DAY = 86400e3;
 export const DEAD_MCAP = 10000;        // igual que CREATOR_DEAD_MCAP del motor
 export const PULL_MIN_LIQ = 1000;     // liquidez mínima al verlo para que cuente si se la quitan
 export const PULL_DROP = 0.95;        // la liquidez cayó más de esto: le quitaron el pool aunque quede capitalización
+export const DRY_LIQ = 1000;          // registro: fuera de la curva y con menos liquidez que esto no se puede vender, aunque
+                                       // DexScreener dé una capitalización enorme (LUMI, 31/10: 434 M$ con 0 $ de liquidez)
+export const RC_FAIL_PCT = 0.5, RC_FAIL_MIN = 10, RC_ALERT_RUNS = 3;   // RugCheck caído: avisar tras 3 ejecuciones seguidas
 export const INFRA_PER_HOUR = 300;     // más transacciones por hora: exchange o plataforma, no una persona
 export const FUNDER_PER_HOUR = 100;    // quien solo financia creadores: a partir de aquí suele ser un exchange pequeño (estudio de 200 tokens, 28/10)
 // casi todo lo nuevo muere (86 % en la muestra del 28/10): el aviso es "lanza en serie y casi nada despega"
@@ -47,6 +50,20 @@ export function onCurve(pairs) {
 // o le quitaron la liquidez
 export function isDead(t) {
   return !!t.rug || !(t.mcap >= DEAD_MCAP) || isPulled(t.liq, t.liqNow, t.cv);
+}
+
+// RugCheck sin responder: cuenta las ejecuciones seguidas en las que falló en al menos la mitad de los tokens
+// nuevos (si hay 10 o más; con menos no se cuenta nada). Devuelve el contador nuevo y, si toca, el aviso: al
+// llegar a RC_ALERT_RUNS y cuando vuelve
+export function rcWatch(down, nuevos, fallos) {
+  down = down || 0;
+  if (nuevos < RC_FAIL_MIN) return { down: down, msg: null };
+  if (fallos >= nuevos * RC_FAIL_PCT) {
+    const next = down + 1;
+    return { down: next, msg: next === RC_ALERT_RUNS ? "⚠️ SolFlag: RugCheck no responde desde hace " + next +
+      " ejecuciones del recolector (" + fallos + " de " + nuevos + " tokens nuevos sin datos). El registro los apunta sin creador ni lanzador (nrc)." : null };
+  }
+  return { down: 0, msg: down >= RC_ALERT_RUNS ? "✅ SolFlag: RugCheck vuelve a responder." : null };
 }
 
 // Wallets de un token, cada una con su papel (sin repetir: el creador que se pagó su lanzamiento cuenta como pagador)

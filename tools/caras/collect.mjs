@@ -13,9 +13,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { DAY, INFRA_PER_HOUR, emptyState, addToken, resolveToken, onCurve, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
+import { DAY, INFRA_PER_HOUR, rcWatch, emptyState, addToken, resolveToken, onCurve, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
 import { emptyBase, observe, mergeAporte, pruneBase, publishBase } from "./base.mjs";
-import { regEntry, regDue, regResolve, regRecheck, regPrune, regPublish, daySummary, mergeDay } from "./registro.mjs";
+import { regEntry, regDue, regResolve, regRecheck, regRejudge, regPrune, regPublish, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
 import { emptyQueue, queueLaunch, queueBuyers, buyerCandidates, trimQueue, d1Config, flush } from "./plano.mjs";
 
@@ -121,9 +121,11 @@ for (let p = 1; p <= 5 && fresh.length < MAX_NEW; p++) {
 }
 for (const f of fresh.slice(0, MAX_NEW)) {
   const t = { t: f.t, seen: now, dex: f.dex, liq: f.liq };
+  let nrc = false;
   try {
     const rc = await getJson("https://api.rugcheck.xyz/v1/tokens/" + f.mint + "/report");
     await sleep(600);
+    if (!rc) { nrc = true; log.sinRugCheck = (log.sinRugCheck || 0) + 1; }
     if (rc) { t.creator = rc.creator || undefined; t.rug = !!rc.rugged; t.plat = (rc.launchpad && rc.launchpad.platform) || rc.deployPlatform || undefined; }
     const me = await earliest(f.mint);                      // quien pagó la creación del token
     if (me && me.signers && me.signers[0]) t.payer = me.signers[0];
@@ -148,7 +150,7 @@ for (const f of fresh.slice(0, MAX_NEW)) {
       // cada token con su propio límite de tiempo: uno que se atasque no se come la ejecución
       r = await analyzeToken(createClient({ rpcUrl: RPC, signal: AbortSignal.timeout(45000) }), f.mint);
     } catch (e) { log.errores++; }
-    state.reg[f.mint] = regEntry(f.mint, Object.assign({ plat: t.plat, dex: f.dex }, t), r, Date.now(), faceOf(t), ENGINE_V);
+    state.reg[f.mint] = regEntry(f.mint, Object.assign({ plat: t.plat, dex: f.dex, nrc: nrc }, t), r, Date.now(), faceOf(t), ENGINE_V);
     if (state.reg[f.mint].liq) t.liq = state.reg[f.mint].liq;   // la liquidez del análisis, si la hay, es la buena
     log.registro++;
   }
@@ -194,6 +196,18 @@ for (const stage of ["h24", "d7"]) {
 
 // los resultados ya guardados se vuelven a juzgar, por si cambió la regla de «muerto»
 Object.keys(state.reg).forEach((m) => { regRecheck(state.reg[m], "h24"); regRecheck(state.reg[m], "d7"); });
+
+// RugCheck caído: aviso visible en la ejecución y, tras varias seguidas, por Telegram (y otro cuando vuelve)
+if (log.sinRugCheck && process.env.GITHUB_ACTIONS) console.log("::warning::RugCheck no respondió en " + log.sinRugCheck + " de " + log.nuevos + " tokens nuevos");
+{
+  const w = rcWatch(state.rcDown, log.nuevos, log.sinRugCheck || 0);
+  state.rcDown = w.down;
+  const TG = process.env.AVISO_TELEGRAM_TOKEN, CHAT = process.env.AVISO_TELEGRAM_CHAT;
+  if (w.msg && TG && CHAT) {
+    try { await fetch("https://api.telegram.org/bot" + TG + "/sendMessage", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ chat_id: CHAT, text: w.msg }) }); }
+    catch (e) { log.errores++; }
+  }
+}
 
 // 3. exchanges y plataformas
 for (const a of needInfraCheck(state).slice(0, MAX_INFRA)) {
@@ -245,6 +259,19 @@ if (ready.length) {
   fs.writeFileSync(ip, JSON.stringify(index));
   fs.writeFileSync(STATE, JSON.stringify(state));
   log.diasPublicados = ready.map((x) => x.day + (x.final ? " final" : " 24h")).join(", ");
+}
+// los días ya publicados también se vuelven a juzgar si cambia la regla de «muerto» (solo se reescriben si cambian)
+if (fs.existsSync(REG)) {
+  const ip = path.join(REG, "indice.json"), fixed = [];
+  const index = fs.existsSync(ip) ? JSON.parse(fs.readFileSync(ip, "utf8")) : { v: 1, days: {} };
+  fs.readdirSync(REG).filter((f) => /^\d{4}-\d\d-\d\d\.json$/.test(f)).forEach((f) => {
+    const fp = path.join(REG, f), file = JSON.parse(fs.readFileSync(fp, "utf8"));
+    if (!regRejudge(file)) return;
+    fs.writeFileSync(fp, JSON.stringify(file));
+    index.days[file.day] = Object.assign(daySummary(file.tokens), { final: !!file.final });
+    fixed.push(file.day);
+  });
+  if (fixed.length) { index.updated = now; fs.writeFileSync(ip, JSON.stringify(index)); log.diasRejuzgados = fixed.join(", "); }
 }
 log.pendientesRegistro = Object.keys(state.reg).length;
 log.base = Object.keys(state.base.wallets).length; log.conocidas = Object.keys(pub.base.wallets).length; log.exchanges = Object.keys(pub.exchanges.exchanges).length;

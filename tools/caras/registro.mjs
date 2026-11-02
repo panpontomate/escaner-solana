@@ -13,12 +13,16 @@
 //   f señales que no son ok («CODIGO:b» rojo, «CODIGO:w» amarillo, «CODIGO:n» sin comprobar)
 //   liq liquidez · mc capitalización · w1 / w10 % de la mayor wallet y de las 10 mayores (personas)
 //   py pagador · fu financiador · cr creador · rug marcado como rug por RugCheck · cara nivel de cara conocida
-//   h24 / d7 resultado: { mc, liq, dead, cv?, pull?, dx?, gr? } (dead = no llega a DEAD_MCAP, rug o le quitaron
-//   la liquidez; cv = sigue en la curva de Pump.fun; pull = muerto porque la liquidez cayó más de un 95 %;
+//   nrc = 1: RugCheck no respondió al verlo (sin creador ni lanzador, y el motor tampoco pudo mirar al creador;
+//   pasó el 31/10/2026 de 01 a 15 h UTC, antes de existir esta marca). Para apartarlos al medir señales de creador
+//   h24 / d7 resultado: { mc, liq, dead, cv?, pull?, dry?, dx?, gr? } (dead = no llega a DEAD_MCAP, rug, le quitaron
+//   la liquidez o no la tiene; cv = sigue en la curva de Pump.fun; pull = muerto porque la liquidez cayó más de un 95 %;
+//   dry = muerto porque fuera de la curva le queda menos de DRY_LIQ de liquidez aunque la capitalización diga otra
+//   cosa (desde el 2/11/2026, también en los días ya publicados);
 //   dx = dex de su mercado principal en ese momento; gr = salió en la curva de Pump.fun y ya tiene mercado
 //   fuera de ella: graduó. Desde el 1/11/2026, para estudiar qué tokens de la curva llegan a graduar)
 
-import { DAY, DEAD_MCAP, isPulled, onCurve } from "./lib.mjs";
+import { DAY, DEAD_MCAP, DRY_LIQ, isPulled, onCurve } from "./lib.mjs";
 
 export const REG_DAYS = 7;          // último resultado: a los 7 días
 export const LEVEL_ORDER = ["HIGH", "MEDIUM", "LOW", "SPAM", "NO_DATA", "NO_MARKET"];
@@ -53,6 +57,7 @@ export function regEntry(mint, launch, r, now, face, ev) {
   if (launch.funder) e.fu = launch.funder;
   if (launch.creator) e.cr = launch.creator;
   if (launch.rug) e.rug = true;
+  if (launch.nrc) e.nrc = 1;
   if (face) e.cara = face;
   Object.keys(e).forEach(function (k) { if (e[k] === undefined) delete e[k]; });
   return e;
@@ -96,9 +101,19 @@ export function regRecheck(e, stage) {
   const r = e[stage];
   if (!r) return e;
   const pull = isPulled(e.liq, r.liq, r.cv);
-  r.dead = !!e.rug || !(r.mc >= DEAD_MCAP) || pull;
+  const dry = !r.cv && !(r.liq >= DRY_LIQ);
+  r.dead = !!e.rug || !(r.mc >= DEAD_MCAP) || pull || dry;
   if (pull && r.mc >= DEAD_MCAP) r.pull = true; else delete r.pull;
+  if (dry && !pull && !e.rug && r.mc >= DEAD_MCAP) r.dry = true; else delete r.dry;
   return e;
+}
+
+// Vuelve a juzgar un día ya publicado con la regla de hoy. Devuelve true si cambió algo
+export function regRejudge(file) {
+  if (!file || !file.tokens) return false;
+  const before = JSON.stringify(file.tokens);
+  Object.keys(file.tokens).forEach(function (m) { regRecheck(file.tokens[m], "h24"); regRecheck(file.tokens[m], "d7"); });
+  return JSON.stringify(file.tokens) !== before;
 }
 
 // Ya tiene los dos resultados

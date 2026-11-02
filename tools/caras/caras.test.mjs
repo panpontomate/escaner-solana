@@ -96,3 +96,14 @@ test("a face counts the launches whose pool was pulled as dead", () => {
   assert.equal(onCurve([{ dexId: "pumpfun" }, { dexId: "pumpswap" }]), false);
   assert.equal(onCurve([]), false);
 });
+
+test("rcWatch: alert after 3 runs in a row with RugCheck down, and once when it is back", async () => {
+  const { rcWatch } = await import("./lib.mjs");
+  let w = rcWatch(undefined, 60, 40); assert.deepEqual([w.down, w.msg], [1, null]);
+  w = rcWatch(w.down, 60, 59); assert.deepEqual([w.down, w.msg], [2, null]);
+  w = rcWatch(w.down, 60, 60); assert.equal(w.down, 3); assert.match(w.msg, /RugCheck no responde desde hace 3/);
+  w = rcWatch(w.down, 60, 60); assert.deepEqual([w.down, w.msg], [4, null]);         // no repeat
+  assert.deepEqual(rcWatch(w.down, 5, 5), { down: 4, msg: null });                 // too few tokens: no change
+  w = rcWatch(w.down, 60, 2); assert.equal(w.down, 0); assert.match(w.msg, /vuelve/);
+  assert.deepEqual(rcWatch(1, 60, 0), { down: 0, msg: null });                      // short outage: no message
+});

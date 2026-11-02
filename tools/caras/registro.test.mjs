@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { regEntry, regDue, regResolve, regRecheck, regDone, daySummary, mergeDay, regPrune, regPublish, dayOf } from "./registro.mjs";
+import { regEntry, regDue, regResolve, regRecheck, regRejudge, regDone, daySummary, mergeDay, regPrune, regPublish, dayOf } from "./registro.mjs";
 import { DAY } from "./lib.mjs";
 
 const NOW = Date.UTC(2026, 9, 29, 12);
@@ -24,6 +24,9 @@ test("an entry keeps the verdict, the signals that are not ok and the launch wal
   assert.equal(regEntry("M1", { t: NOW }, result, NOW, null, "0.4.9").ev, "0.4.9");
   // the engine failed: the launch is still recorded
   assert.deepEqual(regEntry("M2", { t: NOW, rug: true }, null, NOW), { m: "M2", t: NOW, a: NOW, l: "ERROR", rug: true });
+  // RugCheck did not answer: marked so creator signals can be measured without them
+  assert.equal(regEntry("M3", { t: NOW, nrc: true }, result, NOW).nrc, 1);
+  assert.equal(regEntry("M3", { t: NOW, nrc: false }, result, NOW).nrc, undefined);
 });
 
 test("results at 24 h and 7 days, dead under $10k or rug", () => {
@@ -44,8 +47,8 @@ test("dead when the liquidity is pulled, but not on a Pump.fun curve", () => {
     { mc: 12550, liq: 5, dead: true, pull: true, dx: "meteora" });
   // a 90 % drop is not enough
   assert.equal(regResolve({ liq: 20000 }, "h24", [{ marketCap: 50000, liquidity: { usd: 2000 } }]).h24.dead, false);
-  // too little liquidity at the start to tell
-  assert.equal(regResolve({ liq: 900 }, "h24", [{ marketCap: 50000, liquidity: { usd: 1 } }]).h24.dead, false);
+  // too little liquidity at the start to call it pulled, but $1 left is dead anyway (dry)
+  assert.deepEqual(regResolve({ liq: 900 }, "h24", [{ marketCap: 50000, liquidity: { usd: 1 } }]).h24, { mc: 50000, liq: 1, dead: true, dry: true });
   // still on the curve: DexScreener says $0 liquidity, the token is alive
   assert.deepEqual(regResolve({ liq: 5000 }, "h24", [{ dexId: "pumpfun", marketCap: 40000, liquidity: { usd: 0 } }]).h24,
     { mc: 40000, liq: 0, cv: true, dead: false, dx: "pumpfun" });
@@ -54,6 +57,33 @@ test("dead when the liquidity is pulled, but not on a Pump.fun curve", () => {
   regRecheck(old, "h24"); regRecheck(old, "h24");
   assert.deepEqual(old.h24, { mc: 67433, liq: 51, dead: true, pull: true });
   assert.equal(regRecheck({ liq: 100 }, "d7").d7, undefined);
+});
+
+test("dead without liquidity off the curve, whatever the market cap says", () => {
+  // LUMI, 31/10: $434M market cap and $0 liquidity, no starting liquidity known
+  assert.deepEqual(regResolve({}, "h24", [{ dexId: "meteora", marketCap: 434161491, liquidity: { usd: 0 } }]).h24,
+    { mc: 434161491, liq: 0, dead: true, dry: true, dx: "meteora" });
+  // no liquidity field at all counts as none
+  assert.equal(regResolve({}, "h24", [{ marketCap: 90000 }]).h24.dry, true);
+  // $1,000 is enough
+  assert.equal(regResolve({}, "h24", [{ marketCap: 90000, liquidity: { usd: 1000 } }]).h24.dead, false);
+  // under $10k it is dead for that reason: no dry mark
+  assert.deepEqual(regResolve({}, "h24", [{ marketCap: 5000, liquidity: { usd: 0 } }]).h24, { mc: 5000, liq: 0, dead: true });
+  // on the curve, $0 liquidity is normal
+  assert.equal(regResolve({}, "h24", [{ dexId: "pumpfun", marketCap: 20000, liquidity: { usd: 0 } }]).h24.dead, false);
+});
+
+test("a published day is judged again with today's rule, only once", () => {
+  const file = { v: 1, day: "2026-10-31", final: false, tokens: {
+    a: { m: "a", h24: { mc: 434161491, liq: 0, dead: false } },
+    b: { m: "b", h24: { mc: 65273909, liq: 663429, dead: false } },
+    c: { m: "c", h24: { mc: 2678, liq: 0, cv: true, dead: true } } } };
+  assert.equal(regRejudge(file), true);
+  assert.deepEqual(file.tokens.a.h24, { mc: 434161491, liq: 0, dead: true, dry: true });
+  assert.equal(file.tokens.b.h24.dead, false);
+  assert.equal(regRejudge(file), false);
+  assert.equal(regRejudge(null), false);
+  assert.equal(daySummary(file.tokens).levels.ERROR.dead24, 2);
 });
 
 test("graduation: born on the Pump.fun curve and now with a market outside it", () => {
