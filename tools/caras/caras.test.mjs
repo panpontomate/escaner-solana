@@ -107,3 +107,25 @@ test("rcWatch: alert after 3 runs in a row with RugCheck down, and once when it 
   w = rcWatch(w.down, 60, 2); assert.equal(w.down, 0); assert.match(w.msg, /vuelve/);
   assert.deepEqual(rcWatch(1, 60, 0), { down: 0, msg: null });                      // short outage: no message
 });
+
+test("addRolesLate: late creator/funder count as faces, once, with the known outcome", async () => {
+  const { addRolesLate, addToken, resolveToken, emptyState } = await import("./lib.mjs");
+  // already resolved (dead): counted now with its outcome; the payer is not counted twice
+  const s = emptyState();
+  s.faces.PAY = { n: 1, done: 1, dead: 1, roles: { payer: 1 }, last: 5, ex: [] };
+  assert.equal(addRolesLate(s, "M1", { creator: "CR", funder: "FU" }, { payer: "PAY" }, { dead: true, t: 5 }), 2);
+  assert.deepEqual(s.faces.CR, { n: 1, done: 1, dead: 1, roles: { creator: 1 }, last: 5, ex: [{ m: "M1", t: 5 }] });
+  assert.equal(s.faces.FU.roles.funder, 1);
+  assert.equal(s.faces.PAY.n, 1);
+  assert.equal(addRolesLate(s, "M1", { creator: "PAY" }, { payer: "PAY" }, { dead: true, t: 5 }), 0);   // creator = payer
+  // still pending: roles go into the token and are counted when it resolves
+  addToken(s, "M2", { t: 9, payer: "PAY" });
+  assert.equal(addRolesLate(s, "M2", { creator: "CR2" }, {}, null), 1);
+  assert.equal(s.tokens.M2.creator, "CR2");
+  assert.deepEqual([s.faces.CR2.n, s.faces.CR2.done], [1, 0]);
+  resolveToken(s, "M2", 50000, 20000, false);
+  assert.deepEqual([s.faces.CR2.done, s.faces.CR2.dead], [1, 0]);
+  // resolved but outcome unknown: nothing counted
+  assert.equal(addRolesLate(s, "M3", { creator: "Z" }, {}, null), 0);
+  assert.equal(s.faces.Z, undefined);
+});

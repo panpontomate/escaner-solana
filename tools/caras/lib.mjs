@@ -103,6 +103,26 @@ export function resolveToken(state, mint, mcap, liq, curve) {
   return dead;
 }
 
+// Datos de un lanzamiento que llegaron tarde (RugCheck no respondió al verlo): suma las caras que faltaban.
+// known: lo que ya se sabía (el pagador), para no contar dos veces la misma wallet.
+// Si el token aún espera su resultado, esas caras se cuentan al resolverlo; si ya se resolvió, out = { dead, t }
+// cuenta el resultado ya (sin out no se cuenta nada: no se sabría si murió)
+export function addRolesLate(state, mint, roles, known, out) {
+  const pend = state.tokens[mint];
+  if (!pend && !out) return 0;
+  const t = Object.assign({}, pend || Object.assign({ t: out.t }, known));
+  const before = facesOf(t).map(function (f) { return f.addr; });
+  ROLES.forEach(function (r) { if (roles[r] && !t[r]) t[r] = roles[r]; });
+  const added = facesOf(t).filter(function (f) { return before.indexOf(f.addr) < 0; });
+  added.forEach(function (f) {
+    const a = state.faces[f.addr] || (state.faces[f.addr] = { n: 0, done: 0, dead: 0, roles: {}, last: 0, ex: [] });
+    a.n++; a.roles[f.role] = (a.roles[f.role] || 0) + 1; a.last = Math.max(a.last, t.t || 0);
+    if (!pend) { a.done++; if (out.dead) { a.dead++; a.ex.push({ m: mint, t: t.t || 0 }); a.ex.sort(function (x, y) { return y.t - x.t; }); a.ex = a.ex.slice(0, 3); } }
+  });
+  if (pend) ROLES.forEach(function (r) { if (t[r]) pend[r] = t[r]; });
+  return added.length;
+}
+
 function counts(state, addr) {
   // solo cuentan las wallets ya comprobadas que no son exchanges ni plataformas
   const i = state.infra[addr], r = state.faces[addr].roles || {};

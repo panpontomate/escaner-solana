@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { regEntry, regDue, regResolve, regRecheck, regRejudge, regDone, daySummary, mergeDay, regPrune, regPublish, dayOf } from "./registro.mjs";
+import { regEntry, regDue, regResolve, regRecheck, regRejudge, regDone, daySummary, mergeDay, regPrune, regPublish, dayOf, regFill, regMissing } from "./registro.mjs";
 import { DAY } from "./lib.mjs";
 
 const NOW = Date.UTC(2026, 9, 29, 12);
@@ -150,4 +150,21 @@ test("each day is published twice: once all have the 24 h result, and when final
 test("pending entries are dropped after 12 days", () => {
   const reg = { old: { t: NOW - 13 * DAY }, young: { t: NOW - DAY } };
   assert.deepEqual(Object.keys(regPrune(reg, NOW)), ["young"]);
+});
+
+test("regFill completes launch data that RugCheck gave late, without touching the level", () => {
+  const e = { m: "A", t: NOW, l: "MEDIUM", f: ["MKT_NEW:w"], py: "PAY" };
+  assert.equal(regFill(e, { plat: "pump_fun", creator: "CR", funder: "FU", rug: false }), true);
+  assert.deepEqual(e, { m: "A", t: NOW, l: "MEDIUM", f: ["MKT_NEW:w"], py: "PAY", p: "pump_fun", cr: "CR", fu: "FU", nrc: 1, rcl: 1 });
+  assert.equal(regFill(e, { plat: "other", creator: "X" }), false);          // never overwrites what is known
+  assert.equal(e.cr, "CR");
+  assert.equal(regFill(e, { rug: true }), true); assert.equal(e.rug, true);
+  assert.equal(regFill(undefined, { creator: "X" }), false);
+});
+
+test("regMissing picks a day's entries without launchpad nor creator and marks them nrc", () => {
+  const d = Date.parse("2026-10-31T05:00:00Z");
+  const reg = { a: { m: "a", t: d }, b: { m: "b", t: d, p: "pump_fun", cr: "C" }, c: { m: "c", t: d + DAY }, r: { m: "r", t: d, rcl: 1 } };
+  assert.deepEqual(regMissing(reg, "2026-10-31"), ["a"]);
+  assert.equal(reg.a.nrc, 1); assert.equal(reg.b.nrc, undefined); assert.equal(reg.c.nrc, undefined);
 });

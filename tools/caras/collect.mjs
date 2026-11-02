@@ -13,9 +13,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { DAY, INFRA_PER_HOUR, rcWatch, emptyState, addToken, resolveToken, onCurve, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
+import { DAY, INFRA_PER_HOUR, rcWatch, emptyState, addToken, addRolesLate, resolveToken, onCurve, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
 import { emptyBase, observe, mergeAporte, pruneBase, publishBase } from "./base.mjs";
-import { regEntry, regDue, regResolve, regRecheck, regRejudge, regPrune, regPublish, daySummary, mergeDay } from "./registro.mjs";
+import { regEntry, regDue, regResolve, regRecheck, regRejudge, regPrune, regPublish, regFill, regMissing, dayOf, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
 import { emptyQueue, queueLaunch, queueBuyers, buyerCandidates, trimQueue, d1Config, flush } from "./plano.mjs";
 
@@ -49,16 +49,38 @@ async function rpc(method, params) {
   }
   return null;
 }
+// lastFail: por qué falló la última petición (código HTTP, "tiempo" o "red"), para contar los motivos
+let lastFail = null;
 async function getJson(url) {
+  lastFail = null;
   for (let i = 0; i < 3; i++) {
     try {
-      const r = await fetch(url, { headers: { accept: "application/json" } });
-      if (r.status === 429) { await sleep(4000 * (i + 1)); continue; }
-      return r.ok ? await r.json() : null;
-    } catch (e) { await sleep(1500); }
+      const r = await fetch(url, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(15000) });
+      if (r.status === 429) { lastFail = 429; await sleep(4000 * (i + 1)); continue; }
+      // error del servidor: también se reintenta (antes se daba por perdido a la primera, el 31/10 con RugCheck)
+      if (r.status >= 500) { lastFail = r.status; await sleep(1500 * (i + 1)); continue; }
+      if (!r.ok) { lastFail = r.status; return null; }
+      return await r.json();
+    } catch (e) { lastFail = e && e.name === "TimeoutError" ? "tiempo" : "red"; await sleep(1500); }
   }
   return null;
 }
+// RugCheck: si falla RC_BREAK veces seguidas se deja de llamar en esta ejecución (cada fallo cuesta hasta ~45 s)
+// y lo que falte se pide en las siguientes (state.rcQ)
+const RUGCHECK = "https://api.rugcheck.xyz/v1/tokens/";
+const RC_BREAK = 5, RC_TRIES = 6, RC_RETRY = +process.env.RC_RETRY || 150;
+let rcStreak = 0;
+async function rugcheck(mint, log) {
+  if (rcStreak >= RC_BREAK) { (log.rcMotivos = log.rcMotivos || {}).cortado = (log.rcMotivos.cortado || 0) + 1; return null; }
+  const rc = await getJson(RUGCHECK + mint + "/report");
+  await sleep(600);
+  if (rc) { rcStreak = 0; return rc; }
+  rcStreak++;
+  const k = String(lastFail || "vacío");
+  (log.rcMotivos = log.rcMotivos || {})[k] = (log.rcMotivos[k] || 0) + 1;
+  return null;
+}
+const rcInfo = (rc) => ({ creator: rc.creator || undefined, rug: !!rc.rugged, plat: (rc.launchpad && rc.launchpad.platform) || rc.deployPlatform || undefined });
 async function signersOf(sig) {
   const tx = await rpc("getTransaction", [sig, { maxSupportedTransactionVersion: 1, encoding: "jsonParsed", commitment: "confirmed" }]);
   const keys = tx && tx.transaction && tx.transaction.message.accountKeys;
@@ -105,6 +127,14 @@ const knownFaces = buildList(state, now).faces;
 const faceOf = (t) => ["payer", "funder", "creator"].map((k) => knownFaces[t[k]] && knownFaces[t[k]].lvl)
   .reduce((w, l) => (l === "bad" || w === "bad" ? "bad" : l || w), null);
 
+// RugCheck pendiente: tokens que se apuntaron sin su respuesta. La primera vez entran también los del 31/10/2026,
+// cuando RugCheck estuvo caído de 01 a 15 h UTC sin que el recolector lo marcara
+state.rcQ = state.rcQ || {};
+if (!state.rcSeed) {
+  regMissing(state.reg, "2026-10-31").forEach((m) => { state.rcQ[m] = { n: 0 }; });
+  state.rcSeed = 1;
+}
+
 // 1. tokens nuevos
 const fresh = [];
 for (let p = 1; p <= 5 && fresh.length < MAX_NEW; p++) {
@@ -123,10 +153,10 @@ for (const f of fresh.slice(0, MAX_NEW)) {
   const t = { t: f.t, seen: now, dex: f.dex, liq: f.liq };
   let nrc = false;
   try {
-    const rc = await getJson("https://api.rugcheck.xyz/v1/tokens/" + f.mint + "/report");
-    await sleep(600);
-    if (!rc) { nrc = true; log.sinRugCheck = (log.sinRugCheck || 0) + 1; }
-    if (rc) { t.creator = rc.creator || undefined; t.rug = !!rc.rugged; t.plat = (rc.launchpad && rc.launchpad.platform) || rc.deployPlatform || undefined; }
+    const rc = await rugcheck(f.mint, log);
+    // sin respuesta: se apunta igual (nrc) y se vuelve a pedir en las siguientes ejecuciones
+    if (!rc) { nrc = true; log.sinRugCheck = (log.sinRugCheck || 0) + 1; state.rcQ[f.mint] = { n: 0 }; }
+    if (rc) { const i = rcInfo(rc); t.creator = i.creator; t.rug = i.rug; t.plat = i.plat; }
     const me = await earliest(f.mint);                      // quien pagó la creación del token
     if (me && me.signers && me.signers[0]) t.payer = me.signers[0];
     // compradores de los primeros bloques, solo en los que se analizan (cada uno es una petición más)
@@ -160,6 +190,36 @@ for (const f of fresh.slice(0, MAX_NEW)) {
   if (t.funder) observe(state.base, { addr: t.funder, role: "funder", token: f.mint, at: f.t }, now);
   if (t.creator && t.creator !== t.payer) observe(state.base, { addr: t.creator, role: "creator", token: f.mint, at: f.t }, now);
 }
+
+// 1b. RugCheck otra vez para los que se quedaron sin respuesta: se completan creador, lanzador, financiador y rug
+// en el registro (sin tocar el nivel), las caras, la base de wallets y el plano. Cada uno se intenta RC_TRIES veces
+const recovered = {};                                      // día -> entradas del registro completadas
+for (const m of Object.keys(state.rcQ).slice(0, RC_RETRY)) {
+  if (rcStreak >= RC_BREAK) break;                         // sigue caído: en la siguiente ejecución
+  const q = state.rcQ[m], pend = state.tokens[m], e = state.reg[m];
+  if (!pend && !e) { delete state.rcQ[m]; continue; }      // ya no queda dónde apuntarlo
+  const rc = await rugcheck(m, log);
+  if (!rc) { if (++q.n >= RC_TRIES) { delete state.rcQ[m]; log.rcPerdidos = (log.rcPerdidos || 0) + 1; } continue; }
+  delete state.rcQ[m];
+  const info = rcInfo(rc), payer = (pend && pend.payer) || (e && e.py);
+  try {
+    if (info.creator) {
+      const cs = await firstSigners(info.creator);
+      if (cs && cs[0] && cs[0] !== info.creator && cs[0] !== payer) info.funder = cs[0];
+    }
+  } catch (err) { log.errores++; }
+  if (pend) { if (info.plat && !pend.plat) pend.plat = info.plat; if (info.rug) pend.rug = true; }
+  const at = (pend && pend.t) || (e && e.t) || now;
+  addRolesLate(state, m, { creator: info.creator, funder: info.funder }, { payer: payer }, !pend && e && e.h24 ? { dead: !!e.h24.dead, t: at } : null);
+  if (e && regFill(e, info)) (recovered[dayOf(e.t)] = recovered[dayOf(e.t)] || []).push(e);
+  if (info.funder) observe(state.base, { addr: info.funder, role: "funder", token: m, at: at }, now);
+  if (info.creator && info.creator !== payer) observe(state.base, { addr: info.creator, role: "creator", token: m, at: at }, now);
+  if (D1) queueLaunch(state.planoQ, { m: m, t: at, plat: info.plat, cr: info.creator, fu: info.funder });
+  log.rcRecuperados = (log.rcRecuperados || 0) + 1;
+}
+log.rcPendientes = Object.keys(state.rcQ).length;
+if (process.env.GITHUB_ACTIONS && (log.rcRecuperados || log.rcPendientes))
+  console.log("::notice::RugCheck: " + (log.rcRecuperados || 0) + " tokens completados más tarde, " + log.rcPendientes + " pendientes");
 
 // 2. resultado a las 24 h (DexScreener acepta 30 tokens por petición)
 const due = Object.keys(state.tokens).filter((m) => now - state.tokens[m].t > DAY);
@@ -198,7 +258,7 @@ for (const stage of ["h24", "d7"]) {
 Object.keys(state.reg).forEach((m) => { regRecheck(state.reg[m], "h24"); regRecheck(state.reg[m], "d7"); });
 
 // RugCheck caído: aviso visible en la ejecución y, tras varias seguidas, por Telegram (y otro cuando vuelve)
-if (log.sinRugCheck && process.env.GITHUB_ACTIONS) console.log("::warning::RugCheck no respondió en " + log.sinRugCheck + " de " + log.nuevos + " tokens nuevos");
+if (log.sinRugCheck && process.env.GITHUB_ACTIONS) console.log("::warning::RugCheck no respondió en " + log.sinRugCheck + " de " + log.nuevos + " tokens nuevos (motivos: " + JSON.stringify(log.rcMotivos || {}) + "); se vuelven a pedir en las siguientes ejecuciones");
 {
   const w = rcWatch(state.rcDown, log.nuevos, log.sinRugCheck || 0);
   state.rcDown = w.down;
@@ -261,6 +321,15 @@ if (ready.length) {
   log.diasPublicados = ready.map((x) => x.day + (x.final ? " final" : " 24h")).join(", ");
 }
 // los días ya publicados también se vuelven a juzgar si cambia la regla de «muerto» (solo se reescriben si cambian)
+// días ya publicados con tokens que RugCheck completó más tarde: se reescriben con los datos nuevos
+// (los que aún no se han publicado los llevarán al publicarse)
+Object.keys(recovered).forEach((day) => {
+  const fp = path.join(REG, day + ".json");
+  if (!fs.existsSync(fp)) return;
+  const file = mergeDay(JSON.parse(fs.readFileSync(fp, "utf8")), day, recovered[day], now);
+  fs.writeFileSync(fp, JSON.stringify(file));
+  log.diasCompletados = (log.diasCompletados ? log.diasCompletados + ", " : "") + day + " (" + recovered[day].length + ")";
+});
 if (fs.existsSync(REG)) {
   const ip = path.join(REG, "indice.json"), fixed = [];
   const index = fs.existsSync(ip) ? JSON.parse(fs.readFileSync(ip, "utf8")) : { v: 1, days: {} };

@@ -15,6 +15,8 @@
 //   py pagador · fu financiador · cr creador · rug marcado como rug por RugCheck · cara nivel de cara conocida
 //   nrc = 1: RugCheck no respondió al verlo (sin creador ni lanzador, y el motor tampoco pudo mirar al creador;
 //   pasó el 31/10/2026 de 01 a 15 h UTC, antes de existir esta marca). Para apartarlos al medir señales de creador
+//   rcl = 1: RugCheck respondió más tarde y se completaron p, cr, fu y rug (desde el 2/11/2026; también los del 31/10).
+//   El nivel l y las señales f NO cambian: se calcularon sin el creador, por eso sigue nrc = 1
 //   h24 / d7 resultado: { mc, liq, dead, cv?, pull?, dry?, dx?, gr? } (dead = no llega a DEAD_MCAP, rug, le quitaron
 //   la liquidez o no la tiene; cv = sigue en la curva de Pump.fun; pull = muerto porque la liquidez cayó más de un 95 %;
 //   dry = muerto porque fuera de la curva le queda menos de DRY_LIQ de liquidez aunque la capitalización diga otra
@@ -61,6 +63,31 @@ export function regEntry(mint, launch, r, now, face, ev) {
   if (face) e.cara = face;
   Object.keys(e).forEach(function (k) { if (e[k] === undefined) delete e[k]; });
   return e;
+}
+
+// RugCheck respondió tarde: completa los datos fijos del lanzamiento, sin tocar el nivel (se calculó sin ellos).
+// info = { plat, creator, funder, rug }. Devuelve true si cambió algo
+export function regFill(e, info) {
+  if (!e) return false;
+  let ch = false;
+  [["p", "plat"], ["cr", "creator"], ["fu", "funder"]].forEach(function (k) {
+    if (info[k[1]] && !e[k[0]]) { e[k[0]] = info[k[1]]; ch = true; }
+  });
+  if (info.rug && !e.rug) { e.rug = true; ch = true; }
+  if (!e.nrc || !e.rcl) ch = true;
+  e.nrc = 1; e.rcl = 1;
+  return ch;
+}
+
+// Tokens de un día que se quedaron sin datos de RugCheck antes de existir la marca nrc (sin lanzador ni creador):
+// se marcan nrc = 1 y se devuelven para pedirlos otra vez
+export function regMissing(reg, day) {
+  return Object.keys(reg).filter(function (m) {
+    const e = reg[m];
+    if (dayOf(e.t) !== day || e.p || e.cr || e.rcl) return false;
+    e.nrc = 1;
+    return true;
+  });
 }
 
 // Tokens del registro a los que les toca resultado: "h24" a las 24 h, "d7" a los 7 días
