@@ -68,7 +68,7 @@ async function getJson(url) {
 // RugCheck: si se cae (RC_BREAK fallos seguidos de servidor) se deja de llamar en esta ejecución (cada fallo cuesta hasta ~45 s)
 // y lo que falte se pide en las siguientes (state.rcQ)
 const RUGCHECK = "https://api.rugcheck.xyz/v1/tokens/";
-const RC_BREAK = 5, RC_TRIES = 6, RC_RETRY = +process.env.RC_RETRY || 150;
+const RC_BREAK = 5, RC_TRIES = 6, RC_RETRY = +process.env.RC_RETRY || 60;   // 150 hizo durar 19 min una ejecución (2/11)
 let rcStreak = 0;
 async function rugcheck(mint, log) {
   if (rcStreak >= RC_BREAK) { (log.rcMotivos = log.rcMotivos || {}).cortado = (log.rcMotivos.cortado || 0) + 1; return null; }
