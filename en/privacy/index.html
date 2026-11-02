@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy · SolFlag</title>
+<meta name="description" content="What data SolFlag handles: no accounts, no cookies, no ads. What you save stays in your browser.">
+<meta property="og:title" content="Privacy · SolFlag">
+<meta property="og:description" content="What data SolFlag handles: no accounts, no cookies, no ads. What you save stays in your browser.">
+<meta property="og:url" content="https://solflag.com/en/privacy/">
+<meta property="og:image" content="https://solflag.com/og.png">
+<link rel="canonical" href="https://solflag.com/en/privacy/">
+<link rel="alternate" hreflang="es" href="https://solflag.com/privacidad/">
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+/* Mismo aspecto que solflag.com: lila oscuro, turquesa pastel y titulares con serifa */
+:root{--bg:#0e0926;--card:rgba(24,17,62,.96);--line:rgba(196,181,253,.3);--fg:#f1eeff;--muted:#c9c1ea;--soft:#ddd7f5;--kick:#8ec5cf;--accent:#7ab8c4;--alto:#ff6b6b;--bajo:#4ade80;--medio:#fbbf24;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--fg);font:17px/1.65 Manrope,'Segoe UI',system-ui,sans-serif;background:radial-gradient(1100px 720px at 88% -8%,rgba(139,92,246,.38),transparent 62%),radial-gradient(900px 640px at -12% 30%,rgba(192,38,211,.16),transparent 60%),linear-gradient(180deg,#140d33 0%,#0e0926 45%,#0a061c 100%) fixed;background-color:var(--bg);padding:0 16px 64px}
+a{color:var(--kick)}
+a:hover{color:#c3e2e7}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:780px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22)}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo svg{width:42px;height:42px;flex:none}
+.wm{font:700 30px/1 'Barlow Condensed','Arial Narrow',sans-serif}
+.wm-a{color:#fff}.wm-b{color:#c4b5fd}
+.back{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:700;text-decoration:none}
+.back:hover{color:#140e31;filter:brightness(1.06)}
+.intro{padding:52px 0 18px}
+.kick{margin:0;color:var(--kick);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+h1{font:800 clamp(2.4rem,6vw,3.6rem)/1.05 Fraunces,Georgia,serif;margin:14px 0 0;color:#f7f4ff;text-wrap:balance}
+.intro p{color:var(--soft);font-size:1.08rem;margin:16px 0 0;max-width:600px}
+.toc{display:flex;flex-direction:column;gap:2px;margin:28px 0 0;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:20px}
+.toc a{display:flex;gap:14px;padding:8px 0;text-decoration:none;color:var(--fg)}
+.toc a:hover b{color:var(--kick)}
+.toc time{color:var(--muted);font-size:.88rem;flex:none;width:92px;padding-top:2px}
+article{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:32px;scroll-margin-top:16px}
+article time{color:var(--muted);font-size:.9rem}
+article h2{font:700 clamp(1.6rem,4vw,2.2rem)/1.15 Fraunces,Georgia,serif;margin:8px 0 14px;color:#f7f4ff;text-wrap:balance}
+article h3{font-size:1.1rem;margin:24px 0 6px}
+article p{margin:0 0 14px;color:var(--soft)}
+article ul{margin:0 0 14px;padding-left:22px;color:var(--soft)}
+article li{margin:6px 0}
+article b{color:#fff}
+article p.nota{border-left:3px solid var(--medio);background:rgba(251,191,36,.08);border-radius:0 12px 12px 0;padding:10px 14px;font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.tags span{border:1px solid #5e4bb0;border-radius:999px;padding:3px 12px;font-size:.8rem;color:#ece8fd}
+.fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.fig div{background:#1d1550;border:1px solid #3a2c7a;border-radius:16px;padding:14px 16px}
+.fig b{display:block;font:800 1.8rem/1.1 Fraunces,Georgia,serif}
+.fig span{color:var(--muted);font-size:.88rem}
+.share{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;padding-top:16px;border-top:1px solid rgba(196,181,253,.22);font-size:.92rem}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid rgba(196,181,253,.22);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;color:var(--muted);font-size:.92rem}
+footer .wm{font-size:22px}
+footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
+@media (max-width:620px){
+  body{font-size:16px}
+  .logo svg{width:36px;height:36px}.wm{font-size:26px}
+  article{padding:22px 20px}
+  .toc time{width:78px}
+}
+</style>
+<style>
+.lang{margin:18px 0 0;font-size:.95rem}
+.upd{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+.toc a{padding:6px 0}
+article table{width:100%;border-collapse:collapse;margin:0 0 14px;font-size:.95rem}
+article td,article th{text-align:left;vertical-align:top;padding:9px 10px;border-top:1px solid rgba(196,181,253,.22);color:var(--soft)}
+article th{color:var(--kick);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;border-top:0}
+article td:first-child{color:#fff;font-weight:600;width:34%}
+@media (max-width:520px){article td:first-child{width:auto} article td,article th{display:block;padding:6px 0} article tr{display:block;padding:8px 0;border-top:1px solid rgba(196,181,253,.22)} article td{border:0} article th{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="/en/" title="SolFlag">
+    <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="22" fill="#3a2a80" stroke="#a78bfa" stroke-width="2"/><g fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M23 10.5l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M19 12.8l4 2.3 4-2.3M23 15.1v4.6"/><path d="M14 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M10 26.3l4 2.3 4-2.3M14 28.6v4.6"/><path d="M32 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M28 26.3l4 2.3 4-2.3M32 28.6v4.6"/><path d="M19 15.1l-4.6 2.6v6.3M27 15.1l4.6 2.6v6.3M18 30.9L23 33.8l5-2.9"/></g></svg>
+    <span class="wm"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
+  </a>
+  <a class="back" href="/en/">Go to the scanner</a>
+</header>
+
+<section class="intro">
+  <p class="kick">Privacy</p>
+  <h1>We keep the minimum.</h1>
+  <p>SolFlag has no accounts, no cookies and no ads. What you save on the site stays in your browser. Here is everything that happens with your data, with no small print.</p>
+  <p class="upd">Last updated: 2 November 2026</p>
+  <p class="lang"><a href="/privacidad/" hreflang="es">Versión en español</a></p>
+</section>
+
+<article id="controller">
+  <h2>Who is responsible</h2>
+  <p>SolFlag is a project by El Gato Trade. For anything about your data, write to <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>.</p>
+</article>
+<article id="web">
+  <h2>The website (solflag.com)</h2>
+  <table>
+    <tr><th>What</th><th>Where and why</th></tr>
+    <tr><td>Your lists, Confluence groups, risk history, language and settings</td><td>Only in <b>your browser</b> (local storage), so you find them when you come back. They never reach us. They go when you clear the site's data in your browser.</td></tr>
+    <tr><td>Your RPC URL (for example from Helius), if you add one</td><td>Only in your browser. It is used to talk to that service from your browser; it never goes through us.</td></tr>
+    <tr><td>Analytics</td><td>We count visits and how often each feature is used (scan, whales, share, open the bot) with <b>GoatCounter</b>, <b>without cookies</b>. It records the page (if you arrive through a token link, it includes that token's address), where you came from, your browser, screen size and approximate country. We do not keep your IP or the wallets you analyse.</td></tr>
+    <tr><td>Hosting</td><td>The site is served by <b>GitHub Pages</b> (GitHub, Inc.), which may log your IP for technical and security reasons.</td></tr>
+    <tr><td>Fonts</td><td>Served from solflag.com: your browser does not request them from Google.</td></tr>
+  </table>
+  <p>To analyse a token or wallet, <b>your browser asks public services directly</b>: market data (DexScreener, GeckoTerminal, CoinGecko), RugCheck, Solana nodes (PublicNode, Solana Vibe Station or your own) and jsDelivr (the engine's code). They see your IP and the address you look up, and have their own privacy policies.</p>
+</article>
+<article id="bot">
+  <h2>The Telegram bot (@SolFlagBot)</h2>
+  <p>To send you alerts, the bot keeps for each chat: its <b>ID</b>, the <b>language</b>, what you <b>watch</b> (tokens and wallets) and your <b>price alerts</b>. It does not keep your name or phone number. It runs on a Bot-Hosting server.</p>
+  <p>To delete all of it, send <b>/delete</b> to the bot (it asks you to confirm). Telegram handles the data of its own app separately.</p>
+</article>
+<article id="chain">
+  <h2>Public on-chain data</h2>
+  <p>Solana addresses and transactions are public. SolFlag publishes data about addresses (the launch registry, known faces and the wallet base): <b>facts</b> visible on chain, such as how many launches a wallet paid for and how they ended, never personal labels or accusations.</p>
+  <p>If an address is yours and you think something about it is wrong, write to <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>: we will review it and correct any error.</p>
+</article>
+<article id="basis">
+  <h2>Why, and for how long</h2>
+  <ul>
+    <li><b>Analytics and on-chain data:</b> legitimate interest in improving the site and helping people spot risks.</li>
+    <li><b>Bot:</b> to provide the service you ask for. What it keeps stays while you use it or until you delete it.</li>
+    <li>We do not sell or share data with anyone, and there are no ads.</li>
+  </ul>
+</article>
+<article id="rights">
+  <h2>Your rights</h2>
+  <p>You can ask for access, correction, deletion, objection, restriction or portability of your data by writing to <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>. If you think we are not handling it properly, you can complain to the Spanish Data Protection Agency (<a href="https://www.aepd.es" target="_blank" rel="noopener">aepd.es</a>) or your local authority.</p>
+  <p>If this policy changes, you will see it here with the new date.</p>
+</article>
+
+<footer>
+  <span class="wm"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
+  <a href="/en/">Scanner</a>
+  <a href="/en/privacy/">Privacy</a>
+  <a href="/en/terms/">Terms</a>
+  <a href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Alert bot</a>
+  <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Open source</a>
+  <a href="mailto:solflag.team@gmail.com">Contact</a>
+  <p>SolFlag is a guidance tool, not financial advice.</p>
+</footer>
+</div>
+</body>
+</html>

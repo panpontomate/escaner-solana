@@ -10,6 +10,8 @@
 // wallet, token, con, spam, hoy, cancelado, helius, sol, dex) are deliberately not here.
 
 export const CODE = [
+  // footer: privacy and terms pages in English
+  ["<p class=\"foot\">Contamos visitas y análisis de forma anónima, sin cookies ni datos personales. <a href=\"/privacidad/\">Privacidad</a> · <a href=\"/terminos/\">Términos de uso</a></p>", "<p class=\"foot\">We count visits and analyses anonymously, with no cookies and no personal data. <a href=\"/en/privacy/\">Privacy</a> · <a href=\"/en/terms/\">Terms of use</a></p>"],
   // link previews (X, Telegram, WhatsApp): English image and address
   ['<meta property="og:url" content="https://solflag.com/">', '<meta property="og:url" content="https://solflag.com/en/">'],
   ['<meta property="og:image" content="https://solflag.com/og.png">', '<meta property="og:image" content="https://solflag.com/og-en.png">'],
@@ -50,7 +52,6 @@ export const CODE = [
 
 export const TEXT = {
   // ---------- SolFlag: cabecera, portada y pie (oct 2026) ----------
-  "Contamos visitas y análisis de forma anónima, sin cookies ni datos personales.": "We count visits and analyses anonymously, with no cookies and no personal data.",
   "Blog · Avances": "Blog · Updates (Spanish)",
   "Contacto": "Contact",
   "Creado por": "Created by",
