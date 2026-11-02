@@ -180,3 +180,48 @@ export function perHour(sigs) {
   const span = (sigs[0].blockTime - sigs[sigs.length - 1].blockTime) / 3600;
   return span > 0 ? sigs.length / span : sigs.length * 3600;
 }
+
+// ----- Datos del lanzamiento leídos de la cadena (sin depender de RugCheck) -----
+// Pump.fun guarda el creador dentro de la instrucción de creación: 8 bytes de discriminador, nombre, símbolo y uri
+// (cada uno con 4 bytes de longitud) y luego 32 bytes con la dirección del creador. Sirve para create y create_v2.
+// RugCheck tarda en tenerlo en los tokens de pocos minutos y a veces no responde (31/10/2026)
+export const PUMP_PROGRAM = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
+const B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+export function b58decode(s) {
+  let n = 0n;
+  for (const c of s) { const i = B58.indexOf(c); if (i < 0) return null; n = n * 58n + BigInt(i); }
+  const out = [];
+  while (n > 0n) { out.unshift(Number(n & 255n)); n >>= 8n; }
+  for (const c of s) { if (c !== "1") break; out.unshift(0); }
+  return Uint8Array.from(out);
+}
+export function b58encode(b) {
+  let n = 0n, s = "";
+  for (const x of b) n = n * 256n + BigInt(x);
+  while (n > 0n) { s = B58[Number(n % 58n)] + s; n /= 58n; }
+  for (const x of b) { if (x !== 0) break; s = "1" + s; }
+  return s;
+}
+// tx: getTransaction en jsonParsed. Devuelve el creador o null si no es una creación de Pump.fun de ese token
+export function pumpCreator(tx, mint) {
+  const m = tx && tx.transaction && tx.transaction.message;
+  if (!m) return null;
+  const inner = ((tx.meta && tx.meta.innerInstructions) || []).map(function (x) { return x.instructions; });
+  const all = (m.instructions || []).concat.apply(m.instructions || [], inner);
+  for (const ix of all) {
+    if (ix.programId !== PUMP_PROGRAM || !ix.data || !ix.accounts || ix.accounts[0] !== mint) continue;
+    const d = b58decode(ix.data);
+    if (!d) continue;
+    let o = 8, ok = true;
+    for (let k = 0; k < 3 && ok; k++) {
+      if (o + 4 > d.length) { ok = false; break; }
+      o += 4 + (d[o] | (d[o + 1] << 8) | (d[o + 2] << 16) | (d[o + 3] << 24));
+      if (o > d.length) ok = false;
+    }
+    if (ok && o + 32 <= d.length) return b58encode(d.slice(o, o + 32));
+  }
+  return null;
+}
+// Lanzador a partir del dex de GeckoTerminal (mismos nombres que usa RugCheck en launchpad.platform)
+const DEX_PLAT = { "pump-fun": "pump_fun", pumpfun: "pump_fun", "raydium-launchlab": "raydium_launchlab", "meteora-dbc": "meteora_dbc" };
+export function platFromDex(dex) { return DEX_PLAT[dex] || undefined; }

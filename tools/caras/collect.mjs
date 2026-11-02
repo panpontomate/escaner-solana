@@ -13,7 +13,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { DAY, INFRA_PER_HOUR, rcWatch, emptyState, addToken, addRolesLate, resolveToken, onCurve, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
+import { DAY, INFRA_PER_HOUR, rcWatch, emptyState, addToken, addRolesLate, pumpCreator, platFromDex, resolveToken, onCurve, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
 import { emptyBase, observe, mergeAporte, pruneBase, publishBase } from "./base.mjs";
 import { regEntry, regDue, regResolve, regRecheck, regRejudge, regPrune, regPublish, regFill, regMissing, dayOf, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
@@ -65,7 +65,7 @@ async function getJson(url) {
   }
   return null;
 }
-// RugCheck: si falla RC_BREAK veces seguidas se deja de llamar en esta ejecución (cada fallo cuesta hasta ~45 s)
+// RugCheck: si se cae (RC_BREAK fallos seguidos de servidor) se deja de llamar en esta ejecución (cada fallo cuesta hasta ~45 s)
 // y lo que falte se pide en las siguientes (state.rcQ)
 const RUGCHECK = "https://api.rugcheck.xyz/v1/tokens/";
 const RC_BREAK = 5, RC_TRIES = 6, RC_RETRY = +process.env.RC_RETRY || 150;
@@ -74,8 +74,11 @@ async function rugcheck(mint, log) {
   if (rcStreak >= RC_BREAK) { (log.rcMotivos = log.rcMotivos || {}).cortado = (log.rcMotivos.cortado || 0) + 1; return null; }
   const rc = await getJson(RUGCHECK + mint + "/report");
   await sleep(600);
-  if (rc) { rcStreak = 0; return rc; }
-  rcStreak++;
+  // un 4xx (p. ej. 400 «unable to generate report» en tokens de pocos minutos) es que aún no tiene el token, no que
+  // esté caído: no cuenta para cortar. Solo cuentan 429, 5xx, tiempo agotado y red
+  const down = !lastFail || lastFail === 429 || typeof lastFail === "string" || lastFail >= 500;
+  if (rc || !down) rcStreak = 0; else { rcStreak++; log.rcCaido = (log.rcCaido || 0) + 1; }
+  if (rc) return rc;
   const k = String(lastFail || "vacío");
   (log.rcMotivos = log.rcMotivos || {})[k] = (log.rcMotivos[k] || 0) + 1;
   return null;
@@ -93,7 +96,11 @@ async function earliest(addr) {
   for (let i = 0; i < 3; i++) {
     const page = await rpc("getSignaturesForAddress", [addr, before ? { limit: 1000, before } : { limit: 1000 }]);
     if (!page || !page.length) return null;
-    if (page.length < 1000) return { signers: await signersOf(page[page.length - 1].signature), page };
+    if (page.length < 1000) {
+      const tx = await rpc("getTransaction", [page[page.length - 1].signature, { maxSupportedTransactionVersion: 1, encoding: "jsonParsed", commitment: "confirmed" }]);
+      const keys = tx && tx.transaction && tx.transaction.message.accountKeys;
+      return { signers: keys ? keys.filter((k) => k.signer).map((k) => k.pubkey) : null, page, tx };
+    }
     before = page[page.length - 1].signature;
   }
   return null;
@@ -159,6 +166,9 @@ for (const f of fresh.slice(0, MAX_NEW)) {
     if (rc) { const i = rcInfo(rc); t.creator = i.creator; t.rug = i.rug; t.plat = i.plat; }
     const me = await earliest(f.mint);                      // quien pagó la creación del token
     if (me && me.signers && me.signers[0]) t.payer = me.signers[0];
+    // creador y lanzador leídos de la cadena cuando RugCheck no los da (caído, o el token es de hace minutos)
+    if (!t.creator) { const c = pumpCreator(me && me.tx, f.mint); if (c) { t.creator = c; log.creadorCadena = (log.creadorCadena || 0) + 1; } }
+    if (!t.plat || t.plat === "unknown") t.plat = platFromDex(f.dex) || t.plat;
     // compradores de los primeros bloques, solo en los que se analizan (cada uno es una petición más)
     if (D1 && me && log.registro < REG_MAX) {
       const buyers = [];
@@ -258,9 +268,10 @@ for (const stage of ["h24", "d7"]) {
 Object.keys(state.reg).forEach((m) => { regRecheck(state.reg[m], "h24"); regRecheck(state.reg[m], "d7"); });
 
 // RugCheck caído: aviso visible en la ejecución y, tras varias seguidas, por Telegram (y otro cuando vuelve)
-if (log.sinRugCheck && process.env.GITHUB_ACTIONS) console.log("::warning::RugCheck no respondió en " + log.sinRugCheck + " de " + log.nuevos + " tokens nuevos (motivos: " + JSON.stringify(log.rcMotivos || {}) + "); se vuelven a pedir en las siguientes ejecuciones");
+if (log.sinRugCheck && process.env.GITHUB_ACTIONS) console.log((log.rcCaido ? "::warning::" : "::notice::") + "RugCheck no respondió en " + log.sinRugCheck + " de " + log.nuevos + " tokens nuevos (motivos: " + JSON.stringify(log.rcMotivos || {}) + "); se vuelven a pedir en las siguientes ejecuciones");
 {
-  const w = rcWatch(state.rcDown, log.nuevos, log.sinRugCheck || 0);
+  // solo las caídas de verdad (no los 400 de tokens que RugCheck aún no tiene) cuentan para el aviso por Telegram
+  const w = rcWatch(state.rcDown, log.nuevos, log.rcCaido || 0);
   state.rcDown = w.down;
   const TG = process.env.AVISO_TELEGRAM_TOKEN, CHAT = process.env.AVISO_TELEGRAM_CHAT;
   if (w.msg && TG && CHAT) {

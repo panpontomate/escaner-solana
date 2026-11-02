@@ -129,3 +129,20 @@ test("addRolesLate: late creator/funder count as faces, once, with the known out
   assert.equal(addRolesLate(s, "M3", { creator: "Z" }, {}, null), 0);
   assert.equal(s.faces.Z, undefined);
 });
+
+test("pumpCreator reads the creator from a Pump.fun create instruction; platFromDex", async () => {
+  const { pumpCreator, platFromDex, b58encode, b58decode, PUMP_PROGRAM } = await import("./lib.mjs");
+  const CREATOR = "93JtxYeaLkgdWYPVGgfJ8oSsMMMFZuBryrYi6zqQxUfa", MINT = "CmSiqNCJUxDbos9urLrJ9ZiDRkqKkkZnQTfmU3E4pump";
+  assert.equal(b58encode(b58decode(CREATOR)), CREATOR);
+  const str = (x) => { const b = Buffer.from(x); const l = Buffer.alloc(4); l.writeUInt32LE(b.length); return Buffer.concat([l, b]); };
+  const data = Buffer.concat([Buffer.from([214, 144, 76, 236, 95, 139, 49, 180]), str("PUMP SI"), str("PSI"), str("https://ipfs.io/ipfs/Qm"),
+    Buffer.from(b58decode(CREATOR)), Buffer.from([1, 0, 0])]);
+  const ix = { programId: PUMP_PROGRAM, accounts: [MINT, "X"], data: b58encode(data) };
+  const tx = (ixs, inner) => ({ transaction: { message: { instructions: ixs } }, meta: { innerInstructions: inner || [] } });
+  assert.equal(pumpCreator(tx([{ programId: "11111111111111111111111111111111", parsed: {} }, ix]), MINT), CREATOR);
+  assert.equal(pumpCreator(tx([], [{ instructions: [ix] }]), MINT), CREATOR);                 // inside a CPI too
+  assert.equal(pumpCreator(tx([ix]), "OtherMint"), null);                                      // other token's create
+  assert.equal(pumpCreator(tx([Object.assign({}, ix, { data: b58encode(data.subarray(0, 40)) })]), MINT), null);  // truncated
+  assert.equal(pumpCreator(null, MINT), null);
+  assert.deepEqual([platFromDex("pump-fun"), platFromDex("meteora-dbc"), platFromDex("pumpswap")], ["pump_fun", "meteora_dbc", undefined]);
+});
