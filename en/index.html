@@ -2366,7 +2366,7 @@ function renderToken(noScroll){
   var r=state.token, L=LEVELS[r.lvl], fav=!!lista.t[r.mint];
   var tip=TOKEN_TIP[r.lvl]||"";
   if(r.launchLvl) tip+=" Raised to "+L.label.toLowerCase()+(r.faceLvl?" because of who is behind the launch (see Creator control).":" because of what happened at launch (see Launch buys).");
-  if(r.imp) tip="It is a copy of "+r.imp.sym+" with another address. Even if it shows a price, it is not worth that: do not buy it, and if you hold it, do not visit websites under its name to “swap” or “claim” it.";
+  if(r.imp) tip="It is a copy of "+r.imp.sym+" with another address: it is not "+r.imp.sym+" and its price has nothing to do with the real one. Do not buy it thinking it is the original, and if you hold it, do not visit websites under its name to “swap” or “claim” it.";
   else if(dataOnly(r)){
     tip="There is no concrete warning sign: it is rated medium only because this is still unchecked: "+missingText(r)+". What was not checked is never assumed fine. Analyse it again in a while: the verdict may drop to low risk.";
     if(!ownRpc()) tip+=" If it happens often, a free Helius URL in Settings makes it more reliable.";

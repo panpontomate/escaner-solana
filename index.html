@@ -2366,7 +2366,7 @@ function renderToken(noScroll){
   var r=state.token, L=LEVELS[r.lvl], fav=!!lista.t[r.mint];
   var tip=TOKEN_TIP[r.lvl]||"";
   if(r.launchLvl) tip+=" Sube a "+L.label.toLowerCase()+(r.faceLvl?" por quién está detrás del lanzamiento (mira «Control del creador»).":" por lo que pasó en el lanzamiento (mira «Compras en el lanzamiento»).");
-  if(r.imp) tip="Es una copia de "+r.imp.sym+" con otra dirección. Aunque marque un precio, no vale eso: no lo compres, y si lo tienes, no entres en webs que aparezcan a su nombre para «cambiarlo» o «reclamarlo».";
+  if(r.imp) tip="Es una copia de "+r.imp.sym+" con otra dirección: no es "+r.imp.sym+" y su precio no tiene nada que ver con el suyo. No lo compres pensando que es el original, y si lo tienes, no entres en webs que aparezcan a su nombre para «cambiarlo» o «reclamarlo».";
   else if(dataOnly(r)){
     tip="No hay ninguna señal de alerta concreta: sale como riesgo medio solo porque falta comprobar "+missingText(r)+", y lo que no se ha comprobado no se da por bueno. Vuelve a analizarlo en un rato: el veredicto puede bajar a riesgo bajo.";
     if(!ownRpc()) tip+=" Si te pasa a menudo, una URL de Helius (gratis) en Ajustes lo hace más fiable.";
