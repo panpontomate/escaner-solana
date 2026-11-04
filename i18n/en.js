@@ -597,7 +597,6 @@ export const TEXT = {
     " never took off (under $10,000 a day later, or rugged). They usually launch with a fresh creator each time so they are not recognised.",
   " · tokens suyos que no despegaron: ": " · its tokens that never took off: ",
   "' title='Analizar este token'>": "' title='Analyse this token'>",
-  "cara conocida": "known face",
 
   // ---------- token cards ----------
   "Precio <span class='v'>": "Price <span class='v'>",
@@ -890,6 +889,7 @@ export const TEXT = {
   "'>Descargar imagen</a>": "'>Download image</a>",
   "<button class='btn ghost' type='button' data-xclose>Cerrar</button></div></div>": "<button class='btn ghost' type='button' data-xclose>Close</button></div></div>",
   " por lo que pasó en el lanzamiento (mira «Compras en el lanzamiento»).": " because of what happened at launch (see Launch buys).",
+  " por quién está detrás del lanzamiento (mira «Control del creador»).": " because of who is behind the launch (see Creator control).",
   "No se puede revisar: tiene más de 25.000 operaciones y el lanzamiento queda demasiado atrás.": "Cannot be checked: it has more than 25,000 trades and the launch is too far back.",
   "No se puede revisar: tiene más de 4.000 operaciones y el lanzamiento queda demasiado atrás. Con tu propia URL de Helius en Ajustes se llega hasta 25.000.": "Cannot be checked: it has more than 4,000 trades and the launch is too far back. With your own Helius URL in Settings it reaches 25,000.",
   "Todavía no tiene operaciones que revisar.": "It has no trades to check yet.",

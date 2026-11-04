@@ -387,7 +387,7 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 .tag.kb-warn{background:rgba(251,191,36,.12);color:#fcd34d;border-color:rgba(251,191,36,.45)}
 #bundlebox .sold{margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-size:.9rem}
 #bundlebox .sold-warn{background:var(--medio-bg)} #bundlebox .sold-bad{background:var(--alto-bg)}
-#bundlebox .face{margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--alto-bg);color:var(--fg);font-size:.9rem}
+#bundlebox .face,.lt .face{margin:8px 0 0;padding:8px 10px;border-radius:10px;background:var(--alto-bg);color:var(--fg);font-size:.9rem}
 .pmenu-body{min-width:290px} .pmenu-body a{white-space:nowrap}
 /* botones del token: en el ordenador Descargar · X · Telegram · Alerta en una fila y Copiar · Seguir · Ballenas debajo; en el móvil, Descargar entero, X · Telegram · Alerta
    en tres cuadrados y Copiar · Seguir · Ballenas en una barra con separadores */
@@ -2052,12 +2052,37 @@ async function assess(mint,par,valor,unchecked,noConc,copies){
   var r=await call(SRE.assess(client(),mint,par,{value:valor,marketUnknown:unchecked,skipConcentration:noConc,copies:!!copies}));
   if(!r) return null;   // NFT
   var lights=r.lights?r.lights.map(function(l){ return {k:SRE_LK[l.k],s:l.s,t:SRE.explainLight(l,"en")}; }):null;
+  var cl0=r.lights&&r.lights.filter(function(l){ return SRE_LK[l.k]==="ctl"; })[0];
   return {
+    ctlAlt:cl0?ctlSinRC(cl0):null,
     mint:r.mint, sym:r.sym, name:r.name, pts:r.pts, sev:r.sev, lvl:SRE_LV[r.lvl]||r.lvl,
     why:lights?lightsWhy(lights):r.reasons.map(function(x){ return SRE.describe(x,"en"); }),
     warn:[], lights:lights, type:SRE_TY[r.type]||null, valor:valor, par:r.pair, imp:r.impostor, img:r.img,
     cr:(r.creator&&r.creator.creator)||null
   };
+}
+
+// Control del creador sin lo que dice RugCheck del historial del creador (lanzador en serie, tokens previos que no
+// despegaron): cuando sale una cara conocida, nuestro dato lo sustituye. Mismo cálculo de color que el motor
+var RC_CTL=["CTL_SERIAL_CREATOR","CTL_CREATOR_HISTORY"];
+function ctlSinRC(l0){
+  var it=l0.items.filter(function(x){ return RC_CTL.indexOf(x.code)<0; }), l={items:it}, st=l0.s;
+  if(it.length<l0.items.length){
+    st="ok"; it.forEach(function(x){ if(RANKS[x.s]>RANKS[st]) st=x.s; });
+    if(st==="ok"&&it.some(function(x){ return x.s==="na"; })) st="na";
+  }
+  return {s:st,t:it.length?SRE.explainLight(l,"en"):""};
+}
+// La cara conocida va en Control del creador, con su wallet y sus tokens que no despegaron
+function faceToCtl(r,b){
+  var cl=r.lights&&r.lights.filter(function(l){ return l.k==="ctl"; })[0];
+  if(!cl||!b.face) return false;
+  var a=r.ctlAlt||{s:cl.s,t:cl.t}, ft=faceText(b.face), fs=b.face.f.lvl==="bad"?"bad":"warn";
+  cl.s=a.s==="bad"?"bad":fs; cl.t=(a.t?a.t+". ":"")+ft; cl.tv=a.t; cl.face=true;
+  cl.x="<p class='face'>"+esc(ft)+"</p><p class='hint'>Wallet: <a href='#' class='mono' data-analyze='"+esc(b.face.a)+"' title='Analyse this wallet'>"+esc(short(b.face.a))+"</a>"+
+    (b.face.f.ex&&b.face.f.ex.length?" · its tokens that never took off: "+b.face.f.ex.map(function(m){ return "<a href='#' class='mono' data-analyze='"+esc(m)+"' title='Analyse this token'>"+esc(short(m))+"</a>"; }).join(", "):"")+"</p>";
+  r.why=lightsWhy(r.lights);
+  return true;
 }
 
 async function holderBase(mint,step){
@@ -2340,7 +2365,7 @@ function ringHtml(r){
 function renderToken(noScroll){
   var r=state.token, L=LEVELS[r.lvl], fav=!!lista.t[r.mint];
   var tip=TOKEN_TIP[r.lvl]||"";
-  if(r.launchLvl) tip+=" Raised to "+L.label.toLowerCase()+" because of what happened at launch (see Launch buys).";
+  if(r.launchLvl) tip+=" Raised to "+L.label.toLowerCase()+(r.faceLvl?" because of who is behind the launch (see Creator control).":" because of what happened at launch (see Launch buys).");
   if(r.imp) tip="It is a copy of "+r.imp.sym+" with another address. Even if it shows a price, it is not worth that: do not buy it, and if you hold it, do not visit websites under its name to “swap” or “claim” it.";
   else if(dataOnly(r)){
     tip="There is no concrete warning sign: it is rated medium only because this is still unchecked: "+missingText(r)+". What was not checked is never assumed fine. Analyse it again in a while: the verdict may drop to low risk.";
@@ -2544,7 +2569,7 @@ function renderList(){
         "<div class='meta'>"+meta.join("")+"</div>"+
         (function(){
           var ORD={bad:0,warn:1,na:2,ok:3};
-          function ltHtml(l){ return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div><b>"+LKEYS[l.k]+" <em class='lfl'>"+esc(FLAGTXT[l.s]||"")+"</em></b><span>"+esc(l.t)+"</span></div></div>"; }
+          function ltHtml(l){ var t=l.tv!=null?l.tv:l.t; return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div style='min-width:0;flex:1'><b>"+LKEYS[l.k]+" <em class='lfl'>"+esc(FLAGTXT[l.s]||"")+"</em></b>"+(t?"<span>"+esc(t)+"</span>":"")+(l.x||"")+"</div></div>"; }
           var sorted=r.lights?r.lights.slice().sort(function(a,b){ return (ORD[a.s]==null?2:ORD[a.s])-(ORD[b.s]==null?2:ORD[b.s]); }):[];
           var oks=sorted.filter(function(l){ return l.s==="ok"; }), rest=sorted.filter(function(l){ return l.s!=="ok"; });
           // en el móvil, si hay algo que no está en verde, las verdes van plegadas en una línea
@@ -2969,12 +2994,6 @@ async function paintBundle(){
     v={s:v.s==="bad"||sv.s==="bad"?"bad":(v.s==="warn"||sv.s==="warn"?"warn":v.s),t:v.t+" "+sv.t,face:v.face,base:base0,sold:sv.s};
     extra+="<p class='sold sold-"+sv.s+"'>"+esc(sv.t)+"</p>";
   }
-  if(b.face){
-    var ft=faceText(b.face);
-    v={s:v.s==="bad"||b.face.f.lvl==="bad"?"bad":"warn",t:v.t+" "+ft,face:true,base:v.base||v.t,sold:v.sold};
-    extra+="<p class='face'>"+esc(ft)+"</p><p class='hint'>Wallet: <a href='#' class='mono' data-analyze='"+esc(b.face.a)+"' title='Analyse this wallet'>"+esc(short(b.face.a))+"</a>"+
-      (b.face.f.ex&&b.face.f.ex.length?" · its tokens that never took off: "+b.face.f.ex.map(function(m){ return "<a href='#' class='mono' data-analyze='"+esc(m)+"' title='Analyse this token'>"+esc(short(m))+"</a>"; }).join(", "):"")+"</p>";
-  }
   if(b.ws&&b.ws.length){
     var others=b.ws.filter(function(x){ return !x.creator; }).map(function(x){ return x.w; });
     extra+="<details class='cdet'><summary>See who bought ("+b.ws.length+")</summary>"+b.ws.map(function(x){
@@ -2984,8 +3003,13 @@ async function paintBundle(){
   }
   // Un lanzamiento en rojo cuenta como una alerta fuerte más (el círculo y el post de X la cuentan); si además
   // sube el veredicto se guarda en el historial. Se repinta una sola vez: la segunda pasada ya tiene r.launch
+  // La cara conocida se pinta en Control del creador, pero sube el veredicto igual que antes (como parte del lanzamiento)
   var first=!r.launch; r.launch=v;
-  if(raiseByLaunch(r,v)||(first&&v.s==="bad")){ if(r.launchLvl){ r.hist=histRecord(r); keepSnap(r,false,true); } renderToken(true); return; }
+  var fs=b.face?(b.face.f.lvl==="bad"?"bad":"warn"):null, vR=fs?{s:v.s==="bad"||fs==="bad"?"bad":"warn"}:v;
+  var up=first&&raiseByLaunch(r,vR);
+  if(up&&v.s!=="bad") r.faceLvl=true;
+  var moved=first&&faceToCtl(r,b);
+  if(up||moved||(first&&v.s==="bad")){ if(r.launchLvl){ r.hist=histRecord(r); keepSnap(r,false,true); } renderToken(true); return; }
   if(nS>=SRE.SERIAL_WARN) extra+="<p class='hint'>Wallet that paid for the launch: <a href='#' class='mono' data-analyze='"+esc(b.creator)+"' title='Analyse this wallet'>"+esc(short(b.creator))+"</a></p>";
   box.className="lt lt-"+v.s;
   box.innerHTML="<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>"+esc(v.base||v.t)+"</span>"+extra+"</div>";
@@ -3249,7 +3273,7 @@ function cardVerdict(r){ return dataOnly(r)?"Medium due to missing data":LEVELS[
 function cardReason(r){
   if(dataOnly(r)) return "Still to check: "+missingText(r)+". What is not checked is not taken as fine.";
   var ws=cardWhy(r);
-  if(r.launch&&r.launch.s==="bad") ws.unshift(r.launch.face?"known face":r.launch.sold==="bad"?"launch buyers already sold":r.launch.t.indexOf("serial launcher")>=0?"serial launcher":"launch bundle");
+  if(r.launch&&r.launch.s==="bad") ws.unshift(r.launch.sold==="bad"?"launch buyers already sold":r.launch.t.indexOf("serial launcher")>=0?"serial launcher":"launch bundle");
   if(ws.length&&r.lvl!=="BAJO"){ var s=ws.slice(0,3).join(" · "); return s.charAt(0).toUpperCase()+s.slice(1)+"."; }
   return String(TOKEN_TIP[r.lvl]||"").split(". ")[0].replace(/\.?$/,".");
 }
