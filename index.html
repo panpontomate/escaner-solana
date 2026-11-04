@@ -1110,6 +1110,78 @@ details.ml-fold .star{width:38px;height:38px}
   .ml-al .l1{flex-wrap:wrap;gap:4px 8px}
   .ml-al .l1 b{overflow:visible}
 }
+/* On-chain Map: el mapa de un token a pantalla completa */
+body.om-open{overflow:hidden}
+.omap{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;background:#170f43;color:var(--fg)}
+.omap[hidden]{display:none}
+.om-top{display:flex;align-items:center;gap:8px 16px;padding:10px 16px;border-bottom:1px solid var(--line);background:rgba(20,14,49,.92);flex-wrap:wrap}
+.om-brand{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;background:linear-gradient(90deg,#c084fc,#7ab8c4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.om-ttl{display:flex;align-items:center;gap:10px;min-width:0}
+.om-ttl b{font-family:var(--f-display);font-size:1.25rem}
+.om-head{margin:0;flex:1 1 320px;color:var(--muted);font-size:.92rem;min-width:0}
+.om-mode{border-radius:999px;padding:3px 10px;font-size:.76rem;font-weight:700;white-space:nowrap}
+.om-mode.young{background:#3a2c18;color:#fbbf24} .om-mode.mature{background:#163a2c;color:#4ade80}
+.om-act{display:flex;gap:8px;margin-left:auto}
+.om-act .btn{min-height:0;padding:8px 14px}
+.om-body{flex:1;display:flex;min-height:0}
+.om-stage{position:relative;flex:1;min-width:0;background:radial-gradient(ellipse at 50% 45%,#22175c 0%,#170f43 75%)}
+#omSvg{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.om-panel{width:340px;flex:none;overflow:auto;border-left:1px solid var(--line);background:var(--surface);padding:14px 16px 24px}
+.omap.om-np .om-panel{display:none}
+.om-panel .eyebrow{margin:16px 0 8px}
+.om-panel .check{margin:6px 0}
+.om-panel .om-sig{display:grid;grid-template-columns:1fr;gap:8px;margin:0}
+.om-sig .lt{display:flex;align-items:flex-start;gap:10px;width:auto;margin:0}
+.om-sig .lt>div{flex:1;min-width:0}
+.om-sig .lt .ld{margin-top:.4em;flex:none}
+.om-sig .lt span{font-size:.88rem}
+.om-ok{color:var(--bajo);font-size:.88rem;margin:0}
+.om-facts{display:grid;gap:4px;margin-top:12px;font-size:.84rem;color:var(--muted)} .om-facts b{color:var(--fg)}
+.om-grp{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;background:var(--surface-2);color:var(--fg);border:1px solid transparent;border-radius:12px;padding:9px 11px;margin-bottom:8px;cursor:pointer;font:inherit;font-size:.86rem}
+.om-grp:hover,.om-grp.on{border-color:var(--accent)}
+.om-grp i{flex:none;width:12px;height:12px;border-radius:50%;margin-top:4px}
+.om-grp small{display:block;color:var(--muted);margin-top:2px}
+.om-leg{display:grid;gap:6px;font-size:.84rem}
+.om-leg span{display:flex;align-items:center;gap:9px}
+.om-leg i{flex:none;display:inline-block;width:14px;height:14px}
+.om-leg .sq{border-radius:50%;border:2px solid var(--c);background:color-mix(in srgb,var(--c) 28%,transparent)}
+.om-leg .sq.pl{border:2px dashed var(--cpo,#7c6fd6);background:none}
+.om-leg .sq.sm{width:9px;height:9px;margin:0 2.5px;border:1px solid #e9d5ff;background:rgba(233,213,255,.16)}
+.om-leg .sq.cr{border:2px dashed #fbbf24;background:none}
+.om-leg .src{border-radius:50%;border:2px solid var(--cpe,#c084fc);background:radial-gradient(circle,var(--cpe,#c084fc) 0 2px,transparent 3px)}
+.om-leg .ln{height:2px;width:18px;background:var(--cso,#5eead4)}
+.om-leg .ln.tk{background:var(--cto,#fcd34d)}
+.om-leg .kbdot{width:9px;height:9px;margin:0 2.5px;border-radius:50%;background:#fcd34d;box-shadow:0 0 0 1.5px #0b0722}
+.om-tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:.82rem;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;transition:opacity .12s;z-index:2}
+.om-tip b{display:block;font-size:.88rem;margin-bottom:2px}
+.om-y{color:#fbbf24} .om-dim{color:#8b85b8}
+.om-load{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:12px;background:rgba(24,17,62,.92);border:1px solid var(--line);border-radius:14px;padding:14px 18px;max-width:min(90%,440px);font-size:.92rem}
+.om-load[hidden]{display:none}
+.om-load.err{color:#ffb4b4}
+.om-spin{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid rgba(192,132,252,.25);border-top-color:#c084fc;animation:omspin .9s linear infinite}
+@keyframes omspin{to{transform:rotate(360deg)}}
+@keyframes omflow{to{stroke-dashoffset:-20}}
+@keyframes ombreathe{50%{stroke-opacity:1}}
+@keyframes omtwinkle{0%,100%{opacity:var(--o)}50%{opacity:calc(var(--o) * .25)}}
+.om-tokl{stroke-dasharray:6 4;animation:omflow 1.2s linear infinite}
+.om-hull{animation:ombreathe 3.2s ease-in-out infinite}
+.om-star{animation:omtwinkle var(--d) ease-in-out infinite;animation-delay:var(--dl)}
+@media (prefers-reduced-motion:reduce){.om-tokl,.om-hull,.om-star,.om-spin{animation:none}}
+@media (max-width:760px){
+  .om-body{flex-direction:column}
+  .om-panel{width:auto;height:44vh;border-left:0;border-top:1px solid var(--line)}
+  .om-head{flex-basis:100%;order:3;font-size:.86rem}
+}
+/* botón que abre el mapa desde el análisis del token y desde Ballenas */
+.btn.tmap{display:flex;align-items:center;justify-content:center;gap:8px;flex:0 0 100%;color:#fff;font-weight:700;letter-spacing:.02em;
+  background:linear-gradient(90deg,rgba(192,132,252,.24),rgba(122,184,196,.24));border:1px solid rgba(192,132,252,.6);box-shadow:0 0 18px rgba(192,132,252,.22)}
+.btn.tmap:hover{box-shadow:0 0 26px rgba(192,132,252,.38)}
+.btn.tmap .ic{font-size:1.1rem}
+/* con la pestaña On-chain Map son seis: en el móvil caben en una sola fila */
+@media (max-width:700px){ .brand .tabs,.tabs{grid-template-columns:repeat(6,minmax(0,1fr))} .brand .tab,.tab{font-size:.62rem;padding:8px 1px} }
+@media (max-width:360px){ #tabC>span{font-size:.54rem;letter-spacing:-.02em} }
+.tmsub{font-weight:500;opacity:.75}
+.tdesk .tmap{grid-column:1/-1}
 </style>
 </head>
 <body>
@@ -1141,6 +1213,7 @@ details.ml-fold .star{width:38px;height:38px}
     <div class="tabs" role="tablist" aria-label="Secciones">
       <button type="button" class="tab" id="tabW" role="tab" aria-selected="true"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Escáner</span></button>
       <button type="button" class="tab" id="tabH" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13c3-4 7-6 12-5l4-3v6c0 4-4 7-9 7-3 0-5-1-7-3"/></svg><span>Ballenas</span></button>
+      <button type="button" class="tab" id="tabM" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="15" y="4" width="5" height="5" rx="1.2"/><rect x="9" y="15" width="6" height="6" rx="1.5"/><path d="M9 7l6-1M7.5 9l3.5 6M17 9l-3 6"/></svg><span class="tl-lg">On-chain Map</span><span class="tl-sm">Map</span></button>
       <button type="button" class="tab" id="tabN" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg><span class="tl-lg">Tokens nuevos</span><span class="tl-sm">Nuevos</span></button>
       <button type="button" class="tab" id="tabL" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Mi lista <span id="lcount"></span></span></button>
       <button type="button" class="tab" id="tabC" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg><span>Confluencia <span id="ccount"></span></span></button>
@@ -1178,6 +1251,14 @@ details.ml-fold .star{width:38px;height:38px}
         <button class="btn" id="hgo" type="submit">Buscar</button>
       </div>
       <p class="hint">Muestra las cuentas con más saldo y se queda solo con las que parecen personas: descarta pools, programas y cuentas muy activas (bots, exchanges, market makers). Después te deja analizar cada wallet.</p>
+    </form>
+    <form id="mform" autocomplete="off" hidden>
+      <label class="eyebrow" for="mmint">Dirección del token</label>
+      <div class="row">
+        <input id="mmint" type="text" spellcheck="false" placeholder="Pega aquí la dirección (mint) del token">
+        <button class="btn" type="submit">Ver el mapa</button>
+      </div>
+      <p class="hint">Dibuja todo lo que rodea a un token a pantalla completa: sus mayores holders, quién les dio su primer SOL, los grupos que comparten ese origen y las redes por las que se han pasado los tokens.</p>
     </form>
     <details class="adv" id="adv">
       <summary>Ajustes</summary>
@@ -1285,13 +1366,24 @@ details.ml-fold .star{width:38px;height:38px}
   </footer>
 </div>
 
+<div class="omap" id="omap" hidden role="dialog" aria-modal="true" aria-label="On-chain Map">
+  <div class="om-top">
+    <div class="om-ttl"><span class="om-brand">On-chain Map</span><b id="omSym"></b><span id="omMode"></span></div>
+    <p class="om-head" id="omHead"></p>
+    <div class="om-act"><button class="btn ghost small" type="button" id="omPanelBtn">Leyenda y grupos</button><button class="btn ghost small" type="button" id="omClose" aria-label="Cerrar el mapa">✕ Cerrar</button></div>
+  </div>
+  <div class="om-body">
+    <div class="om-stage" id="omStage"><svg id="omSvg" aria-label="Mapa de conexiones del token"></svg><div class="om-tip" id="omTip"></div><div class="om-load" id="omLoad" hidden></div></div>
+    <aside class="om-panel" id="omPanel"><div id="omPanelBody"></div></aside>
+  </div>
+</div>
 <script>
 // Si el motor (librería solana-risk-engine) no carga desde el CDN, se avisa en vez de dejar la página muerta
 setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById("error"); if(!e) return;
   e.innerHTML="No se pudo cargar el motor del escáner desde cdn.jsdelivr.net. Revisa tu conexión a internet y recarga la página."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.4.13/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.5.0/src/index.js";
 window.__escOk=true;
 (function(){
 "use strict";
@@ -2286,7 +2378,7 @@ function deskActions(r,fav){
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"b30"))+"'>📉 Si baja un 30%</a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"m20"))+"'>↕️ Cada vez que se mueva un 20%</a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,""))+"'>✏️ Otro precio (lo eliges en el bot)</a>":"";
-  return "<div class='actions tdesk'>"+
+  return "<div class='actions tdesk'><button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span><span class='tmsub'> · todo lo que rodea a este token</span></button>"+
     (r.par?"<button class='btn small tfav' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
     "<button class='btn small twh' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'><span class='dl'>Buscar ballenas</span><span class='ds'>Ballenas</span></span></button>"+
     "<details class='pmenu tshare'><summary class='btn small'><span class='ic'>↗</span><span class='lb'>Compartir</span><span class='car'>▾</span></summary><div class='pmenu-body'>"+share+"</div></details>"+
@@ -2394,6 +2486,7 @@ function renderToken(noScroll){
       "<div class='tsub'><button class='btn ghost small' type='button' data-copy='"+esc(tokenLink(r.mint))+"' title='Copia un enlace que abre directamente este análisis'><span class='ic'>🔗</span><span class='lb'>Copiar enlace</span></button>"+
       (r.par?"<button class='btn ghost small tfav' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
       "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'>Buscar ballenas</span></button></div>"+
+      "<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button>"+
     "</div>"+deskActions(r,fav);
   $("#filters").style.display="none";
   renderList();
@@ -3899,7 +3992,8 @@ function renderHolders(keep){
     (hiddenN>0?"<label class='check' style='margin-top:12px'><input type='checkbox' id='showAllH'"+(state.showAllH?" checked":"")+"> Mostrar también "+(bigAct.length?"las otras ":"las ")+hiddenN+(hiddenN===1?" cuenta que no parece persona":" cuentas que no parecen personas")+"</label>":"")+
     "<div class='actions'><button class='btn small' id='copyHold' type='button'>Copiar top 5 para un post</button>"+
     (wallets.length?"<button class='btn small ghost' id='addAllH' type='button'>⊕ Añadir las "+wallets.length+" personas a Confluencia</button>":"")+
-    "<a class='btn ghost small' style='text-decoration:none;display:inline-flex;align-items:center' target='_blank' rel='noopener' href='https://solscan.io/token/"+esc(h.mint)+"'>Ver en Solscan</a></div>";
+    "<a class='btn ghost small' style='text-decoration:none;display:inline-flex;align-items:center' target='_blank' rel='noopener' href='https://solscan.io/token/"+esc(h.mint)+"'>Ver en Solscan</a></div>"+
+    "<div class='actions'><button class='btn small tmap' type='button' data-map='"+esc(h.mint)+"' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button></div>";
 
   // Columna derecha: grupos por financiador, creador y cuentas excluidas
   var groups={};
@@ -3944,7 +4038,8 @@ function renderHolders(keep){
 function setMode(m){
   state.mode=m;
   document.body.setAttribute("data-m",m);
-  $("#form").hidden=(m!=="W"); $("#hform").hidden=(m!=="H");
+  $("#form").hidden=(m!=="W"); $("#hform").hidden=(m!=="H"); $("#mform").hidden=(m!=="M");
+  $("#tabM").setAttribute("aria-selected",String(m==="M"));
   $("#tabL").setAttribute("aria-selected",String(m==="L"));
   $("#tabC").setAttribute("aria-selected",String(m==="C"));
   $("#cresults").hidden=(m!=="C"); if(m==="C") renderConf();
@@ -3958,6 +4053,333 @@ function setMode(m){
   $("#error").hidden=true;
 }
 
+/* ---------- On-chain Map ----------
+   Todo el mapa de un token a pantalla completa: los mayores holders (burbujas del tamaño de lo que tienen y del
+   color de lo que son), quién dio a cada uno su primer SOL, los grupos que comparten ese origen y las redes de
+   transferencias de RugCheck. Los datos los da el motor (connectionMap); D3 se carga solo al abrir el mapa */
+var OM={maps:{},mint:null,hl:null,sim:null,drift:null,prevUrl:null,run:0,
+  show:{sol:true,solo:true,tok:true,ex:true,prog:true}};
+// Colores, forma y tamaños elegidos por el usuario en la maqueta del 31/10 (maquetas/onchain-map-ajustes.json)
+var OM_C={person:"#69369b",exchange:"#d06ad7",bot:"#4b86d2",pool:"#000000",sol:"#25d4d1",tok:"#f7d669"};
+var OM_GPAL=["#f0eff0","#a3e4bc","#c2bcb7","#f2b8d8","#e4c1f9","#d4ecaa"];
+var OM_TYPE={person:"Persona",exchange:"Exchange o plataforma",bot:"Bot o trader muy activo",pool:"Pool o programa"};
+var OM_CALM=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function omPct(x){ return x>0&&x<0.01?"<0,01%":x.toLocaleString("es-ES",{maximumFractionDigits:x<1?2:1})+"%"; }
+// Tamaño: crece casi en línea con el porcentaje, para que los grandes se noten mucho más que los pequeños
+function omRad(p,min){ return Math.min(90,Math.max(Math.max(min*6/7,2.5),3+9*Math.pow(Math.max(p,0),0.9))); }
+// Burbuja (círculo) de radio r
+function omShape(r){
+  return "M"+(-r)+",0A"+r+","+r+" 0 1,0 "+r+",0A"+r+","+r+" 0 1,0 "+(-r)+",0Z";
+}
+function omX(n){ return n.x+(n.ox||0); } function omY(n){ return n.y+(n.oy||0); }
+var omD3=null;
+function loadD3(){
+  if(window.d3) return Promise.resolve();
+  if(!omD3) omD3=new Promise(function(res,rej){
+    var s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js";
+    s.onload=res; s.onerror=function(){ omD3=null; rej(new Error("d3")); };
+    document.head.appendChild(s);
+  });
+  return omD3;
+}
+
+// Abre el mapa de un token a pantalla completa (desde la pestaña, el análisis o Ballenas)
+async function openMap(mint){
+  if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(mint||"")) return;
+  var box=$("#omap");
+  OM.mint=mint; OM.hl=null;
+  if(box.hidden){ OM.prevUrl=OM.prevUrl||location.pathname+location.search; document.body.classList.add("om-open"); box.classList.toggle("om-np",innerWidth<=760); }
+  box.hidden=false;
+  try{ history.replaceState(null,"",location.pathname+"?map="+mint); }catch(e){}
+  if(OM.maps[mint]&&OM.maps[mint].holders){ omPaint(); return; }
+  var run=++OM.run;
+  omStop(); $("#omSvg").innerHTML=""; $("#omPanelBody").innerHTML="";
+  $("#omSym").textContent=short(mint); $("#omMode").innerHTML=""; $("#omHead").textContent="";
+  omLoad("Preparando el mapa…");
+  state.rpc=$("#rpc").value.trim()||PUBLIC_RPC; state.cancel=false;
+  try{
+    var r=state.token&&state.token.mint===mint?state.token:null;
+    var created=r&&r.par&&r.par.pairCreatedAt;
+    var res=await Promise.all([
+      loadD3(), loadBase(),
+      call(SRE.connectionMap(client(),mint,{createdAt:created||undefined,onProgress:function(p){ if(run===OM.run) omLoad(SRE.describeStep(p,"es")+(p.data&&p.data.total?" "+p.data.done+"/"+p.data.total:"")); }})),
+      created?Promise.resolve(null):SRE.getMarkets(client(),[mint]).catch(function(){ return null; })
+    ]);
+    var m=res[2];
+    m.sym=(r&&r.sym)||(res[3]&&res[3].data[mint]&&res[3].data[mint].baseToken&&res[3].data[mint].baseToken.symbol)||short(mint);
+    OM.maps[mint]=m;
+    if(run!==OM.run||OM.mint!==mint) return;
+    omLoad(""); omPaint();
+  }catch(e){
+    if(run!==OM.run) return;
+    omLoad(e&&e.message==="d3"?"No se pudo cargar el dibujo del mapa (cdnjs.cloudflare.com). Revisa tu conexión y vuelve a intentarlo.":friendlyError(e),true);
+  }
+}
+function closeMap(){
+  OM.run++; omStop(); cancelEngine();
+  $("#omap").hidden=true; document.body.classList.remove("om-open");
+  try{ history.replaceState(null,"",OM.prevUrl||location.pathname); }catch(e){}
+}
+function omStop(){ if(OM.sim) OM.sim.stop(); if(OM.drift) OM.drift.stop(); OM.sim=OM.drift=null; }
+function omLoad(t,err){
+  var l=$("#omLoad"); l.hidden=!t; l.className="om-load"+(err?" err":"");
+  l.innerHTML=t?(err?"":"<i class='om-spin'></i>")+"<span>"+esc(t)+"</span>":"";
+}
+
+function omPaint(){
+  var m=OM.maps[OM.mint]; if(!m) return;
+  var show=OM.show, hl=OM.hl, young=m.mode==="young";
+  var days=m.ageDays===null?null:Math.floor(m.ageDays);
+  $("#omSym").textContent=m.sym;
+  $("#omMode").innerHTML="<span class='om-mode "+(young?"young":"mature")+"'>"+(young?"Token joven":"Token maduro")+
+    (days!==null?" · "+(days<1?"menos de 1 día":days+(days===1?" día":" días")):"")+"</span>";
+
+  // nodos
+  var nodes=[], links=[], idx={};
+  function add(n){ idx[n.id]=n; nodes.push(n); return n; }
+  var buyers={}, b=bundles[m.mint];
+  if(b&&b.ws) b.ws.forEach(function(x){ if(!x.creator) buyers[x.w]=1; });
+  m.holders.forEach(function(h){
+    if(baseType(h.addr)==="exchange"&&h.type!=="pool") h.type="exchange";
+    if(h.type==="pool"&&!show.prog) return;
+    if(h.type==="exchange"&&!show.ex) return;
+    add({id:h.addr,role:"holder",type:h.type,p:h.pct,rad:omRad(h.pct,7),rate:h.rate||0,f:h.funder,
+      creator:m.creator===h.addr,payer:m.payer===h.addr,early:!!buyers[h.addr],kb:baseType(h.addr)});
+  });
+  var groups=m.groups.map(function(g,i){
+    return {f:g.funder,id:g.id,p:g.pct,rate:g.rate,color:OM_GPAL[i%OM_GPAL.length],ms:g.members.map(function(a){ return idx[a]; }).filter(Boolean)};
+  }).filter(function(g){ return g.ms.length>=2; });
+  groups.forEach(function(g){ g.ms.forEach(function(n){ n.g=g; }); });
+  var by={};
+  nodes.forEach(function(n){ if(n.f) (by[n.f]=by[n.f]||[]).push(n); });
+  if(show.sol) Object.keys(by).forEach(function(f){
+    var s=m.sources[f]||{rate:0,type:"person"}, t=s.type==="exchange"||baseType(f)==="exchange"?"exchange":"person";
+    if(t==="exchange"&&!show.ex) return;
+    // un origen que solo financió a una wallet no dice nada: se oculta salvo que se pida
+    if(t!=="exchange"&&by[f].length<2&&!show.solo&&!idx[f]) return;
+    var n=idx[f]||add({id:f,role:"src",type:t,rad:8,rate:s.rate||0,n:by[f].length,kb:baseType(f)});
+    if(n.role==="src") n.g=groups.filter(function(g){ return g.f===f; })[0]||null;
+    by[f].forEach(function(h){ links.push({source:f,target:h.id,k:"sol"}); });
+  });
+  if(show.tok) m.nets.forEach(function(net,ni){
+    net.nodes.forEach(function(x){
+      if(!idx[x.addr]) add({id:x.addr,role:"net",type:"person",p:x.pct,rad:omRad(x.pct,3.2),net:ni,kb:baseType(x.addr)});
+      else idx[x.addr].inNet=true;
+    });
+    // en redes grandes cada flecha va más fina y tenue, para que la red no sea un bloque amarillo
+    var dense=net.nodes.length>40;
+    net.links.forEach(function(l){ if(idx[l[0]]&&idx[l[1]]&&l[0]!==l[1]) links.push({source:l[0],target:l[1],k:"tok",dense:dense}); });
+  });
+
+  // titular y panel
+  var top=groups[0];
+  $("#omHead").textContent=top&&top.p>=5?top.ms.length+" holders reciben su primer SOL de la misma wallet: "+omPct(top.p)+" del suministro"
+    :m.hub&&m.hub.out>=10?"Una wallet ha repartido tokens a "+m.hub.out+" wallets"
+    :top?top.ms.length+" holders comparten origen del SOL ("+omPct(top.p)+")"
+    :"Sin grupos claros entre los mayores holders";
+  var cnt={person:0,exchange:0,bot:0,pool:0};
+  m.holders.forEach(function(h){ cnt[h.type]++; });
+  var nw=m.nets.reduce(function(s,n){ return s+n.nodes.length; },0);
+  var sig=m.signals.map(function(x){ return "<div class='lt lt-"+x.s+"'><i class='ld'></i><div><span>"+esc(SRE.describe(x,"es"))+"</span></div></div>"; }).join("");
+  $("#omPanelBody").innerHTML=
+    (sig?"<div class='lights om-sig'>"+sig+"</div>":"<p class='om-ok'>Sin avisos: ningún grupo ni reparto pasa de los límites"+(young?" de un token joven.":" de un token maduro.")+"</p>")+
+    "<div class='om-facts'><span><b>"+m.holders.length+"</b> mayores holders</span><span><b>"+cnt.person+"</b> personas · <b>"+cnt.bot+"</b> bots · <b>"+cnt.exchange+"</b> exchanges · <b>"+cnt.pool+"</b> pools</span>"+
+      "<span><b>"+m.nets.length+"</b> "+(m.nets.length===1?"red":"redes")+" de transferencias · <b>"+nw+"</b> wallets</span>"+
+      (nodes.filter(function(n){ return n.kb; }).length?"<span><b>"+nodes.filter(function(n){ return n.kb; }).length+"</b> conocidas por la base de wallets de SolFlag</span>":"")+"</div>"+
+    (!client().ownRpc()&&m.holders.length<=20?"<p class='hint'>Con tu URL de Helius en Ajustes se ven 75 holders en vez de 20.</p>":"")+
+    "<p class='eyebrow'>Grupos</p>"+
+    (groups.length?groups.map(function(g){
+      return "<button type='button' class='om-grp"+(hl===g.f?" on":"")+"' data-omg='"+esc(g.f)+"'><i style='background:"+g.color+"'></i><span><b>Grupo "+esc(g.id)+" · "+g.ms.length+" holders · "+omPct(g.p)+"</b><small>Origen <span class='mono'>"+esc(short(g.f))+"</span> · "+Math.round(g.rate)+" tx/h</small></span></button>";
+    }).join(""):"<p class='hint'>Ningún grupo entre los mayores holders.</p>")+
+    "<p class='eyebrow'>Qué es cada wallet</p><div class='om-leg' style='--cpo:"+OM_C.pool+";--cso:"+OM_C.sol+";--cto:"+OM_C.tok+";--cpe:"+OM_C.person+"'>"+
+      "<span><i class='sq' style='--c:"+OM_C.person+"'></i>Persona</span><span><i class='sq' style='--c:"+OM_C.exchange+"'></i>Exchange o plataforma (+100 tx/h)</span>"+
+      "<span><i class='sq' style='--c:"+OM_C.bot+"'></i>Bot o trader muy activo</span><span><i class='sq pl'></i>Pool o programa</span>"+
+      "<span><i class='sq sm'></i>Wallet de una red de transferencias</span><span><i class='src'></i>Origen del SOL</span>"+
+      "<span><i class='ln'></i>Le dio su primer SOL</span><span><i class='ln tk'></i>Le pasó tokens</span><span><i class='sq cr'></i>Creador del token</span><span><i class='kbdot'></i>Ya conocida por la base de SolFlag</span></div>"+
+    "<p class='eyebrow'>Mostrar</p>"+
+    [["sol","Origen del SOL"],["solo","Orígenes con una sola wallet"],["tok","Transferencias de tokens"],["ex","Exchanges"],["prog","Pools y programas"]].map(function(o){
+      return "<label class='check'><input type='checkbox' data-oms='"+o[0]+"'"+(show[o[0]]?" checked":"")+"> "+o[1]+"</label>";
+    }).join("")+
+    "<p class='hint'>Tamaño = % del suministro. Rueda o dos dedos para hacer zoom, arrastra para moverte, pulsa una burbuja para abrirla en Solscan.</p>";
+
+  // dibujo
+  omStop();
+  var svgEl=$("#omSvg"), svg=d3.select(svgEl); svg.selectAll("*").remove();
+  var bb=svgEl.getBoundingClientRect(), W=bb.width||800, H=bb.height||600;
+  var defs=svg.append("defs");
+  var gr=defs.append("radialGradient").attr("id","omShine").attr("cx","35%").attr("cy","30%").attr("r","70%");
+  gr.append("stop").attr("offset","0%").attr("stop-color","#fff").attr("stop-opacity",.22);
+  gr.append("stop").attr("offset","60%").attr("stop-color","#fff").attr("stop-opacity",0);
+  // resplandor de neón tenue: el propio dibujo desenfocado debajo del nítido
+  [["omGlow",1.3],["omGlowS",0.74]].forEach(function(f){
+    var fl=defs.append("filter").attr("id",f[0]).attr("x","-60%").attr("y","-60%").attr("width","220%").attr("height","220%");
+    fl.append("feGaussianBlur").attr("in","SourceGraphic").attr("stdDeviation",f[1]).attr("result","b0");
+    fl.append("feComponentTransfer").attr("in","b0").attr("result","b").append("feFuncA").attr("type","linear").attr("slope",.7);
+    var mg=fl.append("feMerge"); mg.append("feMergeNode").attr("in","b"); mg.append("feMergeNode").attr("in","SourceGraphic");
+  });
+  defs.append("marker").attr("id","omArrow").attr("viewBox","0 0 10 10").attr("refX",9).attr("refY",5).attr("markerWidth",5).attr("markerHeight",5).attr("orient","auto")
+    .append("path").attr("d","M0 0L10 5L0 10z").attr("fill",OM_C.tok);
+  // cielo de estrellas que parpadean cada una a su ritmo
+  var rs=d3.randomLcg(7);
+  svg.append("g").selectAll("circle").data(d3.range(Math.round(W*H/2600))).join("circle").attr("class","om-star")
+    .attr("cx",function(){ return rs()*W; }).attr("cy",function(){ return rs()*H; })
+    .attr("r",function(){ var v=rs(); return v<.85?.5+v*.6:1.1+v*.5; }).attr("fill","#fff")
+    .attr("style",function(){ var o=(.12+rs()*.5).toFixed(2); return "--o:"+o+";opacity:"+o+";--d:"+(2.5+rs()*5).toFixed(1)+"s;--dl:-"+(rs()*6).toFixed(1)+"s"; });
+  var root=svg.append("g");
+  var zoom=d3.zoom().scaleExtent([.15,4]).on("zoom",function(e){ root.attr("transform",e.transform); });
+  svg.call(zoom);
+  var hullG=root.append("g");
+  var link=root.append("g").attr("filter","url(#omGlowS)").selectAll("line").data(links).join("line")
+    .attr("stroke",function(l){ var s=idx[l.source]; return l.k==="tok"?OM_C.tok:s&&s.g?s.g.color:OM_C.sol; })
+    .attr("stroke-width",function(l){ return l.k==="tok"?(l.dense?.7:1.2):1.5; }).attr("class",function(l){ return l.k==="tok"?"om-tokl":null; })
+    .attr("marker-end",function(l){ return l.k==="tok"?"url(#omArrow)":null; })
+    .attr("stroke-opacity",function(l){ var s=idx[l.source], t=idx[l.target]; return hl?((s.g&&s.g.f===hl)||(t.g&&t.g.f===hl)?.9:.06):(l.k==="tok"?(l.dense?.28:.55):.6); });
+  var node=root.append("g").attr("filter","url(#omGlow)").selectAll("g").data(nodes).join("g").style("cursor","pointer")
+    .attr("opacity",function(n){ return hl&&!(n.g&&n.g.f===hl)?.15:1; })
+    .call(d3.drag().on("start",function(e,n){ if(!e.active) OM.sim.alphaTarget(.2).restart(); n.fx=n.x; n.fy=n.y; })
+      .on("drag",function(e,n){ n.fx=e.x; n.fy=e.y; })
+      .on("end",function(e,n){ if(!e.active) OM.sim.alphaTarget(0); n.fx=null; n.fy=null; }));
+  node.each(function(n){
+    var g=d3.select(this), col=OM_C[n.type];
+    if(n.role==="src"){
+      g.append("circle").attr("r",6.5).attr("fill",col).attr("fill-opacity",.3).attr("stroke",n.g?n.g.color:col).attr("stroke-width",2.2);
+      g.append("circle").attr("r",2.2).attr("fill",n.g?n.g.color:col);
+      return;
+    }
+    if(n.type==="pool") g.append("path").attr("d",omShape(n.rad)).attr("fill","#140e31").attr("fill-opacity",.6).attr("stroke",col).attr("stroke-width",1.6).attr("stroke-dasharray","5 4");
+    else if(n.role==="net") g.append("path").attr("d",omShape(n.rad)).attr("fill","#e9d5ff").attr("fill-opacity",.16).attr("stroke","#e9d5ff").attr("stroke-opacity",.75).attr("stroke-width",.9).attr("stroke-linejoin","round");
+    else{
+      g.append("path").attr("d",omShape(n.rad)).attr("fill",col).attr("fill-opacity",.22).attr("stroke",col).attr("stroke-width",2.2).attr("stroke-linejoin","round");
+      g.append("path").attr("d",omShape(n.rad)).attr("fill","url(#omShine)");
+      if(n.g) g.append("path").attr("d",omShape(n.rad+4)).attr("fill","none").attr("stroke",n.g.color).attr("stroke-width",1.6).attr("stroke-linejoin","round");
+    }
+    if(n.kb) g.append("circle").attr("cx",n.rad*.82).attr("cy",-n.rad*.82).attr("r",Math.max(2.6,Math.min(5,n.rad*.22)))
+      .attr("fill",n.kb==="exchange"?OM_C.exchange:"#fcd34d").attr("stroke","#0b0722").attr("stroke-width",1.2);
+    if(n.creator||n.payer) g.append("path").attr("d",omShape(n.rad+(n.g?9:5))).attr("fill","none").attr("stroke","#fbbf24").attr("stroke-width",2).attr("stroke-dasharray","4 3");
+    if(n.p>=1&&n.rad>=14) g.append("text").text(omPct(n.p)).attr("text-anchor","middle").attr("dy",".35em")
+      .attr("font-size",Math.min(16,n.rad*.5)).attr("font-weight",700).attr("fill","#fff").attr("pointer-events","none");
+  });
+  var tip=$("#omTip");
+  node.on("mousemove",function(e,n){
+    var h;
+    if(n.role==="src") h="<b>Origen del SOL"+(n.g?" · grupo "+esc(n.g.id):"")+"</b><span class='mono'>"+esc(short(n.id))+"</span><br>"+OM_TYPE[n.type]+" · "+Math.round(n.rate).toLocaleString("es-ES")+" tx/h<br>Dio el primer SOL a "+n.n+(n.n===1?" holder":" holders");
+    else if(n.role==="net") h="<b>Wallet de una red de transferencias</b><span class='mono'>"+esc(short(n.id))+"</span><br>"+(n.p>=0.01?"Llegó a tener el "+omPct(n.p)+"<br>":"")+"Recibió o pasó tokens dentro de la red "+(n.net+1);
+    else h="<b>"+omPct(n.p)+" del suministro</b><span class='mono'>"+esc(short(n.id))+"</span><br>"+OM_TYPE[n.type]+(n.rate?" · "+Math.round(n.rate).toLocaleString("es-ES")+" tx/h":"")+
+      (n.creator?"<br><span class='om-y'>Creador del token</span>":"")+(n.payer?"<br><span class='om-y'>Pagó el lanzamiento</span>":"")+(n.early?"<br><span class='om-y'>Compró en el primer segundo</span>":"")+
+      (n.g?"<br>Grupo "+esc(n.g.id)+" ("+n.g.ms.length+" holders)":"")+(n.inNet?"<br>Está en una red de transferencias":"");
+    if(n.kb) h+="<br><span class='om-y'>"+esc(BASE_TXT[n.kb]||n.kb)+"</span> <span class='om-dim'>(base de SolFlag)</span>";
+    tip.innerHTML=h+"<br><span class='om-dim'>Pulsa para abrir en Solscan</span>";
+    var s=$("#omStage").getBoundingClientRect(), x=e.clientX-s.left+14, y=e.clientY-s.top+14;
+    if(x>s.width-260) x-=280; if(y>s.height-140) y-=150;
+    tip.style.left=x+"px"; tip.style.top=y+"px"; tip.style.opacity=1;
+  }).on("mouseleave",function(){ tip.style.opacity=0; })
+    .on("click",function(e,n){ if(e.defaultPrevented) return; window.open("https://solscan.io/account/"+n.id,"_blank","noopener"); });
+
+  omOrbit(nodes,links,m.mint.split("").reduce(function(h,ch){ return (h*31+ch.charCodeAt(0))>>>0; },7)/4294967296);
+  var sim=OM.sim=d3.forceSimulation(nodes)
+    .force("link",d3.forceLink(links).id(function(n){ return n.id; })
+      .distance(function(l){ return l.k==="tok"?14+l.source.rad+l.target.rad:40+l.source.rad+l.target.rad; })
+      .strength(function(l){ return l.k==="tok"?.9:.6; }))
+    .force("charge",d3.forceManyBody().strength(function(n){ return n.role==="net"?-14:-40-n.rad*4; }).distanceMax(160))
+    .force("collide",d3.forceCollide().radius(function(n){ return n.rad*1.18+(n.role==="net"?2.2:4); }))
+    .force("x",d3.forceX(function(n){ return n.tx; }).strength(function(n){ return n.solo?.3:.12; }))
+    .force("y",d3.forceY(function(n){ return n.ty; }).strength(function(n){ return n.solo?.3:.12; }))
+    .stop();
+  function draw(){
+    link.attr("x1",function(l){ return omX(l.source); }).attr("y1",function(l){ return omY(l.source); })
+      .attr("x2",function(l){ var dx=omX(l.target)-omX(l.source), dy=omY(l.target)-omY(l.source), len=Math.hypot(dx,dy)||1; return omX(l.target)-dx/len*(l.target.rad+2); })
+      .attr("y2",function(l){ var dx=omX(l.target)-omX(l.source), dy=omY(l.target)-omY(l.source), len=Math.hypot(dx,dy)||1; return omY(l.target)-dy/len*(l.target.rad+2); });
+    node.attr("transform",function(n){ return "translate("+omX(n)+","+omY(n)+")"; });
+    // contorno de cada grupo, solo la línea
+    hullG.selectAll("path").data(groups).join("path")
+      .attr("d",function(g){
+        var pts=[]; g.ms.forEach(function(n){ for(var a=0;a<16;a++) pts.push([omX(n)+Math.cos(a*Math.PI/8)*(n.rad+16),omY(n)+Math.sin(a*Math.PI/8)*(n.rad+16)]); });
+        var src=idx[g.f]; if(src&&src.x!==undefined) for(var a=0;a<16;a++) pts.push([omX(src)+Math.cos(a*Math.PI/8)*24,omY(src)+Math.sin(a*Math.PI/8)*24]);
+        var hh=d3.polygonHull(pts); g.top=hh?d3.min(hh,function(q){ return q[1]; }):0; g.cx=hh?d3.mean(hh,function(q){ return q[0]; }):0;
+        return hh?d3.line().curve(d3.curveCatmullRomClosed.alpha(.6))(hh):null;
+      })
+      .attr("fill","none").attr("stroke-width",1.8).attr("stroke",function(g){ return g.color; })
+      .attr("stroke-opacity",function(g){ return hl&&hl!==g.f?.1:.6; })
+      .attr("stroke-dasharray","6 5").attr("stroke-linejoin","round").attr("class","om-hull").attr("filter","url(#omGlowS)");
+    hullG.selectAll("text").data(groups).join("text").text(function(g){ return "Grupo "+g.id; })
+      .attr("x",function(g){ return g.cx; }).attr("y",function(g){ return g.top-6; }).attr("text-anchor","middle")
+      .attr("font-size",12).attr("font-weight",700).attr("fill",function(g){ return g.color; })
+      .attr("opacity",function(g){ return hl&&hl!==g.f?.2:1; });
+  }
+  for(var i=0;i<320;i++) sim.tick();
+  // encuadre: que quepa todo
+  var xs=nodes.map(function(n){ return n.x; }), ys=nodes.map(function(n){ return n.y; });
+  if(nodes.length){
+    var x0=d3.min(xs)-40, x1=d3.max(xs)+40, y0=d3.min(ys)-40, y1=d3.max(ys)+40;
+    var k=Math.min(1.6,Math.min(W/(x1-x0),H/(y1-y0)));
+    svg.call(zoom.transform,d3.zoomIdentity.translate(W/2-k*(x0+x1)/2,H/2-k*(y0+y1)/2).scale(k));
+  }
+  draw();
+  sim.on("tick",draw).alpha(.04).restart();
+  // vaivén: cada wallet flota despacio a su ritmo, como estrellas; las grandes se mueven menos
+  if(!OM_CALM){
+    nodes.forEach(function(n){
+      n.amp=n.role==="net"?1.4:Math.max(1.6,4.2-n.rad/18);
+      n.w1=2*Math.PI/(5000+Math.random()*5000); n.w2=2*Math.PI/(5000+Math.random()*5000);
+      n.p1=Math.random()*6.3; n.p2=Math.random()*6.3;
+    });
+    var last=0;
+    OM.drift=d3.timer(function(t){
+      if(t-last<33) return; last=t;
+      nodes.forEach(function(n){ n.ox=n.amp*Math.sin(t*n.w1+n.p1); n.oy=n.amp*Math.cos(t*n.w2+n.p2); });
+      draw();
+    });
+  }
+}
+// Conjuntos de wallets unidas por líneas: el mayor al centro y el resto al azar alrededor sin pisarse.
+// El azar sale del mint, así que el mismo token se dibuja siempre igual
+function omOrbit(nodes,links,seed){
+  var parent={};
+  function find(a){ while(parent[a]!==a){ parent[a]=parent[parent[a]]; a=parent[a]; } return a; }
+  nodes.forEach(function(n){ parent[n.id]=n.id; });
+  links.forEach(function(l){ var a=find(l.source.id||l.source), b=find(l.target.id||l.target); if(a!==b) parent[a]=b; });
+  var comps={};
+  nodes.forEach(function(n){ var r=find(n.id); (comps[r]=comps[r]||[]).push(n); });
+  var list=Object.keys(comps).map(function(k){
+    var ms=comps[k], area=ms.reduce(function(s,n){ var q=n.rad*1.3+4; return s+q*q; },0);
+    return {ms:ms,rc:Math.max(14,Math.sqrt(area)*1.2),w:ms.reduce(function(s,n){ return s+n.rad*n.rad; },0)};
+  }).sort(function(a,b){ return b.ms.length-a.ms.length||b.w-a.w; });
+  if(!list.length) return;
+  var rnd=d3.randomLcg(seed), big=list.shift(), gap=22;
+  big.x=0; big.y=0;
+  for(var i=list.length-1;i>0;i--){ var j=Math.floor(rnd()*(i+1)), t=list[i]; list[i]=list[j]; list[j]=t; }
+  var placed=[big], total=list.reduce(function(s,c){ var q=c.rc+gap; return s+q*q; },0);
+  var Rmax=Math.sqrt(big.rc*big.rc+total*1.25)+gap;
+  list.forEach(function(c){
+    var Rmin=big.rc+gap+c.rc, R=Math.max(Rmax,Rmin+20), ok=false, a=0;
+    for(var tries=0;tries<400&&!ok;tries++){
+      if(tries&&tries%80===0) R*=1.1;
+      a=rnd()*2*Math.PI; var r=Math.sqrt(rnd()*(R*R-Rmin*Rmin)+Rmin*Rmin), x=Math.cos(a)*r, y=Math.sin(a)*r;
+      ok=placed.every(function(p){ return Math.hypot(p.x-x,p.y-y)>p.rc+c.rc+gap; });
+      if(ok){ c.x=x; c.y=y; }
+    }
+    if(!ok){ c.x=Math.cos(a)*R*1.1; c.y=Math.sin(a)*R*1.1; }
+    placed.push(c);
+  });
+  placed.forEach(function(c){
+    c.ms.forEach(function(n){ n.tx=c.x; n.ty=c.y; n.solo=c.ms.length===1; n.x=c.x+(rnd()-.5)*c.rc; n.y=c.y+(rnd()-.5)*c.rc; });
+  });
+}
+$("#omClose").addEventListener("click",closeMap);
+$("#omPanelBtn").addEventListener("click",function(){ var p=$("#omap"); p.classList.toggle("om-np"); setTimeout(omPaint,260); });
+document.addEventListener("keydown",function(ev){ if(ev.key==="Escape"&&!$("#omap").hidden) closeMap(); });
+$("#omap").addEventListener("click",function(ev){
+  var g=ev.target.closest&&ev.target.closest("[data-omg]");
+  if(g){ OM.hl=OM.hl===g.getAttribute("data-omg")?null:g.getAttribute("data-omg"); omPaint(); }
+});
+$("#omap").addEventListener("change",function(ev){
+  var k=ev.target.getAttribute&&ev.target.getAttribute("data-oms");
+  if(k){ OM.show[k]=ev.target.checked; omPaint(); }
+});
+window.addEventListener("resize",function(){ if($("#omap").hidden) return; clearTimeout(OM.rz); OM.rz=setTimeout(omPaint,200); });
+$("#mform").addEventListener("submit",function(e){ e.preventDefault(); var v=$("#mmint").value.trim(); if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(v)){ showError("Eso no parece la dirección de un token de Solana."); return; } openMap(v); });
+
 /* ---------- eventos ---------- */
 document.addEventListener("click",function(ev){
   var ctf=ev.target.closest&&ev.target.closest("[data-ctf]");
@@ -3967,6 +4389,8 @@ document.addEventListener("click",function(ev){
     var pb=$("#pcbody"); if(pb) pb.innerHTML="<p class='hint'>Cargando gráfica…</p>";
     paintChart(); return;
   }
+  var om=ev.target.closest&&ev.target.closest("[data-map]");
+  if(om){ $("#mmint").value=om.getAttribute("data-map"); openMap(om.getAttribute("data-map")); return; }
   var ns=ev.target.closest&&ev.target.closest("[data-nsrc]");
   if(ns){ if(state.nsrc!==ns.getAttribute("data-nsrc")){ state.nsrc=ns.getAttribute("data-nsrc"); loadNew(); } return; }
   if(ev.target.id==="nreload"){ loadNew(); return; }
@@ -4103,6 +4527,7 @@ $("#tabH").addEventListener("click",function(){ setMode("H"); });
 $("#tabL").addEventListener("click",function(){ setMode("L"); });
 $("#tabC").addEventListener("click",function(){ setMode("C"); });
 $("#tabN").addEventListener("click",function(){ setMode("N"); });
+$("#tabM").addEventListener("click",function(){ setMode("M"); });
 document.addEventListener("submit",function(ev){
   if(ev.target.id==="cform"){
     ev.preventDefault();
@@ -4166,6 +4591,9 @@ updateLanding();
   if(q&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(q)){ $("#wallet").value=q; walletHint(); analyze(); }
   var qb=null; try{ qb=new URLSearchParams(location.search).get("ballenas"); }catch(e){}
   if(!q&&qb&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(qb)){ setMode("H"); $("#mint").value=qb; holders(); }
+  // Enlace directo al mapa (?map=MINT): pestaña On-chain Map con el mapa abierto
+  var qm=null; try{ qm=new URLSearchParams(location.search).get("map"); }catch(e){}
+  if(!q&&!qb&&qm&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(qm)){ setMode("M"); $("#mmint").value=qm; OM.prevUrl=location.pathname; openMap(qm); }
 })();
 })();
 </script>
