@@ -654,6 +654,7 @@ export const TEXT = {
   "Ver el mapa": "Open the map",
   "Dibuja todo lo que rodea a un token a pantalla completa: sus mayores holders, quién les dio su primer SOL, los grupos que comparten ese origen y las redes por las que se han pasado los tokens.": "Draws everything around a token, full screen: its largest holders, who gave them their first SOL, the groups that share that source and the networks the tokens were passed through.",
   "Leyenda y grupos": "Legend and groups",
+  "Versión beta: puede tener fallos. Si ves algo raro, avísanos en": "Beta version: it may have bugs. If something looks wrong, tell us at",
   "✕ Cerrar": "✕ Close",
   "Cerrar el mapa": "Close the map",
   "Mapa de conexiones del token": "Token connection map",

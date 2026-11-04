@@ -1182,6 +1182,12 @@ body.om-open{overflow:hidden}
 @media (max-width:360px){ #tabC>span{font-size:.54rem;letter-spacing:-.02em} }
 .tmsub{font-weight:500;opacity:.75}
 .tdesk .tmap{grid-column:1/-1}
+/* el mapa está en beta: etiqueta en la pestaña y en el mapa, y una nota abajo */
+.tbeta{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;line-height:1.5;color:#140e31;background:linear-gradient(90deg,#c084fc,#7ab8c4);vertical-align:middle;-webkit-text-fill-color:#140e31}
+#tabM{position:relative}
+@media (max-width:700px){ #tabM .tbeta{position:absolute;top:1px;right:1px;margin:0;padding:0 3px;font-size:.42rem;letter-spacing:.02em} }
+.om-betan{position:absolute;left:12px;bottom:10px;margin:0;max-width:calc(100% - 24px);font-size:.72rem;color:var(--muted,#b8b0d8);background:rgba(20,14,49,.72);padding:4px 10px;border-radius:8px;pointer-events:auto}
+.om-betan a{color:#c4b5fd}
 </style>
 </head>
 <body>
@@ -1213,7 +1219,7 @@ body.om-open{overflow:hidden}
     <div class="tabs" role="tablist" aria-label="Sections">
       <button type="button" class="tab" id="tabW" role="tab" aria-selected="true"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Scanner</span></button>
       <button type="button" class="tab" id="tabH" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13c3-4 7-6 12-5l4-3v6c0 4-4 7-9 7-3 0-5-1-7-3"/></svg><span>Whales</span></button>
-      <button type="button" class="tab" id="tabM" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="15" y="4" width="5" height="5" rx="1.2"/><rect x="9" y="15" width="6" height="6" rx="1.5"/><path d="M9 7l6-1M7.5 9l3.5 6M17 9l-3 6"/></svg><span class="tl-lg">On-chain Map</span><span class="tl-sm">Map</span></button>
+      <button type="button" class="tab" id="tabM" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="15" y="4" width="5" height="5" rx="1.2"/><rect x="9" y="15" width="6" height="6" rx="1.5"/><path d="M9 7l6-1M7.5 9l3.5 6M17 9l-3 6"/></svg><span class="tl-lg">On-chain Map</span><span class="tl-sm">Map</span><span class="tbeta">Beta</span></button>
       <button type="button" class="tab" id="tabN" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg><span class="tl-lg">New tokens</span><span class="tl-sm">New</span></button>
       <button type="button" class="tab" id="tabL" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>My list <span id="lcount"></span></span></button>
       <button type="button" class="tab" id="tabC" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg><span>Confluence <span id="ccount"></span></span></button>
@@ -1368,12 +1374,12 @@ body.om-open{overflow:hidden}
 
 <div class="omap" id="omap" hidden role="dialog" aria-modal="true" aria-label="On-chain Map">
   <div class="om-top">
-    <div class="om-ttl"><span class="om-brand">On-chain Map</span><b id="omSym"></b><span id="omMode"></span></div>
+    <div class="om-ttl"><span class="om-brand">On-chain Map</span><b id="omSym"></b><span id="omMode"></span><span class="tbeta">Beta</span></div>
     <p class="om-head" id="omHead"></p>
     <div class="om-act"><button class="btn ghost small" type="button" id="omPanelBtn">Legend and groups</button><button class="btn ghost small" type="button" id="omClose" aria-label="Close the map">✕ Close</button></div>
   </div>
   <div class="om-body">
-    <div class="om-stage" id="omStage"><svg id="omSvg" aria-label="Token connection map"></svg><div class="om-tip" id="omTip"></div><div class="om-load" id="omLoad" hidden></div></div>
+    <div class="om-stage" id="omStage"><svg id="omSvg" aria-label="Token connection map"></svg><div class="om-tip" id="omTip"></div><div class="om-load" id="omLoad" hidden></div><p class="om-betan">Beta version: it may have bugs. If something looks wrong, tell us at <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p></div>
     <aside class="om-panel" id="omPanel"><div id="omPanelBody"></div></aside>
   </div>
 </div>
