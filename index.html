@@ -1122,8 +1122,6 @@ body.om-open{overflow:hidden}
 .om-mode{border-radius:999px;padding:3px 10px;font-size:.76rem;font-weight:700;white-space:nowrap}
 .om-mode.young{background:#3a2c18;color:#fbbf24} .om-mode.mature{background:#163a2c;color:#4ade80}
 .om-act{display:flex;gap:8px;margin-left:auto}
-.navback{margin:0 0 12px}
-.navback .btn{font-weight:600}
 .om-act .btn{min-height:0;padding:8px 14px}
 .om-body{flex:1;display:flex;min-height:0}
 .om-stage{position:relative;flex:1;min-width:0;background:radial-gradient(ellipse at 50% 45%,#22175c 0%,#170f43 75%)}
@@ -1229,7 +1227,6 @@ body.om-open{overflow:hidden}
     <a class="botlink" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a>
     <a class="lang" href="https://solflag.com/en/" hreflang="en" title="English version">EN</a>
   </header>
-  <div class="navback" id="navBack" hidden><button class="btn ghost small" type="button" id="navBackBtn"></button></div>
 
   <section class="hero" id="hero">
   <div class="hero-txt">
@@ -4103,12 +4100,7 @@ function navGo(){
     if(NAV.cur===null||NAV.cur===key) history.replaceState({nav:1,v:v,b:(cur&&cur.nav&&cur.b)||""},"",navUrl(v));
     else history.pushState({nav:1,v:v,b:cur&&cur.nav?navLabel(cur.v):""},"",navUrl(v));
   }catch(e){}
-  NAV.cur=key; navPaint();
-}
-function navPaint(){
-  var b=navBackLabel();
-  $("#navBack").hidden=!b; $("#navBackBtn").textContent="← "+b;
-  $("#omClose").textContent=b?"← "+b:"✕ Cerrar";
+  NAV.cur=key;
 }
 // Vuelve a pintar una vista guardada (o la analiza otra vez si ya no está en memoria)
 function navShow(v){
@@ -4129,7 +4121,6 @@ function navShow(v){
       setMode(v.a); window.scrollTo(0,0);
     }
   }finally{ NAV.restoring=false; }
-  navPaint();
 }
 window.addEventListener("popstate",function(ev){
   if(!ev.state||!ev.state.nav) return;
@@ -4615,7 +4606,6 @@ $("#form").addEventListener("submit",function(e){ e.preventDefault(); analyze();
 $("#cancel").addEventListener("click",function(){ state.cancel=true; cancelEngine(); });
 $("#hform").addEventListener("submit",function(e){ e.preventDefault(); holders(); });
 ["W","H","L","C","N","M"].forEach(function(m){ $("#tab"+m).addEventListener("click",function(){ setMode(m); navGo(); }); });
-$("#navBackBtn").addEventListener("click",function(){ history.back(); });
 document.addEventListener("submit",function(ev){
   if(ev.target.id==="cform"){
     ev.preventDefault();
