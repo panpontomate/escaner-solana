@@ -1122,6 +1122,8 @@ body.om-open{overflow:hidden}
 .om-mode{border-radius:999px;padding:3px 10px;font-size:.76rem;font-weight:700;white-space:nowrap}
 .om-mode.young{background:#3a2c18;color:#fbbf24} .om-mode.mature{background:#163a2c;color:#4ade80}
 .om-act{display:flex;gap:8px;margin-left:auto}
+.navback{margin:0 0 12px}
+.navback .btn{font-weight:600}
 .om-act .btn{min-height:0;padding:8px 14px}
 .om-body{flex:1;display:flex;min-height:0}
 .om-stage{position:relative;flex:1;min-width:0;background:radial-gradient(ellipse at 50% 45%,#22175c 0%,#170f43 75%)}
@@ -1227,6 +1229,7 @@ body.om-open{overflow:hidden}
     <a class="botlink" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a>
     <a class="lang" href="https://solflag.com/en/" hreflang="en" title="English version">EN</a>
   </header>
+  <div class="navback" id="navBack" hidden><button class="btn ghost small" type="button" id="navBackBtn"></button></div>
 
   <section class="hero" id="hero">
   <div class="hero-txt">
@@ -2290,7 +2293,7 @@ async function analyze(){
   try{
     setProgress("Comprobando la dirección…",0.01);
     if(await isMint(wallet)){ await checkToken(wallet); track("scan-token"); return; }
-    setUrl(""); state.token=null;
+    state.token=null;
     setProgress("Leyendo la wallet…",0.02);
     var w=await getTokens(wallet);
     var mints=Object.keys(w.tokens);
@@ -2338,9 +2341,6 @@ function ownRpc(){ return state.rpc!==PUBLIC_RPC; }
 // Cuenta un uso (análisis, ballenas, compartir…) en las estadísticas anónimas; si no cargan, no pasa nada
 function track(name){
   try{ if(window.goatcounter&&goatcounter.count) goatcounter.count({path:name+(document.documentElement.lang==="en"?"-en":""),title:name,event:true}); }catch(e){}
-}
-function setUrl(mint){
-  try{ history.replaceState(null,"",location.pathname+(mint?"?token="+mint:"")); }catch(e){}
 }
 function tokenLink(mint){ return location.origin+location.pathname+"?token="+mint; }
 // Abre el bot de Telegram y empieza a vigilar esa dirección: el bot recibe "/start <dirección>"
@@ -2429,7 +2429,6 @@ async function checkToken(mint){
   setProgress("Listo",1);
   r.hist=histRecord(r); keepSnap(r);
   state.results=[r]; state.token=r; state.filter="TODOS";
-  setUrl(mint);
   renderToken();
 }
 var TOKEN_TIP={
@@ -2499,6 +2498,7 @@ function renderToken(noScroll){
   state.shown.W=true;
   if(state.mode==="W") $("#results").hidden=false;
   if(!noScroll) $("#results").scrollIntoView({behavior:"smooth",block:"start"});
+  navGo();
 }
 
 /* ---------- pintado ---------- */
@@ -2581,7 +2581,7 @@ function summaryText(){
     state.results.length+" tokens analizados · "+usd(total)+" en tokens\n"+
     "Alto: "+c.ALTO+" · Medio: "+c.MEDIO+" · Bajo: "+c.BAJO+" · Spam: "+c.SPAM+" · Sin mercado: "+c["SIN MERCADO"]+"\n"+splitText();
 }
-function render(){
+function render(again){
   var c=counts(), n=state.results.length;
   var total=state.results.reduce(function(s,r){return s+r.valor;},0);
   var segs=ORDER.filter(function(k){return c[k]>0;}).map(function(k){
@@ -2623,10 +2623,12 @@ function render(){
   }).join("");
   $("#filters").style.display=n?"flex":"none";
   renderList();
-  recordWallet(); walletHint();
+  if(!again) recordWallet();
+  walletHint();
   state.shown.W=true;
   if(state.mode==="W") $("#results").hidden=false;
   $("#results").scrollIntoView({behavior:"smooth",block:"start"});
+  navGo();
 }
 function hace(ts){ var t=ago(ts); return t==='hoy'?'hoy':'hace '+t; }
 function ago(ts){
@@ -3599,8 +3601,6 @@ async function holders(){
   state.rpc=$("#rpc").value.trim()||PUBLIC_RPC;
   state.cancel=false;
   store("esc.rpc",$("#rpc").value.trim()); store("esc.mint",mint);
-  // Cada búsqueda de ballenas tiene su propio enlace: solflag.com/?ballenas=<mint>
-  try{ history.replaceState(null,"",location.pathname+"?ballenas="+mint); }catch(e){}
   $("#hgo").disabled=true; $("#hresults").hidden=true; state.shown.H=false; $("#progress").hidden=false;
   try{
     var b=await holderBase(mint,setProgress);
@@ -3661,7 +3661,7 @@ async function holders(){
     state.hold={mode:mode,ageDays:ageDays,signals:signals,mint:mint,sym:(par&&par.baseToken&&par.baseToken.symbol)||short(mint),
       name:(par&&par.baseToken&&par.baseToken.name)||"",price:hr.price,rows:hr.rows,
       mintAuth:!!b.info.mintAuth,freezeAuth:!!b.info.freezeAuth,clusters:clusters,hotGroups:hotGroups,creator:creator};
-    renderHolders(); track("whales");
+    renderHolders(); navGo(); track("whales");
   }catch(e){
     if(e.message!=="cancelado") showError(friendlyError(e));
   }finally{
@@ -4059,11 +4059,88 @@ function setMode(m){
   $("#error").hidden=true;
 }
 
+/* ---------- navegación «atrás» ----------
+   Cada vista (token, wallet, ballenas, mapa o pestaña) tiene su propia dirección y su entrada en el historial del
+   navegador. Al volver se pinta otra vez con lo que ya se analizó, sin repetir el análisis; solo si no está en memoria
+   (por ejemplo tras recargar la página) se vuelve a analizar */
+var NAV={cur:null,cache:{},restoring:false};
+var NAV_TAB={W:"",H:"ballenas",M:"mapa",N:"nuevos",L:"lista",C:"confluencia"};
+function navCur(){
+  if(!$("#omap").hidden&&OM.mint) return {k:"map",a:OM.mint};
+  var m=state.mode;
+  if(m==="W"&&state.shown.W) return state.token?{k:"token",a:state.token.mint}:{k:"wallet",a:state.wallet};
+  if(m==="H"&&state.shown.H&&state.hold) return {k:"whales",a:state.hold.mint};
+  return {k:"tab",a:m};
+}
+function navKey(v){ return v.k+":"+v.a; }
+function navUrl(v){
+  var q={token:"token",wallet:"wallet",whales:"ballenas",map:"map"}[v.k];
+  if(q) return location.pathname+"?"+q+"="+v.a;
+  return location.pathname+(NAV_TAB[v.a]?"?v="+NAV_TAB[v.a]:"");
+}
+function navSnap(v){
+  if(v.k==="token") return {token:state.token};
+  if(v.k==="wallet") return {results:state.results,hidden:state.hidden,total:state.total,sol:state.sol,bal:state.bal,wallet:state.wallet,filter:state.filter};
+  if(v.k==="whales") return {hold:state.hold,showAllH:state.showAllH};
+  return null;
+}
+function navLabel(v){
+  var s=NAV.cache[navKey(v)], tk=NAV.cache["token:"+v.a], tsym=tk&&tk.token&&tk.token.sym;
+  if(v.k==="token") return "Volver a "+((s&&s.token&&s.token.sym)||short(v.a));
+  if(v.k==="wallet") return "Volver a la wallet "+short(v.a);
+  if(v.k==="whales") return "Volver a las ballenas de "+((s&&s.hold&&s.hold.sym!==short(v.a)&&s.hold.sym)||tsym||short(v.a));
+  if(v.k==="map") return "Volver al mapa de "+((OM.maps[v.a]&&OM.maps[v.a].sym)||tsym||short(v.a));
+  return {W:"Volver al inicio",H:"Volver a Ballenas",M:"Volver a On-chain Map",N:"Volver a Tokens nuevos",L:"Volver a Mi lista",C:"Volver a Confluencia"}[v.a];
+}
+function navBackLabel(){ var s=null; try{ s=history.state; }catch(e){} return s&&s.nav&&s.b||""; }
+// Apunta la vista actual: si es otra, entrada nueva; si es la misma (o la primera), la actualiza
+function navGo(){
+  if(NAV.restoring) return;
+  var v=navCur(), key=navKey(v), cur=null;
+  try{ cur=history.state; }catch(e){}
+  NAV.cache[key]=navSnap(v);
+  try{
+    if(NAV.cur===null||NAV.cur===key) history.replaceState({nav:1,v:v,b:(cur&&cur.nav&&cur.b)||""},"",navUrl(v));
+    else history.pushState({nav:1,v:v,b:cur&&cur.nav?navLabel(cur.v):""},"",navUrl(v));
+  }catch(e){}
+  NAV.cur=key; navPaint();
+}
+function navPaint(){
+  var b=navBackLabel();
+  $("#navBack").hidden=!b; $("#navBackBtn").textContent="← "+b;
+  $("#omClose").textContent=b?"← "+b:"✕ Cerrar";
+}
+// Vuelve a pintar una vista guardada (o la analiza otra vez si ya no está en memoria)
+function navShow(v){
+  var s=NAV.cache[navKey(v)];
+  if(!$("#progress").hidden){ state.cancel=true; cancelEngine(); }
+  if(v.k!=="map"&&!$("#omap").hidden) omHide();
+  NAV.cur=navKey(v); NAV.restoring=true;
+  try{
+    if(v.k==="map"){ $("#mmint").value=v.a; openMap(v.a); }
+    else if(v.k==="token"&&s){ setMode("W"); state.token=s.token; state.results=[s.token]; state.filter="TODOS"; renderToken(); }
+    else if(v.k==="wallet"&&s){ setMode("W"); state.token=null; for(var f in s) state[f]=s[f]; render(true); }
+    else if(v.k==="whales"&&s){ setMode("H"); state.hold=s.hold; state.showAllH=s.showAllH; $("#mint").value=v.a; renderHolders(); }
+    else if(v.k==="token"||v.k==="wallet"){ setMode("W"); $("#wallet").value=v.a; walletHint(); analyze(); }
+    else if(v.k==="whales"){ setMode("H"); $("#mint").value=v.a; holders(); }
+    else{
+      if(v.a==="W"){ state.shown.W=false; $("#results").hidden=true; }
+      if(v.a==="H"){ state.shown.H=false; }
+      setMode(v.a); window.scrollTo(0,0);
+    }
+  }finally{ NAV.restoring=false; }
+  navPaint();
+}
+window.addEventListener("popstate",function(ev){
+  if(!ev.state||!ev.state.nav) return;
+  track("back"); navShow(ev.state.v);
+});
+
 /* ---------- On-chain Map ----------
    Todo el mapa de un token a pantalla completa: los mayores holders (burbujas del tamaño de lo que tienen y del
    color de lo que son), quién dio a cada uno su primer SOL, los grupos que comparten ese origen y las redes de
    transferencias de RugCheck. Los datos los da el motor (connectionMap); D3 se carga solo al abrir el mapa */
-var OM={maps:{},mint:null,hl:null,sim:null,drift:null,prevUrl:null,run:0,
+var OM={maps:{},mint:null,hl:null,sim:null,drift:null,run:0,
   show:{sol:true,solo:true,tok:true,ex:true,prog:true}};
 // Colores, forma y tamaños elegidos por el usuario en la maqueta del 31/10 (maquetas/onchain-map-ajustes.json)
 var OM_C={person:"#69369b",exchange:"#d06ad7",bot:"#4b86d2",pool:"#000000",sol:"#25d4d1",tok:"#f7d669"};
@@ -4095,9 +4172,10 @@ async function openMap(mint){
   if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(mint||"")) return;
   var box=$("#omap");
   OM.mint=mint; OM.hl=null;
-  if(box.hidden){ OM.prevUrl=OM.prevUrl||location.pathname+location.search; document.body.classList.add("om-open"); box.classList.toggle("om-np",innerWidth<=760); }
+  if(box.hidden){ document.body.classList.add("om-open"); box.classList.toggle("om-np",innerWidth<=760); }
   box.hidden=false;
-  try{ history.replaceState(null,"",location.pathname+"?map="+mint); }catch(e){}
+  if(!NAV.restoring) track("map");
+  navGo();
   if(OM.maps[mint]&&OM.maps[mint].holders){ omPaint(); return; }
   var run=++OM.run;
   omStop(); $("#omSvg").innerHTML=""; $("#omPanelBody").innerHTML="";
@@ -4122,10 +4200,14 @@ async function openMap(mint){
     omLoad(e&&e.message==="d3"?"No se pudo cargar el dibujo del mapa (cdnjs.cloudflare.com). Revisa tu conexión y vuelve a intentarlo.":friendlyError(e),true);
   }
 }
+// Cerrar el mapa es volver atrás si se llegó desde otra vista de SolFlag; si se abrió con un enlace, se queda la pestaña
 function closeMap(){
+  if(navBackLabel()){ history.back(); return; }
+  omHide(); navGo();
+}
+function omHide(){
   OM.run++; omStop(); cancelEngine();
   $("#omap").hidden=true; document.body.classList.remove("om-open");
-  try{ history.replaceState(null,"",OM.prevUrl||location.pathname); }catch(e){}
 }
 function omStop(){ if(OM.sim) OM.sim.stop(); if(OM.drift) OM.drift.stop(); OM.sim=OM.drift=null; }
 function omLoad(t,err){
@@ -4207,7 +4289,7 @@ function omPaint(){
     [["sol","Origen del SOL"],["solo","Orígenes con una sola wallet"],["tok","Transferencias de tokens"],["ex","Exchanges"],["prog","Pools y programas"]].map(function(o){
       return "<label class='check'><input type='checkbox' data-oms='"+o[0]+"'"+(show[o[0]]?" checked":"")+"> "+o[1]+"</label>";
     }).join("")+
-    "<p class='hint'>Tamaño = % del suministro. Rueda o dos dedos para hacer zoom, arrastra para moverte, pulsa una burbuja para abrirla en Solscan.</p>";
+    "<p class='hint'>Tamaño = % del suministro. Rueda o dos dedos para hacer zoom, arrastra para moverte, pulsa una burbuja para analizarla (Ctrl+clic la abre en Solscan).</p>";
 
   // dibujo
   omStop();
@@ -4275,12 +4357,16 @@ function omPaint(){
       (n.creator?"<br><span class='om-y'>Creador del token</span>":"")+(n.payer?"<br><span class='om-y'>Pagó el lanzamiento</span>":"")+(n.early?"<br><span class='om-y'>Compró en el primer segundo</span>":"")+
       (n.g?"<br>Grupo "+esc(n.g.id)+" ("+n.g.ms.length+" holders)":"")+(n.inNet?"<br>Está en una red de transferencias":"");
     if(n.kb) h+="<br><span class='om-y'>"+esc(BASE_TXT[n.kb]||n.kb)+"</span> <span class='om-dim'>(base de SolFlag)</span>";
-    tip.innerHTML=h+"<br><span class='om-dim'>Pulsa para abrir en Solscan</span>";
+    tip.innerHTML=h+"<br><span class='om-dim'>Pulsa para analizarla (Ctrl+clic: Solscan)</span>";
     var s=$("#omStage").getBoundingClientRect(), x=e.clientX-s.left+14, y=e.clientY-s.top+14;
     if(x>s.width-260) x-=280; if(y>s.height-140) y-=150;
     tip.style.left=x+"px"; tip.style.top=y+"px"; tip.style.opacity=1;
   }).on("mouseleave",function(){ tip.style.opacity=0; })
-    .on("click",function(e,n){ if(e.defaultPrevented) return; window.open("https://solscan.io/account/"+n.id,"_blank","noopener"); });
+    .on("click",function(e,n){
+      if(e.defaultPrevented) return;
+      if(e.ctrlKey||e.metaKey){ window.open("https://solscan.io/account/"+n.id,"_blank","noopener"); return; }
+      omHide(); setMode("W"); $("#wallet").value=n.id; walletHint(); analyze();
+    });
 
   omOrbit(nodes,links,m.mint.split("").reduce(function(h,ch){ return (h*31+ch.charCodeAt(0))>>>0; },7)/4294967296);
   var sim=OM.sim=d3.forceSimulation(nodes)
@@ -4460,7 +4546,7 @@ document.addEventListener("click",function(ev){
   if(ev.target.id==="cgo"||ev.target.id==="cgo2"){ compare(); return; }
   if(ev.target.id==="cfmore"){ state.cfAll=true; renderConf(); return; }
   if(ev.target.id==="cfrows"){ state.cfRows=true; renderConf(); return; }
-  if(ev.target.id==="cgoh"){ setMode("H"); window.scrollTo(0,0); return; }
+  if(ev.target.id==="cgoh"){ setMode("H"); navGo(); window.scrollTo(0,0); return; }
   if(ev.target.id==="cfkey"){ ev.preventDefault(); setMode("W"); $("#adv").open=true; $("#rpc").focus(); return; }
   if(ev.target.id==="cpnl"){ conf.pnl=!conf.pnl; if(!conf.pnl) conf.pf="all"; saveConf(); renderConf(); return; }
   if(ev.target.id==="cshow"){ conf.showAll=!conf.showAll; saveConf(); renderConf(); return; }
@@ -4475,7 +4561,7 @@ document.addEventListener("click",function(ev){
   if(ev.target.id==="lallt"){ state.lallT=true; renderLista(true); return; }
   if(ev.target.id==="lconf"){ var fv=Object.keys(lista.w).filter(function(k){ return lista.w[k].fav; }), rc=addAddrs(fv.join(" "));
     state.cmsg=rc.added?"Añadidas "+rc.added+" wallets que sigues.":(rc.full?"El grupo está lleno ("+CMAX+" wallets).":"Las wallets que sigues ya estaban en el grupo.");
-    setMode("C"); window.scrollTo(0,0); return; }
+    setMode("C"); navGo(); window.scrollTo(0,0); return; }
   if(ev.target.id==="chgBtnL"){ checkChanges(Object.keys(lista.w).filter(function(k){return lista.w[k].fav;}),"L"); return; }
   if(ev.target.id==="cchg"){ if(conf.cart.length) checkChanges(conf.cart.slice(),"conf"); return; }
   if(ev.target.id==="chgcopy"){ copyText(chgText(state.chg),ev.target); return; }
@@ -4528,12 +4614,8 @@ function copyText(t,btn){
 $("#form").addEventListener("submit",function(e){ e.preventDefault(); analyze(); });
 $("#cancel").addEventListener("click",function(){ state.cancel=true; cancelEngine(); });
 $("#hform").addEventListener("submit",function(e){ e.preventDefault(); holders(); });
-$("#tabW").addEventListener("click",function(){ setMode("W"); });
-$("#tabH").addEventListener("click",function(){ setMode("H"); });
-$("#tabL").addEventListener("click",function(){ setMode("L"); });
-$("#tabC").addEventListener("click",function(){ setMode("C"); });
-$("#tabN").addEventListener("click",function(){ setMode("N"); });
-$("#tabM").addEventListener("click",function(){ setMode("M"); });
+["W","H","L","C","N","M"].forEach(function(m){ $("#tab"+m).addEventListener("click",function(){ setMode(m); navGo(); }); });
+$("#navBackBtn").addEventListener("click",function(){ history.back(); });
 document.addEventListener("submit",function(ev){
   if(ev.target.id==="cform"){
     ev.preventDefault();
@@ -4570,7 +4652,7 @@ document.addEventListener("click",function(ev){
   }
   var t=ev.target.closest&&ev.target.closest("[data-try]");
   if(t){ track("try-example"); $("#wallet").value=t.getAttribute("data-try"); walletHint(); analyze(); return; }
-  if(ev.target.closest&&ev.target.closest("[data-trynew]")) setMode("N");
+  if(ev.target.closest&&ev.target.closest("[data-trynew]")){ setMode("N"); navGo(); }
 });
 // La portada (texto, banderas, bot) solo se ve en el escáner y mientras no hay un análisis abierto
 function updateLanding(){
@@ -4599,7 +4681,14 @@ updateLanding();
   if(!q&&qb&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(qb)){ setMode("H"); $("#mint").value=qb; holders(); }
   // Enlace directo al mapa (?map=MINT): pestaña On-chain Map con el mapa abierto
   var qm=null; try{ qm=new URLSearchParams(location.search).get("map"); }catch(e){}
-  if(!q&&!qb&&qm&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(qm)){ setMode("M"); $("#mmint").value=qm; OM.prevUrl=location.pathname; openMap(qm); }
+  if(!q&&!qb&&qm&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(qm)){ setMode("M"); $("#mmint").value=qm; openMap(qm); }
+  // ?wallet=DIRECCIÓN abre esa wallet; ?v=lista (o nuevos, mapa…) abre esa pestaña
+  var qw=null, qv=null; try{ qw=new URLSearchParams(location.search).get("wallet"); qv=new URLSearchParams(location.search).get("v"); }catch(e){}
+  if(!q&&!qb&&!qm&&qw&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(qw)){ $("#wallet").value=qw; walletHint(); analyze(); }
+  else if(!q&&!qb&&!qm){
+    Object.keys(NAV_TAB).forEach(function(m){ if(NAV_TAB[m]&&NAV_TAB[m]===qv) setMode(m); });
+    navGo();
+  }
 })();
 })();
 </script>
