@@ -467,7 +467,7 @@ html:root:root:root:root{
   --kick:#8ec5cf;
 }
 body{background:radial-gradient(1100px 720px at 88% -8%,rgba(139,92,246,.38),transparent 62%),radial-gradient(900px 640px at -12% 26%,rgba(192,38,211,.16),transparent 60%),linear-gradient(180deg,#140d33 0%,#0e0926 45%,#0a061c 100%) fixed;background-color:var(--bg);padding-block:0 56px}
-.bgfx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.42;filter:blur(1.2px)}
+.bgfx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.8}.bgfx .bb{mix-blend-mode:screen}.bgtrio .t1{animation:bgT1 16s ease-in-out infinite}.bgtrio .t2{animation:bgT2 16s ease-in-out infinite}.bgtrio .t3{animation:bgT3 16s ease-in-out infinite}@keyframes bgT1{0%,100%{transform:translate(-70px,-30px)}50%{transform:translate(0,0)}}@keyframes bgT2{0%,100%{transform:translate(70px,-30px)}50%{transform:translate(0,0)}}@keyframes bgT3{0%,100%{transform:translate(0,70px)}50%{transform:translate(0,0)}}.bgjoin .wb{animation:bgW 7s ease-in-out infinite}.bgjoin .wb2{animation-duration:5.5s;animation-delay:-2s}.bgjoin .wb3{animation-duration:8.5s;animation-delay:-4s}@keyframes bgW{0%,100%{transform:translate(0,0)}25%{transform:translate(9px,-7px)}50%{transform:translate(-5px,-12px)}75%{transform:translate(-10px,4px)}}@media (max-width:700px){.bgfx .dsk{display:none}}@media (prefers-reduced-motion:reduce){.bgtrio g{animation:none!important}.bgjoin{display:none}}
 .bgflow{stroke-dasharray:70 550;animation:bgFlow 5s linear infinite}
 @keyframes bgFlow{to{stroke-dashoffset:-620}}
 @media (prefers-reduced-motion:reduce){.bgflow{animation:none}.bgmove{display:none}}
@@ -1193,21 +1193,31 @@ body.om-open{overflow:hidden}
 <body>
 <svg class="bgfx" aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
   <defs>
-    <radialGradient id="bgB" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff" stop-opacity=".03"/><stop offset="68%" stop-color="#e9d5ff" stop-opacity=".1"/><stop offset="90%" stop-color="#fff" stop-opacity=".42"/><stop offset="100%" stop-color="#fff" stop-opacity=".06"/></radialGradient>
-    <g id="bgb"><circle r="1" fill="url(#bgB)"/><ellipse cx="-.38" cy="-.44" rx=".24" ry=".11" transform="rotate(-35 -.38 -.44)" fill="#fff" fill-opacity=".6"/></g>
+    <radialGradient id="gL" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#a78bfa" stop-opacity=".08"/><stop offset="62%" stop-color="#a78bfa" stop-opacity=".22"/><stop offset="88%" stop-color="#c4b5fd" stop-opacity=".75"/><stop offset="100%" stop-color="#7c3aed" stop-opacity=".2"/></radialGradient>
+    <radialGradient id="gT" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#9fd3dc" stop-opacity=".08"/><stop offset="62%" stop-color="#9fd3dc" stop-opacity=".22"/><stop offset="88%" stop-color="#b9e3ea" stop-opacity=".75"/><stop offset="100%" stop-color="#3b8796" stop-opacity=".2"/></radialGradient>
+    <radialGradient id="gP" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f0abfc" stop-opacity=".08"/><stop offset="62%" stop-color="#f0abfc" stop-opacity=".22"/><stop offset="88%" stop-color="#f5c6fd" stop-opacity=".75"/><stop offset="100%" stop-color="#a21caf" stop-opacity=".2"/></radialGradient>
+    <g id="bL" class="bb"><circle r="1" fill="url(#gL)"/><ellipse cx="-.38" cy="-.44" rx=".24" ry=".11" transform="rotate(-35 -.38 -.44)" fill="#fff" fill-opacity=".55"/></g><g id="bT" class="bb"><circle r="1" fill="url(#gT)"/><ellipse cx="-.38" cy="-.44" rx=".24" ry=".11" transform="rotate(-35 -.38 -.44)" fill="#fff" fill-opacity=".55"/></g><g id="bP" class="bb"><circle r="1" fill="url(#gP)"/><ellipse cx="-.38" cy="-.44" rx=".24" ry=".11" transform="rotate(-35 -.38 -.44)" fill="#fff" fill-opacity=".55"/></g>
     <path id="bgr1" d="M-60 120 C300 40 520 260 760 220 S1240 100 1500 300"/>
     <path id="bgr2" d="M1500 560 C1200 480 1000 760 700 700 S220 560 -60 820"/>
   </defs>
-  <g fill="none"><use href="#bgr1" stroke="#fff7e0" stroke-width="10" stroke-opacity=".45"/><use href="#bgr1" stroke="#4b2fa0" stroke-width="5"/><use class="bgflow" href="#bgr1" stroke="#fff3c4" stroke-width="2.5" stroke-linecap="round"/>
-  <use href="#bgr2" stroke="#fff7e0" stroke-width="10" stroke-opacity=".45"/><use href="#bgr2" stroke="#4b2fa0" stroke-width="5"/><use class="bgflow" href="#bgr2" stroke="#fff3c4" stroke-width="2.5" stroke-linecap="round" style="animation-delay:-2.5s"/></g>
-  <g class="bgmove">
-    <g><animateMotion dur="60s" repeatCount="indefinite"><mpath href="#bgr1"/></animateMotion><use href="#bgb" transform="scale(40)"/></g>
-    <g><animateMotion dur="60s" repeatCount="indefinite" begin="-30s"><mpath href="#bgr1"/></animateMotion><use href="#bgb" transform="scale(20)"/></g>
-    <g><animateMotion dur="70s" repeatCount="indefinite" begin="-12s"><mpath href="#bgr2"/></animateMotion><use href="#bgb" transform="scale(52)"/></g>
-    <g><animateMotion dur="70s" repeatCount="indefinite" begin="-45s"><mpath href="#bgr2"/></animateMotion><use href="#bgb" transform="scale(24)"/></g>
+  <g fill="none">
+    <use href="#bgr1" stroke="#a78bfa" stroke-width="12" stroke-opacity=".16"/><use href="#bgr1" stroke="#2a1d66" stroke-width="5"/><use class="bgflow" href="#bgr1" stroke="#9fd3dc" stroke-width="2.5" stroke-linecap="round"/>
+    <use href="#bgr2" stroke="#f0abfc" stroke-width="12" stroke-opacity=".12"/><use href="#bgr2" stroke="#2a1d66" stroke-width="5"/><use class="bgflow" href="#bgr2" stroke="#f0abfc" stroke-width="2.5" stroke-linecap="round" style="animation-delay:-2.5s"/>
   </g>
-  <use href="#bgb" transform="translate(150 480) scale(46)"/><use href="#bgb" transform="translate(1290 420) scale(30)"/><use href="#bgb" transform="translate(520 840) scale(22)"/><use href="#bgb" transform="translate(1100 820) scale(60)"/>
-  <g fill="#fff"><circle cx="90" cy="80" r="2"/><circle cx="610" cy="60" r="2.5"/><circle cx="1120" cy="70" r="2"/><circle cx="220" cy="380" r="1.5"/><circle cx="1010" cy="460" r="1.5"/><circle cx="1360" cy="640" r="2"/><circle cx="380" cy="660" r="1.5"/><circle cx="860" cy="560" r="2"/></g>
+  <g class="bgmove">
+    <g><animateMotion dur="60s" repeatCount="indefinite" begin="0s"><mpath href="#bgr1"/></animateMotion><use href="#bL" transform="scale(40)"/></g><g class="dsk"><animateMotion dur="60s" repeatCount="indefinite" begin="-30s"><mpath href="#bgr1"/></animateMotion><use href="#bT" transform="scale(20)"/></g><g><animateMotion dur="70s" repeatCount="indefinite" begin="-12s"><mpath href="#bgr2"/></animateMotion><use href="#bP" transform="scale(52)"/></g><g class="dsk"><animateMotion dur="70s" repeatCount="indefinite" begin="-45s"><mpath href="#bgr2"/></animateMotion><use href="#bL" transform="scale(24)"/></g><g class="dsk"><animateMotion dur="66s" repeatCount="indefinite" begin="-20s"><mpath href="#bgr1"/></animateMotion><use href="#bP" transform="scale(16)"/></g>
+  </g>
+  <use href="#bT" transform="translate(150 480) scale(46)"/><use class="dsk" href="#bP" transform="translate(1290 420) scale(30)"/><use class="dsk" href="#bL" transform="translate(520 840) scale(22)"/>
+  <g class="bgjoin" transform="translate(720 450)">
+    <g opacity="0"><animateMotion dur="24s" repeatCount="indefinite" path="M-820 -40 C-680 -240 -520 120 -360 -60 S-120 -120 0 0" keyPoints="0;1;1" keyTimes="0;0.64;1" calcMode="spline" keySplines=".42 0 .35 1;0 0 1 1"/><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;.1;0.69;0.82;1" dur="24s" repeatCount="indefinite"/><g><animateTransform attributeName="transform" type="scale" values="1;1;1.25;1.25" keyTimes="0;0.68;0.82;1" dur="24s" repeatCount="indefinite"/><g class="wb "><use href="#bL" transform="translate(-28 -16) scale(62)"/></g></g></g><g opacity="0"><animateMotion dur="24s" repeatCount="indefinite" path="M820 -80 C700 120 520 -220 340 -20 S110 90 0 0" keyPoints="0;1;1" keyTimes="0;0.68;1" calcMode="spline" keySplines=".42 0 .35 1;0 0 1 1"/><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;.1;0.73;0.86;1" dur="24s" repeatCount="indefinite"/><g><animateTransform attributeName="transform" type="scale" values="1;1;1.25;1.25" keyTimes="0;0.72;0.86;1" dur="24s" repeatCount="indefinite"/><g class="wb wb2"><use href="#bT" transform="translate(28 -16) scale(62)"/></g></g></g><g opacity="0"><animateMotion dur="24s" repeatCount="indefinite" path="M-60 340 C120 280 -160 200 40 140 S-60 40 0 0" keyPoints="0;1;1" keyTimes="0;0.66;1" calcMode="spline" keySplines=".42 0 .35 1;0 0 1 1"/><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;.1;0.71;0.84;1" dur="24s" repeatCount="indefinite"/><g><animateTransform attributeName="transform" type="scale" values="1;1;1.25;1.25" keyTimes="0;0.70;0.84;1" dur="24s" repeatCount="indefinite"/><g class="wb wb3"><use href="#bP" transform="translate(0 22) scale(62)"/></g></g></g>
+  </g>
+  <g class="bgtrio" style="display:none">
+    <g class="t1"><use href="#bL" transform="translate(-28 -16) scale(62)"/></g><g class="t2"><use href="#bT" transform="translate(28 -16) scale(62)"/></g><g class="t3"><use href="#bP" transform="translate(0 22) scale(62)"/></g>
+  </g>
+  <g class="bgtrio dsk" transform="translate(110 130) scale(.5)">
+    <g class="t1"><use href="#bL" transform="translate(-28 -16) scale(62)"/></g><g class="t2"><use href="#bT" transform="translate(28 -16) scale(62)"/></g><g class="t3"><use href="#bP" transform="translate(0 22) scale(62)"/></g>
+  </g>
+  <g><circle cx="90" cy="80" r="2" fill="#c4b5fd"/><circle cx="610" cy="60" r="2.5" fill="#9fd3dc"/><circle cx="1120" cy="70" r="2" fill="#f0abfc"/><circle cx="220" cy="380" r="1.5" fill="#fff"/><circle cx="1010" cy="460" r="1.5" fill="#9fd3dc"/><circle cx="1360" cy="640" r="2" fill="#c4b5fd"/><circle cx="380" cy="660" r="1.5" fill="#f0abfc"/><circle cx="860" cy="560" r="2" fill="#fff"/></g>
 </svg>
 <div class="wrap">
 
