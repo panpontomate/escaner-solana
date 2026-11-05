@@ -55,7 +55,6 @@ export const CODE = [
 export const TEXT = {
   // ---------- SolFlag: cabecera, portada y pie (oct 2026) ----------
   "Blog · Avances": "Blog · Updates (Spanish)",
-  "Contacto": "Contact",
   "Creado por": "Created by",
   "Sin revisar todavía": "Not checked yet",
   "No aplica: mercado de más de 7 días": "Not applicable: market older than 7 days",
@@ -145,7 +144,6 @@ export const TEXT = {
   "El creador está vendiendo": "The creator is selling",
   "$TOKEN: riesgo medio → riesgo alto": "$TOKEN: medium risk → high risk",
   "Abrir el bot": "Open the bot",
-  "Bot de avisos": "Alerts bot",
   // ---------- head, header, tabs, forms (markup) ----------
   "Analizar": "Analyse",
   "Ballenas": "Whales",
