@@ -648,6 +648,7 @@ export const TEXT = {
   "<br>Está en una red de transferencias": "<br>Is in a transfer network",
   "<br><span class='om-dim'>Pulsa para analizarla (Ctrl+clic: Solscan)</span>": "<br><span class='om-dim'>Tap to analyse it (Ctrl+click: Solscan)</span>",
   "Volver a ": "Back to ",
+  "<span class='tag kb kb-ex' title='Wallet de un exchange: guarda fondos de sus usuarios'>": "<span class='tag kb kb-ex' title='An exchange wallet: it holds its users’ funds'>",
   "Volver a la wallet ": "Back to wallet ",
   "Volver a las ballenas de ": "Back to the whales of ",
   "Volver al mapa de ": "Back to the map of ",

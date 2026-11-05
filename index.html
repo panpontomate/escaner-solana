@@ -1397,7 +1397,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="No se pudo cargar el motor del escáner desde cdn.jsdelivr.net. Revisa tu conexión a internet y recarga la página."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.5.0/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.5.1/src/index.js";
 window.__escOk=true;
 (function(){
 "use strict";
@@ -2900,6 +2900,9 @@ async function loadBase(){
 function baseType(a){ var w=wbase.data&&wbase.data.wallets&&wbase.data.wallets[a]; return w?w.t:null; }
 var BASE_TXT={"exchange":"Exchange conocido","granja":"Granja de lanzamientos","repartidor":"Repartidor conocido","creador en serie":"Creador en serie","sniper":"Sniper conocido"};
 function baseTag(a){
+  // exchange con nombre (lista del motor, comprobada en Solscan): se dice cuál es
+  var kw=SRE.knownWallet&&SRE.knownWallet(a);
+  if(kw&&kw.t==="exchange") return "<span class='tag kb kb-ex' title='Wallet de un exchange: guarda fondos de sus usuarios'>"+esc(kw.n)+" (exchange)</span>";
   var t=baseType(a); if(!t) return "";
   return "<span class='tag kb kb-"+(t==="exchange"?"ex":"warn")+"' title='Lo sabe la base de wallets de SolFlag, que se va llenando con cada lanzamiento revisado'>"+esc(BASE_TXT[t]||t)+"</span>";
 }
@@ -3613,7 +3616,7 @@ async function holders(){
     var busy=await markBusy(b.kind,wal,function(c,n){ setProgress("Separando personas de bots y exchanges… "+c+"/"+n,0.65+0.15*c/Math.max(1,n)); });
     var hr=holderRows(b,busy), par=b.par;
     await loadBase();
-    hr.rows.forEach(function(r){ if(r.kind==="wallet"&&baseType(r.owner)==="exchange") r.kind="activa"; });
+    hr.rows.forEach(function(r){ var kw=SRE.knownWallet&&SRE.knownWallet(r.owner); if(r.kind==="wallet"&&(baseType(r.owner)==="exchange"||(kw&&kw.t==="exchange"))) r.kind="activa"; });
     // Joven (menos de 14 días) o maduro: en los jóvenes casi todos los holders grandes mueven mucho y el reparto
     // del equipo se esconde entre ellos, así que también se busca el origen de las cuentas muy activas
     var created=(par&&par.pairCreatedAt)||null;
@@ -4025,7 +4028,7 @@ function renderHolders(keep){
       "<div class='hex'><span>"+progs.length+" pools o programas</span><b>"+esc(fmtPct(progs.reduce(function(a,r){return a+r.pct;},0)))+"</b></div>"+
     "</div>";
   $("#hlist").innerHTML="<div class='hgrid'><div class='hmain'><h3 class='tgt'>Mayores holders</h3>"+(shown.length?"":"<div class='more'>No hay wallets de personas entre las 20 cuentas más grandes. Marca la casilla de arriba para ver el resto.</div>")+shown.map(function(r){
-    var isW=r.kind==="wallet", isA=r.kind==="activa", isEx=baseType(r.owner)==="exchange";
+    var kwx=SRE.knownWallet&&SRE.knownWallet(r.owner), isW=r.kind==="wallet", isA=r.kind==="activa", isEx=baseType(r.owner)==="exchange"||!!(kwx&&kwx.t==="exchange");
     return "<article class='hrow"+(isW?"":" prog")+(bigAct.indexOf(r)>=0?" big":"")+"'>"+
       "<div class='rk'>"+r.rank+"</div>"+
       "<div style='min-width:0'>"+
