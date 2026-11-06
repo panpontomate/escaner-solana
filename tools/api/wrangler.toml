@@ -1,0 +1,10 @@
+# Worker de la API pública de SolFlag. Para publicarlo (una vez): npx wrangler login, poner el id de la base D1
+# «solflag-plano» (el mismo que el secreto CF_D1_ID del recolector) y npx wrangler deploy desde esta carpeta.
+name = "solflag-api"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "solflag-plano"
+database_id = "PON_AQUI_EL_ID_DE_D1"

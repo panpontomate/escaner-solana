@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 22
       - name: Tests del recolector
-        run: node --test tools/caras/*.test.mjs
+        run: node --test tools/caras/*.test.mjs tools/api/*.test.mjs
       - name: Versión en inglés al día
         run: |
           node build-en.js
