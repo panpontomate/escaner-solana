@@ -49,7 +49,9 @@ export const CODE = [
   if(m<1440) return "hace "+Math.floor(m/60)+" h";`, `  if(m<60) return Math.max(1,m)+" min ago";
   if(m<1440) return Math.floor(m/60)+" h ago";`],
   // engine error messages that the page recognises by their start
-  ['if(/^(solo |no se pudieron leer)/.test(m))', 'if(/^(only |could not read)/.test(m))']
+  ['if(/^(solo |no se pudieron leer)/.test(m))', 'if(/^(only |could not read)/.test(m))'],
+  // pie: enlace a la página de datos (6/11/2026)
+  ['<a href="/acierto/">Datos y acierto</a>', '<a href="/en/accuracy/">Data and accuracy</a>']
 ];
 
 export const TEXT = {

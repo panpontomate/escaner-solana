@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Datos y acierto · SolFlag</title>
+<meta name="description" content="Cada token nuevo que ve SolFlag, lo que dijo al verlo y cómo acabó a las 24 horas y a los 7 días. Con los fallos y los datos para descargar.">
+<meta property="og:title" content="Datos y acierto · SolFlag">
+<meta property="og:description" content="Cada token nuevo que ve SolFlag, lo que dijo al verlo y cómo acabó a las 24 horas y a los 7 días. Con los fallos y los datos para descargar.">
+<meta property="og:url" content="https://solflag.com/acierto/">
+<meta property="og:image" content="https://solflag.com/og.png">
+<link rel="canonical" href="https://solflag.com/acierto/">
+<link rel="alternate" hreflang="en" href="https://solflag.com/en/accuracy/">
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+/* Mismo aspecto que solflag.com: lila oscuro, turquesa pastel y titulares con serifa */
+:root{--bg:#0e0926;--card:rgba(24,17,62,.96);--line:rgba(196,181,253,.3);--fg:#f1eeff;--muted:#c9c1ea;--soft:#ddd7f5;--kick:#8ec5cf;--accent:#7ab8c4;--alto:#ff6b6b;--bajo:#4ade80;--medio:#fbbf24;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--fg);font:17px/1.65 Manrope,'Segoe UI',system-ui,sans-serif;background:radial-gradient(1100px 720px at 88% -8%,rgba(139,92,246,.38),transparent 62%),radial-gradient(900px 640px at -12% 30%,rgba(192,38,211,.16),transparent 60%),linear-gradient(180deg,#140d33 0%,#0e0926 45%,#0a061c 100%) fixed;background-color:var(--bg);padding:0 16px 64px}
+a{color:var(--kick)}
+a:hover{color:#c3e2e7}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:780px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22)}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo svg{width:42px;height:42px;flex:none}
+.wm{font:700 30px/1 'Barlow Condensed','Arial Narrow',sans-serif}
+.wm-a{color:#fff}.wm-b{color:#c4b5fd}
+.back{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:700;text-decoration:none}
+.back:hover{color:#140e31;filter:brightness(1.06)}
+.intro{padding:52px 0 18px}
+.kick{margin:0;color:var(--kick);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+h1{font:800 clamp(2.4rem,6vw,3.6rem)/1.05 Fraunces,Georgia,serif;margin:14px 0 0;color:#f7f4ff;text-wrap:balance}
+.intro p{color:var(--soft);font-size:1.08rem;margin:16px 0 0;max-width:600px}
+.toc{display:flex;flex-direction:column;gap:2px;margin:28px 0 0;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:20px}
+.toc a{display:flex;gap:14px;padding:8px 0;text-decoration:none;color:var(--fg)}
+.toc a:hover b{color:var(--kick)}
+.toc time{color:var(--muted);font-size:.88rem;flex:none;width:92px;padding-top:2px}
+article{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:32px;scroll-margin-top:16px}
+article time{color:var(--muted);font-size:.9rem}
+article h2{font:700 clamp(1.6rem,4vw,2.2rem)/1.15 Fraunces,Georgia,serif;margin:8px 0 14px;color:#f7f4ff;text-wrap:balance}
+article h3{font-size:1.1rem;margin:24px 0 6px}
+article p{margin:0 0 14px;color:var(--soft)}
+article ul{margin:0 0 14px;padding-left:22px;color:var(--soft)}
+article li{margin:6px 0}
+article b{color:#fff}
+article p.nota{border-left:3px solid var(--medio);background:rgba(251,191,36,.08);border-radius:0 12px 12px 0;padding:10px 14px;font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.tags span{border:1px solid #5e4bb0;border-radius:999px;padding:3px 12px;font-size:.8rem;color:#ece8fd}
+.fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.fig div{background:#1d1550;border:1px solid #3a2c7a;border-radius:16px;padding:14px 16px}
+.fig b{display:block;font:800 1.8rem/1.1 Fraunces,Georgia,serif}
+.fig span{color:var(--muted);font-size:.88rem}
+.share{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;padding-top:16px;border-top:1px solid rgba(196,181,253,.22);font-size:.92rem}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid rgba(196,181,253,.22);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;color:var(--muted);font-size:.92rem}
+footer .wm{font-size:22px}
+footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
+@media (max-width:620px){
+  body{font-size:16px}
+  .logo svg{width:36px;height:36px}.wm{font-size:26px}
+  article{padding:22px 20px}
+  .toc time{width:78px}
+}
+</style>
+
+<style>
+.lang{margin:18px 0 0;font-size:.95rem}
+.upd{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+.fig div.k b{color:var(--kick)}
+article table{width:100%;border-collapse:collapse;margin:4px 0 14px;font-size:.93rem}
+article td,article th{text-align:left;vertical-align:top;padding:8px 8px;border-top:1px solid rgba(196,181,253,.22);color:var(--soft)}
+article th{color:var(--kick);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;border-top:0}
+article td.n,article th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+article tr.base td{background:rgba(122,184,196,.1);color:#fff;font-weight:600}
+article tr.few td{opacity:.6}
+article code{font-size:.8rem;color:var(--muted);word-break:break-all}
+.pill{display:inline-block;border-radius:999px;padding:1px 9px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.pill.HIGH{background:rgba(255,107,107,.18);color:var(--alto)}.pill.MEDIUM{background:rgba(251,191,36,.16);color:var(--medio)}
+.pill.LOW{background:rgba(74,222,128,.16);color:var(--bajo)}.pill.x{background:rgba(196,181,253,.16);color:var(--muted)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dl{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px;padding:0;list-style:none}
+.dl a{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid #5e4bb0;border-radius:12px;text-decoration:none;font-size:.9rem}
+.dl small{color:var(--muted);margin-left:6px}
+dl.fmt{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:0 0 14px;font-size:.93rem}
+dl.fmt dt{font-family:ui-monospace,Consolas,monospace;color:#fff}
+dl.fmt dd{margin:0;color:var(--soft)}
+#err{display:none}
+@media (max-width:520px){article table{font-size:.8rem} article td,article th{padding:7px 4px} article th,article th.n{white-space:normal;font-size:.62rem;letter-spacing:.04em} .hide-s{display:none} .pill{font-size:.68rem;padding:1px 6px} article{padding:20px 14px} dl.fmt{grid-template-columns:1fr} dl.fmt dd{margin-bottom:6px}}
+@media (max-width:360px){#alive code{display:none} article code{font-size:.66rem} article td,article th{padding:6px 3px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="/" title="SolFlag">
+    <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="22" fill="#3a2a80" stroke="#a78bfa" stroke-width="2"/><g fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M23 10.5l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M19 12.8l4 2.3 4-2.3M23 15.1v4.6"/><path d="M14 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M10 26.3l4 2.3 4-2.3M14 28.6v4.6"/><path d="M32 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M28 26.3l4 2.3 4-2.3M32 28.6v4.6"/><path d="M19 15.1l-4.6 2.6v6.3M27 15.1l4.6 2.6v6.3M18 30.9L23 33.8l5-2.9"/></g></svg>
+    <span class="wm" translate="no"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
+  </a>
+  <a class="back" href="/">Ir al escáner</a>
+</header>
+
+<section class="intro">
+  <p class="kick">Datos abiertos</p>
+  <h1>Datos y acierto</h1>
+  <p>Cada token nuevo que ve SolFlag se analiza al momento y se apunta cómo acabó a las 24 horas y a los 7 días. Aquí están los números, también los fallos, y los datos para que los compruebes tú.</p>
+  <p class="upd" id="upd">Cargando los datos…</p>
+  <p class="lang"><a href="/en/accuracy/" hreflang="en">English version</a></p>
+  <div class="fig" id="tiles"></div>
+  <p class="nota" id="err">No se han podido cargar los datos. Prueba a recargar la página.</p>
+</section>
+
+<article id="leer">
+  <h2>Antes de leer los números</h2>
+  <p><b>Casi todos los tokens nuevos mueren.</b> De todos los que vemos, muere más del 99 % en un día, digamos lo que digamos. Por eso, que «el 99 % de los marcados en rojo murió» <b>no demuestra mucho solo</b>: hay que compararlo con esa tasa base, que ponemos siempre en la primera fila.</p>
+<p>Lo que de verdad mide si SolFlag sirve: <b>los que siguen vivos</b> (los fallos, abajo, uno a uno), <b>cuántos marcamos en verde</b> (casi ninguno todavía: los tokens de minutos rara vez tienen motivos para el verde) y, más adelante, <b>quién está detrás</b> de cada lanzamiento, que es lo que no se ve en un gráfico.</p>
+<p><b>Muerto</b> = a esa hora vale menos de 10.000 $, RugCheck lo marca como rug, le quitaron más del 95 % de la liquidez o, fuera de la curva de Pump.fun, le quedan menos de 1.000 $ de liquidez o menos del 0,2 % de lo que dice valer (no se puede vender).</p>
+</article>
+<article id="nivel">
+  <h2>Por nivel al verlo</h2>
+  <div class="tw"><table><thead><tr><th class="">Nivel</th><th class="n ">Tokens</th><th class="n ">Muertos a 24 h</th><th class="n ">Muertos a 7 días</th></tr></thead><tbody id="lvl"></tbody></table></div><p class="ld" style="color:var(--muted)">Cargando los datos…</p>
+  <p id="green" class="nota" style="display:none"></p>
+  <p style="color:var(--muted);font-size:.9rem">A 7 días solo cuentan los días ya cerrados.</p>
+</article>
+<article id="senal">
+  <h2>Por señal</h2>
+  <p>Cada fila son los tokens que tenían esa señal (en rojo o en amarillo) al verlos. Las filas con menos de 30 tokens salen más claras: con tan pocos, el porcentaje dice poco.</p>
+  <div class="tw"><table><thead><tr><th class="">Señal</th><th class="n ">Tokens</th><th class="n ">Muertos a 24 h</th><th class="n ">A 7 días</th></tr></thead><tbody id="sig"></tbody></table></div><p class="ld" style="color:var(--muted)">Cargando los datos…</p>
+</article>
+<article id="separa">
+  <h2>Qué separa a los que sobreviven</h2>
+  <p>Análisis del 6/11/2026 con los 6.040 tokens del 29/10 al 4/11 (42 vivos, el 0,7 %; casi todos solo con el resultado de 24 h, así que puede cambiar). El nivel rojo o amarillo apenas los separa. Estas dos cosas sí:</p>
+<h3>Lo grande que era al verlo</h3>
+<div class="tw"><table><thead><tr><th>Capitalización al verlo</th><th class="n">Tokens</th><th class="n">Vivos</th></tr></thead><tbody>
+<tr><td>menos de 5.000 $</td><td class="n">4.298</td><td class="n"><b>0,1 %</b> (3)</td></tr>
+<tr><td>5.000 – 20.000 $</td><td class="n">578</td><td class="n"><b>0,9 %</b> (5)</td></tr>
+<tr><td>20.000 – 100.000 $</td><td class="n">489</td><td class="n"><b>1,8 %</b> (9)</td></tr>
+<tr><td>100.000 $ – 1 M$</td><td class="n">79</td><td class="n"><b>19 %</b> (15)</td></tr>
+<tr><td>más de 1 M$</td><td class="n">41</td><td class="n"><b>22 %</b> (9)</td></tr>
+</tbody></table></div>
+<p>Casi todos los que sobreviven ya tenían un mercado de verdad al primer minuto: pools nuevos de tokens que ya existían o mercados fuera de Pump.fun. Hoy el semáforo los trata igual que a un token de 3.000 $ en la curva; <b>vamos a separarlos</b> (semáforo según madurez, desde el 16/11).</p>
+<h3>Quién pagó el lanzamiento</h3>
+<div class="tw"><table><thead><tr><th>Lanzamientos que pagó esa wallet (en el registro)</th><th class="n">Tokens</th><th class="n">Vivos</th></tr></thead><tbody>
+<tr><td>1</td><td class="n">2.543</td><td class="n"><b>0,7 %</b> (18)</td></tr>
+<tr><td>2 – 5</td><td class="n">1.590</td><td class="n"><b>0,3 %</b> (5)</td></tr>
+<tr><td>6 – 20</td><td class="n">1.086</td><td class="n"><b>0,6 %</b> (6)</td></tr>
+<tr><td>más de 20</td><td class="n">355</td><td class="n"><b>0 %</b> (0)</td></tr>
+</tbody></table></div>
+<p>Ninguno de los 355 tokens pagados por wallets con más de 20 lanzamientos sigue vivo. Es una señal más débil, pero apunta a lo que queremos medir: <b>quién está detrás</b>. Le daremos más peso con el registro de wallets (desde el 9/11).</p>
+</article>
+<article id="vivos">
+  <h2>Los que siguen vivos</h2>
+  <p>Los tokens que no habían muerto en su último resultado. Si los marcamos en rojo o en amarillo, son nuestros fallos (o aún no les ha llegado la hora).</p>
+  <div class="tw"><table><thead><tr><th class="">Día</th><th class="">Token</th><th class="">Al verlo</th><th class="">Resultado</th><th class="n hide-s">Valía</th></tr></thead><tbody id="alive"></tbody></table></div><p class="ld" style="color:var(--muted)">Cargando los datos…</p>
+</article>
+<article id="dias">
+  <h2>Día a día</h2>
+  <div class="tw"><table><thead><tr><th class="">Día</th><th class="n ">Tokens</th><th class="n ">Rojo: muertos 24 h</th><th class="n ">Amarillo: muertos 24 h</th><th class="hide-s">Estado</th><th class="hide-s">Datos</th></tr></thead><tbody id="days"></tbody></table></div><p class="ld" style="color:var(--muted)">Cargando los datos…</p>
+</article>
+<article id="descargar">
+  <h2>Descargar los datos</h2>
+  <p>Un archivo por día de lanzamiento (fecha UTC) y un índice con el resumen. Son JSON. Cada día se publica dos veces: cuando todos sus tokens tienen el resultado de 24 h y, cerrado, cuando tienen el de 7 días.</p>
+  <ul class="dl" id="dl"></ul>
+  <h3>Formato (versión 1)</h3>
+  <p>Cada archivo de día es <code>{ v, day, final, updated, tokens }</code>, y <code>tokens</code> es un objeto con la dirección del token como clave. Claves cortas porque el registro crece cada día:</p>
+  <dl class="fmt"><dt>m</dt><dd>dirección del token (mint)</dd><dt>s</dt><dd>símbolo</dd><dt>t</dt><dd>cuándo se creó (ms desde 1970, UTC)</dd><dt>d</dt><dd>dex donde lo vimos</dd><dt>p</dt><dd>plataforma de lanzamiento según RugCheck</dd><dt>a</dt><dd>cuándo lo analizó SolFlag (ms)</dd><dt>l</dt><dd>nivel al verlo: HIGH, MEDIUM, LOW, SPAM, NO_DATA, NO_MARKET</dd><dt>v</dt><dd>gravedad (número)</dd><dt>ty</dt><dd>tipo de token</dd><dt>f</dt><dd>señales que no salieron bien: «CÓDIGO:b» rojo, «CÓDIGO:w» amarillo, «CÓDIGO:n» sin comprobar</dd><dt>liq / mc</dt><dd>liquidez y capitalización al verlo (USD)</dd><dt>w1 / w10</dt><dd>% de la mayor wallet y de las 10 mayores (personas)</dd><dt>py / fu / cr</dt><dd>quién pagó el lanzamiento, quién le dio los fondos y quién lo creó</dd><dt>rug</dt><dd>RugCheck lo marca como rug</dd><dt>cara</dt><dd>nivel de cara conocida, si la hay</dd><dt>nrc / rcl</dt><dd>RugCheck no respondió al verlo / respondió más tarde y se completaron p, cr, fu y rug</dd><dt>ev</dt><dd>versión del motor que lo analizó (sin ev: 0.4.6)</dd><dt>h24 / d7</dt><dd>resultado: { mc, liq, dead, cv, pull, dry, dx, gr } (cv sigue en la curva, pull le quitaron la liquidez, dry sin liquidez o casi nada frente a su capitalización, dx dex principal, gr graduó de la curva)</dd></dl>
+  <p>El índice es <code>{ v, updated, days }</code>; cada día lleva <code>levels</code> y <code>sig</code> (por nivel y por señal: <code>n, h24, dead24, d7, dead7</code>), <code>curve</code> (tokens de la curva y cuántos graduaron), <code>alive</code> (los vivos) y <code>final</code>. Si algo cambia de forma incompatible, sube <code>v</code>.</p>
+</article>
+<article id="errores">
+  <h2>Si ves un error</h2>
+  <p>Son hechos que se ven en la cadena (quién pagó, quién dio los fondos, cómo acabó), nunca etiquetas como «estafador». Si una dirección es tuya o crees que un dato está mal, escribe a <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>: lo revisamos y, si hay un error, lo corregimos y lo contamos en el <a href="/blog/">blog</a>, como <a href="/blog/#estables-lista-confluencia">ya hicimos</a> con los números del 31/10.</p>
+<p class="nota">El 31/10 de 01 a 15 h UTC RugCheck no respondió y muchos tokens se quedaron sin creador ni plataforma: ese día hay más «riesgo medio» de lo normal y las señales del creador cuentan menos.</p>
+</article>
+
+<footer>
+  <span class="wm" translate="no"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
+  <a href="/">Escáner</a>
+  <a href="/blog/">Blog</a>
+  <a href="/acierto/">Datos y acierto</a>
+  <a href="/privacidad/">Privacidad</a>
+  <a href="/terminos/">Términos</a>
+  <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
+  <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
+  <p>SolFlag es una herramienta orientativa, no consejo financiero.</p>
+</footer>
+</div>
+
+<script>
+(function(){
+var L={"green": ["En verde: ", " siguen vivos a las 24 h", " y ", " a los 7 días", " (entre todos, el ", "). Es la prueba que más importa: un verde que muere hace más daño que un rojo que sobrevive.", " de "], "lang": "es", "upd": "Datos actualizados: ", "tiles": ["tokens registrados", "días con datos", "muertos a las 24 h (todos)", "días cerrados a 7 días"], "base": "Todos (tasa base)", "lv": {"HIGH": "Riesgo alto", "MEDIUM": "Riesgo medio", "LOW": "Riesgo bajo", "SPAM": "Spam", "NO_DATA": "Sin datos", "NO_MARKET": "Sin mercado", "ERROR": "Error"}, "st": {"h24": "vivo a 24 h", "d7": "vivo a 7 días"}, "none": "Ninguno.", "fin": "cerrado", "part": "con 24 h", "idx": "Índice (resumen de todos los días)", "tok": "?token=", "home": "/"}, SIG={"MKT_NEW": "Mercado recién creado", "MKT_LIQ_VERY_LOW": "Liquidez muy baja", "MKT_LIQ_LOW": "Liquidez baja", "MKT_VOLUME_LOW": "Poco volumen", "MKT_LIQ_INFLATED": "Liquidez inflada", "MKT_LP_UNLOCKED": "Liquidez sin bloquear", "MKT_LP_PARTLY_LOCKED": "Liquidez bloqueada en parte", "COPYCAT": "Copia el nombre de otro token", "IMPOSTOR": "Se hace pasar por uno famoso", "BRAND_NAME": "Usa el nombre de una marca", "BRAND_COPY": "Copia una marca", "CTL_SERIAL_CREATOR": "El creador lanza en serie", "CTL_SERIAL_PAYER": "Quien pagó lanza en serie", "CTL_CREATOR_HISTORY": "Historial del creador", "CTL_MINT_ACTIVE": "Se pueden crear más tokens", "CTL_FREEZE_ACTIVE": "Pueden congelar tu saldo", "CTL_TRANSFER_FEE": "Comisión al transferir", "CTL_TRANSFER_HOOK": "Programa en cada transferencia", "CON_HIGH": "Muy concentrado", "CON_UNSPLIT": "Concentración sin repartir", "DEP_PROGRAM_AUTHORITY": "Un programa controla el token", "DEP_PERMANENT_DELEGATE": "Delegado permanente", "DEP_KNOWN_ISSUER": "Emisor conocido"}, LANG=L.lang;
+var nf=new Intl.NumberFormat(LANG==="es"?"es-ES":"en-US");
+function pct(a,b){ if(!b) return "—"; var p=100*a/b, t=(a<b&&p>99.9?99.9:p).toFixed(1); return (LANG==="es"? t.replace(".",",")+" %" : t+"%"); }
+function cell(a,b){ return b? '<b>'+pct(a,b)+'</b> <span class="hide-s" style="color:var(--muted)">('+nf.format(a)+'/'+nf.format(b)+')</span>' : "—"; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function usd(x){ if(typeof x!=="number") return "—"; return x>=1e6? "$"+(x/1e6).toFixed(1)+"M" : x>=1e3? "$"+Math.round(x/1e3)+"k" : "$"+Math.round(x); }
+function dayTxt(d){ var p=d.split("-"); return LANG==="es"? p[2]+"/"+p[1] : p[1]+"/"+p[2]; }
+function add(t,s){ ["n","h24","dead24","d7","dead7"].forEach(function(k){ t[k]=(t[k]||0)+(s[k]||0); }); return t; }
+function pill(l){ return '<span class="pill '+(/^(HIGH|MEDIUM|LOW)$/.test(l)?l:"x")+'">'+esc(L.lv[l]||l)+'</span>'; }
+var ORDER=["HIGH","MEDIUM","LOW","SPAM","NO_DATA","NO_MARKET","ERROR"];
+fetch("/datos/registro/indice.json",{cache:"no-cache"}).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(ix){
+  var days=Object.keys(ix.days||{}).sort(), lv={}, sig={}, base={}, alive=[], fin=0, tot=0;
+  days.forEach(function(d){
+    var x=ix.days[d]; tot+=x.n; if(x.final) fin++;
+    Object.keys(x.levels||{}).forEach(function(k){ var s=x.levels[k]; if(!x.final) s={n:s.n,h24:s.h24,dead24:s.dead24}; add(lv[k]||(lv[k]={}),s); add(base,s); });
+    Object.keys(x.sig||{}).forEach(function(k){ var s=x.sig[k]; if(!x.final) s={n:s.n,h24:s.h24,dead24:s.dead24}; add(sig[k]||(sig[k]={}),s); });
+    (x.alive||[]).forEach(function(a){ alive.push(Object.assign({day:d},a)); });
+  });
+  document.getElementById("upd").textContent=L.upd+new Date(ix.updated).toLocaleString(LANG==="es"?"es-ES":"en-GB",{dateStyle:"medium",timeStyle:"short"});
+  var t=[nf.format(tot), nf.format(days.length), pct(base.dead24,base.h24), nf.format(fin)];
+  document.getElementById("tiles").innerHTML=t.map(function(v,i){ return '<div'+(i==2?' class="k"':'')+'><b>'+v+'</b><span>'+L.tiles[i]+'</span></div>'; }).join("");
+  var h='<tr class="base"><td>'+L.base+'</td><td class="n">'+nf.format(base.n)+'</td><td class="n">'+cell(base.dead24,base.h24)+'</td><td class="n">'+cell(base.dead7,base.d7)+'</td></tr>';
+  ORDER.forEach(function(k){ var s=lv[k]; if(!s) return; h+='<tr><td>'+pill(k)+'</td><td class="n">'+nf.format(s.n)+'</td><td class="n">'+cell(s.dead24,s.h24)+'</td><td class="n">'+cell(s.dead7,s.d7)+'</td></tr>'; });
+  document.getElementById("lvl").innerHTML=h;
+  var G=lv.LOW, g=L.green, ge=document.getElementById("green");
+  if(G&&G.h24){ var a24=G.h24-G.dead24, txt=g[0]+"<b>"+nf.format(a24)+g[6]+nf.format(G.h24)+"</b>"+g[1];
+    if(G.d7) txt+=g[2]+"<b>"+nf.format(G.d7-G.dead7)+g[6]+nf.format(G.d7)+"</b>"+g[3];
+    ge.innerHTML=txt+g[4]+pct(base.h24-base.dead24,base.h24)+g[5]; ge.style.display="block"; }
+  var ks=Object.keys(sig).sort(function(a,b){ return sig[b].n-sig[a].n; });
+  h='<tr class="base"><td>'+L.base+'</td><td class="n">'+nf.format(base.n)+'</td><td class="n">'+cell(base.dead24,base.h24)+'</td><td class="n">'+cell(base.dead7,base.d7)+'</td></tr>';
+  ks.forEach(function(k){ var s=sig[k], nm=SIG[k]; h+='<tr'+(s.n<30?' class="few"':'')+'><td>'+(nm?esc(nm)+'<br>':'')+'<code>'+esc(k)+'</code></td><td class="n">'+nf.format(s.n)+'</td><td class="n">'+cell(s.dead24,s.h24)+'</td><td class="n">'+cell(s.dead7,s.d7)+'</td></tr>'; });
+  document.getElementById("sig").innerHTML=ks.length? h : '<tr><td>'+L.none+'</td></tr>';
+  alive.sort(function(a,b){ return a.day<b.day?1:a.day>b.day?-1:0; });
+  document.getElementById("alive").innerHTML=alive.length? alive.map(function(a){
+    return '<tr><td>'+dayTxt(a.day)+'</td><td><a href="'+L.home+L.tok+encodeURIComponent(a.m)+'">'+esc(a.s||a.m.slice(0,6)+"…")+'</a><br><code>'+esc(a.m.slice(0,4)+"…"+a.m.slice(-4))+'</code></td><td>'+pill(a.l)+'</td><td>'+esc(L.st[a.at]||a.at)+'</td><td class="n hide-s">'+usd(a.mc)+'</td></tr>';
+  }).join("") : '<tr><td>'+L.none+'</td></tr>';
+  h=""; var dl='<li><a href="/datos/registro/indice.json" download>'+L.idx+'</a></li>';
+  days.slice().reverse().forEach(function(d){ var x=ix.days[d], H=(x.levels||{}).HIGH||{}, M=(x.levels||{}).MEDIUM||{};
+    h+='<tr><td>'+dayTxt(d)+'</td><td class="n">'+nf.format(x.n)+'</td><td class="n">'+pct(H.dead24||0,H.h24||0)+'</td><td class="n">'+pct(M.dead24||0,M.h24||0)+'</td><td class="hide-s">'+(x.final?L.fin:L.part)+'</td><td class="hide-s"><a href="/datos/registro/'+d+'.json" download>JSON</a></td></tr>';
+    dl+='<li><a href="/datos/registro/'+d+'.json" download>'+d+'<small>'+(x.final?L.fin:L.part)+'</small></a></li>'; });
+  document.getElementById("days").innerHTML=h; document.getElementById("dl").innerHTML=dl;
+  document.querySelectorAll(".ld").forEach(function(e){ e.style.display="none"; });
+}).catch(function(){ document.getElementById("err").style.display="block"; document.querySelectorAll(".ld").forEach(function(e){ e.style.display="none"; }); });
+})();
+</script>
+</body>
+</html>
