@@ -346,7 +346,8 @@ if (fs.existsSync(REG)) {
   const index = fs.existsSync(ip) ? JSON.parse(fs.readFileSync(ip, "utf8")) : { v: 1, days: {} };
   fs.readdirSync(REG).filter((f) => /^\d{4}-\d\d-\d\d\.json$/.test(f)).forEach((f) => {
     const fp = path.join(REG, f), file = JSON.parse(fs.readFileSync(fp, "utf8"));
-    if (!regRejudge(file)) return;
+    // también los días del índice sin el resumen por señal (sig, desde el 6/11/2026): se completan una vez
+    if (!regRejudge(file) && index.days[file.day] && index.days[file.day].sig) return;
     fs.writeFileSync(fp, JSON.stringify(file));
     index.days[file.day] = Object.assign(daySummary(file.tokens), { final: !!file.final });
     fixed.push(file.day);

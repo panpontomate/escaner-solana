@@ -15,6 +15,8 @@ export const PULL_MIN_LIQ = 1000;     // liquidez mínima al verlo para que cuen
 export const PULL_DROP = 0.95;        // la liquidez cayó más de esto: le quitaron el pool aunque quede capitalización
 export const DRY_LIQ = 1000;          // registro: fuera de la curva y con menos liquidez que esto no se puede vender, aunque
                                        // DexScreener dé una capitalización enorme (LUMI, 31/10: 434 M$ con 0 $ de liquidez)
+export const THIN_LIQ = 0.002;        // registro: fuera de la curva y con liquidez por debajo del 0,2 % de la capitalización
+                                       // tampoco se puede vender (DAKU, 1/11: 118 M$ con 61 k$; desde el 6/11/2026)
 export const RC_FAIL_PCT = 0.5, RC_FAIL_MIN = 10, RC_ALERT_RUNS = 3;   // RugCheck caído: avisar tras 3 ejecuciones seguidas
 export const INFRA_PER_HOUR = 300;     // más transacciones por hora: exchange o plataforma, no una persona
 export const FUNDER_PER_HOUR = 100;    // quien solo financia creadores: a partir de aquí suele ser un exchange pequeño (estudio de 200 tokens, 28/10)

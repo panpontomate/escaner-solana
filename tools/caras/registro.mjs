@@ -20,11 +20,12 @@
 //   h24 / d7 resultado: { mc, liq, dead, cv?, pull?, dry?, dx?, gr? } (dead = no llega a DEAD_MCAP, rug, le quitaron
 //   la liquidez o no la tiene; cv = sigue en la curva de Pump.fun; pull = muerto porque la liquidez cayó más de un 95 %;
 //   dry = muerto porque fuera de la curva le queda menos de DRY_LIQ de liquidez aunque la capitalización diga otra
-//   cosa (desde el 2/11/2026, también en los días ya publicados);
+//   cosa (desde el 2/11/2026, también en los días ya publicados), o liquidez por debajo del 0,2 % de la capitalización
+//   (THIN_LIQ, desde el 6/11/2026);
 //   dx = dex de su mercado principal en ese momento; gr = salió en la curva de Pump.fun y ya tiene mercado
 //   fuera de ella: graduó. Desde el 1/11/2026, para estudiar qué tokens de la curva llegan a graduar)
 
-import { DAY, DEAD_MCAP, DRY_LIQ, isPulled, onCurve } from "./lib.mjs";
+import { DAY, DEAD_MCAP, DRY_LIQ, THIN_LIQ, isPulled, onCurve } from "./lib.mjs";
 
 export const REG_DAYS = 7;          // último resultado: a los 7 días
 export const LEVEL_ORDER = ["HIGH", "MEDIUM", "LOW", "SPAM", "NO_DATA", "NO_MARKET"];
@@ -128,7 +129,7 @@ export function regRecheck(e, stage) {
   const r = e[stage];
   if (!r) return e;
   const pull = isPulled(e.liq, r.liq, r.cv);
-  const dry = !r.cv && !(r.liq >= DRY_LIQ);
+  const dry = !r.cv && (!(r.liq >= DRY_LIQ) || r.liq < r.mc * THIN_LIQ);
   r.dead = !!e.rug || !(r.mc >= DEAD_MCAP) || pull || dry;
   if (pull && r.mc >= DEAD_MCAP) r.pull = true; else delete r.pull;
   if (dry && !pull && !e.rug && r.mc >= DEAD_MCAP) r.dry = true; else delete r.dry;
@@ -166,9 +167,16 @@ export function regPublish(reg, pub, now) {
   return out;
 }
 
-// Resumen de un día: por nivel inicial, cuántos hay, cuántos tienen ya resultado y cuántos murieron
+// Resumen de un día: por nivel inicial y por señal, cuántos hay, cuántos tienen ya resultado y cuántos murieron;
+// alive = los que siguen vivos en su último resultado ({ m, s, l nivel, at h24|d7, mc })
 export function daySummary(tokens) {
-  const by = {}, cur = { n: 0, h24: 0, gr24: 0, d7: 0, gr7: 0 };
+  const by = {}, sig = {}, alive = [], cur = { n: 0, h24: 0, gr24: 0, d7: 0, gr7: 0 };
+  const blank = function () { return { n: 0, h24: 0, dead24: 0, d7: 0, dead7: 0 }; };
+  const count = function (s, e) {
+    s.n++;
+    if (e.h24) { s.h24++; if (e.h24.dead) s.dead24++; }
+    if (e.d7) { s.d7++; if (e.d7.dead) s.dead7++; }
+  };
   Object.keys(tokens).forEach(function (m) {
     const e = tokens[m], k = e.l || "ERROR";
     // tokens nacidos en la curva de Pump.fun y cuántos graduaron (solo los resueltos desde el 1/11 tienen gr/dx)
@@ -177,15 +185,20 @@ export function daySummary(tokens) {
       if (e.h24 && e.h24.dx !== undefined) { cur.h24++; if (e.h24.gr) cur.gr24++; }
       if (e.d7 && e.d7.dx !== undefined) { cur.d7++; if (e.d7.gr) cur.gr7++; }
     }
-    const s = by[k] || (by[k] = { n: 0, h24: 0, dead24: 0, d7: 0, dead7: 0 });
-    s.n++;
-    if (e.h24) { s.h24++; if (e.h24.dead) s.dead24++; }
-    if (e.d7) { s.d7++; if (e.d7.dead) s.dead7++; }
+    count(by[k] || (by[k] = blank()), e);
+    // cada señal (sin el color): cuántos tokens la tenían y cuántos murieron
+    (e.f || []).forEach(function (f) { const c = f.split(":")[0]; count(sig[c] || (sig[c] = blank()), e); });
+    // los que siguen vivos en su último resultado: los fallos de los marcados en rojo, a la vista
+    const last = e.d7 ? "d7" : e.h24 ? "h24" : null;
+    if (last && !e[last].dead) alive.push({ m: e.m, s: e.s, l: k, at: last, mc: e[last].mc });
   });
   const levels = {};
   LEVEL_ORDER.concat(["ERROR"]).forEach(function (k) { if (by[k]) levels[k] = by[k]; });
   const out = { n: Object.keys(tokens).length, levels: levels };
   if (cur.n) out.curve = cur;
+  out.sig = {};
+  Object.keys(sig).sort().forEach(function (c) { out.sig[c] = sig[c]; });
+  out.alive = alive;
   return out;
 }
 

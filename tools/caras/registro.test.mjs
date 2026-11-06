@@ -115,7 +115,8 @@ test("day summary by starting level, and merging into the published day", () => 
     c: { l: "LOW" },
     d: { l: "ERROR" }
   };
-  assert.deepEqual(daySummary(tokens), { n: 4, levels: {
+  const sum = daySummary(tokens);
+  assert.deepEqual({ n: sum.n, levels: sum.levels }, { n: 4, levels: {
     HIGH: { n: 2, h24: 2, dead24: 1, d7: 1, dead7: 1 }, LOW: { n: 1, h24: 0, dead24: 0, d7: 0, dead7: 0 }, ERROR: { n: 1, h24: 0, dead24: 0, d7: 0, dead7: 0 } } });
   const f = mergeDay(null, "2026-10-29", [{ m: "a", l: "LOW" }], NOW);
   mergeDay(f, "2026-10-29", [{ m: "a", l: "LOW", h24: { dead: true } }, { m: "b", l: "HIGH" }], NOW + 1);
@@ -167,4 +168,29 @@ test("regMissing picks a day's entries without launchpad nor creator and marks t
   const reg = { a: { m: "a", t: d }, b: { m: "b", t: d, p: "pump_fun", cr: "C" }, c: { m: "c", t: d + DAY }, r: { m: "r", t: d, rcl: 1 } };
   assert.deepEqual(regMissing(reg, "2026-10-31"), ["a"]);
   assert.equal(reg.a.nrc, 1); assert.equal(reg.b.nrc, undefined); assert.equal(reg.c.nrc, undefined);
+});
+
+test("day summary per signal and the tokens still alive (the misses)", () => {
+  const tokens = {
+    a: { m: "a", s: "A", l: "HIGH", f: ["MKT_NEW:w", "CTL_SERIAL_CREATOR:b"], h24: { dead: true }, d7: { dead: true } },
+    b: { m: "b", s: "B", l: "HIGH", f: ["MKT_NEW:w"], h24: { dead: false, mc: 9000 }, d7: { dead: false, mc: 50000 } },
+    c: { m: "c", s: "C", l: "MEDIUM", f: ["MKT_NEW:b"], h24: { dead: false, mc: 7000 } },
+    d: { m: "d", l: "LOW" }
+  };
+  const sum = daySummary(tokens);
+  assert.deepEqual(sum.sig, {
+    CTL_SERIAL_CREATOR: { n: 1, h24: 1, dead24: 1, d7: 1, dead7: 1 },
+    MKT_NEW: { n: 3, h24: 3, dead24: 1, d7: 2, dead7: 1 }
+  });
+  assert.deepEqual(sum.alive, [
+    { m: "b", s: "B", l: "HIGH", at: "d7", mc: 50000 },
+    { m: "c", s: "C", l: "MEDIUM", at: "h24", mc: 7000 }
+  ]);
+});
+
+test("dry also when liquidity is tiny next to the market cap (under 0.2 %)", () => {
+  assert.equal(regResolve({}, "h24", [{ dexId: "pumpswap", marketCap: 118751314, liquidity: { usd: 60919 } }]).h24.dry, true);
+  const xto = regResolve({}, "h24", [{ dexId: "pumpswap", marketCap: 65273909, liquidity: { usd: 663429 } }]).h24;   // 1 %: alive
+  assert.equal(xto.dead, false);
+  assert.equal(regResolve({}, "h24", [{ dexId: "pump-fun", marketCap: 50000, liquidity: { usd: 0 } }]).h24.dead, false);   // on the curve
 });
