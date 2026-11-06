@@ -27,7 +27,7 @@
 			e: !!(vars.event || goatcounter.event),
 			s: window.screen.width,
 			b: is_bot(),
-			q: location.search,
+			q: no_wallet(location.search),
 		}
 
 		var rcb, pcb, tcb  // Save callbacks to apply later.
@@ -86,6 +86,11 @@
 		return (s && s.dataset.goatcounter) ? s.dataset.goatcounter : goatcounter.endpoint
 	}
 
+	// SolFlag: la dirección de una wallet (?wallet=) nunca se envía a las estadísticas (política de privacidad)
+	var no_wallet = function(q) {
+		return (q || '').replace(/([?&])wallet=[^&#]*&?/g, '$1').replace(/[?&]$/, '')
+	}
+
 	// Get current path.
 	var get_path = function() {
 		var loc = location,
@@ -96,7 +101,7 @@
 			if (a.hostname.replace(/^www\./, '') === location.hostname.replace(/^www\./, ''))
 				loc = a
 		}
-		return (loc.pathname + loc.search) || '/'
+		return (loc.pathname + no_wallet(loc.search)) || '/'
 	}
 
 	// Run function after DOM is loaded.
