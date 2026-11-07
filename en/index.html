@@ -1255,6 +1255,7 @@ body.scanp #form .eyebrow{margin-bottom:8px}
 /* ===== Token en el Escáner: resumen fijo a la izquierda y el detalle a la derecha (ordenador); en el móvil, una columna */
 #tside{display:contents}
 #results.tview{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:start}
+#results[hidden]{display:none!important} /* la vista del token pone display:grid y taparía el hidden al cambiar de pestaña */
 #results.tview:not(.wview) #filters{display:none!important}
 #wnum{order:3}
 #w-who{order:4}
