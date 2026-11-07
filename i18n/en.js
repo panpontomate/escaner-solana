@@ -57,10 +57,15 @@ export const CODE = [
   // engine error messages that the page recognises by their start
   ['if(/^(solo |no se pudieron leer)/.test(m))', 'if(/^(only |could not read)/.test(m))'],
   // pie: enlace a la página de datos (6/11/2026)
-  ['<a href="/acierto/">Datos y acierto</a>', '<a href="/en/accuracy/">Data and accuracy</a>']
+  ['<a href="/acierto/">Datos y acierto</a>', '<a href="/en/accuracy/">Data and accuracy</a>'],
+  ['<a href="/acierto/#licencia">', '<a href="/en/accuracy/#license">']
 ];
 
 export const TEXT = {
+  "<p class='lwc-attr'><span id='lwcmk'></span><a href='https://www.tradingview.com/' target='_blank' rel='noopener'>Gráfica: TradingView Lightweight Charts</a> · <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Datos: Powered by CoinGecko</a></p>": "<p class='lwc-attr'><span id='lwcmk'></span><a href='https://www.tradingview.com/' target='_blank' rel='noopener'>Chart: TradingView Lightweight Charts</a> · <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Data: Powered by CoinGecko</a></p>",
+  "Datos de mercado: DexScreener y GeckoTerminal (": "Market data: DexScreener and GeckoTerminal (",
+  ") · análisis de RugCheck · Solana vía Helius. Nuestros datos, con": ") · RugCheck analysis · Solana via Helius. Our data, under the",
+  "licencia CC BY-NC 4.0": "CC BY-NC 4.0 license",
   "Red de transferencias ": "Transfer network ",
   "Con tu URL de Helius en Ajustes se ven 75 holders en vez de 20.": "With your Helius URL in Settings you see 75 holders instead of 20.",
   "se pasaron tokens entre ellas": "they passed tokens to each other",
@@ -1019,7 +1024,6 @@ export const TEXT = {
   " murieron en las primeras 24 h.</p>": " died in the first 24 h.</p>",
   "' title='Copiar dirección de la wallet'>": "' title='Copy wallet address'>",
   // gráfica estilo TradingView (7/11)
-  "<p class='lwc-attr'><span id='lwcmk'></span><a href='https://www.tradingview.com/' target='_blank' rel='noopener'>Gráfica: TradingView Lightweight Charts</a></p>": "<p class='lwc-attr'><span id='lwcmk'></span><a href='https://www.tradingview.com/' target='_blank' rel='noopener'>Chart: TradingView Lightweight Charts</a></p>",
   "Tú": "You",
   "<i></i>Lo analizaste aquí": "<i></i>You analyzed it here",
   "<span>A <b style='color:": "<span>O <b style='color:",
@@ -1100,7 +1104,6 @@ export const TEXT = {
   "'>Recién creados</button>": "'>Just created</button>",
   "'>En tendencia</button></span>": "'>Trending</button></span>",
   "<button class='btn ghost small' type='button' id='nreload'>Actualizar</button>": "<button class='btn ghost small' type='button' id='nreload'>Refresh</button>",
-  "Datos de GeckoTerminal, ": "GeckoTerminal data, ",
   "Revisando…": "Checking…",
   "No se pudo revisar": "Could not check",
   "En cola": "Queued",

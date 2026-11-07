@@ -1605,14 +1605,14 @@ body:not(.landing) #goH{display:none}
         <div class="lhd"><h2>🔥 En tendencia ahora <small>Solana · por actividad</small></h2>
           <div class="segs" role="group" aria-label="Periodo"><button type="button" class="seg" data-tdur="m5" aria-pressed="false">5 min</button><button type="button" class="seg" data-tdur="h1" aria-pressed="true">1 h</button><button type="button" class="seg" data-tdur="h6" aria-pressed="false">6 h</button><button type="button" class="seg" data-tdur="h24" aria-pressed="false">24 h</button></div></div>
         <div class="trows" id="strows"><p class="hint">Cargando la tendencia…</p></div>
-        <p class="lsrc">Fuente: tendencia de GeckoTerminal (por actividad real, sin puestos de pago). Se actualiza cada 5 min. Que un token esté en tendencia solo dice que se mueve mucho: no es una recomendación de compra.</p>
+        <p class="lsrc">Fuente: tendencia de GeckoTerminal (por actividad real, sin puestos de pago). Se actualiza cada 5 min. Que un token esté en tendencia solo dice que se mueve mucho: no es una recomendación de compra. <a href="https://www.coingecko.com/" target="_blank" rel="noopener">Powered by CoinGecko</a>.</p>
         <p class="lbase">Aquí el veredicto vale más: de los tokens que ya tienen mercado, <b>~1 de cada 5</b> sigue vivo a la semana; de los recién nacidos, <b>menos de 1 de cada 100</b>.</p>
       </section>
       <div class="rcol">
       <section class="card" id="sfresh">
         <div class="lhd"><h2><span class="ldot" aria-hidden="true"></span> Recién lanzados</h2><small class="hint" id="sftime"></small></div>
         <div class="nrows" id="snrows"><p class="hint">Buscando los últimos lanzamientos…</p></div>
-        <p class="lsrc">Los 5 últimos de Solana (Pump.fun y otros). <a href="#" data-trynew>Ver todos en Tokens nuevos →</a></p>
+        <p class="lsrc">Los 5 últimos de Solana (Pump.fun y otros). <a href="#" data-trynew>Ver todos en Tokens nuevos →</a> · <a href="https://www.coingecko.com/" target="_blank" rel="noopener">Powered by CoinGecko</a></p>
         <p class="lbase">De lo que nace, <b>el 99 %</b> está muerto en 24 h (registro de SolFlag). Mira quién está detrás antes de nada.</p>
       </section>
       <section class="card" id="smmap" hidden>
@@ -1673,6 +1673,7 @@ body:not(.landing) #goH{display:none}
       <a href="/acierto/">Datos y acierto</a>
       <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
     </p>
+    <p class="foot">Datos de mercado: DexScreener y GeckoTerminal (<a href="https://www.coingecko.com/" target="_blank" rel="noopener">Powered by CoinGecko</a>) · análisis de RugCheck · Solana vía Helius. Nuestros datos, con <a href="/acierto/#licencia">licencia CC BY-NC 4.0</a>.</p>
     <p class="foot">Creado por <a href="https://x.com/elgatotradebtc" target="_blank" rel="noopener">El Gato Trade</a>.</p>
   </footer>
 </div>
@@ -3680,7 +3681,7 @@ function lwcDraw(box,c,r){
   var minP=Infinity; c.forEach(function(p){ if(p[4]<minP) minP=p[4]; });
   var prec=minP>=1?4:Math.min(12,Math.max(2,2-Math.floor(Math.log10(minP))+2));
   box.innerHTML="<div class='lwc' id='lwcbox'><div class='lwc-lg' id='lwclg'></div></div>"+
-    "<p class='lwc-attr'><span id='lwcmk'></span><a href='https://www.tradingview.com/' target='_blank' rel='noopener'>Gráfica: TradingView Lightweight Charts</a></p>";
+    "<p class='lwc-attr'><span id='lwcmk'></span><a href='https://www.tradingview.com/' target='_blank' rel='noopener'>Gráfica: TradingView Lightweight Charts</a> · <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Datos: Powered by CoinGecko</a></p>";
   var el=$("#lwcbox"), mob=window.matchMedia&&matchMedia("(max-width:520px)").matches;
   var ch=LC.createChart(el,{autoSize:true,height:mob?260:330,
     layout:{background:{type:"solid",color:"transparent"},textColor:"#c9c1ea",fontFamily:"Manrope, system-ui, sans-serif",fontSize:11},
@@ -4082,7 +4083,7 @@ function renderNewHead(){
     "<div class='ntop'><span class='segs'><button type='button' class='seg' data-nsrc='new' aria-pressed='"+(state.nsrc==="new")+"'>Recién creados</button>"+
     "<button type='button' class='seg' data-nsrc='trend' aria-pressed='"+(state.nsrc==="trend")+"'>En tendencia</button></span>"+
     "<button class='btn ghost small' type='button' id='nreload'>Actualizar</button>"+
-    (news.ts?"<span class='hint' style='margin:0'>"+esc("Datos de GeckoTerminal, "+ftime(news.ts))+"</span>":"")+"</div>"+
+    (news.ts?"<span class='hint' style='margin:0'>"+"<a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a> · "+esc(ftime(news.ts))+"</span>":"")+"</div>"+
     (news.err?"<div class='notice err'>"+news.err+"</div>":"");
 }
 function renderNew(){
