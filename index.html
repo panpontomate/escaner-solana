@@ -423,7 +423,7 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 .wacts .wconf{background:transparent;color:var(--accent);border:2px solid var(--accent)}
 .wbr{display:none}
 @media (min-width:521px){
-  .wcopy{order:1} .wacts .tg{order:2} .wfav{order:3} .wbr{order:4} .wmain{order:5} .wconf{order:6} .wsol{order:7}
+  .wcopy{order:1} .wshare{order:1} .wacts .tg{order:2} .wfav{order:3} .wbr{order:4} .wmain{order:5} .wconf{order:6} .wsol{order:7}
   .wbr{display:block;flex:0 0 100%;height:0;border-top:1px dashed var(--line)}
   .wcopy .ic,.wsol .ic{display:none}
   .wcopy .lb,.wsol .lb{margin-left:0}
@@ -433,9 +433,9 @@ details.pmenu>summary::-webkit-details-marker{display:none}
   .wacts .lg{display:none}
   .wacts>.btn{display:flex;align-items:center;justify-content:center;border-radius:999px;padding:13px 16px;min-height:54px;font-size:1.05rem;font-weight:700;text-align:center}
   .wacts>.wmain{background:var(--accent);color:var(--accent-fg);border:0}
-  .wrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .wrow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .wacts .wrow>.btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;min-height:74px;border-radius:20px;padding:10px 4px;font-weight:700;font-size:.84rem;text-align:center}
-  .wacts .wrow>.wcopy,.wacts .wrow>.wsol{background:var(--surface-2);color:var(--fg);border:0}
+  .wacts .wrow>.wcopy,.wacts .wrow>.wsol,.wacts .wrow>.wshare{background:var(--surface-2);color:var(--fg);border:0}
   .wrow .ic{font-size:1.5rem;line-height:1}
   .wrow .ic+.lb{margin-left:0}
 }
@@ -771,16 +771,17 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
 .wrest>summary{cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:11px 14px;font-weight:600}
 .wrest[open]>summary{margin-bottom:10px}
 /* botones del resumen de la wallet: «Ver ganancias y pérdidas» entero y el resto en casillas */
-#results.wmode .wacts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-items:stretch}
+#results.wmode .wacts{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;align-items:stretch}
 #results.wmode .wacts .wrow{display:contents}
 #results.wmode .wacts .wbr{display:none}
 #results.wmode .wacts .lg{display:none}
 #results.wmode .wacts>.btn,#results.wmode .wacts .wrow>.btn{order:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:auto;min-height:60px;margin:0;padding:6px 2px;border-radius:12px;font-size:.7rem;font-weight:700;text-align:center;line-height:1.2}
 #results.wmode .wacts>.wmain{order:-1;grid-column:1/-1;min-height:48px;font-size:.98rem;border-radius:14px;background:var(--accent);color:var(--accent-fg);border:0}
-#results.wmode .wacts .wrow>.wcopy,#results.wmode .wacts .wrow>.wsol{background:var(--surface-2);color:var(--fg);border:1px solid var(--line)}
+#results.wmode .wacts .wrow>.wcopy,#results.wmode .wacts .wrow>.wsol,#results.wmode .wacts .wrow>.wshare{background:var(--surface-2);color:var(--fg);border:1px solid var(--line)}
 #results.wmode .wacts .ic{display:block!important;font-size:1.05rem;line-height:1}
 #results.wmode .wacts .ic+.lb{margin-left:0}
 @media (min-width:521px){#results.wmode .wacts{max-width:640px}}
+@media (max-width:520px){#results.wmode .wacts{grid-template-columns:repeat(3,minmax(0,1fr))}}   /* móvil: dos filas de tres casillas */
 #results.wmode .wacts>.wconf{font-size:.62rem;letter-spacing:-.01em;padding-inline:1px}
 @media (min-width:1000px){
   #results.wmode .wt1{grid-template-columns:34px minmax(80px,1fr) 112px 100px minmax(110px,1.8fr) auto;grid-template-areas:"av n v p w a";gap:10px}
@@ -2928,6 +2929,7 @@ function render(again){
     "<button class='btn ghost small wfav' type='button' data-long data-favw='"+esc(state.wallet)+"' aria-pressed='"+(!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"'>"+starHtml("wallet",!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"</button>"+
     "<button class='btn ghost small wconf' type='button' data-long data-addc='"+esc(state.wallet)+"' aria-pressed='"+inCart(state.wallet)+"'>"+(inCart(state.wallet)?"✓ En Confluencia":"⊕ A Confluencia")+"</button><i class='wbr' aria-hidden='true'></i>"+
     "<div class='wrow'>"+tgBtn(state.wallet,"Te avisa en Telegram de lo que compra o vende esta wallet")+
+    "<button class='btn small wshare' type='button' data-wshare><span class='ic'>↗</span><span class='lb'>Compartir</span></button>"+
     "<button class='btn small wcopy' id='copySum' type='button'><span class='ic'>📋</span><span class='lb'>Copiar<span class='lg'> resumen</span></span></button>"+
     "<a class='btn ghost small wsol' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(state.wallet)+"'><span class='ic'>🔗</span><span class='lb'><span class='lg'>Ver en </span>Solscan</span></a></div></div>"+
     "<div id='pnlbox'>"+((lista.w[state.wallet]&&lista.w[state.wallet].pnl)?"<div class='hint'>Último resultado estimado: "+pnlTag(lista.w[state.wallet].pnl)+"</div>":"")+"</div>";
@@ -4263,7 +4265,10 @@ function cardStamp(x,r,cx,cy,R){
   var col=(CARD.lvl[r.lvl]||[CARD.dot.na])[0], lbl=(r.lvl==="SIN MERCADO"||r.lvl==="SIN DATOS"?LEVELS[r.lvl].label:LEVELS[r.lvl].short).toUpperCase();
   var bad=strongAlerts(r), warn=(r.lights||[]).filter(function(l){ return l.s==="warn"; }).length;
   var sub=dataOnly(r)?"falta de datos":bad?bad+(bad===1?" alerta fuerte":" alertas fuertes"):warn?warn+(warn===1?" aviso":" avisos"):r.lights?"sin alertas":"";
-  var top=/^(ALTO|MEDIO|BAJO)$/.test(r.lvl)?"RIESGO":"", k=R/70, f=2*R/138;
+  cardStampRaw(x,cx,cy,R,col,/^(ALTO|MEDIO|BAJO)$/.test(r.lvl)?"RIESGO":"",lbl,sub);
+}
+function cardStampRaw(x,cx,cy,R,col,top,lbl,sub){
+  var k=R/70, f=2*R/138;
   x.save(); x.translate(cx,cy); x.rotate(-12*Math.PI/180); x.globalAlpha=.95; x.strokeStyle=col; x.fillStyle=col;
   function ring(rad,lw,dash,rot){ x.save(); x.rotate(rot*Math.PI/180); x.lineWidth=lw*k; x.setLineDash(dash.map(function(d){ return d*k; })); x.beginPath(); x.arc(0,0,rad*k,0,6.283); x.stroke(); x.restore(); }
   ring(66,4.5,[58,5,31,3,74,11,22,4,49,2,63,8,36,6,30,100],-38);
@@ -4417,6 +4422,128 @@ async function drawXCard(r){
   x.fillStyle="#b4acdc"; x.font="400 19px "+CF.B; x.textAlign="center";
   x.fillText(fdate(Date.now())+" · @solflagTeam · Herramienta orientativa, no es consejo financiero",W/2,H-36); x.textAlign="left";
   return c;
+}
+// Imagen de una wallet para X (y para descargar desde la misma ventanita): cabecera como la del token, sello (cara conocida
+// o el riesgo de sus tokens), «Quién es» con los números del registro y abajo sus tokens, primero los de riesgo
+function walletLink(a){ return location.origin+location.pathname+"?wallet="+a; }
+function walletFace(a,j,faces){
+  if(!faces||!faces[a]||!j||!j.roles) return null;
+  var R=j.roles, role=["payer","creator","funder"].sort(function(x,y){ return ((R[y]||{}).n||0)-((R[x]||{}).n||0); })[0], x=R[role]||{};
+  return x.n?{role:role,n:x.n,res:x.resolved||0,dead:x.dead24||0}:null;
+}
+function walletLabel(a,j,face,total){
+  var RED="#ff6b6b", TUR="#7ab8c4", LIL="#a78bfa", kw=SRE.knownWallet&&SRE.knownWallet(a);
+  if(kw&&kw.t==="exchange") return {ic:"🏦",lbl:"EXCHANGE · "+String(kw.n).toUpperCase(),col:TUR};
+  if(kw&&kw.t==="market_maker") return {ic:"🏛️",lbl:"CREADOR DE MERCADO · "+String(kw.n).toUpperCase(),col:TUR};
+  var bt=baseType(a), BT={"exchange":["🏦","EXCHANGE CONOCIDO",TUR],"granja":["🏭","GRANJA DE LANZAMIENTOS",RED],"repartidor":["📦","REPARTIDOR CONOCIDO",RED],"creador en serie":["🚀","CREADOR EN SERIE",RED],"sniper":["🎯","SNIPER CONOCIDO",RED]};
+  if(bt&&BT[bt]) return {ic:BT[bt][0],lbl:BT[bt][1],col:BT[bt][2]};
+  if(face) return {payer:{ic:"💸",lbl:"PAGADOR EN SERIE",col:RED},creator:{ic:"🚀",lbl:"CREADOR EN SERIE",col:RED},funder:{ic:"💰",lbl:"FINANCIADOR EN SERIE",col:RED}}[face.role];
+  var R=(j&&j.roles)||{}, fb=(j&&j.firstBuys)||{};
+  if((R.creator||{}).n||(R.payer||{}).n) return {ic:"🚀",lbl:"HA CREADO TOKENS",col:"#fbbf24"};
+  if((R.funder||{}).n) return {ic:"💰",lbl:"HA FINANCIADO LANZAMIENTOS",col:"#fbbf24"};
+  if(fb.n) return {ic:"🎯",lbl:"COMPRA EN LOS PRIMEROS BLOQUES",col:"#fbbf24"};
+  if(state.sol>=1000||total>=100000) return {ic:"🐋",lbl:"BALLENA",col:TUR};
+  return {ic:"👛",lbl:"",col:LIL};
+}
+// el círculo de la wallet: su icono sobre un fondo del color de la etiqueta
+function cardIcon(x,ic,col,px,py,s){
+  var cx=px+s/2, cy=py+s/2, g=x.createRadialGradient(cx-s*.15,cy-s*.15,0,cx,cy,s*.6);
+  g.addColorStop(0,col); g.addColorStop(1,"#1a1142");
+  x.save(); x.globalAlpha=.85; x.fillStyle=g; x.beginPath(); x.arc(cx,cy,s/2,0,6.283); x.fill(); x.globalAlpha=1;
+  x.lineWidth=2; x.strokeStyle=col; x.stroke();
+  x.font=Math.round(s*.5)+"px 'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif"; x.textAlign="center"; x.textBaseline="middle"; x.fillText(ic,cx,cy+s*.03);
+  x.restore(); x.textBaseline="alphabetic"; x.textAlign="left";
+}
+function walletStamp(c,n,face){
+  if(face){ var bad=face.res>=3&&face.dead/face.res>=.9;
+    return {col:bad?CARD.dot.bad:CARD.dot.warn,top:"CARA",lbl:"CONOCIDA",sub:face.res?face.dead+" de "+face.res+" murieron":face.n+(face.n===1?" lanzamiento":" lanzamientos")}; }
+  if(!n) return {col:CARD.dot.na,top:"",lbl:"SIN TOKENS",sub:""};
+  if(c.ALTO) return {col:CARD.lvl.ALTO[0],top:"RIESGO",lbl:"ALTO",sub:c.ALTO+(c.ALTO===1?" token con alertas":" tokens con alertas")};
+  if(c.MEDIO) return {col:CARD.lvl.MEDIO[0],top:"RIESGO",lbl:"MEDIO",sub:c.MEDIO+(c.MEDIO===1?" token en medio":" tokens en medio")};
+  if(c.BAJO) return {col:CARD.lvl.BAJO[0],top:"RIESGO",lbl:"BAJO",sub:"sin alertas"};
+  // sin tokens con mercado de riesgo bajo: no se le da un visto bueno
+  if(c.SPAM) return {col:CARD.dot.na,top:"TOKENS",lbl:"SPAM",sub:c.SPAM+(c.SPAM===1?" parece spam":" parecen spam")};
+  return {col:CARD.dot.na,top:"",lbl:"SIN MERCADO",sub:""};
+}
+async function drawWalletXCard(){
+  await cardFonts();
+  var a=state.wallet, c=counts(), n=state.results.length, total=state.results.reduce(function(s2,r){ return s2+r.valor; },0);
+  var j=wwho[a], faces={}; try{ faces=(await loadCaras()).faces||{}; }catch(e){} try{ await loadBase(); }catch(e){}
+  var face=walletFace(a,j,faces), st=walletStamp(c,n,face), pnl=lista.w[a]&&lista.w[a].pnl;
+  var W=1600, H=900, P=64, col=st.col;
+  var cv=document.createElement("canvas"); cv.width=W; cv.height=H; var x=cv.getContext("2d"); x.textBaseline="alphabetic";
+  cardBg(x,W,H,col,a,[[W*.4,P+12,20],[W*.47,P+40,10],[W*.62,P+20,14],[34,560,16],[W*.38,568,12],[W*.6,566,24],[W*.75,580,11],[W-40,H-44,18],[80,H-40,10]]);
+  cardBrand(x,P,P+30,50);
+  cardKick(x,"ESCÁNER DE SOLANA",W-P,P+22,19,"right");
+  // derecha: «Quién es», los cuatro números del registro
+  var gx0=W-P-400, gy0=208, gw0=400, gh0=330; cardBox(x,gx0,gy0,gw0,gh0,24);
+  x.fillStyle="#c9c1ea"; x.font="700 20px "+CF.B; x.fillText("Quién es · registro de SolFlag",gx0+22,gy0+38);
+  if(j&&j.roles){
+    var Rr=j.roles, fb=j.firstBuys||{}, tiles=[[Rr.payer,"lanzamientos pagados"],[Rr.creator,"tokens creados"],[Rr.funder,"lanzamientos financiados"],[fb,"compras en los primeros bloques"]];
+    tiles.forEach(function(t,i){ var o=t[0]||{}, nn=o.n||0, res=o.resolved||0, dead=o.dead24||0, fr=res?dead/res:0;
+      var tx=gx0+22+(i%2)*178, ty=gy0+100+Math.floor(i/2)*118, tc=res>=3&&fr>=.9?CARD.dot.bad:(res&&fr>=.5?CARD.dot.warn:"#fff");
+      x.fillStyle=tc; x.font="800 40px "+CF.D; x.fillText(String(nn),tx,ty);
+      x.fillStyle="#d3cdef"; x.font="500 16px "+CF.B; cardLines(x,t[1],160,2).forEach(function(l,k){ x.fillText(l,tx,ty+24+k*19); });
+      if(nn){ x.fillStyle=tc==="#fff"?"#9a91c9":tc; x.font="700 15px "+CF.B; x.fillText(dead+(dead===1?" muerto":" muertos"),tx,ty+24+2*19+4); } });
+  }else{ x.fillStyle="#c9c1ea"; x.font="400 19px "+CF.B; cardLines(x,"El registro no respondió: sin estos números esta vez",gw0-44,3).forEach(function(l,i){ x.fillText(l,gx0+22,gy0+80+i*26); }); }
+  // centro: cabecera de la wallet y el sello
+  var Rs=122, scx=gx0-120-Rs, scy=320, maxW=scx-Rs-30-P, av=112;
+  var wl=walletLabel(a,j,face,total);
+  cardKick(x,"WALLET"+(wl.lbl?" · "+wl.lbl:""),P,170,20,"left");
+  cardIcon(x,wl.ic,wl.col,P,170+av*.28,av);
+  var nx=P+av+av*.24; x.fillStyle="#f7f4ff"; cardFitFont(x,short(a),"700",100,50,CF.D,maxW-(nx-P)); x.fillText(short(a),nx,170+av*.28+av*.72);
+  var my=170+av*.28+av+av*.42; x.fillStyle="#b4acdc"; x.font="400 21px "+CF.M; x.fillText(cardFit(x,a,maxW),P,my);
+  var bits=[state.sol.toLocaleString("es-ES",{maximumFractionDigits:2})+" SOL",n+(n===1?" token":" tokens"),usdShort(total)+" en tokens"];
+  x.font="600 22px "+CF.B; var bx=P, by=my+50;
+  bits.forEach(function(t,i){ x.fillStyle=i?"#c9c1ea":"#fff"; x.fillText(t,bx,by); bx+=x.measureText(t).width; if(i<bits.length-1){ x.fillStyle="#6f64a8"; x.fillText("  ·  ",bx,by); bx+=x.measureText("  ·  ").width; } });
+  if(pnl&&pnl.st&&pnl.st!=="unk"){ var pc=Math.abs(pnl.ret*100).toLocaleString("es-ES",{maximumFractionDigits:0}), pt=pnl.st==="win"?"Gana "+pc+" % (est.)":pnl.st==="lose"?"Pierde "+pc+" % (est.)":"Resultado plano (est.)";
+    x.fillStyle=pnl.st==="win"?CARD.dot.ok:pnl.st==="lose"?CARD.dot.bad:"#c9c1ea"; x.font="700 22px "+CF.B; x.fillText(pt,P,by+36); }
+  cardStampRaw(x,scx,scy,Rs,st.col,st.top,st.lbl,st.sub);
+  // abajo: sus tokens (hasta 5), primero los de riesgo y luego por valor
+  var fy=610, fh=158;
+  if(n){
+    var ts=state.results.slice().sort(function(p,q){ var rp=p.lvl==="ALTO"?0:p.lvl==="MEDIO"?1:2, rq=q.lvl==="ALTO"?0:q.lvl==="MEDIO"?1:2; return rp-rq||q.valor-p.valor; }).slice(0,5);
+    var fw=Math.min((W-2*P-(ts.length-1)*14)/ts.length,(W-2*P-2*14)/3);   // con pocos tokens, recuadros de un tercio como mucho
+    ts.forEach(function(r,i){ var fx=P+i*(fw+14), tc=(CARD.lvl[r.lvl]||[CARD.dot.na])[0];
+      cardBox(x,fx,fy,fw,fh,18); x.save(); cardRound(x,fx,fy,fw,fh,18); x.clip(); x.fillStyle=tc; x.fillRect(fx,fy,fw,6); x.restore();
+      x.fillStyle="#fff"; x.font="700 21px "+CF.B; var vt=usdShort(r.valor), vw=x.measureText(vt).width;
+      x.fillText(cardFit(x,"$"+r.sym,fw-36-vw-10),fx+18,fy+44); x.fillStyle="#c9c1ea"; x.textAlign="right"; x.fillText(vt,fx+fw-18,fy+44); x.textAlign="left";
+      x.fillStyle=tc; x.font="700 16px "+CF.B; x.fillText(lvlLabel(r),fx+18,fy+70);
+      x.fillStyle="#d3cdef"; x.font="400 17px "+CF.B; cardLines(x,wtWhy(r).replace(/\s*\([^)]*\)/g,""),fw-36,3).forEach(function(l,k){ x.fillText(l,fx+18,fy+96+k*21); }); });
+  }else{
+    cardBox(x,P,fy,W-2*P,fh,18); x.fillStyle="#fff"; x.font="700 26px "+CF.B; x.fillText(verdict(c),P+28,fy+62);
+    x.fillStyle="#d3cdef"; x.font="400 20px "+CF.B; cardLines(x,"Sin tokens no se puede juzgar por lo que tiene: lo que cuenta es lo que ha hecho. Mira «Quién es» y sus lanzamientos en solflag.com.",W-2*P-56,2).forEach(function(l,i){ x.fillText(l,P+28,fy+100+i*28); });
+  }
+  x.fillStyle="#b4acdc"; x.font="400 19px "+CF.B; x.textAlign="center";
+  x.fillText(fdate(Date.now())+" · @solflagTeam · Son datos, no acusaciones · No es consejo financiero",W/2,H-36); x.textAlign="left";
+  return cv;
+}
+function walletXText(){
+  var a=state.wallet, c=counts(), n=state.results.length, f=null;
+  try{ f=walletFace(a,wwho[a],(caras.list&&caras.list.faces)||null); }catch(e){}
+  if(f) return "🔎 Wallet "+short(a)+": cara conocida en SolFlag. "+({payer:"Pagó",creator:"Creó",funder:"Financió"}[f.role])+" "+f.n+(f.n===1?" lanzamiento":" lanzamientos")+(f.res?"; "+f.dead+" de "+f.res+" murieron en 24 h":"")+" (@solflagTeam)";
+  return "🔎 Wallet "+short(a)+": "+verdict(c).charAt(0).toLowerCase()+verdict(c).slice(1)+" según SolFlag (@solflagTeam)";
+}
+async function shareWallet(btn){
+  track("share-wallet");
+  if(!state.wallet||btn.disabled) return;
+  var a=state.wallet, url="https://x.com/intent/post?text="+encodeURIComponent(walletXText())+"&url="+encodeURIComponent(walletLink(a)), name="wallet-"+a.slice(0,8)+".png";
+  btn.disabled=true;
+  var blobP=drawWalletXCard().then(function(cv){ return new Promise(function(ok){ cv.toBlob(ok,"image/png"); }); });
+  try{
+    if(/Android|iPhone|iPad/i.test(navigator.userAgent)&&navigator.canShare){
+      var blob=await blobP, file=null;
+      try{ file=new File([blob],name,{type:"image/png"}); }catch(e){}
+      if(file&&navigator.canShare({files:[file]})){
+        try{ await navigator.share({files:[file],text:walletXText()+" "+walletLink(a)}); return; }
+        catch(e){ if(e.name==="AbortError") return; }
+      }
+    }
+    var copied=false;
+    try{ if(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write){ await navigator.clipboard.write([new ClipboardItem({"image/png":blobP})]); copied=true; } }catch(e){}
+    xDialog(await blobP,copied,url,name);
+  }catch(e){ openX(url); }
+  finally{ btn.disabled=false; }
 }
 function btnSay(btn,html,ms){ var old=btn.innerHTML; btn.innerHTML=html; setTimeout(function(){ btn.innerHTML=old; },ms); }
 async function shareX(mint,btn){
@@ -5204,6 +5331,8 @@ document.addEventListener("click",function(ev){
   if(cdc){ ev.preventDefault(); shareCard(cdc.getAttribute("data-card"),cdc); return; }
   var xs=ev.target.closest&&ev.target.closest("[data-xshare]");
   if(xs){ shareX(xs.getAttribute("data-xshare"),xs); return; }
+  var wsh=ev.target.closest&&ev.target.closest("[data-wshare]");
+  if(wsh){ shareWallet(wsh); return; }
   var cs=ev.target.closest&&ev.target.closest("#copySum");
   if(cs){ copyText(summaryText(),cs); return; }
   if(ev.target.id==="showAllH"){ state.showAllH=ev.target.checked; renderHolders(true); return; }
