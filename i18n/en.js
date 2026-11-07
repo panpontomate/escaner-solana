@@ -62,6 +62,8 @@ export const CODE = [
 ];
 
 export const TEXT = {
+  "<span class='tag kb kb-ex' title='Creador de mercado con nombre público (Solscan o su propio anuncio): es su inventario y lo puede vender'>": "<span class='tag kb kb-ex' title='Market maker with a public name (Solscan or its own announcement): its own inventory, it can sell it'>",
+  " (creador de mercado)</span>": " (market maker)</span>",
   "Pagó": "Paid for",
   "Creó": "Created",
   "Financió": "Funded",

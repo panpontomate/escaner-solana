@@ -1689,7 +1689,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="The scanner engine could not load from cdn.jsdelivr.net. Check your internet connection and reload the page."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.5.1/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.5.2/src/index.js";
 window.__escOk=true;
 (function(){
 "use strict";
@@ -3810,6 +3810,7 @@ function baseTag(a){
   // exchange con nombre (lista del motor, comprobada en Solscan): se dice cuál es
   var kw=SRE.knownWallet&&SRE.knownWallet(a);
   if(kw&&kw.t==="exchange") return "<span class='tag kb kb-ex' title='An exchange wallet: it holds its users’ funds'>"+esc(kw.n)+" (exchange)</span>";
+  if(kw&&kw.t==="market_maker") return "<span class='tag kb kb-ex' title='Market maker with a public name (Solscan or its own announcement): its own inventory, it can sell it'>"+esc(kw.n)+" (market maker)</span>";
   var t=baseType(a); if(!t) return "";
   return "<span class='tag kb kb-"+(t==="exchange"?"ex":"warn")+"' title='Known to the SolFlag wallet base, which grows with every launch it checks'>"+esc(BASE_TXT[t]||t)+"</span>";
 }
