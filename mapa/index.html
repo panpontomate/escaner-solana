@@ -520,7 +520,9 @@ function placeTip(){ if (!tipNode || matchMedia("(max-width:900px)").matches) re
 var held = null, pinnedN = null;
 function hold(n){ if (held && held !== pinnedN) held.hold = false; held = n; if (n) n.hold = true; }
 svg.addEventListener("mouseover", function(e){ var g = e.target.closest(".nd"); if (!g) return; var n = g.__n; hold(n); state.sel = n.gid || null; apply(); showTip(n, e); });
-svg.addEventListener("mouseout", function(e){ if (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".nd")) return; hold(null); state.sel = null; apply(); tip.classList.remove("on"); });
+function tipOff(){ hold(null); state.sel = null; apply(); if (!pinnedN) tip.classList.remove("on"); else showTip(pinnedN); }
+svg.addEventListener("mouseout", function(e){ var r = e.relatedTarget; if (r && r.closest && (r.closest(".nd") || r.closest(".tip"))) return; tipOff(); });
+tip.addEventListener("mouseleave", function(e){ var r = e.relatedTarget; if (r && r.closest && r.closest(".nd")) return; tipOff(); });
 svg.addEventListener("click", function(e){ var g = e.target.closest(".nd"); if (pinnedN){ pinnedN.hold = false; pinnedN = null; } if (g){ pinnedN = g.__n; pinnedN.hold = true; } if (!g){ state.pinned = null; state.sel = null; apply(); tip.classList.remove("on"); return; }
   var n = g.__n; state.pinned = n.gid || null; apply(); showTip(n, e); });
 
@@ -550,7 +552,7 @@ var seed = 1;
 document.getElementById("sheetb").onclick = function(){ document.body.classList.toggle("sheet"); };
 document.getElementById("close").onclick = function(){ toWeb({type:"om-close"}); };
 document.addEventListener("keydown", function(e){ if (e.key === "Escape") toWeb({type:"om-close"}); });
-tip.addEventListener("click", function(e){ if (e.target.closest(".go") && tipNode && tipNode.info && tipNode.info.a) toWeb({type:"om-analyze", addr:tipNode.info.a}); });
+tip.addEventListener("click", function(e){ if (e.target.closest(".go") && tipNode && tipNode.info && tipNode.info.a) { if (parent !== window) toWeb({type:"om-analyze", addr:tipNode.info.a}); else location.href = "/?wallet=" + encodeURIComponent(tipNode.info.a); } });
 addEventListener("message", function(e){
   if (e.origin !== location.origin || !e.data || e.data.type !== "om-data") return;
   LANG = e.data.lang === "en" ? "en" : "es"; applyTexts(); show(e.data.tok);
