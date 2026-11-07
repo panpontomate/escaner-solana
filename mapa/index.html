@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>On-chain Map · SolFlag</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+:root{--bg:#0b0722;--surface:#18113e;--surface-2:#221a52;--line:#3a2c7a;--fg:#f1eeff;--muted:#c9c1ea;--dim:#9a91c9;--accent:#7ab8c4;--accent-fg:#140e31;--kick:#8ec5cf;
+  --rojo:#ff9e9e;--turq:#7ab8c4;--rosa:#f0abfc;--lila:#c4b5fd;--pool:#f9a8d4;--tok:#fff3c4;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;color:var(--fg);font:15px/1.5 Manrope,system-ui,sans-serif;background:var(--bg);overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:.86em}
+.app{display:grid;grid-template-rows:auto minmax(0,1fr);height:100vh}
+
+/* barra superior */
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid rgba(196,181,253,.16);background:rgba(14,9,38,.92);backdrop-filter:blur(8px);z-index:5}
+.ttl{display:flex;align-items:center;gap:10px;min-width:0}
+.ttl .brand{font:800 1.05rem Fraunces,serif}
+.ttl .tk{display:flex;align-items:center;gap:8px;padding:3px 10px 3px 3px;border-radius:999px;background:var(--surface-2);font-weight:800}
+.ttl .tk i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:800 .66rem Manrope;font-style:normal;color:#3a2a00;background:radial-gradient(circle at 35% 35%,#fffbeb,#fde68a)}
+.beta{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.head{flex:1 1 360px;margin:0;font-size:.92rem;color:var(--muted);min-width:0}
+.head b{color:var(--rojo)}
+.acts{display:flex;gap:6px;align-items:center;margin-left:auto}
+.seg{display:flex;background:var(--surface-2);border-radius:10px;padding:3px}
+.seg button{border:0;background:transparent;border-radius:8px;padding:5px 10px;font-weight:800;font-size:.82rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--lila);color:#140e31}
+.seg button[disabled]{opacity:.45;cursor:not-allowed}
+.seg button.off3d{opacity:1;color:#ff9e9e;background:rgba(255,158,158,.1);box-shadow:inset 0 0 0 1px rgba(255,158,158,.45)}
+.btn{min-height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-weight:700;font-size:.86rem}
+.btn.pri{background:var(--accent);color:var(--accent-fg);border:0}
+
+/* cuerpo */
+.body{display:grid;grid-template-columns:minmax(0,1fr) 340px;min-height:0}
+.stage{position:relative;min-height:0;overflow:hidden}
+.stage svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* fondo de nebulosa (ideas: Hélice de ESO/VISTA y Orión del Hubble): se pinta una vez en un canvas pequeño y se estira (queda difuminado) */
+.stage canvas.neb{position:absolute;inset:-3%;width:106%;height:106%;display:block;animation:nebd 70s ease-in-out infinite alternate}
+@keyframes nebd{from{transform:scale(1) translate(0,0)}to{transform:scale(1.035) translate(-.8%,.5%)}}
+@media (prefers-reduced-motion:reduce){.stage canvas.neb{animation:none}}
+/* ojo del token: se suma a la luz del fondo (lo negro no tapa). Quieto: si girase se despegaría de su nube */
+.stage canvas.eye{position:absolute;display:block;mix-blend-mode:screen;pointer-events:none;filter:blur(4px)}
+.onda{transform-box:fill-box;transform-origin:center;animation:onda 6.4s cubic-bezier(.25,.6,.4,1) infinite;opacity:0}
+@keyframes onda{0%{transform:scale(1);opacity:0}12%{opacity:.5}100%{transform:scale(6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.stage canvas.eye,.onda{animation:none}}
+.panel{border-left:1px solid rgba(196,181,253,.16);background:rgba(18,12,48,.96);overflow:auto;padding:16px;scrollbar-width:thin}
+.panel h3{font:800 1rem Fraunces,serif;margin:18px 0 8px}
+.panel h3:first-child{margin-top:0}
+.sig{display:grid;grid-template-columns:10px minmax(0,1fr);gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,158,158,.1);border:1px solid rgba(255,158,158,.35);font-size:.88rem;margin-bottom:8px}
+.sig i{width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--rojo);box-shadow:0 0 10px var(--rojo)}
+.sig.g{background:rgba(134,239,172,.08);border-color:rgba(134,239,172,.3)}.sig.g i{background:#86efac;box-shadow:0 0 10px #86efac}
+.head b.g{color:#86efac}.head b.y{color:#fbbf24}
+.cases{display:flex;gap:4px;flex-wrap:wrap}.cases button{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:4px 10px;font-weight:800;font-size:.8rem;color:var(--muted)}.cases button[aria-pressed="true"]{background:var(--lila);color:#140e31;border-color:transparent}
+.sig.y{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.3)}.sig.y i{background:#fbbf24;box-shadow:0 0 10px #fbbf24}
+.grp{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:4px 10px;align-items:center;width:100%;text-align:left;padding:10px 12px;margin-bottom:6px;border-radius:12px;border:1px solid transparent;background:var(--surface-2)}
+.grp:hover,.grp.on{border-color:var(--c)}
+.grp i{width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c)}
+.grp b{font-size:.92rem}
+.grp small{grid-column:2/-1;color:var(--dim);font-size:.8rem}
+.grp .pc{font-weight:800;font-variant-numeric:tabular-nums}
+.grp .bar{grid-column:2/-1;height:5px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden}
+.grp .bar span{display:block;height:100%;background:var(--c);border-radius:9px}
+.leg{display:grid;gap:8px;font-size:.84rem;color:var(--muted)}
+.leg div{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center}
+.leg svg{width:44px;height:22px}
+.betan{margin-top:14px;font-size:.78rem;color:var(--dim)}
+
+/* tarjeta al pasar o tocar */
+.tip{position:absolute;left:0;top:0;z-index:4;width:250px;padding:12px 14px;border-radius:14px;background:rgba(14,9,38,.96);border:1px solid var(--c,var(--line));box-shadow:0 14px 40px rgba(0,0,0,.5);font-size:.86rem;pointer-events:none;opacity:0;transition:opacity .15s;will-change:transform}
+.tip.on{opacity:1;pointer-events:auto}
+.tip .t1{display:flex;align-items:center;gap:8px;font-weight:800}
+.tip .t1 i{width:10px;height:10px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+.tip .pc{font:800 1.4rem Fraunces,serif;margin:4px 0 0}
+.tip p{margin:4px 0 0;color:var(--muted)}
+.tip .go{margin-top:10px;min-height:34px;padding:0 12px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-fg);font-weight:800;font-size:.82rem}
+
+/* esquina: cómo leerlo */
+.hint{position:absolute;left:14px;bottom:14px;z-index:3;font-size:.78rem;color:var(--dim);background:rgba(14,9,38,.7);padding:6px 10px;border-radius:10px}
+
+/* animación */
+.tw{animation:tw var(--d) ease-in-out infinite;animation-delay:var(--o)}
+@keyframes tw{50%{opacity:.15}}
+.pulse{transform-box:fill-box;transform-origin:center;animation:pulse 3s ease-out infinite}
+.pulse.alert{animation-duration:1.8s}
+@keyframes pulse{from{transform:scale(1);opacity:.9}to{transform:scale(2.6);opacity:0}}
+.cloud{transform-box:fill-box;transform-origin:center;animation:cloud 4.2s cubic-bezier(.2,.6,.3,1) infinite;opacity:0}
+.cloud.alert{animation-duration:2.85s}
+.wave{animation:wave 3.8s linear infinite}
+@keyframes wave{to{transform:translateX(var(--w))}}
+.rise{animation:rise 3s ease-in infinite;opacity:0}
+@keyframes rise{0%{transform:translateY(0);opacity:0}15%{opacity:.8}85%{opacity:.6}100%{transform:translateY(var(--h));opacity:0}}
+.slosh{animation:slosh 6s ease-in-out infinite}
+.slosh{animation-duration:7s}
+@keyframes slosh{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+@keyframes cloud{0%{transform:scale(.9);opacity:0}15%{opacity:.75}100%{transform:scale(3.4);opacity:0}}
+.lk{stroke-dasharray:100;animation:grow .9s ease-out both,br var(--d) ease-in-out infinite;animation-delay:var(--gd),var(--o)}
+@keyframes grow{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
+@keyframes br{50%{opacity:.3}}
+.pz{fill:none;stroke-linecap:round;stroke-dasharray:2.5 97.5;animation:pz var(--d) linear infinite;animation-delay:var(--o)}
+.pz.back{animation-direction:reverse}
+.lk.dash{stroke-dasharray:2.2 2.2;animation:br var(--d) ease-in-out infinite;animation-delay:var(--o)}
+.shows{display:grid;gap:6px;font-size:.86rem;color:var(--muted)}
+.shows label{display:flex;align-items:center;gap:8px;cursor:pointer}
+.shows input{accent-color:var(--lila);width:16px;height:16px;margin:0}
+.hel{margin:12px 0 0;padding:8px 10px;border-radius:10px;background:rgba(122,184,196,.1);border:1px solid rgba(122,184,196,.3);font-size:.8rem;color:var(--muted)}
+@keyframes pz{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
+.gF{animation:fadein .8s ease both;animation-delay:2.4s}
+@keyframes fadein{from{opacity:0}}
+.pop{animation:pop .55s cubic-bezier(.2,1.5,.4,1) both;animation-delay:var(--pd)}
+@keyframes pop{from{transform:scale(0);opacity:0}}
+.nd{cursor:pointer;transition:opacity .25s}
+.lk,.pz{transition:opacity .25s}
+svg.dim .nd:not(.on){opacity:.12}
+svg.dim .lk:not(.on){opacity:.04!important;animation-play-state:paused}
+svg.dim .pz:not(.on){opacity:0}
+svg.dim .nd.on .ring{stroke-width:2.2}
+body.still .onda,body.still canvas.eye{animation:none}
+body.still .cloud{animation:none;opacity:.35;transform:scale(1.6)}
+body.still .wave,body.still .rise,body.still .slosh{animation:none}
+body.still .tw,body.still .pulse,body.still .lk,body.still .pz,body.still .pop,body.still .gF{animation:none}
+body.still .pz{opacity:0}
+@media (prefers-reduced-motion:reduce){.wave,.rise,.slosh{animation:none}.cloud{animation:none;opacity:.35}.tw,.pulse,.lk,.pz,.pop,.gF{animation:none}.pz{opacity:0}}
+
+/* móvil: panel como hoja inferior */
+@media (max-width:900px){
+  .body{grid-template-columns:1fr}
+  .panel{position:fixed;left:0;right:0;bottom:0;max-height:55vh;border-left:0;border-top:1px solid rgba(196,181,253,.25);border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform .3s;z-index:6;box-shadow:0 -20px 50px rgba(0,0,0,.5)}
+  body.sheet .panel{transform:none}
+  .head{order:5;flex-basis:100%}
+  .top{gap:8px}
+  .seg button{padding:5px 8px}
+  .tip{left:12px!important;right:12px;bottom:12px;top:auto!important;width:auto}
+}
+/* notas de la maqueta */
+.mk{position:fixed;right:12px;bottom:12px;z-index:7;max-width:330px;padding:10px 12px;border-radius:12px;background:rgba(40,10,40,.92);border:1px solid #f9a8d4;color:#f9a8d4;font-size:.8rem}
+.mk b{color:#fff}
+.mk button{margin-top:6px;border:0;border-radius:8px;padding:4px 8px;background:#f9a8d4;color:#1a0a24;font-weight:800;font-size:.76rem}
+body.nonotes .mk{display:none}
+@media (max-width:900px){.mk{top:120px;bottom:auto;max-width:calc(100% - 24px)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="ttl"><span class="brand">On-chain Map</span><span class="tk"><i id="tkI"></i><span id="tkN"></span></span><span class="beta">Beta</span></div>
+    <div class="acts">
+      <div class="seg" role="group" data-t="vista" data-ta="aria-label"><button aria-pressed="true">2D</button><button class="off3d" disabled data-t="pronto" data-ta="title">3D</button></div>
+      <button class="btn" id="sheetb" data-t="grupos">Grupos</button>
+      <button class="btn pri" id="close" data-t="cerrar">✕ Cerrar</button>
+    </div>
+    <p class="head" id="head"></p>
+  </header>
+  <div class="body">
+    <div class="stage" id="stage">
+      <svg id="map"></svg>
+      <div class="tip" id="tip"></div>
+      <div class="hint" data-t="hint">Tamaño = % del token · pasa el ratón o toca una burbuja</div>
+    </div>
+    <aside class="panel" id="panel">
+      <h3 data-t="encontrado">Lo que ha encontrado</h3>
+      <div id="sigs"></div>
+      <h3><span data-t="grupos">Grupos</span> <small style="font:600 .8rem Manrope;color:var(--dim)" data-t="toca">toca uno para verlo</small></h3>
+      <div id="groups"></div>
+      <h3 data-t="mostrar">Mostrar</h3>
+      <div class="shows" id="shows"></div>
+      <h3 data-t="leer">Cómo leerlo</h3>
+      <div class="leg">
+        <div><svg viewBox="0 0 44 22"><circle cx="10" cy="11" r="4" fill="none" stroke="#c4b5fd"/><circle cx="30" cy="11" r="9" fill="none" stroke="#c4b5fd"/></svg><span data-t="l1">Cuanto más grande, más % del token tiene.</span></div>
+        <div><svg viewBox="0 0 44 22"><circle cx="22" cy="11" r="7" fill="none" stroke="#ff9e9e" stroke-dasharray="3 3"/></svg><span data-t="l2">Anillo discontinuo: el financiador (no tiene el token, mandó el SOL).</span></div>
+        <div><svg viewBox="0 0 44 22"><path d="M2 16 Q22 0 42 12" fill="none" stroke="#ff9e9e" stroke-opacity=".5"/><circle cx="28" cy="7" r="1.8" fill="#ff9e9e"/></svg><span data-t="l3">Flujos: por dónde llegó el dinero. Los pulsos van y vuelven.</span></div>
+        <div><svg viewBox="0 0 44 22"><defs><clipPath id="lgc"><circle cx="22" cy="11" r="8"/></clipPath></defs><circle cx="22" cy="11" r="8" fill="none" stroke="#f9a8d4"/><path clip-path="url(#lgc)" d="M10 12 Q14 10 18 12 T26 12 T34 12 V20 H10Z" fill="#f9a8d4" fill-opacity=".45"/></svg><span data-t="l4">Burbuja con agua dentro: la pool de liquidez. Se dibuja, pero no cuenta como holder.</span></div>
+      </div>
+      <p class="hel" id="hel" hidden></p>
+      <p class="betan" id="betan"></p>
+    </aside>
+  </div>
+</div>
+<script>
+var TX = {
+  es:{vista:"Vista", pronto:"3D: muy pronto", grupos:"Grupos", cerrar:"✕ Cerrar", hint:"Tamaño = % del token · pasa el ratón o toca una burbuja", encontrado:"Lo que ha encontrado", toca:"toca uno para verlo",
+    leer:"Cómo leerlo", l1:"Cuanto más grande, más % del token tiene.", l2:"Anillo discontinuo: el financiador (no tiene el token, mandó el SOL).", l3:"Flujos: por dónde llegó el dinero. Los pulsos van y vuelven.",
+    l4:"Burbuja con agua dentro: la pool de liquidez. Se dibuja, pero no cuenta como holder.", betan:"Versión beta. Mira los {n} mayores holders y de dónde les llegó el SOL. Son datos, no acusaciones.",
+    tok:"El token. Todo sale de aquí.", sinrel:"Sin relación con otros holders.", fin:"Financiador", mando:"Mandó el SOL a las {n} wallets del {g}. No tiene el token.", mismo:"Mismo financiador que {n} más ({f}).",
+    analizar:"Analizar esta wallet", wallets:"wallets", aria:"Mapa de conexiones de los holders de {s}",
+    mostrar:"Mostrar", sG:"Grupos con el mismo financiador", sL:"Holders sin relación", sX:"Exchanges", sP:"Pools y programas", sN:"Redes de transferencias de tokens"},
+  en:{vista:"View", pronto:"3D: coming soon", grupos:"Groups", cerrar:"✕ Close", hint:"Size = % of the token · hover or tap a bubble", encontrado:"What it found", toca:"tap one to see it",
+    leer:"How to read it", l1:"The bigger, the more % of the token it holds.", l2:"Dashed ring: the funder (it holds no tokens, it sent the SOL).", l3:"Flows: where the money came from. Pulses go back and forth.",
+    l4:"Bubble with water inside: the liquidity pool. Drawn, but not counted as a holder.", betan:"Beta version. It looks at the top {n} holders and where their SOL came from. Facts, not accusations.",
+    tok:"The token. Everything starts here.", sinrel:"Not related to other holders.", fin:"Funder", mando:"Sent the SOL to the {n} wallets of {g}. It holds no tokens.", mismo:"Same funder as {n} more ({f}).",
+    analizar:"Analyze this wallet", wallets:"wallets", aria:"Connection map of the holders of {s}",
+    mostrar:"Show", sG:"Groups with the same funder", sL:"Unrelated holders", sX:"Exchanges", sP:"Pools and programs", sN:"Token transfer networks"}};
+var LANG = "es";
+function T(k, o){ var t = (TX[LANG] || TX.es)[k] || TX.es[k]; if (o) for (var q in o) t = t.split("{"+q+"}").join(o[q]); return t; }
+function fmtP(p){ var v = p < .01 ? "<0" + (LANG === "en" ? "." : ",") + "01" : (Math.round(p*100)/100).toString(); return LANG === "en" ? v : v.replace(".", ","); }
+function escH(t){ return String(t == null ? "" : t).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function applyTexts(){ document.documentElement.lang = LANG; document.querySelectorAll("[data-t]").forEach(function(e){ var a = e.getAttribute("data-ta"); if (a) e.setAttribute(a, T(e.getAttribute("data-t"))); else e.textContent = T(e.getAttribute("data-t")); }); }
+var RM = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+var NS = "http://www.w3.org/2000/svg", svg = document.getElementById("map"), stage = document.getElementById("stage"), tip = document.getElementById("tip");
+function rng(seed){ var s = seed % 2147483647; if (s <= 0) s += 2147483646; return function(){ s = s*16807 % 2147483647; return (s-1)/2147483646; }; }
+/* ---------- nebulosa de fondo ----------
+   Gas de Orión (rosa, magenta, violeta) con franjas de polvo oscuro, y alrededor del token un anillo como el de la
+   Hélice: dentro azul y turquesa, fuera naranja y rojo con filamentos hacia fuera. Ruido propio (sin librerías),
+   a 1/4 de resolución: unas decenas de ms al abrir o al cambiar el tamaño */
+// la nebulosa es siempre la misma
+var NEB = 12;   // el fondo 12, elegido el 7/11
+var neb = document.createElement("canvas"); neb.className = "neb"; neb.setAttribute("aria-hidden", "true"); stage.insertBefore(neb, svg);
+// el «ojo» de la Hélice pegado al token: un canvas aparte a resolución completa (en el grande quedaría borroso)
+var eye = document.createElement("canvas"); eye.className = "eye"; eye.setAttribute("aria-hidden", "true"); stage.insertBefore(eye, svg);
+function paintNeb(W, H, cx, cy, u, seed, tr){
+  var R = rng(NEB*7 + 3), S = 4, w = Math.ceil(W*1.06/S), h = Math.ceil(H*1.06/S), ox = W*.03, oy = H*.03;
+  var P = new Uint8Array(512), i, j;
+  for (i = 0; i < 256; i++) P[i] = i;
+  for (i = 255; i > 0; i--){ j = Math.floor(R()*(i+1)); var t = P[i]; P[i] = P[j]; P[j] = t; }
+  for (i = 0; i < 256; i++) P[i+256] = P[i];
+  function vn(x, y){ var xi = Math.floor(x), yi = Math.floor(y), xf = x-xi, yf = y-yi; xi &= 255; yi &= 255;
+    var a = P[P[xi]+yi]/255, b = P[P[xi+1]+yi]/255, c = P[P[xi]+yi+1]/255, d = P[P[xi+1]+yi+1]/255;
+    var sx = xf*xf*(3-2*xf), sy = yf*yf*(3-2*yf); return a + (b-a)*sx + (c-a)*sy + (a-b-c+d)*sx*sy; }
+  function fbm(x, y, o){ var v = 0, amp = .5, n = 0; for (var k = 0; k < o; k++){ v += vn(x, y)*amp; n += amp; x = x*2.03 + 17.1; y = y*2.03 + 9.7; amp *= .5; } return v/n; }
+  function sm(a, b, x){ x = Math.max(0, Math.min(1, (x-a)/(b-a))); return x*x*(3-2*x); }
+  // tres zonas de gas lejos del token, como los lóbulos de Orión
+  var blobs = [];
+  for (i = 0; i < 3; i++){ var ang = R()*6.283, dd = (.45 + R()*.4)*u; blobs.push([W/2 + Math.cos(ang)*dd*1.3, H/2 + Math.sin(ang)*dd*.8, (.45 + R()*.35)*u]); }
+  var ring = .36*u, img = new ImageData(w, h), D = img.data, k2 = 2.6/u;
+  // cuánto gas hay (y de qué color) en un punto: lo usa el ojo para unirse a la nube que tiene al lado
+  function gasAt(X, Y){ var nx = X*k2, ny = Y*k2, qx = fbm(nx, ny, 3), qy = fbm(nx + 5.2, ny + 1.3, 3);
+    var g = fbm(nx + 2.2*qx, ny + 2.2*qy, 5), hue = fbm(nx*.5 + 31, ny*.5 + 7, 3), reg = .18;
+    for (var j2 = 0; j2 < 3; j2++){ var bx = X-blobs[j2][0], by = Y-blobs[j2][1]; reg += Math.exp(-(bx*bx + by*by)/(blobs[j2][2]*blobs[j2][2])); }
+    var mA = sm(.3, .7, hue); return [sm(.3, .85, g)*Math.min(1, reg), 230*(1-mA) + 255*mA, 80*(1-mA) + 120*mA, 240*(1-mA) + 170*mA]; }
+  for (var py = 0; py < h; py++) for (var px = 0; px < w; px++){
+    var X = px*S - ox, Y = py*S - oy, nx = X*k2, ny = Y*k2;
+    // gas con el dominio deformado: filamentos en vez de manchas redondas
+    var qx = fbm(nx, ny, 3), qy = fbm(nx + 5.2, ny + 1.3, 3);
+    var g = fbm(nx + 2.2*qx, ny + 2.2*qy, 5), hue = fbm(nx*.5 + 31, ny*.5 + 7, 3);
+    var reg = .18; for (i = 0; i < 3; i++){ var bx = X-blobs[i][0], by = Y-blobs[i][1]; reg += Math.exp(-(bx*bx + by*by)/(blobs[i][2]*blobs[i][2])); }
+    var gas = sm(.42, .85, g)*Math.min(1, reg);
+    // polvo: crestas finas del ruido, oscurecen y dan un tono marrón
+    var dn = fbm(nx*1.7 + 50, ny*1.7 + 20, 4), dust = Math.pow(1 - Math.abs(2*dn - 1), 7)*sm(.2, .6, reg);
+    var r = 11, gg = 7, b = 34;
+    var mA = sm(.3, .7, hue), a1 = gas*(1 - dust*.85);
+    r += a1*(230*(1-mA) + 255*mA)*.3; gg += a1*(80*(1-mA) + 120*mA)*.3; b += a1*(240*(1-mA) + 170*mA)*.3;   // magenta -> rosa
+    r += gas*gas*22; gg += gas*gas*18; b += gas*gas*45;                                                       // núcleo violeta claro
+    // anillo de la Hélice alrededor del token
+    var ex = X-cx, ey = Y-cy, dr = Math.sqrt(ex*ex + ey*ey)/ring, an = Math.atan2(ey, ex);
+    var wob = fbm(Math.cos(an)*2 + 9, Math.sin(an)*2 + 4, 3);
+    var rd = dr*(1 + (wob - .5)*.35);
+    var outer = Math.exp(-Math.pow((rd - 1)/.2, 2)), inner = Math.exp(-Math.pow((rd - .62)/.28, 2))*sm(.15, .5, rd);
+    var fil = Math.pow(sm(.45, .9, fbm(Math.cos(an)*22 + 3, Math.sin(an)*22 + dr*2.5, 4)), 2)*.9*sm(.85, 1.1, rd)*Math.exp(-Math.pow((rd - 1.25)/.35, 2));
+    var tex = .55 + .9*fbm(nx*2.5 + 70, ny*2.5 + 40, 4);
+    var ro = (outer*tex + fil)*.2, ri = inner*tex*.26;
+    // sin anillo: ni el aro dorado ni el interior verde (quitados el 7/11)
+    var q = (py*w + px)*4; D[q] = r > 255 ? 255 : r; D[q+1] = gg > 255 ? 255 : gg; D[q+2] = b < 0 ? 0 : b > 255 ? 255 : b; D[q+3] = 255;
+  }
+  neb.width = w; neb.height = h; neb.getContext("2d").putImageData(img, 0, 0);
+  // ojo: anillo rosa por fuera, violeta por dentro, con filamentos finos hacia fuera; fuera de él, transparente
+  var er = tr*2.5, half = Math.ceil(er*3.1), es = half*2, eimg = new ImageData(es, es), E = eimg.data, ek = 1/(er*.9);
+  // hacia dónde está la nube más cercana: 48 direcciones alrededor del token
+  var NA = 48, gw = [], cr = 0, cgc = 0, cb = 0, cw = 0, gmax = .001;
+  for (i = 0; i < NA; i++){ var aa = i/NA*6.283, sg = 0;
+    for (j = 1; j <= 3; j++){ var smp = gasAt(cx + Math.cos(aa)*er*(.9 + j*.7), cy + Math.sin(aa)*er*(.9 + j*.7)); sg += smp[0]; cr += smp[1]*smp[0]; cgc += smp[2]*smp[0]; cb += smp[3]*smp[0]; cw += smp[0]; }
+    gw.push(sg/3); if (sg/3 > gmax) gmax = sg/3; }
+  for (i = 0; i < NA; i++) gw[i] /= gmax;
+  var cc = cw > .01 ? [cr/cw, cgc/cw, cb/cw] : [240, 100, 220];
+  // colores del ojo mezclados con los de su nube
+  var pk = [255*.55 + cc[0]*.45, 120*.55 + cc[1]*.45, 200*.55 + cc[2]*.45], vt = [150*.6 + cc[0]*.4, 105*.6 + cc[1]*.4, 255*.6 + cc[2]*.4];
+  for (py = 0; py < es; py++) for (px = 0; px < es; px++){
+    var ex2 = px - half, ey2 = py - half, d2 = Math.sqrt(ex2*ex2 + ey2*ey2)/er, a2 = Math.atan2(ey2, ex2);
+    var wb = fbm(Math.cos(a2)*1.6 + 40, Math.sin(a2)*1.6 + 12, 3), rr = d2*(1 + (wb - .5)*.3);
+    var o2 = Math.exp(-Math.pow((rr - 1)/.38, 2)), i2 = Math.exp(-Math.pow((rr - .7)/.4, 2))*sm(.25, .6, rr);
+    var gi = (a2 < 0 ? a2 + 6.283 : a2)/6.283*NA, g0 = Math.floor(gi) % NA, wd = gw[g0] + (gw[(g0 + 1) % NA] - gw[g0])*(gi - Math.floor(gi));
+    // hacia la nube, los filamentos y el difuminado llegan mucho más lejos y se funden con ella
+    var f2 = Math.pow(sm(.5, .92, fbm(Math.cos(a2)*26 + 5, Math.sin(a2)*26 + d2*2.2, 4)), 2)*sm(.95, 1.12, rr)*Math.exp(-Math.pow((rr - 1.3 - .5*wd)/(.3 + .7*wd), 2));
+    var wx2 = fbm(ex2*ek*.7 + 13, ey2*ek*.7 + 2, 3), wy2 = fbm(ex2*ek*.7 + 4, ey2*ek*.7 + 21, 3);
+    var tx2 = .25 + 1.3*sm(.3, .8, fbm(ex2*ek*1.1 + 2.5*wx2 + 90, ey2*ek*1.1 + 2.5*wy2 + 30, 5));   // textura de nube, no de anillo
+    var po = (o2*tx2 + f2*.25)*.4, vi = i2*tx2*.22, fade = sm(1.9 + 1.2*wd, .8, d2);
+    var q2 = (py*es + px)*4;
+    E[q2] = Math.min(255, (po*pk[0] + vi*vt[0])*fade); E[q2+1] = Math.min(255, (po*pk[1] + vi*vt[1])*fade); E[q2+2] = Math.min(255, (po*pk[2] + vi*vt[2])*fade); E[q2+3] = 255;
+  }
+  eye.width = es; eye.height = es; eye.getContext("2d").putImageData(eimg, 0, 0);
+  eye.style.left = (cx - half) + "px"; eye.style.top = (cy - half) + "px"; eye.style.width = es + "px"; eye.style.height = es + "px";
+}
+function f(v){ return Math.round(v*10)/10; }
+function gauss(R){ return (R()+R()+R()-1.5)/1.5; }
+function el(tag, at, parent){ var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); if (parent) parent.appendChild(e); return e; }
+var COLS = {r:"#ff9e9e", t:"#7ab8c4", p:"#fbbf24", l:"#c4b5fd", y:"#fff3c4", o:"#f9a8d4", b:"#7dd3fc", v:"#86efac", w:"#fda4af", n:"#fde68a"};
+function addr(R){ var A = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz", s = ""; for (var i = 0; i < 8; i++) s += A[Math.floor(R()*A.length)]; return s.slice(0,4)+"…"+s.slice(4); }
+
+// datos de ejemplo (en la web vendrán del motor: connectionMap)
+var CASES = {
+  aapl:{sym:"$AAPLCAT", ic:"AA",
+    head:'<b>19 wallets nuevas con el mismo financiador</b> tienen el 8,1 % de los 50 mayores holders. Binance guarda el 11 %.',
+    sigs:[["", "<b>Enjambre:</b> 19 holders recibieron el SOL de la misma wallet (Fpuc…4kT2) poco antes de comprar. Suman el 8,1 %."],["y","Otro grupo de 8 wallets comparte financiador (3,2 %)."]],
+    groups:[
+      {id:"A", k:"r", name:"Grupo A", n:19, pct:8.1, funder:"Fpuc…4kT2", desc:"wallets nuevas, mismo financiador, compraron en la primera hora", alert:1},
+      {id:"X", k:"t", name:"Binance", n:1, pct:11, desc:"exchange: es la wallet de depósitos de Binance", exch:1},
+      {id:"B", k:"p", name:"Grupo B", n:8, pct:3.2, funder:"9mQe…Hh1P", desc:"mismo financiador"},
+      {id:"P", k:"o", name:"Pool PumpSwap", n:1, pct:18.4, desc:"liquidez del token: no cuenta como holder", pool:1},
+      {id:"L", k:"l", name:"Sin relación", n:21, pct:24.6, desc:"holders sin financiador común con otros"}]},
+  // 1) token sano: reparto amplio, sin grupos grandes
+  limpio:{sym:"$KOALA", ic:"KO",
+    head:'<b class="g">Sin grupos grandes.</b> Los 50 mayores holders compraron por su cuenta; solo 3 wallets comparten financiador (1,4 %).',
+    sigs:[["g","<b>Reparto amplio:</b> ningún grupo con el mismo financiador pasa del 2 %."],["y","3 wallets comparten financiador (7tRw…pQ9a). Es poco y pasa en tokens normales."]],
+    groups:[
+      {id:"P", k:"o", name:"Pool Raydium", n:1, pct:24.5, desc:"liquidez del token: no cuenta como holder", pool:1},
+      {id:"X", k:"t", name:"OKX", n:1, pct:4.2, desc:"exchange: wallet de depósitos de OKX", exch:1},
+      {id:"B", k:"p", name:"Grupo B", n:3, pct:1.4, funder:"7tRw…pQ9a", desc:"mismo financiador"},
+      {id:"L", k:"l", name:"Sin relación", n:44, pct:31.8, desc:"holders sin financiador común con otros"}]},
+  // 2) enjambre enorme: casi todo controlado desde dos wallets
+  enjambre:{sym:"$TURBOFROG", ic:"TF",
+    head:'<b>41 wallets con el mismo financiador</b> tienen el 52 % de los 50 mayores holders. Huele a un solo dueño.',
+    sigs:[["", "<b>Enjambre grande:</b> 34 holders recibieron el SOL de Hk2v…Zr8L en los 10 minutos antes del lanzamiento. Suman el 41 %."],["","<b>Segundo enjambre:</b> 7 wallets más, financiadas por Qa9m…3cVd, que a su vez recibió SOL de Hk2v…Zr8L (11 %)."]],
+    groups:[
+      {id:"A", k:"r", name:"Grupo A", n:34, pct:41, funder:"Hk2v…Zr8L", desc:"wallets nuevas, mismo financiador, compraron en el primer bloque", alert:1},
+      {id:"B", k:"r", name:"Grupo B", n:7, pct:11, funder:"Qa9m…3cVd", desc:"su financiador recibió SOL del Grupo A", alert:1},
+      {id:"P", k:"o", name:"Pool PumpSwap", n:1, pct:9.3, desc:"liquidez del token: no cuenta como holder", pool:1},
+      {id:"L", k:"l", name:"Sin relación", n:8, pct:4.1, desc:"holders sin financiador común con otros"}]},
+  // 3) creador con mucho: una sola ballena que es el dev
+  creador:{sym:"$GLIMMER", ic:"GL",
+    head:'<b class="y">El creador guarda el 23 %</b> en una sola wallet. No hay enjambres, pero puede vender de golpe.',
+    sigs:[["y","<b>Creador grande:</b> la wallet que creó el token (Dv4x…m2Nq) sigue con el 23 %."],["y","Otras 5 wallets recibieron SOL del creador (3,8 %)."],["g","El resto del reparto es normal: 38 holders sin relación."]],
+    groups:[
+      {id:"C", k:"r", name:"Creador", n:1, pct:23, desc:"la wallet que creó el token; no ha vendido nada"},
+      {id:"B", k:"p", name:"Grupo del creador", n:5, pct:3.8, funder:"Dv4x…m2Nq", desc:"recibieron SOL del creador"},
+      {id:"P", k:"o", name:"Pool Meteora", n:1, pct:14.6, desc:"liquidez del token: no cuenta como holder", pool:1},
+      {id:"X", k:"t", name:"Bybit", n:1, pct:2.9, desc:"exchange: wallet de depósitos de Bybit", exch:1},
+      {id:"L", k:"l", name:"Sin relación", n:38, pct:27.4, desc:"holders sin financiador común con otros"}]}
+};
+var CASE_ORDER = [["aapl","$AAPLCAT"],["limpio","Sano"],["enjambre","Enjambre"],["creador","Creador"]];
+var CUR = /caso=(\w+)/.exec(location.search); CUR = CUR && CASES[CUR[1]] ? CUR[1] : "aapl";
+var TOK = CASES[CUR], GROUPS = TOK.groups;
+var state = {sel:null, pinned:null}, M;
+function build(seed){
+  var R = rng(seed), W = stage.clientWidth, H = stage.clientHeight, u = Math.min(W, H), sc = Math.min(1.25, u/520), big = Math.max(.85, sc);
+  svg.innerHTML = ""; svg.setAttribute("viewBox", "0 0 "+W+" "+H); svg.classList.remove("dim");
+  var defs = '<defs><filter id="g" x="-2" y="-2" width="5" height="5"><feGaussianBlur stdDeviation="'+f(2*sc+.6)+'" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
+    + '<filter id="h" x="-2" y="-2" width="5" height="5"><feGaussianBlur stdDeviation="'+f(16*sc+4)+'"/></filter>'
+    + '<radialGradient id="n1" cx="22%" cy="40%" r="45%"><stop offset="0" stop-color="#ff9e9e" stop-opacity=".1"/><stop offset="1" stop-color="#ff9e9e" stop-opacity="0"/></radialGradient>'
+    + '<radialGradient id="n2" cx="78%" cy="30%" r="40%"><stop offset="0" stop-color="#7ab8c4" stop-opacity=".09"/><stop offset="1" stop-color="#7ab8c4" stop-opacity="0"/></radialGradient>'
+    + '<radialGradient id="n3" cx="48%" cy="52%" r="60%"><stop offset="0" stop-color="#8b5cf6" stop-opacity=".2"/><stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/></radialGradient>';
+  Object.keys(COLS).forEach(function(k){ var c = COLS[k], mid = k === "y" ? ".18" : ".1", edge = k === "y" ? ".5" : ".38";
+    defs += '<radialGradient id="s'+k+'" cx=".5" cy=".5" r=".5" fx=".36" fy=".3"><stop offset="0" stop-color="#ffffff" stop-opacity=".10"/><stop offset=".35" stop-color="'+c+'" stop-opacity=".05"/><stop offset=".72" stop-color="'+c+'" stop-opacity="'+mid+'"/><stop offset=".93" stop-color="'+c+'" stop-opacity="'+edge+'"/><stop offset="1" stop-color="'+c+'" stop-opacity=".2"/></radialGradient>'
+      + '<radialGradient id="d'+k+'" cx=".5" cy=".5" r=".5" fx=".7" fy=".78"><stop offset="0" stop-color="#0b0722" stop-opacity=".35"/><stop offset=".6" stop-color="#0b0722" stop-opacity=".12"/><stop offset="1" stop-color="#0b0722" stop-opacity="0"/></radialGradient>'; });
+  defs += '<radialGradient id="cg"><stop offset="0" stop-color="#fff3c4" stop-opacity="0"/><stop offset=".45" stop-color="#fff3c4" stop-opacity=".25"/><stop offset=".75" stop-color="#fde68a" stop-opacity=".45"/><stop offset="1" stop-color="#fde68a" stop-opacity="0"/></radialGradient>'
+    + '<radialGradient id="cgr"><stop offset="0" stop-color="#ff9e9e" stop-opacity="0"/><stop offset=".45" stop-color="#ff9e9e" stop-opacity=".25"/><stop offset=".75" stop-color="#ff9e9e" stop-opacity=".5"/><stop offset="1" stop-color="#ff9e9e" stop-opacity="0"/></radialGradient>'
+    + '<filter id="cf" x="-1" y="-1" width="3" height="3"><feTurbulence type="fractalNoise" baseFrequency="'+f(.05/big)+'" numOctaves="2" seed="'+Math.floor(R()*99)+'" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="'+f(14*big)+'" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="'+f(4*big)+'"/></filter>';
+  // la pool: líquido de luz (lavanda y azul claro), en el mismo lenguaje que la nebulosa
+  defs += '<radialGradient id="liqs" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fdf2f8" stop-opacity=".55"/><stop offset="1" stop-color="#fbcfe8" stop-opacity=".08"/></radialGradient>';
+  defs += '<linearGradient id="liq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbcfe8" stop-opacity=".34"/><stop offset=".55" stop-color="#f9a8d4" stop-opacity=".42"/><stop offset="1" stop-color="#f0abfc" stop-opacity=".55"/></linearGradient>'
+    + '<radialGradient id="liqg" cx=".5" cy=".85" r=".6"><stop offset="0" stop-color="#fdf2f8" stop-opacity=".55"/><stop offset=".5" stop-color="#fce7f3" stop-opacity=".18"/><stop offset="1" stop-color="#fce7f3" stop-opacity="0"/></radialGradient>';
+  defs += '<radialGradient id="hl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset=".45" stop-color="#fff" stop-opacity=".28"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>'
+    + '<linearGradient id="iri" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0abfc"/><stop offset=".45" stop-color="#7ab8c4"/><stop offset=".75" stop-color="#c4b5fd"/><stop offset="1" stop-color="#fff3c4"/></linearGradient>';
+  defs += '<radialGradient id="bst"><stop offset="0" stop-color="#ffffff"/><stop offset=".18" stop-color="#dbe8ff" stop-opacity=".9"/><stop offset=".45" stop-color="#8fb8ff" stop-opacity=".25"/><stop offset="1" stop-color="#8fb8ff" stop-opacity="0"/></radialGradient>';
+  var st = '', ns = Math.round(W*H/2600), nb = 5 + Math.round(W*H/220000);
+  // pocas estrellas grandes azuladas con halo y destellos en cruz
+  for (var bi = 0; bi < nb; bi++){ var bx = R()*W, by = R()*H, br = (5 + R()*7)*sc, sp = br*(2.2 + R()*1.6);
+    st += '<g class="tw" style="--d:'+f(4+R()*4)+'s;--o:-'+f(R()*6)+'s"><circle cx="'+f(bx)+'" cy="'+f(by)+'" r="'+f(br)+'" fill="url(#bst)"/>'
+      + '<path d="M'+f(bx-sp)+' '+f(by)+'H'+f(bx+sp)+'M'+f(bx)+' '+f(by-sp)+'V'+f(by+sp)+'" stroke="#dbe8ff" stroke-width=".7" opacity=".55"/></g>'; }
+  for (var i = 0; i < ns; i++){ var x = R()*W, y = R()*H, r = Math.pow(R(), 3)*1.5 + .3, o = .18 + R()*.45;
+    st += '<circle cx="'+f(x)+'" cy="'+f(y)+'" r="'+f(r)+'" fill="#fff" opacity="'+f(o)+'"'+(R() < .3 ? ' class="tw" style="--d:'+f(2+R()*4)+'s;--o:-'+f(R()*6)+'s"' : '')+'/>';
+    if (R() < .015){ var L = 4 + R()*5; st += '<path class="tw" style="--d:'+f(3+R()*3)+'s;--o:-'+f(R()*5)+'s" opacity=".6" d="M'+f(x-L)+' '+f(y)+'H'+f(x+L)+'M'+f(x)+' '+f(y-L)+'V'+f(y+L)+'" stroke="#fff" stroke-width=".6"/>'; } }
+  svg.innerHTML = defs + '</defs><g>'+st+'</g>';
+  var gHalo = el("g", {}, svg), gE = el("g", {}, svg), gF = el("g", {class:"gF"}, svg), gN = el("g", {}, svg);
+
+  var placed = [], AMP = 1.5*big, GAP = 6*big;
+  function free(x, y, r){ if (x < r+8 || x > W-r-8 || y < r+8 || y > H-r-8) return false;
+    for (var i = 0; i < placed.length; i++){ var p = placed[i], dx = p.x-x, dy = p.y-y, m = p.r + r + 2*AMP + GAP; if (dx*dx + dy*dy < m*m) return false; } return true; }
+  function put(gen, r, tries){ for (var t = 0; t < (tries||80); t++){ var q = gen(); if (free(q[0], q[1], r)){ placed.push({x:q[0], y:q[1], r:r}); return {x:q[0], y:q[1]}; } } return null; }
+  function rad(p){ return (2.4 + 4.6*Math.sqrt(p))*big; } // tamaño según el % del token
+
+  var nodes = [], links = [];
+  function node(x, y, r, k, o){ o = o || {};
+    var A2 = (o.amp != null ? o.amp : o.still ? 3 : 18 + R()*9)*big;
+    var n = {x0:x, y0:y, x:x, y:y, r:r, k:k, gid:o.gid, ax:A2, ay:A2*(.7+R()*.5), fx:(.00018+R()*.00035)*(o.fast||1), fy:(.00018+R()*.00035)*(o.fast||1), gx:.0006+R()*.0006, gy:.0006+R()*.0006, px:R()*6.283, py:R()*6.283, qx:R()*6.283, qy:R()*6.283, bs:.0008+R()*.0012, bp:R()*6.283, m:o.still ? 6 : 1, info:o.info};
+    var c = COLS[k], g = el("g", {class:"nd"}, gN), inner = el("g", {class:"pop", style:"--pd:"+f(o.delay||0)+"s"}, g);
+    if (o.ring) el("circle", {class:"ring", r:f(r), fill:"none", stroke:c, "stroke-width":"1.4", "stroke-dasharray":o.ring, filter:"url(#g)"}, inner);
+    else { el("circle", {class:"ring", r:f(r), fill:"url(#s"+k+")", stroke:o.pool ? "#f9a8d4" : c /* la pool: aro rosa como su agua */, "stroke-opacity":".6", "stroke-width":f(Math.max(.7, r*.09)), filter:"url(#g)"}, inner);
+      el("circle", {r:f(r*.96), fill:"url(#d"+k+")"}, inner);
+      if (o.pool){ var cid = svg.id + "pc" + nodes.length, lam = r*1.7, lvl = -r*.05;
+        el("circle", {r:f(r*.94)}, el("clipPath", {id:cid}, inner));
+        var liq = el("g", {"clip-path":"url(#"+cid+")"}, inner), slosh = el("g", {}, liq); liq = slosh; o.liqEl = slosh;
+        function wave(y, amp){ var d = "M"+f(-3*r)+" "+f(y); for (var x = -3*r; x < 3*r; x += lam) d += " q"+f(lam/4)+" "+f(-amp)+" "+f(lam/2)+" 0 t"+f(lam/2)+" 0"; return d + " V"+f(r)+" H"+f(-3*r)+"Z"; }
+        // agua de verdad: superficie casi plana vista un poco desde arriba (elipse), cuerpo más oscuro al fondo, oleaje mínimo
+        var hw = Math.sqrt(r*r - lvl*lvl)*.94;
+        el("path", {class:"wave", d:wave(lvl, r*.03), fill:"url(#liq)", style:"--w:"+f(lam)+"px;animation-duration:9s"}, liq);
+        // luz que sale del fondo del líquido, como si brillase por dentro
+        el("rect", {x:f(-r), y:f(lvl), width:f(2*r), height:f(r - lvl), fill:"url(#liqg)"}, liq);
+        // la superficie: una línea de luz suave, sin borde de cristal
+        el("ellipse", {cx:"0", cy:f(lvl), rx:f(hw), ry:f(r*.09), fill:"url(#liqs)", filter:"url(#g)"}, liq);
+        el("path", {class:"wave", d:"M"+f(-3*r)+" "+f(lvl)+(function(){ var d = ""; for (var x = -3*r; x < 3*r; x += lam) d += " q"+f(lam/4)+" "+f(-r*.03)+" "+f(lam/2)+" 0 t"+f(lam/2)+" 0"; return d; })(), fill:"none", stroke:"#fdf2f8", "stroke-opacity":".6", "stroke-width":f(Math.max(.5, r*.025)), filter:"url(#g)", style:"--w:"+f(lam)+"px;animation-duration:9s"}, liq);
+        // chispas de luz que suben (como estrellas pequeñas), en vez de burbujas de aire
+        for (var bi = 0; bi < 5; bi++){ var bx = (R()-.5)*r*1.1, br = Math.max(.45, r*(.018 + R()*.022));
+          el("circle", {class:"rise", cx:f(bx), cy:f(r*.8), r:f(br), fill:"#fff", "fill-opacity":".85", filter:"url(#g)", style:"--h:"+f(-(r*.8 - lvl))+"px;animation-duration:"+f(4 + R()*4)+"s;animation-delay:-"+f(R()*7)+"s"}, liq); } }
+      if (r > 5) el("circle", {r:f(r*.9), fill:"none", stroke:"url(#iri)", "stroke-width":f(Math.max(.6, r*.07)), opacity:".22"}, inner);
+      el("ellipse", {cx:f(-r*.32), cy:f(-r*.4), rx:f(r*.42), ry:f(r*.24), transform:"rotate(-32 "+f(-r*.32)+" "+f(-r*.4)+")", fill:"url(#hl)", opacity:".55"}, inner);
+      el("circle", {cx:f(-r*.42), cy:f(-r*.46), r:f(Math.max(.6, r*.09)), fill:"#fff", opacity:".85"}, inner);
+      if (r > 4) el("path", {d:"M"+f(r*.62)+" "+f(r*.42)+" A"+f(r*.78)+" "+f(r*.78)+" 0 0 1 "+f(-r*.05)+" "+f(r*.76), fill:"none", stroke:"#fff", "stroke-opacity":".22", "stroke-width":f(Math.max(.6, r*.07)), "stroke-linecap":"round"}, inner); }
+    el("circle", {r:f(Math.max(r, 9)), fill:"transparent"}, inner); // zona para tocar
+    // el agua de la pool: se inclina con el movimiento de la burbuja (ver tick)
+    if (o.liqEl){ n.liq = o.liqEl; n.ang = 0; n.av = 0; n.lx = x; n.lt = 0; }
+    n.g = g; n.inner = inner; nodes.push(n); g.__n = n; return n; }
+  function link(a, b, c, op, w, pulses, o){ o = o || {};
+    var e = el("path", {pathLength:"100", fill:"none", stroke:c, "stroke-opacity":op, "stroke-width":w, class:"lk"+(o.dash ? " dash" : ""), style:"--gd:"+f(o.gd||0)+"s;--d:"+f(2.5+R()*3.5)+"s;--o:-"+f(R()*6)+"s"}, gE);
+    var l = {a:a, b:b, e:e, gid:o.gid, bend:(R() < .5 ? -1 : 1)*(.12 + R()*.22), sw:.0003+R()*.0006, sp:R()*6.283, p:[]};
+    if (pulses){ var back = o.fwd ? false : R() < .4, dur = (o.fast ? 1.1 : 1.8) + R()*(o.fast ? 1.2 : 2.6);
+      for (var i = 0; i < pulses; i++) l.p.push(el("path", {pathLength:"100", class:"pz"+(back ? " back" : ""), stroke:c, "stroke-opacity":".85", "stroke-width":f(Math.max(1.4, parseFloat(w)*1.6)), filter:"url(#g)", style:"--d:"+f(dur)+"s;--o:-"+f(dur*i/pulses + R()*.4)+"s"}, gF)); }
+    links.push(l); return l; }
+
+  // token
+  var tr = 20*big, cx = W*(.48 + R()*.04), cy = H*(.48 + R()*.04);
+  paintNeb(W, H, cx, cy, u, seed, tr);
+  placed.push({x:cx, y:cy, r:tr*1.6});
+  el("circle", {cx:f(cx), cy:f(cy), r:f(tr*2.6), fill:"#fde68a", opacity:".1", filter:"url(#h)"}, gHalo);
+  for (var c2 = 0; c2 < 3; c2++) el("circle", {class:"cloud", cx:f(cx), cy:f(cy), r:f(tr*1.05), fill:"url(#cg)", filter:"url(#cf)", style:"animation-delay:-"+f(c2*1.4)+"s"}, gHalo);
+  var tok = node(cx, cy, tr, "y", {still:1, delay:0, info:{t:TOK.sym, d:T("tok")}});
+  var tx = el("text", {"text-anchor":"middle", y:f(4*big), "font-family":"Manrope", "font-weight":"800", "font-size":f(12*big), fill:"#fffbeb"}, tok.inner); tx.textContent = TOK.ic;
+
+  // los grupos grandes, cada uno por un lado: repartidos en círculo alrededor del token
+  var bigs = GROUPS.filter(function(g){ return g.id !== "L" && !g.pool; }), a0 = R()*6.283, step = 6.283/bigs.length, spots = {};
+  bigs.forEach(function(g, i){ var a = a0 + i*step + (R()-.5)*step*.35, mx = W*.1, my = H*.12;
+    spots[g.id] = [Math.min(W-mx, Math.max(mx, cx + Math.cos(a)*W*.34)), Math.min(H-my, Math.max(my, cy + Math.sin(a)*H*.33))]; });
+  // los sueltos, rellenando huecos: de 30 sitios al azar, el más alejado de todo lo que ya hay
+  function far(r){ var best = null, bd = -1;
+    for (var t = 0; t < 30; t++){ var x = r + 10 + R()*(W - 2*r - 20), y = r + 10 + R()*(H - 2*r - 20), md = 1e9;
+      for (var i = 0; i < placed.length; i++){ var q = placed[i], d = Math.hypot(q.x-x, q.y-y) - q.r; if (d < md) md = d; }
+      if (md > bd){ bd = md; best = [x, y]; } }
+    return best; }
+  var gi = 0;
+  GROUPS.forEach(function(g){
+    var c = COLS[g.k], base = .35 + gi*.25; gi++;
+    if (g.id === "L"){
+      var left = g.pct, cnt = g.members ? g.members.length : g.n;
+      for (var j = 0; j < cnt; j++){ var mm = g.members ? g.members[j] : null, pc = mm ? mm.p : j === cnt-1 ? left : Math.max(.15, left/(cnt-j)*(0.4 + R()*1.2)); left -= pc;
+        var r = rad(pc), p = put(function(){ return far(r); }, r, 60); if (!p) continue;
+        var n = node(p.x, p.y, r, "l", {gid:"L", delay:1.6 + R()*1.2, info:{t:mm ? mm.s : addr(R), a:mm && mm.a, p:pc, d:mm && mm.d || T("sinrel")}});
+        link(tok, n, c, ".09", "1", R() < .3 ? 1 : 0, {gid:"L", gd:1.4 + R()*.8}); }
+      return; }
+    // la pool va cerca del token (sin línea: no es un holder ni le llegó dinero de nadie)
+    var sp = g.pool ? null : spots[g.id], gx = sp ? sp[0] : 0, gy = sp ? sp[1] : 0;
+    if (g.n === 1){ // Binance o el pool: una sola burbuja grande
+      var r1 = rad(g.pct), p1 = put(g.pool ? function(){ var a = R()*6.283, d = tr*2.6 + r1 + (44 + R()*44)*big; return [cx + Math.cos(a)*d, cy + Math.sin(a)*d]; }
+        : function(){ return [gx + (R()-.5)*40, gy + (R()-.5)*40]; }, r1, 300); if (!p1) return;
+      el("circle", {cx:f(p1.x), cy:f(p1.y), r:f(r1*(g.pool ? 2.6 : 2)), fill:g.pool ? "#f9a8d4" : c, opacity:g.pool ? ".11" : ".06", filter:"url(#h)"}, gHalo);   // la pool, con un resplandor que la funde con el fondo
+      var one = node(p1.x, p1.y, r1, g.k, {gid:g.id, still:1, pool:g.pool, amp:g.pool ? 16 : 14, fast:g.pool ? 1.6 : 1, delay:base + .6, info:{t:g.name, a:g.addr, p:g.pct, d:g.desc}});
+      if (!g.pool) link(tok, one, c, ".35", "1.2", 2, {gid:g.id, gd:base});
+      return; }
+    if (g.net){
+      var spr = u*(.06 + .02*Math.sqrt(g.n)), nn = [];
+      el("circle", {cx:f(gx), cy:f(gy), r:f(spr*1.4), fill:c, opacity:".05", filter:"url(#h)"}, gHalo);
+      (g.members || []).forEach(function(mm, i){ var r = rad(Math.max(mm.p, .04));
+        var p = put(function(){ var a = R()*6.283, d = (.25 + Math.abs(gauss(R)))*spr*(1 + R()*.5); return [gx + Math.cos(a)*d*1.2, gy + Math.sin(a)*d]; }, r);
+        nn.push(p ? node(p.x, p.y, r, g.k, {gid:g.id, delay:base + .7 + i*.04, info:{t:mm.s, a:mm.a, p:mm.p, d:g.name+"."+(mm.d ? " "+mm.d : "")}}) : null); });
+      (g.links || []).forEach(function(q){ var a = nn[q[0]], b = nn[q[1]]; if (a && b) link(a, b, c, ".5", ".9", 1, {gid:g.id, gd:base + .9, dash:1, fwd:1}); });
+      return; }
+    var hr = 9*big, hp = put(function(){ return [gx + (R()-.5)*30, gy + (R()-.5)*30]; }, hr, 300); if (!hp) return;
+    var spread = u*(.09 + .025*Math.sqrt(g.n));
+    el("circle", {cx:f(hp.x), cy:f(hp.y), r:f(spread*1.3), fill:c, opacity:g.alert ? ".09" : ".06", filter:"url(#h)"}, gHalo);
+    if (g.alert) for (var c3 = 0; c3 < 3; c3++) el("circle", {class:"cloud alert", cx:f(hp.x), cy:f(hp.y), r:f(hr*1.3), fill:"url(#cgr)", filter:"url(#cf)", style:"animation-delay:-"+f(c3*.95)+"s"}, gHalo);
+    var hub = node(hp.x, hp.y, hr, g.k, {gid:g.id, still:1, ring:"3 3", amp:8, delay:base + .5, info:{t:T("fin")+" "+g.funder, a:g.funderA, d:T("mando", {n:g.n, g:g.name})}});
+    link(tok, hub, c, ".35", "1.2", g.alert ? 4 : 3, {gid:g.id, gd:base, fast:g.alert});
+    var each = g.pct/g.n;
+    for (var i = 0; i < g.n; i++){
+      var mm = g.members ? g.members[i] : null, pc = mm ? mm.p : each*(.7 + R()*.6), r = rad(pc);
+      var p = put(function(){ var a = R()*6.283, d = (.35 + Math.abs(gauss(R)))*spread*(1 + R()*.6); return [hp.x + Math.cos(a)*d*1.2, hp.y + Math.sin(a)*d]; }, r);
+      if (!p) continue;
+      var n = node(p.x, p.y, r, g.k, {gid:g.id, delay:base + .9 + i*.05, info:{t:mm ? mm.s : addr(R), a:mm && mm.a, p:pc, d:g.name+": "+g.desc+"."+(mm && mm.d ? " "+mm.d : "")}});
+      link(hub, n, c, ".22", ".8", R() < (g.alert ? .85 : .6) ? 1 : 0, {gid:g.id, gd:base + .7 + i*.04, fast:g.alert});
+    }
+  });
+  M = {nodes:nodes, links:links}; tick(0); apply();
+}
+function tick(t){
+  var N = M.nodes, GAP = 4;
+  N.forEach(function(n){ if (n.hold) return; var tx = n.x0 + (Math.sin(t*n.fx + n.px)*.75 + Math.sin(t*n.gx + n.qx)*.25)*n.ax, ty = n.y0 + (Math.cos(t*n.fy + n.py)*.75 + Math.cos(t*n.gy + n.qy)*.25)*n.ay;
+    n.x += (tx - n.x)*.08; n.y += (ty - n.y)*.08; });
+  for (var it = 0; it < 3; it++) for (var i = 0; i < N.length; i++) for (var j = i+1; j < N.length; j++){
+    var a = N[i], b = N[j], dx = b.x - a.x, dy = b.y - a.y, min = a.r + b.r + GAP, d2 = dx*dx + dy*dy;
+    if (d2 >= min*min) continue;
+    var d = Math.sqrt(d2) || .01, push = (min - d), ma = a.hold ? 1e6 : a.m, mb = b.hold ? 1e6 : b.m, wa = mb/(ma + mb), wb = ma/(ma + mb);
+    a.x -= dx/d*push*wa; a.y -= dy/d*push*wa; b.x += dx/d*push*wb; b.y += dy/d*push*wb; }
+  // agua: por la inercia se queda atrás cuando la burbuja se mueve (se inclina al lado contrario) y luego se balancea
+  N.forEach(function(n){ if (!n.liq) return;
+    var dt = n.lt ? Math.min(64, t - n.lt) : 16, vx = dt > 0 ? (n.x - n.lx)/dt*16 : 0;
+    var targ = Math.max(-22, Math.min(22, -vx*26));
+    n.av += (targ - n.ang)*.05; n.av *= .9; n.ang += n.av; n.lx = n.x; n.lt = t;
+    n.liq.setAttribute("transform", "rotate("+n.ang.toFixed(2)+")"); });
+  N.forEach(function(n){ var s = n.m > 1 || n.hold ? 1 : 1 + .05*Math.sin(t*n.bs + n.bp);
+    n.g.setAttribute("transform", "translate("+f(n.x)+" "+f(n.y)+") scale("+s.toFixed(3)+")"); });
+  M.links.forEach(function(l){ var a = l.a, b = l.b, dx = b.x-a.x, dy = b.y-a.y, k = l.bend*(1 + .35*Math.sin(t*l.sw + l.sp));
+    var qx = (a.x+b.x)/2 - dy*k, qy = (a.y+b.y)/2 + dx*k, ax = a.x, ay = a.y, bx = b.x, by = b.y;
+    // sin pulso: la línea solo toca la burbuja por fuera; con pulso llega al centro
+    if (!l.p.length){ var ua = Math.hypot(qx-ax, qy-ay) || 1, ub = Math.hypot(qx-bx, qy-by) || 1;
+      ax += (qx-ax)/ua*a.r; ay += (qy-ay)/ua*a.r; bx += (qx-bx)/ub*b.r; by += (qy-by)/ub*b.r; }
+    var d = "M"+f(ax)+" "+f(ay)+" Q"+f(qx)+" "+f(qy)+" "+f(bx)+" "+f(by);
+    l.e.setAttribute("d", d); l.p.forEach(function(p){ p.setAttribute("d", d); }); });
+}
+var still = false;
+function loop(t){ if (!still && !RM && M) tick(t); if (tip.classList.contains("on")) placeTip(); requestAnimationFrame(loop); }
+
+// resaltar un grupo
+function apply(){ var g = state.sel || state.pinned;
+  svg.classList.toggle("dim", !!g);
+  M.nodes.forEach(function(n){ n.g.classList.toggle("on", !!g && (n.gid === g || n.k === "y")); });
+  M.links.forEach(function(l){ var on = !!g && l.gid === g; l.e.classList.toggle("on", on); l.p.forEach(function(p){ p.classList.toggle("on", on); }); });
+  document.querySelectorAll(".grp").forEach(function(b){ b.classList.toggle("on", b.dataset.g === g); }); }
+function showTip(n, ev){ var c = COLS[n.k], i = n.info || {}, gr = GROUPS.filter(function(x){ return x.id === n.gid; })[0];
+  tip.style.setProperty("--c", c);
+  tip.innerHTML = '<div class="t1"><i></i><span class="mono">'+escH(i.t)+'</span></div>'+(i.p != null ? '<div class="pc">'+fmtP(i.p)+' %</div>' : '')+'<p>'+escH(i.d)+'</p>'+(gr && gr.n > 1 && gr.funder && i.p != null ? '<p>'+escH(T("mismo", {n:gr.n-1, f:gr.funder}))+'</p>' : '')+(i.a && n.k !== "o" && n.k !== "y" ? '<button class="go">'+escH(T("analizar"))+'</button>' : '');
+  tipNode = n; placeTip(); tip.classList.add("on"); }
+var tipNode = null;
+// la tarjeta va pegada a su burbuja: se recoloca en cada fotograma
+function placeTip(){ if (!tipNode || matchMedia("(max-width:900px)").matches) return;
+  var n = tipNode, W = stage.clientWidth, H = stage.clientHeight, tw = tip.offsetWidth || 250, th = tip.offsetHeight || 160, gap = n.r + 12;
+  var x = n.x + gap, y = n.y - th/2;
+  if (x + tw > W - 8) x = n.x - gap - tw;
+  y = Math.max(8, Math.min(H - th - 8, y));
+  tip.style.transform = "translate("+Math.round(x)+"px,"+Math.round(y)+"px)"; }
+var held = null, pinnedN = null;
+function hold(n){ if (held && held !== pinnedN) held.hold = false; held = n; if (n) n.hold = true; }
+svg.addEventListener("mouseover", function(e){ var g = e.target.closest(".nd"); if (!g) return; var n = g.__n; hold(n); state.sel = n.gid || null; apply(); showTip(n, e); });
+svg.addEventListener("mouseout", function(e){ if (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".nd")) return; hold(null); state.sel = null; apply(); tip.classList.remove("on"); });
+svg.addEventListener("click", function(e){ var g = e.target.closest(".nd"); if (pinnedN){ pinnedN.hold = false; pinnedN = null; } if (g){ pinnedN = g.__n; pinnedN.hold = true; } if (!g){ state.pinned = null; state.sel = null; apply(); tip.classList.remove("on"); return; }
+  var n = g.__n; state.pinned = n.gid || null; apply(); showTip(n, e); });
+
+// panel de grupos
+function renderPanel(){
+document.getElementById("tkI").textContent = TOK.ic; document.getElementById("tkN").textContent = TOK.sym; svg.setAttribute("aria-label", T("aria", {s:TOK.sym}));
+document.getElementById("betan").textContent = T("betan", {n:TOK.nh || 50});
+document.getElementById("head").innerHTML = TOK.head;
+document.getElementById("sigs").innerHTML = TOK.sigs.map(function(x){ return '<div class="sig '+x[0]+'"><i></i><span>'+x[1]+'</span></div>'; }).join("");
+document.getElementById("groups").innerHTML = GROUPS.map(function(g){ var c = COLS[g.k];
+  return '<button class="grp" data-g="'+g.id+'" style="--c:'+c+'"><i></i><b>'+escH(g.name)+(g.n > 1 ? ' · '+g.n+' '+T("wallets") : '')+'</b><span class="pc">'+fmtP(g.pct)+' %</span><small>'+escH(g.desc)+'</small><span class="bar"><span style="width:'+Math.min(100, g.pct*3)+'%"></span></span></button>'; }).join("");
+document.querySelectorAll(".grp").forEach(function(b){ b.onclick = function(){ state.pinned = state.pinned === b.dataset.g ? null : b.dataset.g; apply(); }; });
+}
+var SHOW = {G:true, L:true, X:true, P:true, N:true};
+function kindOf(g){ return g.pool ? "P" : g.exch ? "X" : g.net ? "N" : g.id === "L" ? "L" : "G"; }
+function renderShows(){
+  var have = {}; TOK.groups.forEach(function(g){ have[kindOf(g)] = 1; });
+  document.getElementById("shows").innerHTML = ["G","N","L","X","P"].filter(function(k){ return have[k]; }).map(function(k){
+    return '<label><input type="checkbox" data-sh="'+k+'"'+(SHOW[k] ? " checked" : "")+'> '+escH(T("s"+k))+'</label>'; }).join("");
+  document.querySelectorAll("[data-sh]").forEach(function(b){ b.onchange = function(){ SHOW[b.getAttribute("data-sh")] = b.checked; show(TOK); }; });
+}
+function show(tok){ TOK = tok; GROUPS = TOK.groups.filter(function(g){ return SHOW[kindOf(g)]; }); state.sel = state.pinned = null; pinnedN = held = null; tip.classList.remove("on");
+  var h = document.getElementById("hel"); h.hidden = !TOK.hint; h.textContent = TOK.hint || "";
+  renderPanel(); renderShows(); build(TOK.seed || 1); }
+function toWeb(m){ try { if (parent !== window) parent.postMessage(m, location.origin); } catch(e){} }
+var seed = 1;
+document.getElementById("sheetb").onclick = function(){ document.body.classList.toggle("sheet"); };
+document.getElementById("close").onclick = function(){ toWeb({type:"om-close"}); };
+document.addEventListener("keydown", function(e){ if (e.key === "Escape") toWeb({type:"om-close"}); });
+tip.addEventListener("click", function(e){ if (e.target.closest(".go") && tipNode && tipNode.info && tipNode.info.a) toWeb({type:"om-analyze", addr:tipNode.info.a}); });
+addEventListener("message", function(e){
+  if (e.origin !== location.origin || !e.data || e.data.type !== "om-data") return;
+  LANG = e.data.lang === "en" ? "en" : "es"; applyTexts(); show(e.data.tok);
+});
+var rt; addEventListener("resize", function(){ clearTimeout(rt); rt = setTimeout(function(){ if (M) build(TOK.seed || 1); }, 200); });
+applyTexts();
+if (/[?&]demo\b/.test(location.search)) show(Object.assign({seed:7}, CASES[CUR]));
+toWeb({type:"om-ready"});
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
