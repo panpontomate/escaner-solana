@@ -4132,20 +4132,6 @@ function usdShort(n){
   if(n>=1e3) return (n/1e3).toLocaleString("es-ES",{maximumFractionDigits:1})+" mil $";
   return usd(n);
 }
-// Motivos cortos del veredicto: primero lo grave, luego los avisos; sin la coletilla tras los dos puntos
-function cardWhy(r){
-  var out=[];
-  ["bad","warn"].forEach(function(s){
-    r.lights.forEach(function(l){
-      if(l.s!==s) return;
-      l.t.split(/\.\s+/).forEach(function(t){
-        t=t.split(": ")[0].replace(/\.$/,"").trim();
-        if(t&&out.length<3) out.push(t.charAt(0).toLowerCase()+t.slice(1));
-      });
-    });
-  });
-  return out;
-}
 function cardFit(ctx,text,maxW){
   if(ctx.measureText(text).width<=maxW) return text;
   while(text.length&&ctx.measureText(text+"…").width>maxW) text=text.slice(0,-1);
@@ -4161,22 +4147,58 @@ function cardFonts(){
   return Promise.all(["800 80px Fraunces","700 40px Fraunces","700 26px Manrope","400 22px Manrope","700 40px 'Barlow Condensed'","400 20px 'IBM Plex Mono'"]
     .map(function(f){ return document.fonts.load(f); })).catch(function(){});
 }
-function cardBg(x,W,H,col){
-  var g=x.createLinearGradient(0,0,W*.35,H); g.addColorStop(0,"#1a1142"); g.addColorStop(.6,"#0f0a28"); g.addColorStop(1,"#0b071e");
-  x.fillStyle=g; x.fillRect(0,0,W,H);
-  [[W*.5,-H*.2,W*.6,"rgba(139,92,246,.5)"],[-W*.05,H*1.1,W*.45,"rgba(192,38,211,.2)"],[W*1.05,H*1.1,W*.45,"rgba(99,102,241,.2)"]].forEach(function(o){
-    var rg=x.createRadialGradient(o[0],o[1],0,o[0],o[1],o[2]); rg.addColorStop(0,o[3]); rg.addColorStop(1,"rgba(0,0,0,0)");
-    x.fillStyle=rg; x.fillRect(0,0,W,H);
-  });
-  // una carretera de luz y unas burbujas, muy tenues, como el fondo de la web
-  x.save(); x.globalAlpha=.3;
-  x.beginPath(); x.moveTo(-40,H*.62); x.bezierCurveTo(W*.16,H*.51,W*.32,H*.71,W*.5,H*.62); x.bezierCurveTo(W*.68,H*.53,W*.82,H*.44,W+40,H*.53);
-  x.lineWidth=8; x.strokeStyle="rgba(255,247,224,.5)"; x.stroke(); x.lineWidth=4; x.strokeStyle="#5b3bb8"; x.stroke();
-  [[W*.95,H*.28,34],[W*.045,H*.33,22],[W*.6,H*.9,18]].forEach(function(b){
-    x.beginPath(); x.arc(b[0],b[1],b[2],0,Math.PI*2); x.fillStyle="rgba(255,255,255,.05)"; x.fill(); x.lineWidth=2; x.strokeStyle="rgba(255,255,255,.35)"; x.stroke();
-  });
-  x.restore();
+// Fondo de las dos imágenes: la nebulosa del On-chain Map (gas magenta y violeta con franjas de polvo), estrellas y unas
+// burbujas de jabón del color del veredicto en los huecos libres (bubs: [x, y, radio]). Cada token tiene su nebulosa: sale de su dirección
+function cardRng(seed){ var h=7; for(var i=0;i<seed.length;i++) h=(h*31+seed.charCodeAt(i))>>>0; var s=(h%2147483646)+1; return function(){ s=s*16807%2147483647; return (s-1)/2147483646; }; }
+function cardBg(x,W,H,col,seed,bubs){
+  var R=cardRng(seed||"solflag"), S=4, w=Math.ceil(W/S), h=Math.ceil(H/S), P=new Uint8Array(512), i, j;
+  for(i=0;i<256;i++) P[i]=i;
+  for(i=255;i>0;i--){ j=Math.floor(R()*(i+1)); var t=P[i]; P[i]=P[j]; P[j]=t; }
+  for(i=0;i<256;i++) P[i+256]=P[i];
+  function vn(a,b){ var xi=Math.floor(a), yi=Math.floor(b), xf=a-xi, yf=b-yi; xi&=255; yi&=255;
+    var p=P[P[xi]+yi]/255, q=P[P[xi+1]+yi]/255, r=P[P[xi]+yi+1]/255, d=P[P[xi+1]+yi+1]/255, sx=xf*xf*(3-2*xf), sy=yf*yf*(3-2*yf);
+    return p+(q-p)*sx+(r-p)*sy+(p-q-r+d)*sx*sy; }
+  function fbm(a,b,o){ var v=0,am=.5,n=0; for(var k=0;k<o;k++){ v+=vn(a,b)*am; n+=am; a=a*2.03+17.1; b=b*2.03+9.7; am*=.5; } return v/n; }
+  function sm(a,b,v){ v=Math.max(0,Math.min(1,(v-a)/(b-a))); return v*v*(3-2*v); }
+  var u=Math.min(W,H), k2=2.6/u, blobs=[];
+  for(i=0;i<3;i++){ var an=R()*6.283, dd=(.45+R()*.4)*u; blobs.push([W/2+Math.cos(an)*dd*1.3,H/2+Math.sin(an)*dd*.8,(.45+R()*.35)*u]); }
+  var img=x.createImageData(w,h), D=img.data;
+  for(var py=0;py<h;py++) for(var px=0;px<w;px++){
+    var X=px*S, Y=py*S, nx=X*k2, ny=Y*k2, qx=fbm(nx,ny,3), qy=fbm(nx+5.2,ny+1.3,3);
+    var g=fbm(nx+2.2*qx,ny+2.2*qy,5), hue=fbm(nx*.5+31,ny*.5+7,3), reg=.18;
+    for(i=0;i<3;i++){ var bx=X-blobs[i][0], by=Y-blobs[i][1]; reg+=Math.exp(-(bx*bx+by*by)/(blobs[i][2]*blobs[i][2])); }
+    var gas=sm(.42,.85,g)*Math.min(1,reg), dn=fbm(nx*1.7+50,ny*1.7+20,4), dust=Math.pow(1-Math.abs(2*dn-1),7)*sm(.2,.6,reg);
+    var rr=11, gg=7, bb=34, mA=sm(.3,.7,hue), a1=gas*(1-dust*.85);
+    rr+=a1*(230*(1-mA)+255*mA)*.3; gg+=a1*(80*(1-mA)+120*mA)*.3; bb+=a1*(240*(1-mA)+170*mA)*.3;
+    rr+=gas*gas*22; gg+=gas*gas*18; bb+=gas*gas*45;
+    var o=(py*w+px)*4; D[o]=rr; D[o+1]=gg; D[o+2]=bb; D[o+3]=255; }
+  var nc=document.createElement("canvas"); nc.width=w; nc.height=h; nc.getContext("2d").putImageData(img,0,0);
+  x.save(); x.imageSmoothingQuality="high"; x.drawImage(nc,0,0,W,H); x.restore();
+  // estrellas: muchas pequeñas y unas pocas azuladas con destello en cruz
+  var ns=Math.round(W*H/5200);
+  for(i=0;i<ns;i++){ var sx=R()*W, sy=R()*H, sr=Math.pow(R(),3)*1.8+.4; x.globalAlpha=.18+R()*.5; x.fillStyle="#fff"; x.beginPath(); x.arc(sx,sy,sr,0,6.283); x.fill(); }
+  for(i=0;i<5;i++){ var edge=R(), bx2=edge<.5?R()*W:(R()<.5?R()*W*.06:W-R()*W*.06), by2=edge<.5?(R()<.5?R()*H*.1:H-R()*H*.08):R()*H, br=7+R()*7,   // solo por los bordes, lejos del texto
+    sp=br*(2.2+R()*1.4), gr=x.createRadialGradient(bx2,by2,0,bx2,by2,br);
+    gr.addColorStop(0,"#fff"); gr.addColorStop(.2,"rgba(219,232,255,.9)"); gr.addColorStop(.5,"rgba(143,184,255,.25)"); gr.addColorStop(1,"rgba(143,184,255,0)");
+    x.globalAlpha=.9; x.fillStyle=gr; x.fillRect(bx2-br,by2-br,2*br,2*br);
+    x.globalAlpha=.5; x.strokeStyle="#dbe8ff"; x.lineWidth=1; x.beginPath(); x.moveTo(bx2-sp,by2); x.lineTo(bx2+sp,by2); x.moveTo(bx2,by2-sp); x.lineTo(bx2,by2+sp); x.stroke(); }
+  x.globalAlpha=1;
+  (bubs||[]).forEach(function(q){ cardBubble(x,q[0],q[1],q[2],col); });
   x.fillStyle=col; x.fillRect(0,0,W,10);
+}
+// una burbuja de jabón como las del mapa: borde del color, sombra abajo a la derecha, brillo arriba a la izquierda y un reflejo
+function cardBubble(x,cx,cy,r,col){
+  x.save(); x.translate(cx,cy);
+  var g=x.createRadialGradient(-r*.28,-r*.4,0,0,0,r); g.addColorStop(0,"rgba(255,255,255,.1)"); g.addColorStop(.7,"rgba(255,255,255,.03)"); g.addColorStop(.93,col); g.addColorStop(1,"rgba(255,255,255,.05)");
+  x.globalAlpha=.55; x.fillStyle=g; x.beginPath(); x.arc(0,0,r,0,6.283); x.fill();
+  var d=x.createRadialGradient(r*.4,r*.56,0,0,0,r); d.addColorStop(0,"rgba(11,7,34,.35)"); d.addColorStop(1,"rgba(11,7,34,0)");
+  x.globalAlpha=1; x.fillStyle=d; x.beginPath(); x.arc(0,0,r*.96,0,6.283); x.fill();
+  x.globalAlpha=.7; x.strokeStyle=col; x.lineWidth=Math.max(1,r*.07); x.shadowColor=col; x.shadowBlur=r*.35; x.beginPath(); x.arc(0,0,r,0,6.283); x.stroke(); x.shadowBlur=0;
+  x.globalAlpha=.5; x.save(); x.translate(-r*.32,-r*.4); x.rotate(-.56); var hl=x.createRadialGradient(0,0,0,0,0,r*.42);
+  hl.addColorStop(0,"rgba(255,255,255,.85)"); hl.addColorStop(1,"rgba(255,255,255,0)"); x.fillStyle=hl; x.scale(1,.57); x.beginPath(); x.arc(0,0,r*.42,0,6.283); x.fill(); x.restore();
+  x.globalAlpha=.85; x.fillStyle="#fff"; x.beginPath(); x.arc(-r*.42,-r*.46,Math.max(.8,r*.09),0,6.283); x.fill();
+  x.globalAlpha=.22; x.strokeStyle="#fff"; x.lineWidth=Math.max(1,r*.07); x.lineCap="round"; x.beginPath(); x.arc(0,0,r*.78,.6,2.0); x.stroke();
+  x.restore();
 }
 function cardLogo(x,px,py,s){
   // el círculo lila con los tres cubos, dibujado sobre una cuadrícula de 46
@@ -4201,16 +4223,6 @@ function cardKick(x,t,px,py,size,align){
   x.textAlign=align||"left"; x.fillText(t,px,py); x.restore();
 }
 function cardBox(x,bx,by,bw,bh,r){ x.fillStyle="rgba(24,17,62,.92)"; cardRound(x,bx,by,bw,bh,r); x.fill(); x.lineWidth=1.5; x.strokeStyle="#44358f"; x.stroke(); }
-function cardRing(x,cx,cy,R,lw,col,fr,count){
-  x.beginPath(); x.arc(cx,cy,R,0,Math.PI*2); x.fillStyle="rgba(24,17,62,.6)"; x.fill();
-  x.lineWidth=lw; x.strokeStyle="#2a2350"; x.stroke();
-  x.beginPath(); x.arc(cx,cy,R,-Math.PI/2,-Math.PI/2+Math.PI*2*fr); x.strokeStyle=col; x.lineCap="round"; x.stroke(); x.lineCap="butt";
-  x.textAlign="center"; x.fillStyle=col; x.font="800 "+Math.round(R*.58)+"px "+CF.D; x.fillText(String(count),cx,cy+R*.14);
-  x.fillStyle="#ece8fd"; x.font="700 "+Math.round(R*.14)+"px "+CF.B;
-  if("letterSpacing" in x) x.letterSpacing="2px";
-  x.fillText("RED FLAGS",cx,cy+R*.42); if("letterSpacing" in x) x.letterSpacing="0px";
-  x.textAlign="left";
-}
 // Las cinco banderas de la imagen: las cuatro del motor y el lanzamiento (revisado o no)
 function cardFlags(r){
   var ls=r.lights.map(function(l){ return {n:LKEYS[l.k],s:l.s,t:l.t}; });
@@ -4219,13 +4231,6 @@ function cardFlags(r){
   return ls;
 }
 function cardVerdict(r){ return dataOnly(r)?"Medio por falta de datos":LEVELS[r.lvl].label; }
-function cardReason(r){
-  if(dataOnly(r)) return "Falta comprobar "+missingText(r)+": lo que no se comprueba no se da por bueno.";
-  var ws=cardWhy(r);
-  if(r.launch&&r.launch.s==="bad") ws.unshift(r.launch.sold==="bad"?"los del lanzamiento ya vendieron":r.launch.t.indexOf("lanzador en serie")>=0?"lanzador en serie":"bundle en el lanzamiento");
-  if(ws.length&&r.lvl!=="BAJO"){ var s=ws.slice(0,3).join(" · "); return s.charAt(0).toUpperCase()+s.slice(1)+"."; }
-  return String(TOKEN_TIP[r.lvl]||"").split(". ")[0].replace(/\.?$/,".");
-}
 function cardStats(r){
   var par=r.par||{};
   return [["Liquidez",usdShort((par.liquidity&&par.liquidity.usd)||0)],["Volumen 24 h",usdShort((par.volume&&par.volume.h24)||0)],
@@ -4238,31 +4243,75 @@ function cardFitFont(x,t,weight,max,min,fam,w){
   x.font=weight+" "+min+"px "+fam; return min;
 }
 
+// Cabecera como la del análisis del token: tipo, logo y nombre, dirección, y el sello del veredicto
+// el logo: muchos servidores de imágenes no dejan usarlas en un lienzo (la imagen no se podría guardar). Se pide a través de
+// wsrv.nl, que las sirve con permiso; si falla, la directa; y si tampoco, las iniciales
+async function cardImg(url){ if(!url) return null;
+  return (await cardImg1("https://wsrv.nl/?url="+encodeURIComponent(url)+"&w=200&h=200&fit=cover&output=png"))||(await cardImg1(url)); }
+function cardImg1(url){ return new Promise(function(ok){
+  var im=new Image(), done=false; im.crossOrigin="anonymous"; im.referrerPolicy="no-referrer";
+  im.onload=function(){ if(!done){ done=true; ok(im); } }; im.onerror=function(){ if(!done){ done=true; ok(null); } };
+  setTimeout(function(){ if(!done){ done=true; ok(null); } },3000); im.src=url; }); }
+function cardAvatar(x,im,sym,px,py,s){
+  x.save(); x.beginPath(); x.arc(px+s/2,py+s/2,s/2,0,6.283); x.closePath();
+  var g=x.createRadialGradient(px+s*.35,py+s*.35,0,px+s/2,py+s/2,s*.6); g.addColorStop(0,"#c4b5fd"); g.addColorStop(1,"#5b3bb8"); x.fillStyle=g; x.fill();
+  if(im){ x.clip(); x.drawImage(im,px,py,s,s); }
+  else{ x.fillStyle="#fff"; x.font="800 "+Math.round(s*.36)+"px "+CF.B; x.textAlign="center"; x.fillText(String(sym||"?").replace(/^\$/,"").slice(0,2).toUpperCase(),px+s/2,py+s*.62); x.textAlign="left"; }
+  x.restore(); x.lineWidth=2; x.strokeStyle="rgba(196,181,253,.5)"; x.beginPath(); x.arc(px+s/2,py+s/2,s/2,0,6.283); x.stroke(); }
+// el sello: los mismos trazos irregulares del aro de la web (viewBox 140), girado -12°, con SOLFLAG, RIESGO, el nivel y las alertas
+function cardStamp(x,r,cx,cy,R){
+  var col=(CARD.lvl[r.lvl]||[CARD.dot.na])[0], lbl=(r.lvl==="SIN MERCADO"||r.lvl==="SIN DATOS"?LEVELS[r.lvl].label:LEVELS[r.lvl].short).toUpperCase();
+  var bad=strongAlerts(r), warn=(r.lights||[]).filter(function(l){ return l.s==="warn"; }).length;
+  var sub=dataOnly(r)?"falta de datos":bad?bad+(bad===1?" alerta fuerte":" alertas fuertes"):warn?warn+(warn===1?" aviso":" avisos"):r.lights?"sin alertas":"";
+  var top=/^(ALTO|MEDIO|BAJO)$/.test(r.lvl)?"RIESGO":"", k=R/70, f=2*R/138;
+  x.save(); x.translate(cx,cy); x.rotate(-12*Math.PI/180); x.globalAlpha=.95; x.strokeStyle=col; x.fillStyle=col;
+  function ring(rad,lw,dash,rot){ x.save(); x.rotate(rot*Math.PI/180); x.lineWidth=lw*k; x.setLineDash(dash.map(function(d){ return d*k; })); x.beginPath(); x.arc(0,0,rad*k,0,6.283); x.stroke(); x.restore(); }
+  ring(66,4.5,[58,5,31,3,74,11,22,4,49,2,63,8,36,6,30,100],-38);
+  ring(58.5,1.6,[41,7,88,4,26,13,67,3,52,9,60,10],25);
+  x.setLineDash([]); x.textAlign="center";
+  var big=lbl.length>6?16.8:28, hb=big*f, y=-(9.3+5+(top?11.2+3:0)+hb+4+(sub?10.6:0))*f/2;
+  function sp(t,size,ls){ x.font="800 "+Math.round(size*f)+"px "+CF.B; if("letterSpacing" in x) x.letterSpacing=Math.round(size*f*ls)+"px"; }
+  sp("",9.3,.22); x.globalAlpha=.85; y+=9.3*f; x.fillText("SOLFLAG",0,y); x.globalAlpha=.95; y+=5*f;
+  if(top){ sp("",11.2,.16); y+=11.2*f; x.fillText(top,0,y); y+=3*f; }
+  if("letterSpacing" in x) x.letterSpacing="0px"; x.font="800 "+Math.round(hb)+"px "+CF.D; y+=hb; x.fillText(lbl,0,y); y+=4*f;
+  if(sub){ x.font="700 "+Math.round(10.6*f)+"px "+CF.B; y+=10.6*f; x.fillText(sub,0,y); }
+  x.restore(); x.textAlign="left"; if("letterSpacing" in x) x.letterSpacing="0px";
+}
+// kicker «TOKEN · TIPO», logo y nombre (con el nombre largo debajo si aporta), y la dirección; devuelve dónde acaba
+function cardTokenHead(x,r,im,px,py,maxW,av,nameMax){
+  cardKick(x,"TOKEN"+(r.type&&TYPES[r.type]?" · "+TYPES[r.type].label.toUpperCase():""),px,py,Math.round(av*.18),"left");
+  var ay=py+av*.28; cardAvatar(x,im,r.sym,px,ay,av);
+  var nx=px+av+av*.24, nw=maxW-(nx-px); x.fillStyle="#f7f4ff";
+  var fs=cardFitFont(x,r.sym,"700",nameMax,Math.round(nameMax*.5),CF.D,nw), long=r.name&&!sameName(r.name,r.sym);
+  x.fillText(cardFit(x,r.sym,nw),nx,ay+av*(long?.6:.72));
+  if(long){ x.fillStyle="#c9c1ea"; x.font="600 "+Math.round(av*.22)+"px "+CF.B; x.fillText(cardFit(x,r.name,nw),nx,ay+av*.6+av*.32); }
+  var my=ay+av+av*.42; x.fillStyle="#b4acdc"; x.font="400 "+Math.round(av*.19)+"px "+CF.M; x.fillText(cardFit(x,r.mint,maxW),px,my);
+  return my; }
+
 // Imagen para descargar: vertical 1080 de ancho (4:5 como mínimo), para Telegram, WhatsApp o Instagram
 async function drawCard(r){
-  await cardFonts();
-  var W=1080, P=72, IW=W-2*P, col=(CARD.lvl[r.lvl]||CARD.lvl.MEDIO)[0], fr={ALTO:.85,MEDIO:.55,BAJO:.25}[r.lvl]||.55;
+  await cardFonts(); var im=await cardImg(r.img);
+  var W=1080, P=72, IW=W-2*P, col=(CARD.lvl[r.lvl]||CARD.lvl.MEDIO)[0];
   var flags=cardFlags(r);
   // primero se mide el alto de la lista de banderas para dibujar el fondo a la medida
   var m=document.createElement("canvas").getContext("2d"), rowsH=0, rowLines=[];
   m.font="400 23px "+CF.B;
-  flags.forEach(function(f){ var ls=cardLines(m,f.t,IW-62-300-28,2); rowLines.push(ls); rowsH+=Math.max(64,30+ls.length*31)+12; });
-  var H=Math.max(1350,640+rowsH+56+170);
+  flags.forEach(function(f){ var ls=cardLines(m,f.t,IW-62-300-28,3); rowLines.push(ls); rowsH+=Math.max(64,30+ls.length*31)+12; });
+  var by=P+430, H=Math.max(1350,by+130+rowsH+24+56+170);
   var c=document.createElement("canvas"); c.width=W; c.height=H;
   var x=c.getContext("2d"); x.textBaseline="alphabetic";
-  cardBg(x,W,H,col);
+  var fEnd=by+130+rowsH+24, fTop=H-P-70-40, mid=(fEnd+fTop)/2, room=Math.max(0,(fTop-fEnd)/2-12);
+  var bubs=[[W*.43,P+18,16],[W*.53,P+52,8]];
+  if(room>14) bubs.push([W*.2,mid,Math.min(34,room)],[W*.5,mid+room*.25,Math.min(16,room*.6)],[W*.78,mid-room*.2,Math.min(26,room*.85)],[W*.92,mid+room*.3,Math.min(11,room*.5)]);
+  cardBg(x,W,H,col,r.mint,bubs);
   cardBrand(x,P,P+44,56);
   cardKick(x,"ESCÁNER DE SOLANA",W-P,P+34,20,"right");
-  // aro con las red flags y, al lado, el token, el veredicto y el motivo
-  var cy=P+120+125;
-  cardRing(x,P+125,cy,112,22,col,fr,strongAlerts(r));
-  var tx=P+290, tw=W-P-tx;
-  x.fillStyle="#fff"; x.font="700 30px "+CF.B; x.fillText(cardFit(x,"$"+r.sym,tw),tx,cy-90);
-  x.fillStyle=col; cardFitFont(x,cardVerdict(r),"800",80,46,CF.D,tw); x.fillText(cardVerdict(r),tx,cy-6);
-  x.fillStyle="#ece8fd"; x.font="400 26px "+CF.B;
-  cardLines(x,cardReason(r),tw,3).forEach(function(t,i){ x.fillText(t,tx,cy+44+i*35); });
+  // cabecera como la del análisis: tipo, logo y nombre, dirección y el sello a la derecha
+  var R=118, scx=W-P-R-50, scy=P+250;
+  cardTokenHead(x,r,im,P,P+150,scx-R-24-P,100,84);
+  cardStamp(x,r,scx,scy,R);
   // cuatro cifras
-  var by=P+400, bw=(IW-3*14)/4;
+  var bw=(IW-3*14)/4;
   cardStats(r).forEach(function(b,i){
     var bx=P+i*(bw+14); cardBox(x,bx,by,bw,100,18);
     x.fillStyle="#c9c1ea"; x.font="500 19px "+CF.B; x.fillText(b[0],bx+18,by+36);
@@ -4279,9 +4328,8 @@ async function drawCard(r){
     ly+=rh+12;
     if(i<flags.length-1){ x.fillStyle="#2e2268"; x.fillRect(P+24,ly-8,IW-48,2); }
   });
-  // pie pegado abajo: dirección, fecha y marca
+  // pie pegado abajo: fecha y marca
   var fy=H-P-70;
-  x.fillStyle="#b4acdc"; x.font="400 19px "+CF.M; x.fillText(cardFit(x,r.mint,IW),P,fy);
   x.fillStyle="rgba(196,181,253,.25)"; x.fillRect(P,fy+22,IW,2);
   x.fillStyle="#8ec5cf"; x.font="700 26px "+CF.B; x.fillText("solflag.com",P,fy+64);
   x.fillStyle="#c9c1ea"; x.font="400 20px "+CF.B; x.textAlign="right";
@@ -4316,22 +4364,19 @@ async function shareCard(mint,btn){
 // Imagen para X: apaisada (16:9), que es como X la enseña entera en el timeline. Tres bandas:
 // marca arriba; aro, veredicto y gráfica con cifras en el centro; las cinco banderas abajo
 async function drawXCard(r){
-  await cardFonts();
-  var W=1600, H=900, P=64, col=(CARD.lvl[r.lvl]||CARD.lvl.MEDIO)[0], fr={ALTO:.85,MEDIO:.55,BAJO:.25}[r.lvl]||.55;
+  await cardFonts(); var im=await cardImg(r.img);
+  var W=1600, H=900, P=64, col=(CARD.lvl[r.lvl]||CARD.lvl.MEDIO)[0];
   var c=document.createElement("canvas"); c.width=W; c.height=H;
   var x=c.getContext("2d"); x.textBaseline="alphabetic";
-  cardBg(x,W,H,col);
+  cardBg(x,W,H,col,r.mint,[[W*.4,P+12,20],[W*.47,P+40,10],[W*.62,P+20,14],[34,560,16],[W*.38,568,12],[W*.6,566,24],[W*.75,580,11],[W-40,H-44,18],[80,H-40,10]]);
   cardBrand(x,P,P+30,50);
   cardKick(x,"ESCÁNER DE SOLANA",W-P,P+22,19,"right");
-  // centro: aro
-  var cy=372;
-  cardRing(x,P+135,cy,124,22,col,fr,strongAlerts(r));
   // centro: gráfica con las cuatro cifras, a la derecha
   var gx0=W-P-400, gy0=208, gw0=400, gh0=330;
   cardBox(x,gx0,gy0,gw0,gh0,24);
   var par=r.par||{}, pts=par.pairAddress&&(charts[par.pairAddress+"|"+state.ctf]||charts[par.pairAddress+"|h1"]);
   var cx0=gx0+22, cw=gw0-44, ctop=gy0+56, chh=96;
-  if(Array.isArray(pts)&&pts.length>=2){
+  if(Array.isArray(pts)&&pts.length>=6){
     var tf=charts[par.pairAddress+"|"+state.ctf]===pts?state.ctf:"h1", lo=Infinity, hi=-Infinity;
     pts.forEach(function(p){ lo=Math.min(lo,p[1]); hi=Math.max(hi,p[1]); });
     var span=(hi-lo)||hi*0.02, t0=pts[0][0], t1=pts[pts.length-1][0];
@@ -4343,23 +4388,21 @@ async function drawXCard(r){
     x.strokeStyle="#8ec5cf"; x.lineWidth=3; x.lineJoin="round"; x.stroke();
     x.lineTo(cx0+cw,ctop+chh); x.lineTo(cx0,ctop+chh); x.closePath(); x.globalAlpha=.14; x.fillStyle="#8ec5cf"; x.fill(); x.globalAlpha=1;
   }else{
-    x.fillStyle="#c9c1ea"; x.font="400 19px "+CF.B;
-    cardLines(x,"Sin gráfica todavía: el mercado tiene muy pocas operaciones",cw,2).forEach(function(t,i){ x.fillText(t,cx0,gy0+60+i*26); });
+    var hoy=par.pairCreatedAt&&Date.now()-par.pairCreatedAt<86400000;
+    x.fillStyle=CARD.dot.warn; x.font="800 26px "+CF.B;
+    cardLines(x,hoy?"Token de hoy: casi sin operaciones":"Casi sin operaciones todavía",cw,2).forEach(function(t,i){ x.fillText(t,cx0,gy0+52+i*32); });
+    x.fillStyle="#c9c1ea"; x.font="400 18px "+CF.B; x.fillText("Por eso no hay gráfica de precio",cx0,gy0+(hoy?92:62)+20);
   }
+  var big=!(Array.isArray(pts)&&pts.length>=6);
   cardStats(r).forEach(function(b,i){
-    var bx=cx0+(i%2)*(cw/2+8), byy=gy0+196+Math.floor(i/2)*66;
-    x.fillStyle="#c9c1ea"; x.font="500 16px "+CF.B; x.fillText(b[0],bx,byy);
-    x.fillStyle="#fff"; cardFitFont(x,b[1],"700",23,15,CF.B,cw/2-14); x.fillText(b[1],bx,byy+28);
+    var bx=cx0+(i%2)*(cw/2+8), byy=(big?gy0+170:gy0+196)+Math.floor(i/2)*(big?78:66);
+    x.fillStyle="#c9c1ea"; x.font="500 "+(big?18:16)+"px "+CF.B; x.fillText(b[0],bx,byy);
+    x.fillStyle="#fff"; cardFitFont(x,b[1],"700",big?32:23,15,CF.B,cw/2-14); x.fillText(b[1],bx,byy+(big?36:28));
   });
-  // centro: token, veredicto y motivo, entre el aro y la gráfica
-  var tx=P+270+48, tw=gx0-48-tx;
-  x.fillStyle="#fff"; x.font="700 30px "+CF.B;
-  var head="$"+r.sym, tl=r.type&&TYPES[r.type]?TYPES[r.type].label:"";
-  x.fillText(cardFit(x,head,tw),tx,cy-108);
-  if(tl){ var hw=x.measureText(head).width; x.fillStyle="#c9c1ea"; x.font="500 22px "+CF.B; x.fillText(cardFit(x," · "+tl,Math.max(0,tw-hw)),tx+hw,cy-108); }
-  x.fillStyle=col; cardFitFont(x,cardVerdict(r),"800",96,52,CF.D,tw); x.fillText(cardVerdict(r),tx,cy-6);
-  x.fillStyle="#ece8fd"; x.font="400 27px "+CF.B;
-  cardLines(x,cardReason(r),tw,3).forEach(function(t,i){ x.fillText(t,tx,cy+50+i*37); });
+  // centro: cabecera como la del análisis (tipo, logo y nombre, dirección), el sello entre ella y la gráfica, y el motivo debajo
+  var R=122, scx=gx0-120-R, scy=320;
+  cardTokenHead(x,r,im,P,170,scx-R-30-P,112,100);
+  cardStamp(x,r,scx,scy,R);
   // abajo: las cinco banderas en fila, cada una con su color arriba
   var flags=cardFlags(r), fy=610, fh=158, fw=(W-2*P-4*14)/5;
   flags.forEach(function(f,i){
@@ -4368,7 +4411,7 @@ async function drawXCard(r){
     x.save(); cardRound(x,fx,fy,fw,fh,18); x.clip(); x.fillStyle=fc; x.fillRect(fx,fy,fw,6); x.restore();
     x.fillStyle="#fff"; x.font="700 21px "+CF.B; x.fillText(cardFit(x,f.n,fw-36),fx+18,fy+44);
     x.fillStyle="#d3cdef"; x.font="400 18px "+CF.B;
-    cardLines(x,f.t,fw-36,4).forEach(function(t,k){ x.fillText(t,fx+18,fy+74+k*23); });
+    cardLines(x,f.t.replace(/\s*\([^)]*\)/g,""),fw-36,4).forEach(function(t,k){ x.fillText(t,fx+18,fy+74+k*23); });
   });
   // pie
   x.fillStyle="#b4acdc"; x.font="400 19px "+CF.B; x.textAlign="center";
