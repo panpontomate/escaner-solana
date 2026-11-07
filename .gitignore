@@ -4,3 +4,4 @@ tools/caras/node_modules/
 # los publica el recolector en la rama datos (ver .github/workflows/pages.yml)
 /caras.json
 /datos/
+tools/momento/node_modules/

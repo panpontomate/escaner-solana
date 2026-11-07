@@ -1,0 +1,9 @@
+{
+  "name": "solflag-momento",
+  "private": true,
+  "description": "Mapa del momento de la página Escáner: el On-chain Map del token en tendencia, una vez por hora (GitHub Actions)",
+  "type": "module",
+  "dependencies": {
+    "solana-risk-engine": "0.5.1"
+  }
+}

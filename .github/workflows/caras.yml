@@ -54,6 +54,17 @@ jobs:
           AVISO_TELEGRAM_TOKEN: ${{ secrets.AVISO_TELEGRAM_TOKEN }}
           AVISO_TELEGRAM_CHAT: ${{ secrets.AVISO_TELEGRAM_CHAT }}
         run: node tools/caras/collect.mjs
+      # Mapa del momento de la página Escáner (datos/momento.json): una vez por hora, con su propio motor. Si falla,
+      # se queda el anterior y el resto del recolector sigue igual
+      - name: Mapa del momento
+        continue-on-error: true
+        timeout-minutes: 8
+        env:
+          SOLANA_RPC: ${{ secrets.SOLANA_RPC }}
+          PUB_DIR: _pub
+        run: |
+          npm ci --prefix tools/momento --no-audit --no-fund
+          node tools/momento/momento.mjs
       - uses: actions/cache/save@v6
         if: always()
         with:
