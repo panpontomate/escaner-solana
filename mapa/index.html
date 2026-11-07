@@ -55,6 +55,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 @keyframes nebd{from{transform:scale(1) translate(0,0)}to{transform:scale(1.035) translate(-.8%,.5%)}}
 @media (prefers-reduced-motion:reduce){.stage canvas.neb{animation:none}}
 /* ojo del token: se suma a la luz del fondo (lo negro no tapa). Quieto: si girase se despegaría de su nube */
+.stage canvas.lkc{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 .stage canvas.eye{position:absolute;display:block;mix-blend-mode:screen;pointer-events:none;filter:blur(4px)}
 .onda{transform-box:fill-box;transform-origin:center;animation:onda 6.4s cubic-bezier(.25,.6,.4,1) infinite;opacity:0}
 @keyframes onda{0%{transform:scale(1);opacity:0}12%{opacity:.5}100%{transform:scale(6);opacity:0}}
@@ -109,34 +110,22 @@ button{font:inherit;color:inherit;cursor:pointer}
 .slosh{animation-duration:7s}
 @keyframes slosh{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
 @keyframes cloud{0%{transform:scale(.9);opacity:0}15%{opacity:.75}100%{transform:scale(3.4);opacity:0}}
-.lk{stroke-dasharray:100;animation:grow .9s ease-out both,br var(--d) ease-in-out infinite;animation-delay:var(--gd),var(--o)}
-@keyframes grow{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
-@keyframes br{50%{opacity:.3}}
-.pz{fill:none;stroke-linecap:round;stroke-dasharray:2.5 97.5;animation:pz var(--d) linear infinite;animation-delay:var(--o)}
-.pz.back{animation-direction:reverse}
-.lk.dash{stroke-dasharray:2.2 2.2;animation:br var(--d) ease-in-out infinite;animation-delay:var(--o)}
 .shows{display:grid;gap:6px;font-size:.86rem;color:var(--muted)}
 .shows label{display:flex;align-items:center;gap:8px;cursor:pointer}
 .shows input{accent-color:var(--lila);width:16px;height:16px;margin:0}
 .hel{margin:12px 0 0;padding:8px 10px;border-radius:10px;background:rgba(122,184,196,.1);border:1px solid rgba(122,184,196,.3);font-size:.8rem;color:var(--muted)}
-@keyframes pz{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
 .gF{animation:fadein .8s ease both;animation-delay:2.4s}
 @keyframes fadein{from{opacity:0}}
 .pop{animation:pop .55s cubic-bezier(.2,1.5,.4,1) both;animation-delay:var(--pd)}
 @keyframes pop{from{transform:scale(0);opacity:0}}
 .nd{cursor:pointer;transition:opacity .25s}
-.lk,.pz{transition:opacity .25s}
 svg.dim .nd:not(.on){opacity:.12}
-svg.dim .lk:not(.on){opacity:.04!important;animation-play-state:paused}
-svg.dim .lk.ex.on{stroke-opacity:.4}
-svg.dim .pz:not(.on){opacity:0}
 svg.dim .nd.on .ring{stroke-width:2.2}
 body.still .onda,body.still canvas.eye{animation:none}
 body.still .cloud{animation:none;opacity:.35;transform:scale(1.6)}
 body.still .wave,body.still .rise,body.still .slosh{animation:none}
-body.still .tw,body.still .pulse,body.still .lk,body.still .pz,body.still .pop,body.still .gF{animation:none}
-body.still .pz{opacity:0}
-@media (prefers-reduced-motion:reduce){.wave,.rise,.slosh{animation:none}.cloud{animation:none;opacity:.35}.tw,.pulse,.lk,.pz,.pop,.gF{animation:none}.pz{opacity:0}}
+body.still .tw,body.still .pulse,body.still .pop{animation:none}
+@media (prefers-reduced-motion:reduce){.wave,.rise,.slosh{animation:none}.cloud{animation:none;opacity:.35}.tw,.pulse,.pop{animation:none}}
 
 /* móvil: panel como hoja inferior */
 @media (max-width:900px){
@@ -159,7 +148,6 @@ body.mini .top,body.mini .panel,body.mini .hint,body.mini .tip,body.mini .mk{dis
 body.mini .app{grid-template-rows:minmax(0,1fr)}
 body.mini .body{grid-template-columns:minmax(0,1fr)}
 body.mini .pop{animation:none}
-body.mini .lk:not(.dash){animation:br var(--d) ease-in-out infinite;animation-delay:var(--o)}
 body.still canvas.neb{animation:none}
 @media (max-width:900px){.mk{top:120px;bottom:auto;max-width:calc(100% - 24px)}}
 </style>
@@ -240,6 +228,9 @@ var NEB = 12;   // el fondo 12, elegido el 7/11
 var neb = document.createElement("canvas"); neb.className = "neb"; neb.setAttribute("aria-hidden", "true"); stage.insertBefore(neb, svg);
 // el «ojo» de la Hélice pegado al token: un canvas aparte a resolución completa (en el grande quedaría borroso)
 var eye = document.createElement("canvas"); eye.className = "eye"; eye.setAttribute("aria-hidden", "true"); stage.insertBefore(eye, svg);
+// las líneas y los pulsos van en un lienzo: como elementos SVG, con cientos de líneas animadas, el navegador no daba abasto
+var lkc = document.createElement("canvas"); lkc.className = "lkc"; lkc.setAttribute("aria-hidden", "true"); stage.insertBefore(lkc, svg);
+var lkx = lkc.getContext("2d"), LDPR = Math.min(2, window.devicePixelRatio || 1);
 function paintNeb(W, H, cx, cy, u, seed, tr){
   var R = rng(NEB*7 + 3), S = 4, w = Math.ceil(W*1.06/S), h = Math.ceil(H*1.06/S), ox = W*.03, oy = H*.03;
   var P = new Uint8Array(512), i, j;
@@ -364,6 +355,7 @@ var TOK = CASES[CUR], GROUPS = TOK.groups;
 var state = {sel:null, pinned:null}, M;
 function build(seed){
   var R = rng(seed), W = stage.clientWidth, H = stage.clientHeight, u = Math.min(W, H), sc = Math.min(1.25, u/520), big = Math.max(.85, sc);
+  lkc.width = Math.round(W*LDPR); lkc.height = Math.round(H*LDPR); lkx.setTransform(LDPR, 0, 0, LDPR, 0, 0);
   svg.innerHTML = ""; svg.setAttribute("viewBox", "0 0 "+W+" "+H); svg.classList.remove("dim");
   var defs = '<defs><filter id="g" x="-2" y="-2" width="5" height="5"><feGaussianBlur stdDeviation="'+f(2*sc+.6)+'" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'
     + '<filter id="h" x="-2" y="-2" width="5" height="5"><feGaussianBlur stdDeviation="'+f(16*sc+4)+'"/></filter>'
@@ -432,10 +424,11 @@ function build(seed){
     if (o.liqEl){ n.liq = o.liqEl; n.ang = 0; n.av = 0; n.lx = x; n.lt = 0; }
     n.g = g; n.inner = inner; nodes.push(n); g.__n = n; return n; }
   function link(a, b, c, op, w, pulses, o){ o = o || {};
-    var e = el("path", {pathLength:"100", fill:"none", stroke:c, "stroke-opacity":op, "stroke-width":w, class:"lk"+(o.dash ? " dash" : "")+(o.ex ? " ex" : ""), style:"--gd:"+f(o.gd||0)+"s;--d:"+f(2.5+R()*3.5)+"s;--o:-"+f(R()*6)+"s"}, gE);
-    var l = {a:a, b:b, e:e, gid:o.gid, bend:(R() < .5 ? -1 : 1)*(.12 + R()*.22), sw:.0003+R()*.0006, sp:R()*6.283, p:[]};
+    // gd: cuándo empieza a crecer; d y o: el parpadeo suave (periodo y desfase); en los pulsos, dur y su desfase
+    var l = {a:a, b:b, c:c, op:parseFloat(op), w:parseFloat(w), dash:!!o.dash, ex:!!o.ex, gd:o.gd || 0, d:2.5 + R()*3.5, o:R()*6,
+      gid:o.gid, bend:(R() < .5 ? -1 : 1)*(.12 + R()*.22), sw:.0003+R()*.0006, sp:R()*6.283, p:[]};
     if (pulses){ var back = o.fwd ? false : R() < .4, dur = (o.fast ? 1.1 : 1.8) + R()*(o.fast ? 1.2 : 2.6);
-      for (var i = 0; i < pulses; i++) l.p.push(el("path", {pathLength:"100", class:"pz"+(back ? " back" : ""), stroke:c, "stroke-opacity":".85", "stroke-width":f(Math.max(1.4, parseFloat(w)*1.6)), filter:"url(#g)", style:"--d:"+f(dur)+"s;--o:-"+f(dur*i/pulses + R()*.4)+"s"}, gF)); }
+      for (var i = 0; i < pulses; i++) l.p.push({dur:dur, off:dur*i/pulses + R()*.4, back:back}); }
     links.push(l); return l; }
 
   // token
@@ -510,7 +503,7 @@ function build(seed){
       link(hub, n, c, ".22", ".8", R() < (g.alert ? .85 : .6) ? 1 : 0, {gid:g.id, gd:base + .7 + i*.04, fast:g.alert});
     }
   });
-  M = {nodes:nodes, links:links}; tick(0); apply();
+  M = {nodes:nodes, links:links, t0:performance.now(), sc:sc}; tick(performance.now()); apply();
 }
 function tick(t){
   var N = M.nodes, GAP = 4;
@@ -534,9 +527,39 @@ function tick(t){
     // sin pulso: la línea solo toca la burbuja por fuera; con pulso llega al centro
     if (!l.p.length){ var ua = Math.hypot(qx-ax, qy-ay) || 1, ub = Math.hypot(qx-bx, qy-by) || 1;
       ax += (qx-ax)/ua*a.r; ay += (qy-ay)/ua*a.r; bx += (qx-bx)/ub*b.r; by += (qy-by)/ub*b.r; }
-    var d = "M"+f(ax)+" "+f(ay)+" Q"+f(qx)+" "+f(qy)+" "+f(bx)+" "+f(by);
-    l.e.setAttribute("d", d); l.p.forEach(function(p){ p.setAttribute("d", d); }); });
+    l.k = [ax, ay, qx, qy, bx, by]; });
+  M.lt = t; drawLinks(t);
 }
+// las líneas en el lienzo: crecen al abrir el mapa, parpadean suave, las de las redes van discontinuas y los pulsos
+// recorren la línea en su sentido con un brillo; al resaltar un grupo, el resto se apaga
+function qp(k, u){ var v = 1 - u; return [v*v*k[0] + 2*v*u*k[2] + u*u*k[4], v*v*k[1] + 2*v*u*k[3] + u*u*k[5]]; }
+function drawLinks(t){ if (!M) return;
+  var x = lkx, W = lkc.width/LDPR, H = lkc.height/LDPR, g = state.sel || state.pinned, calm = still || RM, el2 = (t - M.t0)/1000;
+  x.clearRect(0, 0, W, H); x.lineCap = "butt";
+  M.links.forEach(function(l){ var k = l.k; if (!k) return;
+    var on = !!g && l.gid === g, a = l.op;
+    if (g && !on) a = .04; else if (on && l.ex) a = .4;
+    if (!calm && !(g && !on)) a *= 1 - .7*(.5 - .5*Math.cos(6.2832*(el2 + l.o)/l.d));   // parpadeo suave
+    var grow = (calm || l.dash || MINI) ? 1 : Math.max(0, Math.min(1, (el2 - l.gd)/.9)); grow = 1 - Math.pow(1 - grow, 3);
+    if (grow <= 0) return;
+    x.strokeStyle = l.c; x.globalAlpha = a; x.lineWidth = l.w;
+    if (l.dash){ var len = 0, p0 = [k[0], k[1]]; for (var i = 1; i <= 8; i++){ var p1 = qp(k, i/8); len += Math.hypot(p1[0] - p0[0], p1[1] - p0[1]); p0 = p1; }
+      x.setLineDash([len*.022, len*.022]); } else x.setLineDash([]);
+    x.beginPath(); x.moveTo(k[0], k[1]);
+    if (grow >= 1) x.quadraticCurveTo(k[2], k[3], k[4], k[5]);
+    else for (var j = 1; j <= 16; j++){ var q = qp(k, grow*j/16); x.lineTo(q[0], q[1]); }
+    x.stroke(); });
+  x.setLineDash([]);
+  // pulsos: aparecen a los 2,4 s; ocultos si está quieto o si su grupo no está resaltado
+  if (!calm){ var fadeIn = Math.max(0, Math.min(1, (el2 - 2.4)/.8));
+    if (fadeIn > 0){ x.save(); x.lineCap = "round"; x.shadowBlur = (2*(M.sc || 1) + .6)*2.2;
+      M.links.forEach(function(l){ var k = l.k; if (!k || !l.p.length) return; if (g && l.gid !== g) return;
+        x.strokeStyle = l.c; x.shadowColor = l.c; x.lineWidth = Math.max(1.4, l.w*1.6); x.globalAlpha = .85*fadeIn;
+        l.p.forEach(function(p){ var u = ((el2 + p.off)/p.dur) % 1; if (p.back) u = 1 - u;
+          var u2 = Math.min(1, u + .025); x.beginPath(); var q0 = qp(k, u); x.moveTo(q0[0], q0[1]);
+          var q1 = qp(k, (u + u2)/2), q2 = qp(k, u2); x.lineTo(q1[0], q1[1]); x.lineTo(q2[0], q2[1]); x.stroke(); }); });
+      x.restore(); } }
+  x.globalAlpha = 1; }
 var still = false, MINI = /[?&]mini\b/.test(location.search);
 if (MINI){ still = true; document.body.classList.add("mini", "still"); }
 // mapas enormes (más de 100 burbujas, p. ej. una red de transferencias gigante): las posiciones se actualizan un fotograma sí y otro no;
@@ -548,7 +571,7 @@ function loop(t){ frm++; if (!still && !RM && M && (M.nodes.length <= 100 || frm
 function apply(){ var g = state.sel || state.pinned;
   svg.classList.toggle("dim", !!g);
   M.nodes.forEach(function(n){ n.g.classList.toggle("on", !!g && (n.gid === g || n.k === "y")); });
-  M.links.forEach(function(l){ var on = !!g && l.gid === g; l.e.classList.toggle("on", on); l.p.forEach(function(p){ p.classList.toggle("on", on); }); });
+  drawLinks(M.lt || performance.now());
   document.querySelectorAll(".grp").forEach(function(b){ b.classList.toggle("on", b.dataset.g === g); }); }
 function showTip(n, ev){ var c = COLS[n.k], i = n.info || {}, gr = GROUPS.filter(function(x){ return x.id === n.gid; })[0];
   tip.style.setProperty("--c", c);
@@ -610,6 +633,7 @@ async function mapCard(){
   x.drawImage(neb, ox - W*s*.03, oy - H*s*.03, W*s*1.06, H*s*1.06);
   x.save(); x.globalCompositeOperation = "screen"; x.filter = "blur(" + (4*s) + "px)";
   x.drawImage(eye, ox + parseFloat(eye.style.left)*s, oy + parseFloat(eye.style.top)*s, eye.width*s, eye.height*s); x.restore();
+  x.drawImage(lkc, ox, oy, W*s, H*s);
   // el SVG tal cual se ve, sin los pulsos ni las chispas (dependen de CSS animado) y sin resaltar ningún grupo
   var sv = svg.cloneNode(true); sv.classList.remove("dim"); sv.setAttribute("xmlns", NS); sv.setAttribute("width", W); sv.setAttribute("height", H);
   sv.querySelectorAll(".gF,.rise").forEach(function(e){ e.remove(); });
