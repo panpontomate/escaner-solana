@@ -128,6 +128,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .lk,.pz{transition:opacity .25s}
 svg.dim .nd:not(.on){opacity:.12}
 svg.dim .lk:not(.on){opacity:.04!important;animation-play-state:paused}
+svg.dim .lk.ex.on{stroke-opacity:.4}
 svg.dim .pz:not(.on){opacity:0}
 svg.dim .nd.on .ring{stroke-width:2.2}
 body.still .onda,body.still canvas.eye{animation:none}
@@ -431,7 +432,7 @@ function build(seed){
     if (o.liqEl){ n.liq = o.liqEl; n.ang = 0; n.av = 0; n.lx = x; n.lt = 0; }
     n.g = g; n.inner = inner; nodes.push(n); g.__n = n; return n; }
   function link(a, b, c, op, w, pulses, o){ o = o || {};
-    var e = el("path", {pathLength:"100", fill:"none", stroke:c, "stroke-opacity":op, "stroke-width":w, class:"lk"+(o.dash ? " dash" : ""), style:"--gd:"+f(o.gd||0)+"s;--d:"+f(2.5+R()*3.5)+"s;--o:-"+f(R()*6)+"s"}, gE);
+    var e = el("path", {pathLength:"100", fill:"none", stroke:c, "stroke-opacity":op, "stroke-width":w, class:"lk"+(o.dash ? " dash" : "")+(o.ex ? " ex" : ""), style:"--gd:"+f(o.gd||0)+"s;--d:"+f(2.5+R()*3.5)+"s;--o:-"+f(R()*6)+"s"}, gE);
     var l = {a:a, b:b, e:e, gid:o.gid, bend:(R() < .5 ? -1 : 1)*(.12 + R()*.22), sw:.0003+R()*.0006, sp:R()*6.283, p:[]};
     if (pulses){ var back = o.fwd ? false : R() < .4, dur = (o.fast ? 1.1 : 1.8) + R()*(o.fast ? 1.2 : 2.6);
       for (var i = 0; i < pulses; i++) l.p.push(el("path", {pathLength:"100", class:"pz"+(back ? " back" : ""), stroke:c, "stroke-opacity":".85", "stroke-width":f(Math.max(1.4, parseFloat(w)*1.6)), filter:"url(#g)", style:"--d:"+f(dur)+"s;--o:-"+f(dur*i/pulses + R()*.4)+"s"}, gF)); }
@@ -476,12 +477,23 @@ function build(seed){
       if (!g.pool) link(tok, one, c, ".35", "1.2", 2, {gid:g.id, gd:base});
       return; }
     if (g.net){
-      var spr = u*(.06 + .02*Math.sqrt(g.n)), nn = [];
+      // más sitio cuanto más grande es la red (antes se amontonaba en un rincón)
+      var spr = u*Math.min(.38, .06 + .035*Math.sqrt(g.n)), nn = [];
       el("circle", {cx:f(gx), cy:f(gy), r:f(spr*1.4), fill:c, opacity:".05", filter:"url(#h)"}, gHalo);
-      (g.members || []).forEach(function(mm, i){ var r = rad(Math.max(mm.p, .04));
+      // la red entera, aunque sea enorme (RugCheck puede traer cientos de wallets)
+      var mems = g.members || [], lks = g.links || [];
+      mems.forEach(function(mm, i){ var r = rad(Math.max(mm.p, .04));
         var p = put(function(){ var a = R()*6.283, d = (.25 + Math.abs(gauss(R)))*spr*(1 + R()*.5); return [gx + Math.cos(a)*d*1.2, gy + Math.sin(a)*d]; }, r);
         nn.push(p ? node(p.x, p.y, r, g.k, {gid:g.id, delay:base + .7 + i*.04, info:{t:mm.s, a:mm.a, p:mm.p, d:g.name+"."+(mm.d ? " "+mm.d : "")}}) : null); });
-      (g.links || []).forEach(function(q){ var a = nn[q[0]], b = nn[q[1]]; if (a && b) link(a, b, c, ".5", ".9", 1, {gid:g.id, gd:base + .9, dash:1, fwd:1}); });
+      // dos niveles: la estructura (la primera conexión que une a cada wallet con la red) se ve; las conexiones de más,
+      // muy tenues y solo marcadas al resaltar la red. Pocos pulsos en total: con cientos de conexiones era un parpadeo sin fin
+      var par = nn.map(function(_, i){ return i; }), main = [], extra = [];
+      function root(i){ while (par[i] !== i) i = par[i] = par[par[i]]; return i; }
+      lks.forEach(function(q){ var a = nn[q[0]], b = nn[q[1]]; if (!a || !b) return;
+        var ra = root(q[0]), rb = root(q[1]); if (ra !== rb){ par[ra] = rb; main.push([a, b]); } else extra.push([a, b]); });
+      var every = Math.max(1, Math.ceil(main.length/20));   // unos 20 pulsos por red como mucho
+      main.forEach(function(x, i){ link(x[0], x[1], c, ".45", ".9", i % every === 0 ? 1 : 0, {gid:g.id, gd:base + .9, dash:1, fwd:1}); });
+      extra.slice(0, 120).forEach(function(x){ link(x[0], x[1], c, ".07", ".6", 0, {gid:g.id, gd:base + .9, dash:1, ex:1}); });
       return; }
     var hr = 9*big, hp = put(function(){ return [gx + (R()-.5)*30, gy + (R()-.5)*30]; }, hr, 300); if (!hp) return;
     var spread = u*(.09 + .025*Math.sqrt(g.n));
@@ -527,7 +539,10 @@ function tick(t){
 }
 var still = false, MINI = /[?&]mini\b/.test(location.search);
 if (MINI){ still = true; document.body.classList.add("mini", "still"); }
-function loop(t){ if (!still && !RM && M) tick(t); if (tip.classList.contains("on")) placeTip(); requestAnimationFrame(loop); }
+// mapas enormes (más de 100 burbujas, p. ej. una red de transferencias gigante): las posiciones se actualizan un fotograma sí y otro no;
+// se mueven tan despacio que no se nota y el navegador va el doble de desahogado
+var frm = 0;
+function loop(t){ frm++; if (!still && !RM && M && (M.nodes.length <= 100 || frm % 2)) tick(t); if (tip.classList.contains("on")) placeTip(); requestAnimationFrame(loop); }
 
 // resaltar un grupo
 function apply(){ var g = state.sel || state.pinned;
