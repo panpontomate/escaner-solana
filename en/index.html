@@ -682,7 +682,9 @@ a.rdc{transition:transform .15s,border-color .15s}
 .tok.one{display:block}
 .tok.one>.av,.tok.one .head,.tok.one .meta,.tok.one .links .dup{display:none}
 .tok.one .tgrid{margin-left:0;margin-top:0}
-.pchart.pc-empty{display:none}
+.pc-na{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:170px;padding:18px;text-align:center;border:1px dashed var(--line);border-radius:14px;color:var(--muted);font-size:.86rem}
+.pc-na svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
+.pc-na b{color:#f7f4ff;font-size:.98rem}
 /* logo del token: la imagen encima de las iniciales (si no carga, quedan las iniciales) */
 .lav{position:relative;width:38px;height:38px;border-radius:50%;display:inline-grid;place-items:center;flex:none;overflow:hidden;background:#2e2268;color:#e9e3ff;font:700 .8rem var(--f-display)}
 .lav img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -3043,7 +3045,7 @@ function tokenDetail(r){
       "<button type='button' data-tgo='t-who'>Who is behind</button>"+
       "<button type='button' data-tgo='t-hold'>Whales</button></nav>"+
     "<section class='card tdc' id='t-chart'><h2>Chart <small>price in $</small></h2>"+
-      (r.par&&r.par.pairAddress?chartHtml(r):"<p class='hint'>No market: there is no price to draw.</p>")+histHtml(r)+"</section>"+
+      (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("No market: there is no price to draw.")+"</div>")+histHtml(r)+"</section>"+
     "<section class='card tdc' id='t-who'><h2>Who is behind<span class='tnew'>new</span> <small>what they did before</small></h2>"+
       (young?"<div class='lights' style='margin:0 0 12px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Buys at launch</b><span>Checking who bought in the first second…</span></div></div></div>":"")+
       "<div id='whobox'><p class='hint'>Looking in the SolFlag registry…</p></div>"+
@@ -3547,6 +3549,10 @@ var GT="https://api.geckoterminal.com/api/v2/networks/solana/";
 var CHART_TF={m1:["minute",1,120,"1 min"],m5:["minute",5,120,"5 min"],m15:["minute",15,96,"15 min"],h1:["hour",1,120,"1 h"],d1:["day",1,90,"1 d"]};
 var charts={};   // "pool|periodo" -> [[ms, cierre]...], "loading" o "err"
 state.ctf="m5";
+// en vez de una gráfica vacía, un aviso del mismo tamaño
+function chartNA(why){
+  return "<div class='pc-na'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M3 3v18h18'/><path d='m7 15 4-4 3 3 5-6'/></svg><b>Chart not available right now</b><span>"+esc(why)+"</span></div>";
+}
 function chartHtml(r){
   if(!r.par||!r.par.pairAddress) return "";
   return "<div class='pchart'><div class='pc-head'><b>Price</b><span class='pc-chg' id='pcchg'></span><span class='segs'>"+
@@ -3571,10 +3577,8 @@ async function paintChart(){
   }
   if(c==="loading") return;
   state.cpts=null;
-  var pc=box.closest&&box.closest(".pchart");
-  if(pc) pc.classList.toggle("pc-empty",c!=="err"&&c.length<2&&!!r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<2*86400000);
   if(c==="err"||c.length<2){
-    box.innerHTML="<p class='hint'>"+(c==="err"?"Could not load the chart: GeckoTerminal is not answering or does not have this market yet.":"There are not enough trades yet to draw the chart.")+"</p>";
+    box.innerHTML=chartNA(c==="err"?"GeckoTerminal is not answering or does not have this market yet.":"There are not enough trades yet to draw the candles.");
     $("#pcchg").textContent=""; return;
   }
   var key0=key;
@@ -5486,7 +5490,7 @@ $("#form").addEventListener("submit",function(e){ e.preventDefault(); analyze();
 $("#cancel").addEventListener("click",function(){ state.cancel=true; cancelEngine(); });
 $("#hform").addEventListener("submit",function(e){ e.preventDefault(); holders(); });
 ["W","H","L","C","N","M"].forEach(function(m){ $("#tab"+m).addEventListener("click",function(){
-  if(m==="W"){ state.scan=true; if(state.mode==="W"){ state.shown.W=false; $("#results").hidden=true; } }
+  if(m==="W"){ state.scan=true; state.shown.W=false; $("#results").hidden=true; }
   setMode(m); navGo(); if(m==="W") window.scrollTo(0,0); }); });
 document.addEventListener("submit",function(ev){
   if(ev.target.id==="cform"){
