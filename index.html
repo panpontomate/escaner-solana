@@ -1295,6 +1295,12 @@ body.scanp #form .eyebrow{margin-bottom:8px}
 .whr.r{border-left-color:var(--alto)}.whr.y{border-left-color:var(--medio)}
 .whr .role{display:block;font-size:.8rem;color:var(--muted);font-weight:700}
 .whr b.mono{display:block;margin:2px 0}
+.wk{width:max-content;max-width:100%;text-decoration:underline dotted var(--muted);text-underline-offset:4px;cursor:help}
+.wkc{position:absolute;z-index:60;display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:14px;background:#120c33;border:1px solid var(--kick);box-shadow:0 14px 40px rgba(0,0,0,.5);font:500 .84rem/1.45 var(--f-body);color:var(--muted);pointer-events:none;animation:wkin .18s ease both}
+.wkc>b{color:#fff;font-family:var(--f-mono);margin-bottom:3px}
+.wkc .wkf{margin-left:6px}
+@keyframes wkin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.wkc{animation:none}}
 .whr small{display:block;color:var(--muted);font-size:.84rem}
 .whr .wbar{height:5px;border-radius:9px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:6px}
 .whr .wbar i{display:block;height:100%;background:var(--alto)}
@@ -3113,7 +3119,7 @@ function whoRow(roles,x,cara){
     n+(n===1?" lanzamiento":" lanzamientos")+" antes que este · "+dead+(dead===1?" muerto":" muertos")+" a las 24 h"+(n>res?" · "+(n-res)+" sin resultado aún":"");
   return "<div class='whr"+cls+"'>"+tokAv("",x.wallet)+
     "<div style='min-width:0'><span class='role'>"+esc(roles)+(cara?"<span class='wkf'>Cara conocida</span>":"")+"</span>"+
-    "<b class='mono'>"+esc(short(x.wallet))+"</b><small>"+esc(txt)+"</small>"+(res?"<div class='wbar'><i style='width:"+Math.round(fr*100)+"%'></i></div>":"")+"</div>"+
+    "<b class='mono wk' tabindex='0' data-wk='"+esc(x.wallet)+"'"+(cara?" data-cara='1'":"")+">"+esc(short(x.wallet))+"</b><small>"+esc(txt)+"</small>"+(res?"<div class='wbar'><i style='width:"+Math.round(fr*100)+"%'></i></div>":"")+"</div>"+
     "<button type='button' class='btn small ghost' data-analyze='"+esc(x.wallet)+"'>Ver esta wallet</button></div>";
 }
 function whoHtml(j){
@@ -3221,6 +3227,42 @@ function wwhoHtml(j){
     fb.map(function(x){ return wlaunchRow(x,x.blocks?"compró en el bloque +"+x.blocks:"compró en el mismo bloque"); }).join("")+"</div>";
   return h;
 }
+/* tarjeta rápida de una wallet de «Quién está detrás»: al pasar el ratón, con el teclado o tocando la dirección.
+   Pide al registro su historial (el mismo que usa la vista de wallet, y queda guardado para ella) */
+var wkc=null, wkEl=null;
+function wkHide(){ if(wkc){ wkc.remove(); wkc=null; } wkEl=null; }
+function wkLines(j){
+  if(j==="loading") return ["Buscando en el registro…"];
+  if(j==="err"||!j||!j.roles) return ["No se pudo consultar el registro ahora."];
+  var R=j.roles, fb=j.firstBuys||{}, L=[], ts=(j.launches||[]).concat((fb.list)||[]).map(function(x){ return x.t; }).filter(Boolean);
+  if(ts.length) L.push("Activa desde el "+fdate(Math.min.apply(null,ts)));
+  [["payer","Pagó"],["creator","Creó"],["funder","Financió"]].forEach(function(k){ var x=R[k[0]]||{};
+    if(x.n) L.push(k[1]+" "+x.n+(x.n===1?" lanzamiento":" lanzamientos")+" ("+(x.dead24||0)+(x.dead24===1?" muerto":" muertos")+(x.n>(x.resolved||0)?", "+(x.n-(x.resolved||0))+" sin resultado aún":"")+")"); });
+  if(fb.n) L.push("Compró en los primeros bloques de "+fb.n+(fb.n===1?" lanzamiento":" lanzamientos"));
+  if(!L.length) L.push("No sale en otros lanzamientos registrados.");
+  return L;
+}
+function wkPaint(){
+  if(!wkEl||!document.body.contains(wkEl)) return wkHide();
+  var a=wkEl.getAttribute("data-wk");
+  if(!wkc){ wkc=document.createElement("div"); wkc.className="wkc"; wkc.setAttribute("role","tooltip"); document.body.appendChild(wkc); }
+  wkc.innerHTML="<b>"+esc(short(a))+(wkEl.getAttribute("data-cara")?" <span class='wkf'>Cara conocida</span>":"")+"</b>"+wkLines(wwho[a]).map(function(l){ return "<span>"+esc(l)+"</span>"; }).join("");
+  var r=wkEl.getBoundingClientRect(), w=Math.min(290,innerWidth-24);
+  wkc.style.width=w+"px"; wkc.style.left=Math.max(12,Math.min(r.left,innerWidth-w-12))+scrollX+"px"; wkc.style.top=(r.bottom+8+scrollY)+"px";
+}
+async function wkShow(el){
+  wkEl=el; var a=el.getAttribute("data-wk");
+  if(wwho[a]===undefined){
+    wwho[a]="loading"; wkPaint();
+    try{ var res=await fetch(API+"wallet/"+a); wwho[a]=res.ok?await res.json():"err"; }catch(e){ wwho[a]="err"; }
+  }
+  if(wkEl===el) wkPaint();
+}
+document.addEventListener("mouseover",function(e){ var el=e.target.closest&&e.target.closest("[data-wk]"); if(el&&el!==wkEl) wkShow(el); else if(!el&&wkEl&&e.pointerType!=="touch"&&!(e.sourceCapabilities&&e.sourceCapabilities.firesTouchEvents)) wkHide(); });
+document.addEventListener("focusin",function(e){ var el=e.target.closest&&e.target.closest("[data-wk]"); if(el) wkShow(el); else if(wkEl) wkHide(); });
+document.addEventListener("click",function(e){ var el=e.target.closest&&e.target.closest("[data-wk]"); if(el){ if(wkEl===el&&wkc) wkHide(); else wkShow(el); } else if(wkEl) wkHide(); });
+addEventListener("scroll",function(){ if(wkc) wkPaint(); },{passive:true});
+document.addEventListener("keydown",function(e){ if(e.key==="Escape") wkHide(); });
 // los nombres de los tokens: una sola consulta a DexScreener; los que ya no están se quedan con la dirección corta
 var syms={};
 async function fillSyms(){

@@ -62,6 +62,14 @@ export const CODE = [
 ];
 
 export const TEXT = {
+  "Pagó": "Paid for",
+  "Creó": "Created",
+  "Financió": "Funded",
+  "Compró en los primeros bloques de ": "Bought in the first blocks of ",
+  "Buscando en el registro…": "Searching the registry…",
+  "No se pudo consultar el registro ahora.": "Could not check the registry right now.",
+  "Activa desde el ": "Active since ",
+  "No sale en otros lanzamientos registrados.": "Not seen in other registered launches.",
   // ---------- SolFlag: cabecera, portada y pie (oct 2026) ----------
   "Blog · Avances": "Blog · Updates (Spanish)",
   "Creado por": "Created by",
