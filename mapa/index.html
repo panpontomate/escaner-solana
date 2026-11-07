@@ -33,6 +33,18 @@ button{font:inherit;color:inherit;cursor:pointer}
 .seg button.off3d{opacity:1;color:#ff9e9e;background:rgba(255,158,158,.1);box-shadow:inset 0 0 0 1px rgba(255,158,158,.45)}
 .btn{min-height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);font-weight:700;font-size:.86rem}
 .btn.pri{background:var(--accent);color:var(--accent-fg);border:0}
+.head{order:2}
+.acts{order:3}
+.shr{position:relative}
+.btn{white-space:nowrap}
+@media (max-width:360px){.acts{flex-wrap:wrap;justify-content:flex-end;row-gap:6px}}
+@media (max-width:480px){.acts{gap:4px}.btn{padding:0 8px;font-size:.8rem}.seg button{padding:5px 7px}}
+.shm{position:absolute;right:0;top:calc(100% + 6px);z-index:10;display:flex;flex-direction:column;gap:2px;min-width:210px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:0 14px 40px rgba(0,0,0,.5)}
+.shm[hidden]{display:none}
+.shm button{border:0;background:transparent;text-align:left;padding:9px 10px;border-radius:8px;font-weight:700;font-size:.86rem}
+.shm button:hover,.shm button:focus-visible{background:var(--surface-2)}
+.toast{position:fixed;left:50%;top:70px;z-index:20;transform:translate(-50%,-10px);max-width:calc(100% - 32px);padding:10px 14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--accent);font-size:.86rem;font-weight:700;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
 
 /* cuerpo */
 .body{display:grid;grid-template-columns:minmax(0,1fr) 340px;min-height:0}
@@ -140,6 +152,14 @@ body.still .pz{opacity:0}
 .mk b{color:#fff}
 .mk button{margin-top:6px;border:0;border-radius:8px;padding:4px 8px;background:#f9a8d4;color:#1a0a24;font-weight:800;font-size:.76rem}
 body.nonotes .mk{display:none}
+/* miniatura del Mapa del momento (portada, ?mini): solo el dibujo, quieto hasta que pasan el ratón por encima.
+   Sin la entrada (pop, líneas que crecen): si no, se repetiría cada vez que se anima */
+body.mini .top,body.mini .panel,body.mini .hint,body.mini .tip,body.mini .mk{display:none}
+body.mini .app{grid-template-rows:minmax(0,1fr)}
+body.mini .body{grid-template-columns:minmax(0,1fr)}
+body.mini .pop{animation:none}
+body.mini .lk:not(.dash){animation:br var(--d) ease-in-out infinite;animation-delay:var(--o)}
+body.still canvas.neb{animation:none}
 @media (max-width:900px){.mk{top:120px;bottom:auto;max-width:calc(100% - 24px)}}
 </style>
 </head>
@@ -150,6 +170,8 @@ body.nonotes .mk{display:none}
     <div class="acts">
       <div class="seg" role="group" data-t="vista" data-ta="aria-label"><button aria-pressed="true">2D</button><button class="off3d" disabled data-t="pronto" data-ta="title">3D</button></div>
       <button class="btn" id="sheetb" data-t="grupos">Grupos</button>
+      <div class="shr"><button class="btn" id="shareb" aria-haspopup="true" aria-expanded="false" data-t="compartir">↗ Compartir ▾</button>
+        <div class="shm" id="shm" hidden><button id="shx" data-t="shx">𝕏 Compartir en X</button><button id="shd" data-t="shd">⬇ Descargar imagen</button><button id="shl" data-t="shl">🔗 Copiar enlace</button></div></div>
       <button class="btn pri" id="close" data-t="cerrar">✕ Cerrar</button>
     </div>
     <p class="head" id="head"></p>
@@ -158,6 +180,7 @@ body.nonotes .mk{display:none}
     <div class="stage" id="stage">
       <svg id="map"></svg>
       <div class="tip" id="tip"></div>
+      <div class="toast" id="toast" role="status"></div>
       <div class="hint" data-t="hint">Tamaño = % del token · pasa el ratón o toca una burbuja</div>
     </div>
     <aside class="panel" id="panel">
@@ -181,13 +204,19 @@ body.nonotes .mk{display:none}
 </div>
 <script>
 var TX = {
-  es:{vista:"Vista", pronto:"3D: muy pronto", grupos:"Grupos", cerrar:"✕ Cerrar", hint:"Tamaño = % del token · pasa el ratón o toca una burbuja", encontrado:"Lo que ha encontrado", toca:"toca uno para verlo",
+  es:{vista:"Vista", pronto:"3D: muy pronto", grupos:"Grupos", cerrar:"✕ Cerrar",
+    compartir:"↗ Compartir ▾", shx:"𝕏 Compartir en X", shd:"⬇ Descargar imagen", shl:"🔗 Copiar enlace", copiado:"Enlace copiado",
+    pega:"Imagen copiada: pégala en el post de X con Ctrl+V", bajada:"Imagen descargada: añádela al post de X", xtxt:"On-chain Map de {s} en SolFlag: quién tiene el token y de dónde les llegó el SOL.",
+    ckick:"ON-CHAIN MAP · SOLANA", cpie:"Son datos, no acusaciones.", hint:"Tamaño = % del token · pasa el ratón o toca una burbuja", encontrado:"Lo que ha encontrado", toca:"toca uno para verlo",
     leer:"Cómo leerlo", l1:"Cuanto más grande, más % del token tiene.", l2:"Anillo discontinuo: el financiador (no tiene el token, mandó el SOL).", l3:"Flujos: por dónde llegó el dinero. Los pulsos van y vuelven.",
     l4:"Burbuja con agua dentro: la pool de liquidez. Se dibuja, pero no cuenta como holder.", betan:"Versión beta. Mira los {n} mayores holders y de dónde les llegó el SOL. Son datos, no acusaciones.",
     tok:"El token. Todo sale de aquí.", sinrel:"Sin relación con otros holders.", fin:"Financiador", mando:"Mandó el SOL a las {n} wallets del {g}. No tiene el token.", mismo:"Mismo financiador que {n} más ({f}).",
     analizar:"Analizar esta wallet", wallets:"wallets", aria:"Mapa de conexiones de los holders de {s}",
     mostrar:"Mostrar", sG:"Grupos con el mismo financiador", sL:"Holders sin relación", sX:"Exchanges", sP:"Pools y programas", sN:"Redes de transferencias de tokens"},
-  en:{vista:"View", pronto:"3D: coming soon", grupos:"Groups", cerrar:"✕ Close", hint:"Size = % of the token · hover or tap a bubble", encontrado:"What it found", toca:"tap one to see it",
+  en:{vista:"View", pronto:"3D: coming soon", grupos:"Groups", cerrar:"✕ Close",
+    compartir:"↗ Share ▾", shx:"𝕏 Share on X", shd:"⬇ Download image", shl:"🔗 Copy link", copiado:"Link copied",
+    pega:"Image copied: paste it into your X post with Ctrl+V", bajada:"Image downloaded: add it to your X post", xtxt:"On-chain Map of {s} on SolFlag: who holds the token and where their SOL came from.",
+    ckick:"ON-CHAIN MAP · SOLANA", cpie:"Facts, not accusations.", hint:"Size = % of the token · hover or tap a bubble", encontrado:"What it found", toca:"tap one to see it",
     leer:"How to read it", l1:"The bigger, the more % of the token it holds.", l2:"Dashed ring: the funder (it holds no tokens, it sent the SOL).", l3:"Flows: where the money came from. Pulses go back and forth.",
     l4:"Bubble with water inside: the liquidity pool. Drawn, but not counted as a holder.", betan:"Beta version. It looks at the top {n} holders and where their SOL came from. Facts, not accusations.",
     tok:"The token. Everything starts here.", sinrel:"Not related to other holders.", fin:"Funder", mando:"Sent the SOL to the {n} wallets of {g}. It holds no tokens.", mismo:"Same funder as {n} more ({f}).",
@@ -496,7 +525,8 @@ function tick(t){
     var d = "M"+f(ax)+" "+f(ay)+" Q"+f(qx)+" "+f(qy)+" "+f(bx)+" "+f(by);
     l.e.setAttribute("d", d); l.p.forEach(function(p){ p.setAttribute("d", d); }); });
 }
-var still = false;
+var still = false, MINI = /[?&]mini\b/.test(location.search);
+if (MINI){ still = true; document.body.classList.add("mini", "still"); }
 function loop(t){ if (!still && !RM && M) tick(t); if (tip.classList.contains("on")) placeTip(); requestAnimationFrame(loop); }
 
 // resaltar un grupo
@@ -547,6 +577,67 @@ function renderShows(){
 function show(tok){ TOK = tok; GROUPS = TOK.groups.filter(function(g){ return SHOW[kindOf(g)]; }); state.sel = state.pinned = null; pinnedN = held = null; tip.classList.remove("on");
   var h = document.getElementById("hel"); h.hidden = !TOK.hint; h.textContent = TOK.hint || "";
   renderPanel(); renderShows(); build(TOK.seed || 1); }
+// ---------- compartir: imagen del mapa (1600×900, como la tarjeta de X), enlace ?map= y texto ----------
+var shb = document.getElementById("shareb"), shm = document.getElementById("shm"), toastT;
+function toast(t){ var e = document.getElementById("toast"); e.textContent = t; e.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(function(){ e.classList.remove("on"); }, 4000); }
+function shMenu(on){ shm.hidden = !on; shb.setAttribute("aria-expanded", String(on)); }
+shb.onclick = function(e){ e.stopPropagation(); shMenu(shm.hidden); };
+document.addEventListener("click", function(e){ if (!e.target.closest(".shr")) shMenu(false); });
+function mapLink(){ return location.origin + (LANG === "en" ? "/en/" : "/") + (TOK.mint ? "?map=" + TOK.mint : ""); }
+function plain(h){ var d = document.createElement("div"); d.innerHTML = h || ""; return d.textContent.replace(/\s+/g, " ").trim(); }
+function wrap(x, t, w){ var ws = t.split(" "), ls = [], l = ""; ws.forEach(function(p){ var q = l ? l + " " + p : p; if (x.measureText(q).width > w && l){ ls.push(l); l = p; } else l = q; }); if (l) ls.push(l); return ls; }
+async function mapCard(){
+  var W = stage.clientWidth, H = stage.clientHeight, CW = 1600, CH = 900;
+  // cubrir sin recortar más de un 20 %: en el móvil (vertical) se ve entero con fondo a los lados
+  var s = Math.min(Math.max(CW/W, CH/H), Math.min(CW/W, CH/H)*1.25), ox = (CW - W*s)/2, oy = (CH - H*s)/2;
+  var c = document.createElement("canvas"); c.width = CW; c.height = CH; var x = c.getContext("2d");
+  x.fillStyle = "#0b0722"; x.fillRect(0, 0, CW, CH);
+  x.drawImage(neb, ox - W*s*.03, oy - H*s*.03, W*s*1.06, H*s*1.06);
+  x.save(); x.globalCompositeOperation = "screen"; x.filter = "blur(" + (4*s) + "px)";
+  x.drawImage(eye, ox + parseFloat(eye.style.left)*s, oy + parseFloat(eye.style.top)*s, eye.width*s, eye.height*s); x.restore();
+  // el SVG tal cual se ve, sin los pulsos ni las chispas (dependen de CSS animado) y sin resaltar ningún grupo
+  var sv = svg.cloneNode(true); sv.classList.remove("dim"); sv.setAttribute("xmlns", NS); sv.setAttribute("width", W); sv.setAttribute("height", H);
+  sv.querySelectorAll(".gF,.rise").forEach(function(e){ e.remove(); });
+  var st = document.createElementNS(NS, "style"); st.textContent = ".lk.dash{stroke-dasharray:2.2 2.2}text{font-family:Manrope,system-ui,sans-serif}"; sv.insertBefore(st, sv.firstChild);
+  var url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(sv)], {type:"image/svg+xml"}));
+  await new Promise(function(ok){ var im = new Image(); im.onload = function(){ x.drawImage(im, ox, oy, W*s, H*s); ok(); }; im.onerror = ok; im.src = url; });
+  URL.revokeObjectURL(url);
+  // franja de arriba: marca, token y titular; abajo: dirección y aviso
+  try { await Promise.all([document.fonts.load("800 60px Fraunces"), document.fonts.load("700 30px Manrope"), document.fonts.load("800 20px Manrope")]); } catch(e){}
+  var g = x.createLinearGradient(0, 0, 0, 290); g.addColorStop(0, "rgba(11,7,34,.94)"); g.addColorStop(.65, "rgba(11,7,34,.7)"); g.addColorStop(1, "rgba(11,7,34,0)");
+  x.fillStyle = g; x.fillRect(0, 0, CW, 290);
+  var g2 = x.createLinearGradient(0, CH - 120, 0, CH); g2.addColorStop(0, "rgba(11,7,34,0)"); g2.addColorStop(1, "rgba(11,7,34,.9)");
+  x.fillStyle = g2; x.fillRect(0, CH - 120, CW, 120);
+  x.textBaseline = "alphabetic";
+  x.fillStyle = "#8ec5cf"; x.font = "800 20px Manrope, sans-serif"; x.fillText(T("ckick"), 64, 78);
+  x.fillStyle = "#f1eeff"; x.font = "800 62px Fraunces, serif"; x.fillText(TOK.sym, 64, 148);
+  x.fillStyle = "#c9c1ea"; x.font = "700 30px Manrope, sans-serif";
+  wrap(x, plain(TOK.head), CW - 128).slice(0, 2).forEach(function(l, i){ x.fillText(l, 64, 200 + i*40); });
+  x.fillStyle = "#f1eeff"; x.font = "800 30px Fraunces, serif"; x.fillText("SolFlag", 64, CH - 44);
+  x.fillStyle = "#9a91c9"; x.font = "700 22px Manrope, sans-serif"; x.fillText("solflag.com", 200, CH - 46);
+  x.textAlign = "right"; x.fillText(T("cpie"), CW - 64, CH - 46);
+  return new Promise(function(ok){ c.toBlob(ok, "image/png"); });
+}
+function fileName(){ return "mapa-" + String(TOK.sym || "token").replace(/[^\w-]+/g, "").slice(0, 20) + ".png"; }
+function download(blob){ var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fileName(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000); }
+document.getElementById("shd").onclick = async function(){ shMenu(false); download(await mapCard()); };
+document.getElementById("shl").onclick = async function(){ shMenu(false); try { await navigator.clipboard.writeText(mapLink()); toast(T("copiado")); } catch(e){ prompt("", mapLink()); } };
+document.getElementById("shx").onclick = async function(){ shMenu(false);
+  var text = T("xtxt", {s:TOK.sym}), link = mapLink(), blobP = mapCard();
+  // en el móvil, el menú de compartir del sistema lleva la imagen y el texto juntos
+  if (/Android|iPhone|iPad/i.test(navigator.userAgent) && navigator.canShare){
+    try { var f = new File([await blobP], fileName(), {type:"image/png"});
+      if (navigator.canShare({files:[f]})){ await navigator.share({files:[f], text:text + " " + link}); return; } }
+    catch(e){ if (e.name === "AbortError") return; } }
+  // en el ordenador X no acepta imágenes por enlace: se copia la imagen (se pega con Ctrl+V) y se abre X con el texto.
+  // La ventana se abre dentro del clic para que no la bloquee el navegador
+  var w = window.open("about:blank", "_blank"), copied = false;
+  try { if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write){ await navigator.clipboard.write([new ClipboardItem({"image/png":blobP})]); copied = true; } } catch(e){}
+  if (!copied) download(await blobP);
+  toast(T(copied ? "pega" : "bajada"));
+  var u = "https://x.com/intent/post?text=" + encodeURIComponent(text) + "&url=" + encodeURIComponent(link);
+  if (w) w.location = u; else location.href = u; };
+
 function toWeb(m){ try { if (parent !== window) parent.postMessage(m, location.origin); } catch(e){} }
 var seed = 1;
 document.getElementById("sheetb").onclick = function(){ document.body.classList.toggle("sheet"); };
@@ -554,13 +645,15 @@ document.getElementById("close").onclick = function(){ toWeb({type:"om-close"});
 document.addEventListener("keydown", function(e){ if (e.key === "Escape") toWeb({type:"om-close"}); });
 tip.addEventListener("click", function(e){ if (e.target.closest(".go") && tipNode && tipNode.info && tipNode.info.a) { if (parent !== window) toWeb({type:"om-analyze", addr:tipNode.info.a}); else location.href = "/?wallet=" + encodeURIComponent(tipNode.info.a); } });
 addEventListener("message", function(e){
-  if (e.origin !== location.origin || !e.data || e.data.type !== "om-data") return;
+  if (e.origin !== location.origin || !e.data) return;
+  if (e.data.type === "om-anim"){ if (MINI){ still = !e.data.on; document.body.classList.toggle("still", still); } return; }
+  if (e.data.type !== "om-data") return;
   LANG = e.data.lang === "en" ? "en" : "es"; applyTexts(); show(e.data.tok);
 });
 var rt; addEventListener("resize", function(){ clearTimeout(rt); rt = setTimeout(function(){ if (M) build(TOK.seed || 1); }, 200); });
 applyTexts();
 if (/[?&]demo\b/.test(location.search)) show(Object.assign({seed:7}, CASES[CUR]));
-toWeb({type:"om-ready"});
+toWeb({type:MINI ? "mm-ready" : "om-ready"});
 requestAnimationFrame(loop);
 </script>
 </body>

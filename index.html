@@ -1403,6 +1403,7 @@ body:not(.landing) #goH{display:none}
   background:radial-gradient(60% 70% at 50% 50%,rgba(139,92,246,.2),transparent 70%),radial-gradient(40% 40% at 25% 40%,rgba(255,107,107,.1),transparent 70%),#0d0826}
 .mmbox:focus-visible{outline:2px solid var(--kick);outline-offset:2px}
 .mm{display:block;width:100%;height:auto}
+iframe.mm{border:0;aspect-ratio:8/5;pointer-events:none;background:#0b0722}
 .mm .e{fill:none;stroke-width:1}
 .mm .fw{fill:none;stroke-width:1.6;stroke-dasharray:3 9;animation:mmflow 2.4s linear infinite}
 @keyframes mmflow{to{stroke-dashoffset:-24}}
@@ -1618,7 +1619,7 @@ body:not(.landing) #goH{display:none}
       </section>
       <section class="card" id="smmap" hidden>
         <div class="lhd"><h2>◉ Mapa del momento <span class="tbeta">Beta</span></h2><span id="smtok"></span></div>
-        <div class="mmbox" id="smbox" role="button" tabindex="0"><svg class="mm" id="smsvg" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid meet" role="img"></svg><span class="mmcta">Abrir el mapa →</span></div>
+        <div class="mmbox" id="smbox" role="button" tabindex="0"><iframe class="mm" id="smframe" tabindex="-1"></iframe><span class="mmcta">Abrir el mapa →</span></div>
         <div class="mchips" id="smchips"></div>
         <p class="lsrc" id="smsrc"></p>
       </section>
@@ -3406,97 +3407,25 @@ async function loadMoment(){
   try{ var r=await fetch("/datos/momento.json",{cache:"no-cache"}); mom.j=r.ok?await r.json():null; }catch(e){ mom.j=null; }
   mom.ts=Date.now(); mom.run=false; paintMoment();
 }
-function mmRand(seed){ var h=0; for(var i=0;i<seed.length;i++) h=(h*31+seed.charCodeAt(i))|0; var s2=(Math.abs(h)%2147483646)+1; return function(){ s2=s2*16807%2147483647; return (s2-1)/2147483646; }; }
 function paintMoment(){
   var j=mom.j, card=$("#smmap"); if(!card) return;
   // sin archivo, o de hace más de 3 horas (el recolector se ha parado): no se enseña
   if(!j||!j.mint||!j.holders||!j.holders.length||Date.now()-j.at>3*3600000){ card.hidden=true; return; }
   card.hidden=false;
   $("#smtok").innerHTML=tokAv(j.img,j.sym)+"<span><b>$"+esc(j.sym)+"</b> · #"+j.rank+" en tendencia · "+esc(haceMin(j.at))+"</span>";
-  // mismo estilo que el On-chain Map nuevo (maquetas/escaner/mapa-completo.html): burbujas de jabón, pool con agua,
-  // nubes, líneas que solo tocan el borde y pulsos que llegan al centro
-  var R=mmRand(j.mint), W=400, H=250, cx=W/2, cy=H/2, max=j.holders[0].p||1;
-  function f(v){ return (Math.round(v*10)/10).toString(); }
-  function rad(pc){ return Math.max(2.6,Math.min(22,3+14*Math.sqrt(pc/max))); }
-  var COL={r:"#ff9e9e",t:"#7ab8c4",p:"#f0abfc",l:"#c4b5fd",y:"#fff3c4",o:"#8fb8ff",b:"#fbbf24",g:"#a3e4bc"};
-  var gs=(j.groups||[]), alert=(j.signals||[]).some(function(x){ return x.s==="bad"; });
-  var GK=alert?["r","p","b","g"]:["p","b","g","r"], gk={}, gcol={};
-  gs.forEach(function(g,i){ gk[g.id]=GK[i%GK.length]; gcol[g.id]=COL[gk[g.id]]; });
-  var defs="<defs><filter id='mmg' x='-2' y='-2' width='5' height='5'><feGaussianBlur stdDeviation='1.4' result='b'/><feMerge><feMergeNode in='b'/><feMergeNode in='SourceGraphic'/></feMerge></filter>"+
-    "<filter id='mmh' x='-2' y='-2' width='5' height='5'><feGaussianBlur stdDeviation='12'/></filter>"+
-    "<filter id='mmcf' x='-1' y='-1' width='3' height='3'><feTurbulence type='fractalNoise' baseFrequency='.06' numOctaves='2' seed='"+Math.floor(R()*99)+"' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='12' xChannelSelector='R' yChannelSelector='G' result='d'/><feGaussianBlur in='d' stdDeviation='3'/></filter>"+
-    "<radialGradient id='mmcg'><stop offset='0' stop-color='#fff3c4' stop-opacity='0'/><stop offset='.45' stop-color='#fff3c4' stop-opacity='.25'/><stop offset='.75' stop-color='#fde68a' stop-opacity='.45'/><stop offset='1' stop-color='#fde68a' stop-opacity='0'/></radialGradient>"+
-    "<radialGradient id='mmcgr'><stop offset='0' stop-color='#ff9e9e' stop-opacity='0'/><stop offset='.45' stop-color='#ff9e9e' stop-opacity='.25'/><stop offset='.75' stop-color='#ff9e9e' stop-opacity='.5'/><stop offset='1' stop-color='#ff9e9e' stop-opacity='0'/></radialGradient>"+
-    "<radialGradient id='mmliqs' cx='.4' cy='.4' r='.7'><stop offset='0' stop-color='#cfe0ff' stop-opacity='.5'/><stop offset='1' stop-color='#7ea6f2' stop-opacity='.25'/></radialGradient>"+
-    "<linearGradient id='mmliq' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#6f95e0' stop-opacity='.42'/><stop offset='.6' stop-color='#3f63c4' stop-opacity='.55'/><stop offset='1' stop-color='#22408f' stop-opacity='.75'/></linearGradient>"+
-    "<radialGradient id='mmhl' cx='.5' cy='.5' r='.5'><stop offset='0' stop-color='#fff' stop-opacity='.85'/><stop offset='.45' stop-color='#fff' stop-opacity='.28'/><stop offset='1' stop-color='#fff' stop-opacity='0'/></radialGradient>"+
-    "<linearGradient id='mmiri' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#f0abfc'/><stop offset='.45' stop-color='#7ab8c4'/><stop offset='.75' stop-color='#c4b5fd'/><stop offset='1' stop-color='#fff3c4'/></linearGradient>";
-  Object.keys(COL).forEach(function(k){ var c=COL[k], mid=k==="y"?".18":".1", edge=k==="y"?".5":".38";
-    defs+="<radialGradient id='mms"+k+"' cx='.5' cy='.5' r='.5' fx='.36' fy='.3'><stop offset='0' stop-color='#ffffff' stop-opacity='.10'/><stop offset='.35' stop-color='"+c+"' stop-opacity='.05'/><stop offset='.72' stop-color='"+c+"' stop-opacity='"+mid+"'/><stop offset='.93' stop-color='"+c+"' stop-opacity='"+edge+"'/><stop offset='1' stop-color='"+c+"' stop-opacity='.2'/></radialGradient>"+
-      "<radialGradient id='mmd"+k+"' cx='.5' cy='.5' r='.5' fx='.7' fy='.78'><stop offset='0' stop-color='#0b0722' stop-opacity='.35'/><stop offset='.6' stop-color='#0b0722' stop-opacity='.12'/><stop offset='1' stop-color='#0b0722' stop-opacity='0'/></radialGradient>"; });
-  defs+="</defs>";
-  var halo="", e="", pz="", n="", placed=[{x:cx,y:cy,r:22}], pc=0;
-  function free(x,y,r){ for(var i=0;i<placed.length;i++){ var q=placed[i]; if(Math.hypot(q.x-x,q.y-y)<q.r+r+4) return false; } return x>r+5&&x<W-r-5&&y>r+5&&y<H-r-5; }
-  function put(x0,y0,r,spread){ for(var t=0;t<90;t++){ var a=R()*6.283, d=spread*(t<20?R():0.5+R()*(1+t/30)), x=x0+Math.cos(a)*d*1.35, y=y0+Math.sin(a)*d; if(free(x,y,r)){ placed.push({x:x,y:y,r:r}); return {x:x,y:y,r:r}; } } return null; }
-  // una burbuja (o el anillo discontinuo del financiador)
-  function bub(q,k,o){ o=o||{}; var r=q.r, c=COL[k];
-    var h="<g transform='translate("+f(q.x)+" "+f(q.y)+")'><g class='fl' style='--d:"+(5+R()*4).toFixed(1)+"s;--o:-"+(R()*6).toFixed(1)+"s;--x:"+(R()*4-2).toFixed(1)+"px;--y:"+(R()*4-2).toFixed(1)+"px'>";
-    if(o.ring) return h+"<circle r='"+f(r)+"' fill='none' stroke='"+c+"' stroke-width='1.4' stroke-dasharray='3 3' filter='url(#mmg)'/></g></g>";
-    h+="<circle r='"+f(r)+"' fill='url(#mms"+k+")' stroke='"+c+"' stroke-opacity='.6' stroke-width='"+f(Math.max(.7,r*.09))+"' filter='url(#mmg)'/><circle r='"+f(r*.96)+"' fill='url(#mmd"+k+")'/>";
-    if(o.pool){ var id="mmpc"+(pc++), lvl=-r*.05, hw=Math.sqrt(r*r-lvl*lvl)*.94, lam=r*1.7, wd="M"+f(-3*r)+" "+f(lvl);
-      for(var x=-3*r;x<3*r;x+=lam) wd+=" q"+f(lam/4)+" "+f(-r*.018)+" "+f(lam/2)+" 0 t"+f(lam/2)+" 0";
-      wd+=" V"+f(r)+" H"+f(-3*r)+"Z";
-      h+="<clipPath id='"+id+"'><circle r='"+f(r*.94)+"'/></clipPath><g clip-path='url(#"+id+")'><g class='mmslosh'>"+
-        "<path class='mmwave' d='"+wd+"' fill='url(#mmliq)' style='--w:"+f(lam)+"px'/><rect x='"+f(-r)+"' y='"+f(r*.35)+"' width='"+f(2*r)+"' height='"+f(r*.7)+"' fill='#1e3a8a' opacity='.28'/>"+
-        "<ellipse cy='"+f(lvl)+"' rx='"+f(hw)+"' ry='"+f(r*.11)+"' fill='url(#mmliqs)' stroke='#e6efff' stroke-opacity='.35' stroke-width='"+f(Math.max(.4,r*.02))+"'/>"+
-        "<ellipse cx='"+f(-hw*.25)+"' cy='"+f(lvl-r*.02)+"' rx='"+f(hw*.35)+"' ry='"+f(r*.03)+"' fill='#fff' opacity='.25'/>";
-      for(var bi=0;bi<3;bi++) h+="<circle class='mmrise' cx='"+f((R()-.5)*r*.9)+"' cy='"+f(r*.8)+"' r='"+f(Math.max(.4,r*(.015+R()*.02)))+"' fill='#e6efff' fill-opacity='.35' style='--h:"+f(-(r*.8-lvl))+"px;animation-duration:"+f(4+R()*3)+"s;animation-delay:-"+f(R()*6)+"s'/>";
-      h+="<ellipse cx='"+f(r*.18)+"' cy='"+f(r*.62)+"' rx='"+f(r*.42)+"' ry='"+f(r*.14)+"' fill='#dbe8ff' opacity='.12'/></g></g>"; }
-    if(r>5) h+="<circle r='"+f(r*.9)+"' fill='none' stroke='url(#mmiri)' stroke-width='"+f(Math.max(.6,r*.07))+"' opacity='.22'/>";
-    h+="<ellipse cx='"+f(-r*.32)+"' cy='"+f(-r*.4)+"' rx='"+f(r*.42)+"' ry='"+f(r*.24)+"' transform='rotate(-32 "+f(-r*.32)+" "+f(-r*.4)+")' fill='url(#mmhl)' opacity='.55'/>"+
-      "<circle cx='"+f(-r*.42)+"' cy='"+f(-r*.46)+"' r='"+f(Math.max(.6,r*.09))+"' fill='#fff' opacity='.85'/>";
-    if(r>4) h+="<path d='M"+f(r*.62)+" "+f(r*.42)+" A"+f(r*.78)+" "+f(r*.78)+" 0 0 1 "+f(-r*.05)+" "+f(r*.76)+"' fill='none' stroke='#fff' stroke-opacity='.22' stroke-width='"+f(Math.max(.6,r*.07))+"' stroke-linecap='round'/>";
-    return h+"</g></g>";
-  }
-  // línea curva: sin pulso solo toca la burbuja por fuera; con pulso llega al centro
-  function link(a,b,k,op,w,pulses,fast){
-    var dx=b.x-a.x, dy=b.y-a.y, bend=(R()<.5?-1:1)*(.12+R()*.2), qx=(a.x+b.x)/2-dy*bend, qy=(a.y+b.y)/2+dx*bend, ax=a.x, ay=a.y, bx=b.x, by=b.y;
-    if(!pulses){ var ua=Math.hypot(qx-ax,qy-ay)||1, ub=Math.hypot(qx-bx,qy-by)||1; ax+=(qx-ax)/ua*a.r; ay+=(qy-ay)/ua*a.r; bx+=(qx-bx)/ub*b.r; by+=(qy-by)/ub*b.r; }
-    var d="M"+f(ax)+" "+f(ay)+" Q"+f(qx)+" "+f(qy)+" "+f(bx)+" "+f(by);
-    e+="<path class='e' d='"+d+"' stroke='"+COL[k]+"' stroke-opacity='"+op+"' stroke-width='"+w+"'/>";
-    var dur=(fast?1.1:1.8)+R()*(fast?1.2:2.4), back=R()<.4;
-    for(var i=0;i<pulses;i++) pz+="<path class='mmpz"+(back?" back":"")+"' pathLength='100' d='"+d+"' stroke='"+COL[k]+"' stroke-opacity='.85' stroke-width='"+f(Math.max(1.4,w*1.6))+"' filter='url(#mmg)' style='--d:"+f(dur)+"s;--o:-"+f(dur*i/pulses+R()*.4)+"s'/>";
-  }
-  var tok={x:cx,y:cy,r:15};
-  // grupos: cada uno por un lado, con su financiador (anillo discontinuo) en medio; el del aviso con nube roja
-  var a0=R()*6.283;
-  gs.forEach(function(g,i){
-    var a=a0+i*6.283/Math.max(gs.length,1)+0.3, k=gk[g.id], al=alert&&i===0;
-    var hub={x:Math.max(30,Math.min(W-30,cx+Math.cos(a)*W*.3)),y:Math.max(26,Math.min(H-26,cy+Math.sin(a)*H*.3)),r:6};
-    placed.push({x:hub.x,y:hub.y,r:7});
-    halo+="<circle cx='"+f(hub.x)+"' cy='"+f(hub.y)+"' r='34' fill='"+COL[k]+"' opacity='"+(al?".09":".06")+"' filter='url(#mmh)'/>";
-    if(al) for(var c3=0;c3<3;c3++) halo+="<circle class='mmcloud al' cx='"+f(hub.x)+"' cy='"+f(hub.y)+"' r='9' fill='url(#mmcgr)' filter='url(#mmcf)' style='animation-delay:-"+f(c3*.95)+"s'/>";
-    link(tok,hub,k,".35","1.2",al?4:3,al);
-    n+=bub(hub,k,{ring:1});
-    j.holders.filter(function(h){ return h.g===g.id; }).forEach(function(h){
-      var q=put(hub.x,hub.y,rad(h.p),38); if(!q) return;
-      link(hub,q,k,".22",".8",R()<(al?.85:.6)?1:0,al);
-      n+=bub(q,k);
-    });
-  });
-  // el resto: pools (con agua) y exchanges cerca del token, las demás wallets por fuera
-  j.holders.filter(function(h){ return !h.g; }).forEach(function(h){
-    var k=h.t==="pool"?"o":(h.t==="exchange"||h.name)?"t":"l", near=k!=="l";
-    var q=put(cx,cy,rad(h.p),near?70:140); if(!q) return;
-    if(near){ halo+="<circle cx='"+f(q.x)+"' cy='"+f(q.y)+"' r='"+f(q.r*2)+"' fill='"+COL[k]+"' opacity='.06' filter='url(#mmh)'/>"; link(tok,q,k,".35","1.2",k==="t"?2:0); }
-    else link(tok,q,"l",".09","1",R()<.3?1:0);
-    n+=bub(q,k,{pool:k==="o"});
-  });
-  // el token en el centro, con su nube amarilla
-  halo+="<circle cx='"+cx+"' cy='"+cy+"' r='38' fill='#fde68a' opacity='.1' filter='url(#mmh)'/>";
-  for(var c2=0;c2<3;c2++) halo+="<circle class='mmcloud' cx='"+cx+"' cy='"+cy+"' r='16' fill='url(#mmcg)' filter='url(#mmcf)' style='animation-delay:-"+f(c2*1.4)+"s'/>";
-  n+=bub(tok,"y")+"<text x='"+cx+"' y='"+(cy+4)+"' text-anchor='middle' font-family='Manrope,sans-serif' font-weight='800' font-size='10' fill='#fffbeb'>"+esc(String(j.sym).slice(0,3).toUpperCase())+"</text>";
-  var sv=$("#smsvg"); sv.innerHTML=defs+"<g>"+halo+"</g><g>"+e+"</g><g>"+pz+"</g><g>"+n+"</g>"; sv.setAttribute("aria-label","Mapa de conexiones de los mayores holders de $"+j.sym);
+  // el mismo On-chain Map de /mapa/ en miniatura (?mini): quieto, y se anima al pasar el ratón por encima.
+  // momento.json va recortado; se pasa a la forma del motor para usar omTok, como el mapa grande
+  var COL={t:"#7ab8c4",o:"#f9a8d4"}, gs=(j.groups||[]), gcol={}, MMO=["#fbbf24","#7dd3fc","#86efac","#fda4af"], oi=0, byG={};
+  j.holders.forEach(function(h){ if(h.g) (byG[h.g]=byG[h.g]||[]).push(h.a); });
+  gs.forEach(function(g){ gcol[g.id]=g.pct>=5?"#ff9e9e":MMO[oi++%MMO.length]; });   // los mismos colores que pone omTok
+  try{ mom.tok=omTok({mint:j.mint,sym:"$"+j.sym,mode:j.mode,creator:(j.holders.filter(function(h){ return h.cr; })[0]||{}).a,
+    holders:j.holders.map(function(h){ return {addr:h.a,pct:h.p,type:h.t}; }),
+    groups:gs.map(function(g){ return {funder:g.f,pct:g.pct,members:byG[g.id]||[]}; }),signals:j.signals||[]}); }
+  catch(err){ card.hidden=true; return; }
+  var fr=$("#smframe"); fr.title="Mapa de conexiones de los mayores holders de $"+j.sym;
+  if(!fr.getAttribute("src")) fr.setAttribute("src","/mapa/?mini"); else mmSend();
+  if(!mom.hov){ mom.hov=true; ["mouseenter","mouseleave"].forEach(function(ev){ $("#smbox").addEventListener(ev,function(){
+    if(mom.ready&&fr.contentWindow) fr.contentWindow.postMessage({type:"om-anim",on:ev==="mouseenter"},location.origin); }); }); }
   $("#smbox").setAttribute("data-map",j.mint);
   // pastillas: grupos, exchanges con nombre y pools
   var ch=gs.slice(0,3).map(function(g){ return "<span><i style='background:"+gcol[g.id]+"'></i>Grupo "+esc(g.id)+" · "+g.n+" wallets · <b>"+esc(fmtPct(g.pct))+"</b></span>"; });
@@ -3507,6 +3436,8 @@ function paintMoment(){
   $("#smchips").innerHTML=ch.join("");
   $("#smsrc").textContent="Los "+j.holders.length+" mayores holders del nº "+j.rank+" en tendencia (1 h). Se prepara una vez por hora; al abrirlo se calcula de nuevo con todo el detalle.";
 }
+function mmSend(){ var fr=$("#smframe"); if(!mom.ready||!mom.tok||!fr||!fr.contentWindow) return;
+  fr.contentWindow.postMessage({type:"om-data",lang:document.documentElement.lang==="en"?"en":"es",tok:mom.tok},location.origin); }
 function liveTick(){
   if(!document.body.classList.contains("scanp")||document.visibilityState!=="visible") return;
   if(Date.now()-fresh.ts>=30000) loadFresh(); else paintFresh(true);
@@ -5174,7 +5105,7 @@ function omTok(m){
   var sigs=(m.signals||[]).map(function(x){ return [x.s==="bad"?"":x.s==="warn"?"y":"g",esc(SRE.describe(x,document.documentElement.lang==="en"?"en":"es"))]; });
   if(!sigs.length) sigs=[["g",esc("Sin avisos: ningún grupo ni reparto pasa de los límites"+(young?" de un token joven.":" de un token maduro."))]];
   var sym=m.sym||short(m.mint);
-  return {sym:sym,ic:sym.replace(/^\$/,"").slice(0,2).toUpperCase(),head:head,sigs:sigs,groups:out,nh:hs.length,
+  return {mint:m.mint,sym:sym,ic:sym.replace(/^\$/,"").slice(0,2).toUpperCase(),head:head,sigs:sigs,groups:out,nh:hs.length,
     hint:!client().ownRpc()&&hs.length<=20?"Con tu URL de Helius en Ajustes se ven 75 holders en vez de 20.":"",
     seed:(m.mint.split("").reduce(function(h,ch){ return (h*31+ch.charCodeAt(0))>>>0; },7)%2147483000)+1};
 }
@@ -5192,6 +5123,7 @@ window.addEventListener("message",function(e){
   if(e.origin!==location.origin||!e.data) return;
   var d=e.data;
   if(d.type==="om-ready"){ OM.ready=true; omSend(); }
+  else if(d.type==="mm-ready"){ mom.ready=true; mmSend(); }
   else if(d.type==="om-close"){ if(!$("#omap").hidden) closeMap(); }
   else if(d.type==="om-analyze"&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(d.addr||"")){ omHide(); setMode("W"); $("#wallet").value=d.addr; walletHint(); analyze(); }
 });
