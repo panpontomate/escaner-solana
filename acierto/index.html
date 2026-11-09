@@ -80,6 +80,7 @@ article code{font-size:.8rem;color:var(--muted);word-break:break-all}
 .pill.HIGH{background:rgba(255,107,107,.18);color:var(--alto)}.pill.MEDIUM{background:rgba(251,191,36,.16);color:var(--medio)}
 .pill.LOW{background:rgba(74,222,128,.16);color:var(--bajo)}.pill.x{background:rgba(196,181,253,.16);color:var(--muted)}
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mono{font-family:ui-monospace,Consolas,monospace}
 .dl{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px;padding:0;list-style:none}
 .dl a{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid #5e4bb0;border-radius:12px;text-decoration:none;font-size:.9rem}
 .dl small{color:var(--muted);margin-left:6px}
@@ -148,6 +149,55 @@ dl.fmt dd{margin:0;color:var(--soft)}
 <tr><td>más de 20</td><td class="n">355</td><td class="n"><b>0 %</b> (0)</td></tr>
 </tbody></table></div>
 <p>Ninguno de los 355 tokens pagados por wallets con más de 20 lanzamientos sigue vivo. Es una señal más débil, pero apunta a lo que queremos medir: <b>quién está detrás</b>. Le daremos más peso con el registro de wallets (desde el 9/11).</p>
+</article>
+<article id="detras">
+  <h2>Quién está detrás de los lanzamientos</h2>
+  <p>De cada token nuevo guardamos qué wallet pagó su creación, cuál lo creó, quién le dio los fondos y quién compró en los primeros bloques. Esto es lo que se ve al juntarlo todo, desde el 30 de octubre. Cifras del 9/11/2026.</p>
+  <div class="fig">
+    <div><b>18.141</b><span>lanzamientos guardados</span></div>
+    <div><b>7.916</b><span>wallets distintas los pagaron</span></div>
+    <div><b>225</b><span>wallets pagaron el 30 % de todos</span></div>
+  </div>
+  <h3>Los que repiten</h3>
+  <p>Una de cada cuatro wallets ha pagado más de un lanzamiento, y entre ellas suman el <b>64 %</b>. Los que sobreviven salen, sobre todo, de quien lanza por primera vez.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Pagó</th><th class="n">Wallets</th><th class="n">Total</th><th class="n">Vivos a las 24 h</th></tr></thead>
+    <tbody>
+      <tr class="base"><td>Todas</td><td class="n">7.916</td><td class="n">16.765</td><td class="n">1,2 % (184)</td></tr>
+      <tr><td>Solo 1</td><td class="n">5.959</td><td class="n">5.959</td><td class="n"><b>2,2 %</b> (118)</td></tr>
+      <tr><td>De 2 a 9</td><td class="n">1.732</td><td class="n">5.837</td><td class="n"><b>0,6 %</b> (34)</td></tr>
+      <tr><td>De 10 a 49</td><td class="n">214</td><td class="n">3.781</td><td class="n"><b>0,9 %</b> (30)</td></tr>
+      <tr><td>50 o más</td><td class="n">11</td><td class="n">1.188</td><td class="n"><b>0,2 %</b> (2)</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:.9rem">«Vivos» se calcula sobre los que ya tienen resultado a las 24 h. «Solo 1» quiere decir una vez desde el 30/10: pudo lanzar antes.</p>
+  <h3>Las caras conocidas</h3>
+  <p>SolFlag avisa cuando quien está detrás ya tiene historial. Así acabaron esos lanzamientos:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Al verlo</th><th class="n">Lanzamientos</th><th class="n">Vivos a las 24 h</th></tr></thead>
+    <tbody>
+      <tr><td>Sin cara conocida</td><td class="n">13.997</td><td class="n"><b>1,6 %</b> (203)</td></tr>
+      <tr><td>Cara conocida en amarillo</td><td class="n">1.883</td><td class="n"><b>0,6 %</b> (10)</td></tr>
+      <tr><td>Cara conocida en rojo</td><td class="n">2.261</td><td class="n"><b>0,6 %</b> (11)</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Las wallets que más lanzamientos han pagado</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Wallet</th><th class="n">Pagó</th><th class="n">Con resultado</th><th class="n">Muertos a 24 h</th></tr></thead>
+    <tbody>
+      <tr><td><a class="mono" href="/?wallet=K6Eh9fwKkrhVNq6SpRtJn7F4Myi3HUst5QP8x5BKHnR">K6Eh…KHnR</a></td><td class="n">313</td><td class="n">270</td><td class="n">270</td></tr>
+      <tr><td><a class="mono" href="/?wallet=6c1Dmi9L4rTXT5GcTbTv8p3BuBEn8SJbo37UGJ3f6yfj">6c1D…6yfj</a></td><td class="n">144</td><td class="n">144</td><td class="n">144</td></tr>
+      <tr><td><a class="mono" href="/?wallet=ArLugmai8XHkZY4cvz3hM3jPeEwz7FA7CgZUSXQtZq1X">ArLu…Zq1X</a></td><td class="n">131</td><td class="n">111</td><td class="n">110</td></tr>
+      <tr><td><a class="mono" href="/?wallet=EjcwXG6ywzorxLcX7565C614LdhxiHF6uJhkYyRTDVgZ">Ejcw…DVgZ</a></td><td class="n">130</td><td class="n">122</td><td class="n">121</td></tr>
+      <tr><td><a class="mono" href="/?wallet=CXe9CgTE2xePNdvMpFEYyuNxhRYfTY7FL2vWFiBbMQQo">CXe9…MQQo</a></td><td class="n">95</td><td class="n">95</td><td class="n">95</td></tr>
+      <tr><td><a class="mono" href="/?wallet=38qy9n81zMDWKVJsQY1hjps8qPScGPL45VFAhxWgBrs7">38qy…Brs7</a></td><td class="n">90</td><td class="n">82</td><td class="n">82</td></tr>
+      <tr><td><a class="mono" href="/?wallet=7FVfSdnR9VPGjMtmBP1Hz9C2DFTpoNX8gVVRmnimnGt9">7FVf…nGt9</a></td><td class="n">61</td><td class="n">61</td><td class="n">61</td></tr>
+      <tr><td><a class="mono" href="/?wallet=5SFhHYXG5Rxwh9oFFARLseG61i3XfL1YC7ionxMktCrs">5SFh…tCrs</a></td><td class="n">59</td><td class="n">59</td><td class="n">59</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Los que compran primero</h3>
+  <p>Hemos visto <b>3.136 wallets</b> comprando en los primeros bloques de <b>3.649 tokens</b> (de los que analizamos, hasta 5 por token). La que más repite estuvo en <b>652</b> de ellos.</p>
+  <p class="nota">Son datos, no acusaciones. Pagar un lanzamiento no prueba quién se queda el dinero: puede ser un servicio que lanza para otros, y un token muerto no es por sí solo una estafa. ¿Algo no cuadra? <a href="mailto:solflag.team@gmail.com">Escríbenos</a> y lo corregimos.</p>
 </article>
 <article id="vivos">
   <h2>Los que siguen vivos</h2>
