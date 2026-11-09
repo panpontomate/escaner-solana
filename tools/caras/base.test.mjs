@@ -26,6 +26,14 @@ test("classify: exchanges by rate, farms, distributors, serial creators, labels"
   assert.equal(classify({ roles: {}, nTok: 0, label: "exchange" }), "exchange");
 });
 
+test("classify: a busy wallet with more than 3 own launches is not an exchange; a named one still is", () => {
+  assert.equal(classify({ ph: 900, roles: { payer: 130, own: 124 }, nTok: 130 }), "granja");   // bot like Ejcw…DVgZ
+  assert.equal(classify({ ph: 191, roles: { payer: 130, own: 124, funder: 7 }, nTok: 137 }), "granja");
+  assert.equal(classify({ ph: 900, roles: { payer: 3, own: 3 }, nTok: 3 }), "exchange");       // its own token or two: BNB, PUMP
+  assert.equal(classify({ ph: 900, roles: { payer: 46 }, nTok: 46 }), "exchange");             // pays for others, creates nothing
+  assert.equal(classify({ ph: 900, roles: { payer: 9, own: 9 }, nTok: 9, label: "exchange" }), "exchange");
+});
+
 test("prune forgets one-off unknown wallets after 3 days, keeps known ones", () => {
   const b = emptyBase();
   observe(b, { addr: "ONE", role: "creator", token: "t", at: NOW - 4 * DAY }, NOW);

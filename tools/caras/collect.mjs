@@ -199,6 +199,7 @@ for (const f of fresh.slice(0, MAX_NEW)) {
   if (t.payer) observe(state.base, { addr: t.payer, role: "payer", token: f.mint, at: f.t }, now);
   if (t.funder) observe(state.base, { addr: t.funder, role: "funder", token: f.mint, at: f.t }, now);
   if (t.creator && t.creator !== t.payer) observe(state.base, { addr: t.creator, role: "creator", token: f.mint, at: f.t }, now);
+  else if (t.creator) observe(state.base, { addr: t.creator, role: "own", at: f.t }, now);
 }
 
 // 1b. RugCheck otra vez para los que se quedaron sin respuesta: se completan creador, lanzador, financiador y rug
@@ -224,6 +225,7 @@ for (const m of Object.keys(state.rcQ).slice(0, RC_RETRY)) {
   if (e && regFill(e, info)) (recovered[dayOf(e.t)] = recovered[dayOf(e.t)] || []).push(e);
   if (info.funder) observe(state.base, { addr: info.funder, role: "funder", token: m, at: at }, now);
   if (info.creator && info.creator !== payer) observe(state.base, { addr: info.creator, role: "creator", token: m, at: at }, now);
+  else if (info.creator) observe(state.base, { addr: info.creator, role: "own", at: at }, now);
   if (D1) queueLaunch(state.planoQ, { m: m, t: at, plat: info.plat, cr: info.creator, fu: info.funder });
   log.rcRecuperados = (log.rcRecuperados || 0) + 1;
 }

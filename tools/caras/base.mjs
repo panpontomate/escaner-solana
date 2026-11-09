@@ -2,14 +2,15 @@
 // para ir trazando poco a poco un mapa propio de Solana. Todo son datos públicos de la cadena.
 //
 //   wallets: { addr: { first, last, ph (transacciones por hora, si se midió), roles: {payer, funder, creator, group,
-//              sniper...}, tokens: [últimos mints], nTok (tokens distintos), label (si se sabe a mano) } }
+//              sniper, own (pagó y creó el mismo token)...}, tokens: [últimos mints], nTok (tokens distintos), label (si se sabe a mano) } }
 //   merged:  aportes ya sumados (archivos de tools/caras/aportes)
 //
 // Una observación es { addr, ph?, role?, token?, at?, label? }.
 
 export const DAY = 86400e3;
 export const EXCHANGE_PH = 100;     // igual que el motor: los orígenes de grupos reales hacen de 0 a 50 por hora
-export const PLATFORM_PH = 300;     // por encima, exchange o plataforma seguro, haga lo que haga
+export const PLATFORM_PH = 300;     // por encima, exchange o plataforma, salvo que lance tokens en serie
+export const OWN_MAX_EXCHANGE = 3;  // con más lanzamientos propios (pagó y creó) no es un exchange: BNB o PUMP son uno; un bot, decenas
 export const KEEP_UNKNOWN_DAYS = 3; // una wallet vista una vez y sin nada especial se olvida pronto
 export const KEEP_KNOWN_DAYS = 180;
 export const TYPES = ["exchange", "granja", "repartidor", "creador en serie", "sniper"];
@@ -35,9 +36,10 @@ export function classify(w) {
   if (!w) return null;
   if (w.label) return w.label;
   const r = w.roles || {}, ph = w.ph;
-  if (ph >= PLATFORM_PH) return "exchange";
+  const serial = (r.own || 0) > OWN_MAX_EXCHANGE;
+  if (!serial && ph >= PLATFORM_PH) return "exchange";
   // da el primer SOL a holders de tokens distintos y mueve mucho: un exchange pequeño, no un equipo
-  if (ph > EXCHANGE_PH && ((r.funder || 0) + (r.group || 0)) > 0 && w.nTok >= 2) return "exchange";
+  if (!serial && ph > EXCHANGE_PH && ((r.funder || 0) + (r.group || 0)) > 0 && w.nTok >= 2) return "exchange";
   if ((r.payer || 0) >= 3) return "granja";
   if ((r.sniper || 0) >= 3) return "sniper";
   if ((r.funder || 0) + (r.group || 0) >= 2) return "repartidor";
