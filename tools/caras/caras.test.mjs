@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { faceLevel, isDead, onCurve, facesOf, emptyState, addToken, resolveToken, buildList, prune, needInfraCheck, perHour, DAY } from "./lib.mjs";
+import { oldToken, faceLevel, isDead, onCurve, facesOf, emptyState, addToken, resolveToken, buildList, prune, needInfraCheck, perHour, DAY } from "./lib.mjs";
 
 const NOW = 1e12;
 const ok = { at: NOW, infra: false };
@@ -145,4 +145,14 @@ test("pumpCreator reads the creator from a Pump.fun create instruction; platFrom
   assert.equal(pumpCreator(tx([Object.assign({}, ix, { data: b58encode(data.subarray(0, 40)) })]), MINT), null);  // truncated
   assert.equal(pumpCreator(null, MINT), null);
   assert.deepEqual([platFromDex("pump-fun"), platFromDex("meteora-dbc"), platFromDex("pumpswap")], ["pump_fun", "meteora_dbc", undefined]);
+});
+
+test("oldToken: un token viejo que estrena pool no cuenta como lanzamiento", () => {
+  const pool = Date.parse("2026-11-09T13:47:58Z");
+  assert.equal(oldToken(pool, "2026-07-23T19:07:21Z", null), true);                  // $STONK: RugCheck lo vio en julio
+  assert.equal(oldToken(pool, "2026-11-09T13:40:00Z", null), false);                 // lanzamiento de verdad
+  assert.equal(oldToken(pool, null, [{ blockTime: pool / 1000 - 1 }, { blockTime: pool / 1000 - 3 * 86400 }]), true);  // la creación fue hace 3 días
+  assert.equal(oldToken(pool, null, [{ blockTime: pool / 1000 - 60 }]), false);
+  assert.equal(oldToken(pool, null, null), false);                                   // sin datos: no se puede saber
+  assert.equal(oldToken(pool, "basura", null), false);
 });

@@ -44,6 +44,17 @@ export function isPulled(liq0, liq, curve) {
 }
 
 // Todos los pares de DexScreener del token siguen en la curva de Pump.fun
+// ¿Es un token viejo que estrena pool, y no un lanzamiento? GeckoTerminal da pools nuevos, y un token antiguo también
+// los abre (otro DEX, la migración de pump.fun días después…). Se mira cuándo lo vio RugCheck por primera vez
+// (detectedAt) y, si se llegó, el bloque de su creación (la firma más antigua de earliest). Más de un día antes del
+// pool: viejo. Sin ninguno de los dos datos no se puede saber y se toma como lanzamiento (false).
+export function oldToken(poolT, detectedAt, page) {
+  const d = detectedAt ? Date.parse(detectedAt) : NaN;
+  if (d && poolT - d > DAY) return true;
+  const last = page && page.length ? page[page.length - 1] : null;
+  return !!(last && last.blockTime && poolT - last.blockTime * 1000 > DAY);
+}
+
 export function onCurve(pairs) {
   return !!(pairs && pairs.length && pairs.every(function (p) { return /^pump-?fun$/.test(p.dexId || ""); }));
 }

@@ -14,7 +14,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { DAY, INFRA_PER_HOUR, rcWatch, emptyState, addToken, addRolesLate, pumpCreator, platFromDex, resolveToken, onCurve, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
+import { DAY, oldToken, INFRA_PER_HOUR, rcWatch, emptyState, addToken, addRolesLate, pumpCreator, platFromDex, resolveToken, onCurve, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
 import { emptyBase, observe, mergeAporte, pruneBase, publishBase } from "./base.mjs";
 import { regEntry, regDue, regResolve, regRecheck, regRejudge, regPrune, regPublish, regFill, regMissing, dayOf, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
@@ -166,6 +166,12 @@ for (const f of fresh.slice(0, MAX_NEW)) {
     if (!rc) { nrc = true; log.sinRugCheck = (log.sinRugCheck || 0) + 1; state.rcQ[f.mint] = { n: 0 }; }
     if (rc) { const i = rcInfo(rc); t.creator = i.creator; t.rug = i.rug; t.plat = i.plat; }
     const me = await earliest(f.mint);                      // quien pagó la creación del token
+    // un token viejo que estrena pool no es un lanzamiento: fuera del registro, de las 24 h y de quién está detrás
+    if (oldToken(f.t, rc && rc.detectedAt, me && me.page)) {
+      state.seen[f.mint] = now; delete state.rcQ[f.mint]; log.viejos = (log.viejos || 0) + 1;
+      if (log.sinRugCheck && !rc) log.sinRugCheck--;
+      continue;
+    }
     if (me && me.signers && me.signers[0]) t.payer = me.signers[0];
     // creador y lanzador leídos de la cadena cuando RugCheck no los da (caído, o el token es de hace minutos)
     if (!t.creator) { const c = pumpCreator(me && me.tx, f.mint); if (c) { t.creator = c; log.creadorCadena = (log.creadorCadena || 0) + 1; } }
@@ -213,6 +219,11 @@ for (const m of Object.keys(state.rcQ).slice(0, RC_RETRY)) {
   const rc = await rugcheck(m, log);
   if (!rc) { if (++q.n >= RC_TRIES) { delete state.rcQ[m]; log.rcPerdidos = (log.rcPerdidos || 0) + 1; } continue; }
   delete state.rcQ[m];
+  // RugCheck llega tarde y dice que el token es viejo: se quita de lo pendiente (lo ya publicado lo arregla la limpieza)
+  if (oldToken((pend && pend.t) || (e && e.t) || now, rc.detectedAt, null)) {
+    delete state.tokens[m]; delete state.reg[m];
+    log.viejosTarde = (log.viejosTarde || 0) + 1; continue;
+  }
   const info = rcInfo(rc), payer = (pend && pend.payer) || (e && e.py);
   try {
     if (info.creator) {
