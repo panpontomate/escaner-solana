@@ -18,7 +18,7 @@ function d1() {
   ins.run(M3, 3000, "pump_fun", "pump-fun", A, A, null, 0, "HIGH", null, null, null, 1);
   const buy = db.prepare("INSERT INTO compras (m,w,d,sig) VALUES (?,?,?,?)");
   buy.run(M1, C, 0, "s1"); buy.run(M2, C, 1, "s2"); buy.run(M2, A, 0, "s3");
-  return { prepare: (sql) => ({ bind: (...args) => ({ all: async () => ({ results: db.prepare(sql).all(...args) }) }) }) };
+  return { raw: db, prepare: (sql) => ({ bind: (...args) => ({ all: async () => ({ results: db.prepare(sql).all(...args) }), run: async () => db.prepare(sql).run(...args) }) }) };
 }
 const env = { DB: d1() };
 const get = async (path, method) => { const r = await handle(new Request("https://api.solflag.com" + path, { method: method || "GET" }), env); return { status: r.status, body: r.status === 204 ? null : await r.json(), h: r.headers }; };
@@ -65,6 +65,7 @@ test("bad requests: not an address, unknown token, wrong path or method", async 
   assert.equal((await get("/api/token/" + "Nope1111111111111111111111111111111")).status, 404);
   assert.equal((await get("/api/other/" + A)).status, 404);
   assert.equal((await get("/api/wallet/" + A, "POST")).status, 405);
+  assert.equal((await get("/api/visto/" + A)).status, 404);           // visto is only POST
   assert.equal((await get("/api/wallet/" + A, "OPTIONS")).status, 204);
 });
 
@@ -72,4 +73,33 @@ test("a database failure answers 503 instead of crashing", async () => {
   const bad = { DB: { prepare: () => ({ bind: () => ({ all: async () => { throw new Error("down"); } }) }) } };
   const r = await handle(new Request("https://x/api/wallet/" + A), bad);
   assert.equal(r.status, 503);
+});
+
+test("visto: counts each scan of a token, stores nothing about who", async () => {
+  const e = { DB: d1() };
+  const post = (m) => handle(new Request("https://api.solflag.com/api/visto/" + m, { method: "POST" }), e);
+  assert.equal((await post(M1)).status, 204);
+  assert.equal((await post(M1)).status, 204);
+  assert.equal((await post("<script>")).status, 400);
+  const rows = e.DB.raw.prepare("SELECT * FROM pedidos").all();
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].m, M1);
+  assert.equal(rows[0].n, 2);
+  assert.equal(rows[0].hecho, null);
+  assert.deepEqual(Object.keys(rows[0]).sort(), ["hecho", "m", "n", "t0", "t1"]);
+});
+
+test("visto creates the table if the collector has not yet", async () => {
+  const db = new DatabaseSync(":memory:");
+  const e = { DB: { raw: db, prepare: (sql) => ({ bind: (...a) => ({ run: async () => db.prepare(sql).run(...a) }) }) } };
+  const r = await handle(new Request("https://x/api/visto/" + M2, { method: "POST" }), e);
+  assert.equal(r.status, 204);
+  assert.equal(db.prepare("SELECT n FROM pedidos").get().n, 1);
+});
+
+test("visto: over the rate limit answers 429 and stores nothing", async () => {
+  const e = { DB: d1(), VISTO_LIMIT: { limit: async () => ({ success: false }) } };
+  const r = await handle(new Request("https://x/api/visto/" + M1, { method: "POST" }), e);
+  assert.equal(r.status, 429);
+  assert.equal(e.DB.raw.prepare("SELECT COUNT(*) AS c FROM pedidos").get().c, 0);
 });

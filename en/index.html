@@ -2593,7 +2593,7 @@ async function analyze(){
   $("#go").disabled=true; $("#results").hidden=true; state.shown.W=false; $("#progress").hidden=false;
   try{
     setProgress("Checking the address…",0.01);
-    if(await isMint(wallet)){ await checkToken(wallet); track("scan-token"); return; }
+    if(await isMint(wallet)){ await checkToken(wallet); track("scan-token"); seenToken(wallet); return; }
     state.token=null;
     setProgress("Reading the wallet…",0.02);
     var w=await getTokens(wallet);
@@ -3104,6 +3104,8 @@ async function whalesInline(mint){
 }
 // Quién está detrás: la API pública de SolFlag (registro de lanzamientos en D1)
 var API="https://api.solflag.com/api/", who={};
+// avisa a la API de que se escaneó este token (solo el token, nada de quién; ver /privacidad/). Nunca wallets
+function seenToken(m){ try{ if(navigator.sendBeacon) navigator.sendBeacon(API+"visto/"+m); }catch(e){} }
 async function loadWho(mint){
   var box=function(){ return state.token&&state.token.mint===mint?$("#whobox"):null; };
   if(who[mint]===undefined){

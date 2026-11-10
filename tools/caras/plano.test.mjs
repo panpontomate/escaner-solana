@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { emptyQueue, queueLaunch, queueBuyers, queueSize, trimQueue, buyerCandidates, upsertStatements, d1Config, SCHEMA, LANZ, COMPRAS, BUYERS_MAX, QUEUE_MAX } from "./plano.mjs";
+import { pedidosHechos, pedidoLaunch, PEDIDOS_PENDIENTES, emptyQueue, queueLaunch, queueBuyers, queueSize, trimQueue, buyerCandidates, upsertStatements, d1Config, SCHEMA, LANZ, COMPRAS, BUYERS_MAX, QUEUE_MAX } from "./plano.mjs";
 
 let sqlite = null;
 try { sqlite = await import("node:sqlite"); } catch (e) { /* Node sin SQLite: se salta la prueba con base de datos */ }
@@ -67,4 +67,26 @@ test("el SQL funciona en SQLite (lo mismo que usa D1)", { skip: !sqlite && "Node
   // muchas filas a la vez
   run(upsertStatements("lanz", LANZ, Array.from({ length: 50 }, (_, i) => ({ m: "X" + i, t: i, py: "P" })), 30));
   assert.equal(db.prepare("SELECT COUNT(*) AS n FROM lanz WHERE py = 'P'").get().n, 51);
+});
+
+test("pedidoLaunch: solo quién está detrás y cuándo; nunca nivel, liquidez ni resultado a 24 h", () => {
+  const row = pedidoLaunch("M", { t: 5, plat: "pump_fun", payer: "P", creator: "C", funder: "F", lvl: "HIGH", liq: 9, dead24: true, mc24: 1 });
+  assert.deepEqual(row, { m: "M", t: 5, plat: "pump_fun", py: "P", cr: "C", fu: "F" });
+});
+
+test("pedidos: pendientes por búsquedas sin los que ya están en lanz, y se marcan hechos", { skip: !sqlite }, () => {
+  const db = new sqlite.DatabaseSync(":memory:");
+  SCHEMA.forEach((s) => db.exec(s));
+  const ins = db.prepare("INSERT INTO pedidos (m, n, t0, t1) VALUES (?, ?, 1, ?)");
+  ins.run("A", 1, 10); ins.run("B", 5, 1); ins.run("C", 1, 20); ins.run("YA", 9, 1);
+  db.prepare("INSERT INTO lanz (m) VALUES ('YA')").run();
+  assert.deepEqual(db.prepare(PEDIDOS_PENDIENTES).all(10).map((r) => r.m), ["B", "C", "A"]);
+  assert.deepEqual(db.prepare(PEDIDOS_PENDIENTES).all(2).map((r) => r.m), ["B", "C"]);
+  const st = pedidosHechos(["B"], 99);
+  db.prepare(st.sql).run(...st.params);
+  const hecho = Object.fromEntries(db.prepare("SELECT m, hecho FROM pedidos").all().map((r) => [r.m, r.hecho]));
+  assert.deepEqual(hecho, { A: null, B: 99, C: null, YA: 99 });
+  const none = pedidosHechos([], 100);               // sin procesados: solo los que ya estaban en lanz
+  db.prepare(none.sql).run(...none.params);
+  assert.equal(db.prepare("SELECT COUNT(*) AS c FROM pedidos WHERE hecho IS NULL").get().c, 2);
 });

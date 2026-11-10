@@ -6,6 +6,9 @@
 //           a las 24 h, si murió (dead24) y su capitalización (mc24)
 //   compras quien compró en los primeros bloques (d = bloques después de la creación; solo tokens analizados,
 //           hasta BUYERS_MAX por token): la base para reconocer snipers
+//   pedidos tokens que alguien escaneó en la web (la API apunta solo el token y cuántas veces, nada de quién):
+//           n búsquedas, t0/t1 primera y última, hecho = cuándo los procesó el recolector. Van a lanz por su propio
+//           camino (ver collect.mjs): sin nivel ni resultado a 24 h, porque se miran tarde y falsearían el acierto
 //
 // Necesita CF_API_TOKEN (permiso D1: Edit), CF_ACCOUNT_ID y CF_D1_ID. Sin ellos no hace nada.
 // Lo pendiente de subir vive en el estado del recolector (state.planoQ): si D1 falla, se reintenta en la siguiente.
@@ -18,6 +21,9 @@ const MAX_PARAMS = 100;               // límite de D1 de valores por consulta
 export const LANZ = ["m", "t", "plat", "dex", "py", "cr", "fu", "liq", "lvl", "cara", "dead24", "mc24"];
 export const COMPRAS = ["m", "w", "d", "sig"];
 
+export const PEDIDOS_SCHEMA = "CREATE TABLE IF NOT EXISTS pedidos (m TEXT PRIMARY KEY, n INTEGER, t0 INTEGER, t1 INTEGER, hecho INTEGER)";
+export const PEDIDOS_MAX = 10;        // tokens pedidos que se procesan por ejecución, los más buscados primero
+
 export const SCHEMA = [
   "CREATE TABLE IF NOT EXISTS lanz (m TEXT PRIMARY KEY, t INTEGER, plat TEXT, dex TEXT, py TEXT, cr TEXT, fu TEXT, liq INTEGER, lvl TEXT, cara TEXT, dead24 INTEGER, mc24 INTEGER, up INTEGER)",
   "CREATE INDEX IF NOT EXISTS lanz_py ON lanz(py)",
@@ -25,7 +31,8 @@ export const SCHEMA = [
   "CREATE INDEX IF NOT EXISTS lanz_fu ON lanz(fu)",
   "CREATE INDEX IF NOT EXISTS lanz_t ON lanz(t)",
   "CREATE TABLE IF NOT EXISTS compras (m TEXT, w TEXT, d INTEGER, sig TEXT, PRIMARY KEY (m, w))",
-  "CREATE INDEX IF NOT EXISTS compras_w ON compras(w)"
+  "CREATE INDEX IF NOT EXISTS compras_w ON compras(w)",
+  PEDIDOS_SCHEMA
 ];
 
 export function emptyQueue() { return { l: {}, c: [] }; }
@@ -101,3 +108,21 @@ export async function flush(cfg, q, now) {
   done.compras = q.c.length; q.c = [];
   return done;
 }
+
+// Pedidos de la web: los pendientes que aún no están en lanz, los más buscados primero
+export const PEDIDOS_PENDIENTES = "SELECT m, n FROM pedidos WHERE hecho IS NULL AND m NOT IN (SELECT m FROM lanz) ORDER BY n DESC, t1 DESC LIMIT ?";
+// Se marcan como hechos los procesados y, de paso, los que ya estaban en lanz por el camino normal
+export function pedidosHechos(ms, now) {
+  const marks = ms.map(function () { return "?"; }).join(",");
+  return { sql: "UPDATE pedidos SET hecho = ? WHERE hecho IS NULL AND (m IN (SELECT m FROM lanz)" + (ms.length ? " OR m IN (" + marks + ")" : "") + ")", params: [now].concat(ms) };
+}
+// Fila de lanz de un token pedido: solo quién está detrás y cuándo se creó. Nunca nivel, liquidez ni resultado a 24 h
+export function pedidoLaunch(m, info) {
+  return { m: m, t: info.t, plat: info.plat, py: info.payer, cr: info.creator, fu: info.funder };
+}
+export async function pedidosPendientes(cfg, max) {
+  await query(cfg, { sql: PEDIDOS_SCHEMA });
+  const r = await query(cfg, { sql: PEDIDOS_PENDIENTES, params: [max] });
+  return ((r && r[0] && r[0].results) || []).map(function (x) { return x.m; });
+}
+export async function marcarPedidos(cfg, ms, now) { await query(cfg, pedidosHechos(ms, now)); }

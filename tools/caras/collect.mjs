@@ -6,6 +6,7 @@
 //      transacciones por hora hace cada wallet) y suma los aportes de estudios y pruebas (tools/caras/aportes)
 //   5. registro de tokens: analiza con el motor (como la web) hasta REG_MAX tokens nuevos y apunta cómo acabaron a las
 //      24 h y a los 7 días (datos/registro, ver registro.mjs)
+//   5b. tokens que la gente escaneó en la web (tabla pedidos de D1): quién está detrás, por su propio camino
 //   6. escribe caras.json y datos/base.json + datos/exchanges.json (lo que lee la web; van en la rama "datos") y tools/caras/estado.json (lo que
 //      recuerda entre ejecuciones; no va en git, lo guardan Cloudflare KV y la caché de Actions, ver nube.mjs)
 //
@@ -17,7 +18,7 @@ import { DAY, INFRA_PER_HOUR, rcWatch, emptyState, addToken, addRolesLate, pumpC
 import { emptyBase, observe, mergeAporte, pruneBase, publishBase } from "./base.mjs";
 import { regEntry, regDue, regResolve, regRecheck, regRejudge, regPrune, regPublish, regFill, regMissing, dayOf, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
-import { emptyQueue, queueLaunch, queueBuyers, buyerCandidates, trimQueue, d1Config, flush } from "./plano.mjs";
+import { emptyQueue, queueLaunch, queueBuyers, buyerCandidates, trimQueue, d1Config, flush, pedidosPendientes, marcarPedidos, pedidoLaunch, PEDIDOS_MAX } from "./plano.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const STATE = path.join(HERE, "estado.json");
@@ -293,9 +294,56 @@ for (const a of needInfraCheck(state).slice(0, MAX_INFRA)) {
   } catch (e) { log.errores++; }
 }
 
+// 5b. tokens escaneados en la web (tabla pedidos, la llena la API): quién pagó, creó y financió, y los primeros
+// compradores, a lanz. No entran en state.tokens ni en el registro: se miran tarde, así que su nivel y su resultado a
+// 24 h no serían los del lanzamiento y falsearían el acierto. En tokens con más de 3000 firmas, earliest() no llega a
+// la creación: solo queda el creador (RugCheck) y, si se puede, quien lo financió
+const PED_MAX = +process.env.PEDIDOS_MAX || PEDIDOS_MAX;
+const pedidosOk = [];
+if (D1 && PED_MAX > 0) {
+  let ms = [];
+  try { ms = await pedidosPendientes(D1, PED_MAX); } catch (e) { log.pedidos = "D1 falló al leer"; }
+  let guardados = 0;
+  for (const m of ms) {
+    const info = {};
+    try {
+      // la API acepta cualquier dirección: solo se sigue si de verdad es un token
+      const acc = await rpc("getAccountInfo", [m, { encoding: "jsonParsed" }]);
+      const isMint = !!(acc && acc.value && acc.value.data && acc.value.data.parsed && acc.value.data.parsed.type === "mint");
+      if (!isMint) { if (acc) pedidosOk.push(m); continue; }   // sin respuesta del RPC: se reintenta en la siguiente
+      const rc = await rugcheck(m, log);
+      if (rc) { const i = rcInfo(rc); info.creator = i.creator; info.plat = i.plat; }
+      const me = await earliest(m);
+      if (me && me.page && me.page.length && me.page[me.page.length - 1].blockTime) info.t = me.page[me.page.length - 1].blockTime * 1000;
+      if (me && me.signers && me.signers[0]) info.payer = me.signers[0];
+      if (!info.creator) { const c = pumpCreator(me && me.tx, m); if (c) info.creator = c; }
+      if (me) {
+        const buyers = [];
+        for (const b of buyerCandidates(me.page)) {
+          try { const s = await signersOf(b.sig); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
+        }
+        queueBuyers(state.planoQ, m, buyers);
+      }
+      if (info.creator) {
+        const cs = await firstSigners(info.creator);
+        if (cs && cs[0] && cs[0] !== info.creator && cs[0] !== info.payer) info.funder = cs[0];
+      }
+      // sin creador ni pagador y RugCheck caído: se deja pendiente para la siguiente
+      if (!info.creator && !info.payer && rcStreak > 0) continue;
+      if (info.creator || info.payer) { queueLaunch(state.planoQ, pedidoLaunch(m, info)); guardados++; }
+      pedidosOk.push(m);
+    } catch (e) { log.errores++; }
+  }
+  if (ms.length) log.pedidos = guardados + " de " + ms.length + " tokens pedidos";
+}
+
 // plano del dinero: subir a D1 lo pendiente; si falla, se queda en la cola para la siguiente ejecución
 if (D1) {
-  try { const up = await flush(D1, state.planoQ, now); log.plano = up.lanz + " lanzamientos, " + up.compras + " compras"; }
+  try {
+    const up = await flush(D1, state.planoQ, now); log.plano = up.lanz + " lanzamientos, " + up.compras + " compras";
+    // los pedidos se dan por hechos solo cuando ya están en lanz
+    try { await marcarPedidos(D1, pedidosOk, now); } catch (e) { log.pedidos = (log.pedidos || "") + " (no se pudieron marcar, se repiten)"; }
+  }
   catch (e) { log.plano = "D1 falló (" + e.message.slice(0, 120) + "), se reintenta"; trimQueue(state.planoQ); }
   // en Actions, como aviso visible en la ejecución (se lee sin iniciar sesión, a diferencia del registro)
   if (process.env.GITHUB_ACTIONS) console.log((log.plano.startsWith("D1") ? "::warning::" : "::notice::") + "Plano del dinero: " + log.plano);

@@ -12,3 +12,9 @@ database_id = "419668bd-32cd-4673-af81-2e1780cdb60d"
 [[routes]]
 pattern = "api.solflag.com"
 custom_domain = true
+
+# límite de avisos de escaneo (POST /api/visto): 20 por minuto por conexión
+[[ratelimits]]
+name = "VISTO_LIMIT"
+namespace_id = "1001"
+simple = { limit = 20, period = 60 }

@@ -1,9 +1,11 @@
 // API pública de SolFlag (Cloudflare Worker delante de la base D1 «solflag-plano» que llena el recolector).
-// Solo lectura y solo hechos de la cadena: quién pagó, creó o financió cada lanzamiento, quién compró en los
-// primeros bloques y cómo acabó a las 24 h. Sin etiquetas personales.
+// Solo hechos de la cadena: quién pagó, creó o financió cada lanzamiento, quién compró en los primeros bloques y
+// cómo acabó a las 24 h. Sin etiquetas personales.
 //
-//   GET /api/wallet/<dirección>   lo que se sabe de una wallet en los lanzamientos registrados
-//   GET /api/token/<mint>         un lanzamiento: quién está detrás (con su historial) y sus primeros compradores
+//   GET  /api/wallet/<dirección>   lo que se sabe de una wallet en los lanzamientos registrados
+//   GET  /api/token/<mint>         un lanzamiento: quién está detrás (con su historial) y sus primeros compradores
+//   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
+//                                  veces (tabla pedidos), nada de quién. El recolector lo analiza después él mismo
 //
 // Formato versión 1 (v: 1). Si cambia de forma incompatible, sube v.
 // Cada respuesta se guarda 5 min en la caché de Cloudflare para no repetir consultas a D1.
@@ -61,10 +63,32 @@ export async function token(db, m) {
   return { v: V, token: launch(r), cara: r.cara || undefined, behind: behind, firstBuyers: buyers };
 }
 
+const PEDIDOS = "CREATE TABLE IF NOT EXISTS pedidos (m TEXT PRIMARY KEY, n INTEGER, t0 INTEGER, t1 INTEGER, hecho INTEGER)";
+const SEEN = "INSERT INTO pedidos (m, n, t0, t1) VALUES (?1, 1, ?2, ?2) ON CONFLICT(m) DO UPDATE SET n = n + 1, t1 = ?2";
+
+// Apunta un token escaneado. Si la tabla aún no existe (antes de la primera ejecución del recolector), la crea
+export async function seen(db, m, now) {
+  try { await db.prepare(SEEN).bind(m, now).run(); }
+  catch (e) { await db.prepare(PEDIDOS).bind().run(); await db.prepare(SEEN).bind(m, now).run(); }
+}
+
+async function visto(req, env, m) {
+  const empty = (status) => new Response(null, { status: status, headers: { "access-control-allow-origin": "*", "cache-control": "no-store" } });
+  if (!ADDR.test(m)) return empty(400);
+  // límite por conexión con el limitador de Cloudflare (lo guarda él, de paso y en memoria; aquí no se apunta la IP)
+  if (env.VISTO_LIMIT) {
+    const { success } = await env.VISTO_LIMIT.limit({ key: req.headers.get("cf-connecting-ip") || "?" });
+    if (!success) return empty(429);
+  }
+  try { await seen(env.DB, m, Date.now()); return empty(204); }
+  catch (e) { return empty(503); }
+}
+
 export async function handle(req, env) {
-  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: Object.assign({}, HEAD, { "access-control-allow-methods": "GET", "access-control-max-age": "86400" }) });
-  if (req.method !== "GET") return fail(405, "only GET");
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: Object.assign({}, HEAD, { "access-control-allow-methods": "GET, POST", "access-control-max-age": "86400" }) });
   const p = new URL(req.url).pathname.replace(/\/+$/, "").split("/");
+  if (req.method === "POST" && p.length === 4 && p[1] === "api" && p[2] === "visto") return visto(req, env, p[3]);
+  if (req.method !== "GET") return fail(405, "only GET");
   // /api/<tipo>/<dirección>
   if (p.length !== 4 || p[1] !== "api" || !/^(wallet|token)$/.test(p[2])) return fail(404, "use /api/wallet/<address> or /api/token/<mint>");
   if (!ADDR.test(p[3])) return fail(400, "not a Solana address");
