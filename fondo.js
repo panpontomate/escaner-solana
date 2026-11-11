@@ -1,5 +1,6 @@
 // Fondo común (maqueta fondo-paginas-aprobado.html, 11/11): nebulosa de puntos solo en dos esquinas, lila arriba a la
-// derecha y turquesa abajo a la izquierda (sin verde: recordaba a Solana y el verde es «riesgo bajo»); el centro queda limpio para que no tape las letras. Va fijo y se pinta una vez
+// derecha y una cortina azul petróleo abajo a la izquierda (maqueta fondo-colores.html, F3; sin verde: recordaba a Solana y
+// el verde es «riesgo bajo»); el centro queda limpio para que no tape las letras. Va fijo y se pinta una vez
 // (y al cambiar el ancho): no gasta nada mientras se lee. Lo usan las páginas sueltas y, en la app, Escáner, Mi lista y
 // Confluencia (en la portada y en el resultado de un token se esconde: allí va la nebulosa de puntos.js).
 (function(){
@@ -20,7 +21,7 @@ function makeNoise(seed){
 }
 function sm(a, b, x){ x = Math.max(0, Math.min(1, (x-a)/(b-a))); return x*x*(3-2*x); }
 function mix(a, b, t){ return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t]; }
-var VI = [139,92,246], MG = [192,38,211], TQ = [122,184,196], TQ2 = [160,214,224];
+var VI = [139,92,246], MG = [192,38,211], TQ = [38,120,140], TQ2 = [80,160,180];   // TQ/TQ2: azul petróleo
 function paint(){
   var W = innerWidth, H = innerHeight, D = Math.min(2, devicePixelRatio || 1), step = W > 960 ? 6 : 5;
   cv.width = W*D; cv.height = H*D; var x = cv.getContext("2d"); x.setTransform(D, 0, 0, D, 0, 0); x.clearRect(0, 0, W, H);
@@ -31,15 +32,19 @@ function paint(){
       var u = px/W, v = py/H, X = px*K, Y = py*K;
       // distancia a cada esquina (en proporción a la pantalla), y una cola corta hacia dentro
       var dtr = Math.hypot((1 - u)*A, v), dbl = Math.hypot(u*A, 1 - v);
-      var tr = Math.exp(-Math.pow(dtr/(.36*Math.min(A, 1.6)), 2)*2.2), bl = Math.exp(-Math.pow(dbl/(.32*Math.min(A, 1.6)), 2)*2.2)*.8;
+      var tr = Math.exp(-Math.pow(dtr/(.36*Math.min(A, 1.6)), 2)*2.2);
+      // abajo a la izquierda: una franja en diagonal que sube desde la esquina, como una cortina de aurora (ondulada)
+      var al = (u*A + 1 - v)/1.414, pe = (1 - v - u*A)/1.414 + .04*Math.sin(al*9);
+      var bl = Math.exp(-Math.pow(pe/.13, 2))*Math.exp(-Math.pow(al/(.62*Math.min(A, 1.6)), 2)*1.6)*.85;
       var shape = Math.max(tr, bl*.95);
       if (shape < .02) continue;
       var qx = N.fbm(X, Y, 3), qy = N.fbm(X + 5.2, Y + 1.3, 3), g = N.fbm(X + 2.4*qx, Y + 2.4*qy, 5);
       var dust = N.fbm(X*2.1 + 40, Y*2.1 + 9, 4); dust = Math.pow(1 - Math.abs(2*dust - 1), 6);
       var b = sm(.36, .76, g)*shape*(1 - dust*.75)*1.35; if (b < .04) continue;
+      if (bl > tr && dbl < .12) b *= .5 + .5*sm(0, .12, dbl);           // la puntita de la esquina, menos azul
       var h = N.fbm(X*.6 + 31, Y*.6 + 3, 3), c;
       if (tr >= bl) c = mix(VI, MG, sm(.3, .75, h + (1 - dtr)*.3));      // arriba a la derecha: lila con toques magenta
-      else c = mix(TQ, TQ2, sm(.3, .7, h));                             // abajo a la izquierda: turquesa con toques más claros
+      else c = mix(TQ, TQ2, sm(.3, .7, h));                             // abajo a la izquierda: azul petróleo
       x.fillStyle = "rgba(" + (c[0]+b*60|0) + "," + (c[1]+b*50|0) + "," + (c[2]+b*40|0) + "," + Math.min(1, .25 + b*.9) + ")";
       x.beginPath(); x.arc(px, py, Math.min(step*.62, .35 + b*step*.6), 0, 6.283); x.fill();
     }
