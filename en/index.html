@@ -1519,6 +1519,10 @@ body.landing #adv{margin-top:10px}
 .hrows .hint{padding:22px}
 .hr{display:grid;grid-template-columns:56px minmax(0,1fr) 110px 150px 170px 110px;align-items:center;min-height:62px;width:100%;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:0}
 .hr:last-child{border-bottom:0}
+.hr[role=button],.tr[role=button]{cursor:pointer}
+.hr[role=button]:focus-visible,.tr[role=button]:focus-visible{outline:2px solid var(--kick);outline-offset:-2px}
+.fic{display:inline-block;margin-top:2px;font-size:.75rem;font-weight:700;color:var(--kick);text-decoration:none;white-space:nowrap}
+.fic:hover{text-decoration:underline}
 .hr:not(.hh):hover{background:rgba(139,92,246,.08)}
 .hr.hh{min-height:44px;font-size:.75rem;letter-spacing:.1em;color:var(--mut2);font-weight:700;cursor:default}
 .hr>*{padding:0 14px;min-width:0}
@@ -1870,6 +1874,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
       <p class="hint" id="whint" hidden></p>
       <div class="tryw"><span>Try</span><button type="button" class="chip" data-try="DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263">BONK</button><button type="button" class="chip" data-try="JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN">JUP</button><button type="button" class="chip" data-trynew>A token launched just now</button></div>
       <div class="whale"><span>Want to see who holds the most of a token?</span><button type="button" class="lnk" id="goH">Find whales →</button></div>
+      <div class="whale"><span>Who is behind a token?</span><button type="button" class="lnk" id="goF">See its file →</button></div>
       <p class="hint safe">We only read public data. We will never ask for keys, recovery phrases or signatures.</p>
     </form>
     <form id="hform" autocomplete="off" hidden>
@@ -3005,6 +3010,8 @@ function track(name){
 function tokenLink(mint){ return location.origin+location.pathname+"?token="+mint; }
 // Enlace para compartir: la ficha pública del token (token.solflag.com, y /en/ en inglés), con su propia vista previa en X y Telegram
 function fichaLink(mint){ return "https://token.solflag.com/"+(document.documentElement.lang==="en"?"en/":"")+mint; }
+// «Ficha →» dentro de una fila que analiza al pulsarla: abre la ficha en otra pestaña (el clic en un enlace no analiza)
+function fichaA(mint){ return "<a class='fic' href='"+esc(fichaLink(mint))+"' target='_blank' rel='noopener'>File →</a>"; }
 // Abre el bot de Telegram y empieza a vigilar esa dirección: el bot recibe "/start <dirección>"
 var TG_BOT="SolFlagBot";
 function tgLink(addr){ return "https://t.me/"+TG_BOT+"?start="+encodeURIComponent(addr); }
@@ -3049,6 +3056,7 @@ function deskActions(r,fav){
   return "<div class='actions tdesk'><button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Everything around this token, full screen'><span class='ic'>✦</span><span class='lb'>On-chain Map</span><span class='tmsub'> · everything around this token</span></button>"+
     (r.par?"<button class='btn small tfav' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
     "<button class='btn small twh' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'><span class='dl'>Find whales</span><span class='ds'>Whales</span></span></button>"+
+    "<a class='btn small tfic' href='"+esc(fichaLink(r.mint))+"' target='_blank' rel='noopener' title='Who launched it, who funded it, who bought first and what happened next'><span class='ic'>📄</span><span class='lb'>Full token file</span></a>"+
     "<details class='pmenu tshare'><summary class='btn small'><span class='ic'>↗</span><span class='lb'>Share</span><span class='car'>▾</span></summary><div class='pmenu-body'>"+share+"</div></details>"+
     (avisos?"<details class='pmenu tavisos'><summary class='btn small'><span class='ic'>🔔</span><span class='lb'><span class='dl'>Telegram alerts</span><span class='ds'>Alerts</span></span><span class='car'>▾</span></summary><div class='pmenu-body'>"+avisos+"</div></details>":"")+
     "</div>";
@@ -3166,7 +3174,8 @@ function renderToken(noScroll){
       (r.par?tgBtn(r.mint,"Alerts you on Telegram if risk rises, liquidity drops or the creator sells")+priceMenu(r.mint):"")+"</div>"+
       "<div class='tsub'><button class='btn ghost small' type='button' data-copy='"+esc(fichaLink(r.mint))+"' title='Copy the link to this token&#39;s public file'><span class='ic'>🔗</span><span class='lb'>Copy link</span></button>"+
       (r.par?"<button class='btn ghost small tfav' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
-      "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'>Find whales</span></button></div>"+
+      "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'>Find whales</span></button>"+
+      "<a class='btn ghost small tfic' href='"+esc(fichaLink(r.mint))+"' target='_blank' rel='noopener'><span class='ic'>📄</span><span class='lb'>Full token file</span></a></div>"+
       "<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Everything around this token, full screen'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button>"+
     "</div>"+deskActions(r,fav);
   $("#filters").style.display="none";
@@ -3759,9 +3768,9 @@ function paintFresh(keepAnim){
   if(fresh.err){ box.innerHTML="<p class='hint'>The latest launches could not be loaded right now.</p>"; return; }
   if(!fresh.rows) return;
   box.innerHTML=fresh.rows.map(function(x){
-    return "<button type='button' class='tr nr"+(x.isNew&&!keepAnim?" in":"")+"' data-analyze='"+esc(x.mint)+"'>"+tokAv(x.img,x.sym)+
-      "<span style='min-width:0'><b>$"+esc(x.sym)+"</b><small>"+esc([DEXN[x.dex]||x.dex,x.liq?"Liquidity "+usd(x.liq):""].filter(Boolean).join(" · "))+"</small></span>"+
-      "<span class='tx'><em>"+esc(x.created?haceMin(x.created):"")+"</em></span></button>";
+    return "<div class='tr nr"+(x.isNew&&!keepAnim?" in":"")+"' role='button' tabindex='0' data-analyze='"+esc(x.mint)+"'>"+tokAv(x.img,x.sym)+
+      "<span style='min-width:0'><b>$"+esc(x.sym)+"</b><small>"+esc([DEXN[x.dex]||x.dex,x.liq?"Liquidity "+usd(x.liq):""].filter(Boolean).join(" · "))+"</small>"+fichaA(x.mint)+"</span>"+
+      "<span class='tx'><em>"+esc(x.created?haceMin(x.created):"")+"</em></span></div>";
   }).join("");
   if(!keepAnim) fresh.rows.forEach(function(x){ x.isNew=false; });
   $("#sftime").textContent=fresh.ts?"updated "+ftime(fresh.ts):"";
@@ -3791,11 +3800,11 @@ function paintHot(){
     if(!tr.length){ box.innerHTML="<p class='hint'>GeckoTerminal has no trending tokens right now.</p>"; return; }
     box.innerHTML="<div class='hr hh' aria-hidden='true'><span>#</span><span>TOKEN</span><span class='c3'>PRICE 1 H</span><span class='c4'>VOLUME 24 H</span><span class='c5'>SIGNAL</span><span>RISK</span></div>"+
       tr.map(function(x,i){ var ch=isFinite(x.chg)?x.chg:null;
-        return "<button type='button' class='hr' data-analyze='"+esc(x.mint)+"'><span class='n'>"+(i+1)+"</span><span class='tk'>"+tokAv(x.img,x.sym)+
-          "<span><b>$"+esc(x.sym)+"</b><small>"+esc([DEXN[x.dex]||x.dex,x.created?haceMin(x.created):""].filter(Boolean).join(" · "))+"</small></span></span>"+
+        return "<div class='hr' role='button' tabindex='0' data-analyze='"+esc(x.mint)+"'><span class='n'>"+(i+1)+"</span><span class='tk'>"+tokAv(x.img,x.sym)+
+          "<span><b>$"+esc(x.sym)+"</b><small>"+esc([DEXN[x.dex]||x.dex,x.created?haceMin(x.created):""].filter(Boolean).join(" · "))+"</small>"+fichaA(x.mint)+"</span></span>"+
           "<span class='num c3"+(ch===null?"":ch>=0?" up":" dn")+"'>"+(ch!==null?(ch>=0?"+":"")+esc(fmtPct(ch)):"—")+"</span>"+
           "<span class='num c4'>"+(x.vol?esc(usd(x.vol)):"—")+"</span>"+
-          "<span class='c5 sg'>"+(x.st==="done"?esc(hotSignal(x.r)):"Analyzing…")+"</span>"+(x.st==="done"?hotSeal(x.r):"<span class='hseal wait'>…</span>")+"</button>";
+          "<span class='c5 sg'>"+(x.st==="done"?esc(hotSignal(x.r)):"Analyzing…")+"</span>"+(x.st==="done"?hotSeal(x.r):"<span class='hseal wait'>…</span>")+"</div>";
       }).join("");
   } else {
     src.innerHTML="The 5 latest on Solana (Pump.fun and others). Of what is born, <b>99%</b> is dead within 24 h (SolFlag registry). <a href='#' data-trynew>See all in New tokens →</a> · <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a>";
@@ -3803,10 +3812,10 @@ function paintHot(){
     if(!fresh.rows){ box.innerHTML="<p class='hint'>Looking for the latest launches…</p>"; return; }
     box.innerHTML="<div class='hr hh' aria-hidden='true'><span>#</span><span>TOKEN</span><span class='c3'>AGE</span><span class='c4'>LIQUIDITY</span><span class='c5'>DEX</span><span>RISK</span></div>"+
       fr.map(function(x,i){
-        return "<button type='button' class='hr' data-analyze='"+esc(x.mint)+"'><span class='n'>"+(i+1)+"</span><span class='tk'>"+tokAv(x.img,x.sym)+
-          "<span><b>$"+esc(x.sym)+"</b><small>"+esc(DEXN[x.dex]||x.dex)+"</small></span></span>"+
+        return "<div class='hr' role='button' tabindex='0' data-analyze='"+esc(x.mint)+"'><span class='n'>"+(i+1)+"</span><span class='tk'>"+tokAv(x.img,x.sym)+
+          "<span><b>$"+esc(x.sym)+"</b><small>"+esc(DEXN[x.dex]||x.dex)+"</small>"+fichaA(x.mint)+"</span></span>"+
           "<span class='num c3'>"+esc(x.created?haceMin(x.created):"—")+"</span><span class='num c4'>"+(x.liq?esc(usd(x.liq)):"—")+"</span>"+
-          "<span class='c5 sg'>"+esc(DEXN[x.dex]||x.dex)+"</span><span class='hseal go'>ANALYZE</span></button>";
+          "<span class='c5 sg'>"+esc(DEXN[x.dex]||x.dex)+"</span><span class='hseal go'>ANALYZE</span></div>";
       }).join("");
   }
 }
@@ -5958,7 +5967,11 @@ document.addEventListener("click",function(ev){
   var wf=ev.target.closest&&ev.target.closest("[data-wfl]");
   if(wf){ var wb=wf.closest(".tok").querySelector(".wfl"); wb.hidden=!wb.hidden; wf.setAttribute("aria-expanded",String(!wb.hidden)); wf.lastChild.textContent=wb.hidden?"▾":"▴"; return; }
   var an=ev.target.closest&&ev.target.closest("[data-analyze]");
-  if(an){ ev.preventDefault(); setMode("W"); $("#wallet").value=an.getAttribute("data-analyze"); analyze(); }
+  if(an&&!ev.target.closest("a")){ ev.preventDefault(); setMode("W"); $("#wallet").value=an.getAttribute("data-analyze"); analyze(); }
+});
+document.addEventListener("keydown",function(ev){
+  var r=ev.target.closest&&ev.target.closest("[role='button'][data-analyze]");
+  if(r&&ev.target===r&&(ev.key==="Enter"||ev.key===" ")){ ev.preventDefault(); r.click(); }
 });
 function copyText(t,btn){
   var old=btn.innerHTML;
@@ -6006,6 +6019,12 @@ document.addEventListener("change",function(ev){
 $("#wallet").addEventListener("input",walletHint);
 // Portada: «Buscar ballenas» usa la misma dirección; «Prueba con» rellena y analiza
 $("#ctaGo").addEventListener("click",function(){ window.scrollTo({top:0,behavior:"smooth"}); setTimeout(function(){ $("#wallet").focus({preventScroll:true}); },400); });
+// «Ver su ficha»: la ficha pública de la dirección escrita (si está vacía, se pide que se escriba)
+$("#goF").addEventListener("click",function(){
+  var v=($("#wallet").value||"").trim();
+  if(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(v)){ track("ficha"); window.open(fichaLink(v),"_blank","noopener"); }
+  else $("#wallet").focus();
+});
 $("#goH").addEventListener("click",function(){
   var v=$("#wallet").value.trim(); setMode("H"); if(v){ $("#mint").value=v; holders(); } else $("#mint").focus();
 });
