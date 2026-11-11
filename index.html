@@ -1715,6 +1715,14 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 .sitefoot .foot{color:#c9c1ea!important;font-size:.9rem;line-height:1.6;max-width:760px}
 .sitefoot a{color:var(--kick)}
 .sitefoot .credits a{color:#d8d2f5}
+
+/* qué es la wallet: identificada (turquesa) o por su comportamiento (ámbar; rojo si la mayoría de sus lanzamientos murió) */
+.wkind{margin:12px 0 0;padding:10px 12px;border-radius:12px;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.07);font-size:.9rem;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.wkind b{color:#fcd34d}
+.wkind small{flex-basis:100%;color:var(--muted);font-size:.82rem}
+.wkind .wk-g{font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);flex-basis:100%}
+.wkind.red{border-color:rgba(255,107,107,.45);background:rgba(255,107,107,.08)}.wkind.red b{color:var(--alto)}
+.wkind.id{border-color:rgba(122,184,196,.5);background:rgba(122,184,196,.08)}.wkind.id b{color:var(--kick)}
 </style>
 </head>
 <body>
@@ -3190,10 +3198,11 @@ function render(again){
   if(c["SIN DATOS"]>0) tip+=" "+c["SIN DATOS"]+(c["SIN DATOS"]===1?" token no se pudo comprobar por un fallo de red: vuelve a analizar la wallet para revisarlo.":" tokens no se pudieron comprobar por un fallo de red: vuelve a analizar la wallet para revisarlos.");
   var split=splitText();
   $("#results").classList.add("wmode"); walletDetail();
+  var wa=state.wallet; loadBase().then(function(){ if(state.wallet===wa) paintWKind(wa); }).catch(function(){});
   var hid=state.hidden?(state.hidden===1?" Se ha ocultado 1 token de menos de 1 $.":" Se han ocultado "+state.hidden+" tokens de menos de 1 $."):"";
   $("#summary").innerHTML=
     "<div class='sum-head'>"+
-      "<div><div class='eyebrow'>Wallet</div><button type='button' class='mono tmint2' style='margin-top:4px' data-copy='"+esc(state.wallet)+"' title='Copiar dirección de la wallet'>"+esc(state.wallet)+"</button></div>"+
+      "<div><div class='eyebrow'>Wallet</div><button type='button' class='mono tmint2' style='margin-top:4px' data-copy='"+esc(state.wallet)+"' title='Copiar dirección de la wallet'>"+esc(state.wallet)+"</button><div id='wkind'></div></div>"+
       "<div class='stats'>"+
         "<div class='stat'><div class='eyebrow'>SOL</div><div class='v'>"+state.sol.toLocaleString('de-DE',{maximumFractionDigits:3})+"</div></div>"+
         "<div class='stat'><div class='eyebrow'>Tokens</div><div class='v'>"+n+"</div></div>"+
@@ -3744,13 +3753,13 @@ function paintHotW(){
   var j=hotw.j; if(!j) return;
   var ex=hotw.ex||{}, ok=function(x){ return !ex[x.w]; };
   var cr=(j.creators||[]).filter(ok)[0], bu=(j.buyers||[]).filter(ok)[0], fu=(j.funders||[]).filter(ok)[0], c=[];
-  if(cr) c.push("<button type='button' class='w' data-analyze='"+esc(cr.w)+"'><span class='top'><span class='ad'>"+esc(short(cr.w))+"</span><span class='tag t-hi'>CREADOR EN SERIE</span></span>"+
+  if(cr) c.push("<button type='button' class='w' data-analyze='"+esc(cr.w)+"'><span class='top'><span class='ad'>"+esc(short(cr.w))+"</span><span class='tag "+(cr.all&&cr.all.resolved>=3&&cr.all.dead24/cr.all.resolved>=.5?"t-hi":"t-me")+"'>CREA TOKENS EN SERIE</span></span>"+
     "<span class='big'>"+cr.n+"<span>lanzamientos hoy</span></span>"+sparkHtml(cr.spark)+
     "<span class='ft'><span>"+(cr.all&&cr.all.resolved?cr.all.dead24+" de "+cr.all.resolved+" muertos a 24 h":cr.hi+" en rojo hoy")+"</span><span>"+((cr.all&&cr.all.n)||cr.n)+" en total</span></span></button>");
   if(bu) c.push("<button type='button' class='w' data-analyze='"+esc(bu.w)+"'><span class='top'><span class='ad'>"+esc(short(bu.w))+"</span><span class='tag t-me'>COMPRA AL NACER</span></span>"+
     "<span class='big'>"+bu.n+"<span>compras en los primeros bloques</span></span>"+sparkHtml(bu.spark)+
     "<span class='ft'><span>"+(bu.d0?bu.d0+" en el mismo bloque":"ninguna en el mismo bloque")+"</span><span>"+(bu.all||bu.n)+" en total</span></span></button>");
-  if(fu) c.push("<button type='button' class='w' data-analyze='"+esc(fu.w)+"'><span class='top'><span class='ad'>"+esc(short(fu.w))+"</span><span class='tag'>FINANCIADOR</span></span>"+
+  if(fu) c.push("<button type='button' class='w' data-analyze='"+esc(fu.w)+"'><span class='top'><span class='ad'>"+esc(short(fu.w))+"</span><span class='tag t-me'>FINANCIA CREADORES</span></span>"+
     "<span class='big'>"+fu.creators+"<span>creadores financiados</span></span>"+sparkHtml(fu.spark)+
     "<span class='ft'><span>"+fu.n+" lanzamientos detrás</span><span>en 24 h</span></span></button>");
   $("#hotwl").innerHTML=c.join(""); $("#hotw").hidden=!c.length;
@@ -4124,14 +4133,40 @@ async function loadBase(){
   return wbase.data||{wallets:{}};
 }
 function baseType(a){ var w=wbase.data&&wbase.data.wallets&&wbase.data.wallets[a]; return w?w.t:null; }
-var BASE_TXT={"exchange":"Exchange conocido","granja":"Granja de lanzamientos","repartidor":"Repartidor conocido","creador en serie":"Creador en serie","sniper":"Sniper conocido"};
+// Nombres públicos (11/11): describen lo que hace la wallet, sin juicio. Los tipos internos (granja, repartidor…) no cambian
+var BASE_TXT={"exchange":"Ritmo de exchange","granja":"Paga lanzamientos","repartidor":"Reparte SOL","creador en serie":"Crea tokens en serie","sniper":"Compra al nacer"};
+// Qué es la wallet, en su resumen: «Identificada» (nombre comprobado) o «Por su comportamiento» (con el motivo)
+function paintWKind(a){
+  var box=$("#wkind"); if(!box) return;
+  var kw=SRE.knownWallet&&SRE.knownWallet(a);
+  if(kw&&(kw.t==="exchange"||kw.t==="market_maker")){
+    box.innerHTML="<p class='wkind id'><span class='wk-g'>Identificada</span><b>"+(kw.t==="exchange"?"🏦 ":"🏛️ ")+esc(kw.n)+"</b> · "+(kw.t==="exchange"?"exchange: guarda fondos de sus usuarios":"creador de mercado: es su inventario y lo puede vender")+"</p>"; return; }
+  var t=baseType(a); if(!t){ box.innerHTML=""; return; }
+  var IC={"exchange":"🏦","granja":"🧾","repartidor":"📦","creador en serie":"🚀","sniper":"🎯"}, j=wwho[a], R=(j&&j.roles)||{}, res=0, dd=0;
+  ["payer","creator","funder"].forEach(function(k){ res+=(R[k]||{}).resolved||0; dd+=(R[k]||{}).dead24||0; });
+  var cls=t==="exchange"?" id":(res>=3&&dd/res>=.5?" red":""), why=baseWhy(a);
+  box.innerHTML="<p class='wkind"+cls+"'><span class='wk-g'>Por su comportamiento</span><b>"+(IC[t]||"")+" "+esc(BASE_TXT[t]||t)+"</b>"+
+    "<small>"+esc((why?why.charAt(0).toUpperCase()+why.slice(1)+". ":"")+"Es un hecho de la cadena, no una acusación.")+"</small></p>";
+}
+// El motivo, con los números de la base de wallets
+function baseWhy(a){
+  var w=wbase.data&&wbase.data.wallets&&wbase.data.wallets[a]; if(!w) return "";
+  var r=w.roles||{}, t=w.t;
+  if(t==="exchange") return w.ph?"hace unas "+w.ph+" operaciones por hora, como un exchange":"mueve tanto como un exchange";
+  if(t==="granja") return "ha pagado la creación de "+(r.payer||0)+" tokens";
+  if(t==="repartidor") return "ha dado el primer SOL a wallets de "+((r.funder||0)+(r.group||0))+" lanzamientos";
+  if(t==="creador en serie") return "ha creado "+(r.creator||0)+" tokens";
+  if(t==="sniper") return "ha comprado en el primer bloque "+(r.sniper||0)+" veces";
+  return "";
+}
 function baseTag(a){
   // exchange con nombre (lista del motor, comprobada en Solscan): se dice cuál es
   var kw=SRE.knownWallet&&SRE.knownWallet(a);
-  if(kw&&kw.t==="exchange") return "<span class='tag kb kb-ex' title='Wallet de un exchange: guarda fondos de sus usuarios'>"+esc(kw.n)+" (exchange)</span>";
-  if(kw&&kw.t==="market_maker") return "<span class='tag kb kb-ex' title='Creador de mercado con nombre público (Solscan o su propio anuncio): es su inventario y lo puede vender'>"+esc(kw.n)+" (creador de mercado)</span>";
+  if(kw&&kw.t==="exchange") return "<span class='tag kb kb-ex' title='Identificada: wallet de un exchange, comprobada en Solscan. Guarda fondos de sus usuarios'>"+esc(kw.n)+" (exchange)</span>";
+  if(kw&&kw.t==="market_maker") return "<span class='tag kb kb-ex' title='Identificada: creador de mercado con nombre público (Solscan o su propio anuncio). Es su inventario y lo puede vender'>"+esc(kw.n)+" (creador de mercado)</span>";
   var t=baseType(a); if(!t) return "";
-  return "<span class='tag kb kb-"+(t==="exchange"?"ex":"warn")+"' title='Lo sabe la base de wallets de SolFlag, que se va llenando con cada lanzamiento revisado'>"+esc(BASE_TXT[t]||t)+"</span>";
+  var why=baseWhy(a);
+  return "<span class='tag kb kb-"+(t==="exchange"?"ex":"warn")+"' title='"+esc("Por su comportamiento"+(why?": "+why:"")+". Es un hecho de la cadena, no una acusación. Lo sabe la base de wallets de SolFlag, que crece con cada lanzamiento revisado")+"'>"+esc(BASE_TXT[t]||t)+"</span>";
 }
 /* ---------- caras conocidas ----------
    Lista que publica cada 30 minutos el recolector (tools/caras): wallets que pagaron, financiaron o crearon
@@ -4820,9 +4855,13 @@ function walletLabel(a,j,face,total){
   var RED="#ff6b6b", TUR="#7ab8c4", LIL="#a78bfa", kw=SRE.knownWallet&&SRE.knownWallet(a);
   if(kw&&kw.t==="exchange") return {ic:"🏦",lbl:"EXCHANGE · "+String(kw.n).toUpperCase(),col:TUR};
   if(kw&&kw.t==="market_maker") return {ic:"🏛️",lbl:"CREADOR DE MERCADO · "+String(kw.n).toUpperCase(),col:TUR};
-  var bt=baseType(a), BT={"exchange":["🏦","EXCHANGE CONOCIDO",TUR],"granja":["🏭","GRANJA DE LANZAMIENTOS",RED],"repartidor":["📦","REPARTIDOR CONOCIDO",RED],"creador en serie":["🚀","CREADOR EN SERIE",RED],"sniper":["🎯","SNIPER CONOCIDO",RED]};
+  var AMB="#fbbf24", RR=(j&&j.roles)||{}, res=0, dd=0;
+  ["payer","creator","funder"].forEach(function(k){ res+=(RR[k]||{}).resolved||0; dd+=(RR[k]||{}).dead24||0; });
+  var bad=res>=3&&dd/res>=.5?RED:AMB;
+  var bt=baseType(a), BT={"exchange":["🏦","RITMO DE EXCHANGE",TUR],"granja":["🧾","PAGA LANZAMIENTOS",bad],"repartidor":["📦","REPARTE SOL",bad],"creador en serie":["🚀","CREA TOKENS EN SERIE",bad],"sniper":["🎯","COMPRA AL NACER",AMB]};
   if(bt&&BT[bt]) return {ic:BT[bt][0],lbl:BT[bt][1],col:BT[bt][2]};
-  if(face) return {payer:{ic:"💸",lbl:"PAGADOR EN SERIE",col:RED},creator:{ic:"🚀",lbl:"CREADOR EN SERIE",col:RED},funder:{ic:"💰",lbl:"FINANCIADOR EN SERIE",col:RED}}[face.role];
+  // caras conocidas: sus lanzamientos no despegaron, por eso van en rojo
+  if(face) return {payer:{ic:"🧾",lbl:"PAGA LANZAMIENTOS",col:RED},creator:{ic:"🚀",lbl:"CREA TOKENS EN SERIE",col:RED},funder:{ic:"💰",lbl:"FINANCIA LANZAMIENTOS",col:RED}}[face.role];
   var R=(j&&j.roles)||{}, fb=(j&&j.firstBuys)||{};
   if((R.creator||{}).n||(R.payer||{}).n) return {ic:"🚀",lbl:"HA CREADO TOKENS",col:"#fbbf24"};
   if((R.funder||{}).n) return {ic:"💰",lbl:"HA FINANCIADO LANZAMIENTOS",col:"#fbbf24"};
