@@ -4,6 +4,8 @@
 //
 //   GET  /api/wallet/<dirección>   lo que se sabe de una wallet en los lanzamientos registrados
 //   GET  /api/token/<mint>         un lanzamiento: quién está detrás (con su historial) y sus primeros compradores
+//   GET  /api/portada              lo de las últimas 24 h para la portada: lanzamientos por DEX y nivel, creadores
+//                                  en serie, financiadores de varios creadores y quién compra en los primeros bloques
 //   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
 //                                  veces (tabla pedidos), nada de quién. El recolector lo analiza después él mismo
 //
@@ -63,6 +65,47 @@ export async function token(db, m) {
   return { v: V, token: launch(r), cara: r.cara || undefined, behind: behind, firstBuyers: buyers };
 }
 
+// Portada: las últimas 24 h. Devuelve TOP de cada lista (la web quita después los exchanges conocidos).
+// spark: lanzamientos (o compras) en 8 tramos de 3 h, del más antiguo al más reciente
+export const TOP = 12, DAY = 86400000, SLOT = 10800000;
+export async function portada(db, now) {
+  // ph(n, k): marcadores ?k … ?(k+n-1) para un IN
+  const since = now - DAY, ph = (n, k) => Array.from({ length: n }, (_, i) => "?" + (i + k)).join(",");
+  const spark = (rows, list) => { const by = {}; list.forEach((x) => { x.spark = by[x.w] = [0, 0, 0, 0, 0, 0, 0, 0]; });
+    rows.forEach((r) => { const b = Math.max(0, Math.min(7, r.b)); if (by[r.w]) by[r.w][b] += r.n; }); };
+  const tot = (await all(db, "SELECT COUNT(*) AS n, SUM(lvl = 'HIGH') AS hi, SUM(lvl IS NOT NULL) AS lv FROM lanz WHERE t > ?1", [since]))[0] || {};
+  const dex = (await all(db, "SELECT dex, COUNT(*) AS n, SUM(lvl = 'HIGH') AS hi, SUM(lvl = 'MEDIUM') AS me, SUM(lvl = 'LOW') AS lo FROM lanz WHERE t > ?1 AND dex IS NOT NULL GROUP BY dex ORDER BY n DESC LIMIT 8", [since]))
+    .map((r) => ({ dex: r.dex, n: r.n, hi: r.hi || 0, me: r.me || 0, lo: r.lo || 0 }));
+
+  const creators = (await all(db, "SELECT cr AS w, COUNT(*) AS n, SUM(lvl = 'HIGH') AS hi, MAX(t) AS last FROM lanz WHERE t > ?1 AND cr IS NOT NULL GROUP BY cr HAVING n > 1 ORDER BY n DESC LIMIT " + TOP, [since]))
+    .map((r) => ({ w: r.w, n: r.n, hi: r.hi || 0, last: r.last }));
+  if (creators.length) {
+    const ws = creators.map((c) => c.w), byW = {};
+    creators.forEach((c) => { byW[c.w] = c; });
+    (await all(db, "SELECT cr AS w, " + SUM + " FROM lanz WHERE cr IN (" + ph(ws.length, 1) + ") GROUP BY cr", ws))
+      .forEach((r) => { Object.assign(byW[r.w], { all: tally(r) }); });
+    spark(await all(db, "SELECT cr AS w, CAST((t - ?1) / " + SLOT + " AS INTEGER) AS b, COUNT(*) AS n FROM lanz WHERE t > ?1 AND cr IN (" + ph(ws.length, 2) + ") GROUP BY cr, b", [since].concat(ws)), creators);
+  }
+
+  const funders = (await all(db, "SELECT fu AS w, COUNT(DISTINCT cr) AS c, COUNT(*) AS n, MIN(t) AS first FROM lanz WHERE t > ?1 AND fu IS NOT NULL GROUP BY fu HAVING c > 1 ORDER BY c DESC, n DESC LIMIT " + TOP, [since]))
+    .map((r) => ({ w: r.w, creators: r.c, n: r.n }));
+  if (funders.length) {
+    const ws = funders.map((f) => f.w);
+    spark(await all(db, "SELECT fu AS w, CAST((t - ?1) / " + SLOT + " AS INTEGER) AS b, COUNT(*) AS n FROM lanz WHERE t > ?1 AND fu IN (" + ph(ws.length, 2) + ") GROUP BY fu, b", [since].concat(ws)), funders);
+  }
+
+  const buyers = (await all(db, "SELECT c.w AS w, COUNT(*) AS n, SUM(c.d = 0) AS d0 FROM compras c JOIN lanz l ON l.m = c.m WHERE l.t > ?1 GROUP BY c.w HAVING n > 1 ORDER BY n DESC LIMIT " + TOP, [since]))
+    .map((r) => ({ w: r.w, n: r.n, d0: r.d0 || 0 }));
+  if (buyers.length) {
+    const ws = buyers.map((b) => b.w), byW = {};
+    buyers.forEach((b) => { byW[b.w] = b; });
+    (await all(db, "SELECT w, COUNT(*) AS n FROM compras WHERE w IN (" + ph(ws.length, 1) + ") GROUP BY w", ws))
+      .forEach((r) => { byW[r.w].all = r.n; });
+    spark(await all(db, "SELECT c.w AS w, CAST((l.t - ?1) / " + SLOT + " AS INTEGER) AS b, COUNT(*) AS n FROM compras c JOIN lanz l ON l.m = c.m WHERE l.t > ?1 AND c.w IN (" + ph(ws.length, 2) + ") GROUP BY c.w, b", [since].concat(ws)), buyers);
+  }
+  return { v: V, since: since, until: now, launches: { n: tot.n || 0, analyzed: tot.lv || 0, high: tot.hi || 0 }, dex: dex, creators: creators, funders: funders, buyers: buyers };
+}
+
 const PEDIDOS = "CREATE TABLE IF NOT EXISTS pedidos (m TEXT PRIMARY KEY, n INTEGER, t0 INTEGER, t1 INTEGER, hecho INTEGER)";
 const SEEN = "INSERT INTO pedidos (m, n, t0, t1) VALUES (?1, 1, ?2, ?2) ON CONFLICT(m) DO UPDATE SET n = n + 1, t1 = ?2";
 
@@ -89,6 +132,9 @@ export async function handle(req, env) {
   const p = new URL(req.url).pathname.replace(/\/+$/, "").split("/");
   if (req.method === "POST" && p.length === 4 && p[1] === "api" && p[2] === "visto") return visto(req, env, p[3]);
   if (req.method !== "GET") return fail(405, "only GET");
+  if (p.length === 3 && p[1] === "api" && p[2] === "portada") {
+    try { return json(await portada(env.DB, Date.now())); } catch (e) { return fail(503, "database unavailable"); }
+  }
   // /api/<tipo>/<dirección>
   if (p.length !== 4 || p[1] !== "api" || !/^(wallet|token)$/.test(p[2])) return fail(404, "use /api/wallet/<address> or /api/token/<mint>");
   if (!ADDR.test(p[3])) return fail(400, "not a Solana address");

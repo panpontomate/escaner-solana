@@ -1569,6 +1569,35 @@ body.landing #adv{margin-top:10px}
   .lblk{padding:40px 0 56px}
 }
 
+/* billeteras calientes y DEX */
+.wal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.wal .w{border:1px solid var(--line);border-radius:20px;padding:22px 22px 20px;background:rgba(14,10,36,.35);display:flex;flex-direction:column;gap:14px;color:inherit;font:inherit;text-align:left;cursor:pointer;min-width:0;transition:border-color .2s,background .2s}
+.wal .w:hover{border-color:var(--line2);background:rgba(139,92,246,.08)}
+.wal .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.wal .ad{font:500 1.1rem var(--f-mono)}
+.wal .tag{font:700 .69rem var(--f-body);letter-spacing:.1em;padding:5px 10px;border-radius:999px;border:1px solid var(--line2);color:#ddd6fb;white-space:nowrap}
+.wal .tag.t-hi{color:var(--alto);border-color:rgba(255,107,107,.4)}.wal .tag.t-me{color:var(--medio);border-color:rgba(251,191,36,.4)}
+.wal .big{display:block;font:700 2.1rem/1 var(--f-display)}
+.wal .big span{font:400 .94rem var(--f-body);color:var(--muted);margin-left:8px}
+.spark{display:flex;align-items:flex-end;gap:3px;height:34px}
+.spark i{flex:1;background:rgba(196,181,253,.35);border-radius:2px}
+.wal .ft{display:flex;justify-content:space-between;gap:10px;font-size:.82rem;color:var(--mut2);border-top:1px solid var(--line);padding-top:12px}
+.dex{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:14px}
+.dx{border:1px solid var(--line);border-radius:20px;padding:10px 24px;background:rgba(14,10,36,.35)}
+.dr{display:grid;grid-template-columns:150px minmax(0,1fr) 80px 90px;gap:16px;align-items:center;height:60px;border-bottom:1px solid var(--line)}
+.dr:last-child{border-bottom:0}
+.dr b{font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dex .bar{height:10px;border-radius:5px;background:rgba(196,181,253,.25);overflow:hidden;display:flex}
+.dex .bar i{display:block;height:100%}
+.dr .num{text-align:right;white-space:nowrap}
+.dnote{border:1px solid var(--line);border-radius:20px;padding:26px;background:rgba(14,10,36,.35)}
+.dnote h3{font:700 1.5rem var(--f-display);margin:8px 0 10px}
+.dnote p{color:var(--muted);margin:0 0 16px;font-size:.94rem}
+.leg{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--muted)}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+@media (max-width:960px){ .wal{grid-template-columns:1fr 1fr} .dex{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:560px){ .wal{grid-template-columns:minmax(0,1fr)} .dr{grid-template-columns:96px minmax(0,1fr) 64px}.dr .c4{display:none}.dx{padding:6px 14px} }
+
 /* ---- resultado de un token: cabecera grande con la nebulosa, sello redondo, cuatro cifras grandes;
    banderas a la izquierda junto a la gráfica y, debajo, Quién está detrás y Ballenas a todo el ancho ---- */
 #results{position:relative}
@@ -1839,6 +1868,25 @@ body:not(.landing):not(.scanp) #form .row .btn{min-height:40px;border-radius:999
         <div class="hrows" id="hotrows"><p class="hint">Cargando la tendencia…</p></div>
       </div>
       <p class="syn" id="hotsrc"></p>
+    </section>
+    <section class="lblk" id="hotw" hidden style="padding-top:20px">
+      <div class="sec-head"><h2>Billeteras calientes<span class="thin">de hoy.</span></h2><p>Las que más lanzan, compran o financian en las últimas 24 horas según nuestro registro. Son datos, no acusaciones.</p></div>
+      <div class="wal" id="hotwl"></div>
+      <p class="syn">Fuente: registro de SolFlag (las últimas 24 h). Sin exchanges conocidos. Pulsa una para analizarla. ¿Un dato mal? <a href="mailto:solflag.team@gmail.com">Escríbenos</a>.</p>
+    </section>
+    <div class="seam" id="dexseam" hidden><canvas data-seam="2" aria-hidden="true"></canvas></div>
+    <section class="lblk" id="hotd" hidden>
+      <div class="sec-head"><h2>Dónde se lanza<span class="thin">en las últimas 24 h.</span></h2><p>Lanzamientos por DEX y cuántos de sus tokens nuevos marcamos en rojo.</p></div>
+      <div class="dex">
+        <div class="dx" id="hotdl"></div>
+        <div class="dnote">
+          <p class="kick">Cómo leerlo</p>
+          <h3>No todos los DEX son iguales</h3>
+          <p>La barra reparte los tokens nuevos de cada DEX por nivel de riesgo. Después vienen los lanzamientos y el porcentaje en rojo de los que analizamos.</p>
+          <div class="leg"><span><i style="background:var(--alto)"></i>Alto</span><span><i style="background:var(--medio)"></i>Medio</span><span><i style="background:var(--bajo)"></i>Bajo</span><span><i style="background:rgba(196,181,253,.25)"></i>Sin analizar</span></div>
+        </div>
+      </div>
+      <p class="syn" id="hotdsrc"></p>
     </section>
     <section class="lblk lstats" id="lstats" hidden>
       <div class="sec-head"><h2>Lo que hemos visto<span class="thin">hasta hoy.</span></h2><p>Cada lanzamiento queda guardado: quién lo creó, quién lo pagó y cómo acabó a las 24 horas.</p></div>
@@ -3634,11 +3682,53 @@ function paintHot(){
   }
 }
 document.addEventListener("click",function(ev){ var b=ev.target.closest&&ev.target.closest("[data-hot]"); if(b){ hot.tab=b.getAttribute("data-hot"); paintHot(); } });
+/* Billeteras calientes y DEX: /api/portada (las últimas 24 h del registro). Sin respuesta, los apartados no salen */
+var hotw={j:null,ts:0,run:false,ex:null};
+async function loadHotW(){
+  if(hotw.run||(hotw.j&&Date.now()-hotw.ts<300000)) return;
+  hotw.run=true;
+  try{
+    var r=await Promise.all([fetch(API+"portada").then(function(x){ return x.ok?x.json():null; }),
+      hotw.ex?Promise.resolve(null):fetch("/datos/exchanges.json",{cache:"no-cache"}).then(function(x){ return x.ok?x.json():null; }).catch(function(){ return null; })]);
+    if(r[1]&&r[1].exchanges) hotw.ex=r[1].exchanges;
+    if(r[0]&&r[0].v===1){ hotw.j=r[0]; hotw.ts=Date.now(); }
+  }catch(e){}
+  hotw.run=false; paintHotW();
+}
+function sparkHtml(a){
+  var mx=Math.max.apply(null,(a||[0]).concat([1]));
+  return "<div class='spark' aria-hidden='true'>"+(a||[]).map(function(v){ return "<i style='height:"+Math.max(6,Math.round(v/mx*100))+"%'></i>"; }).join("")+"</div>";
+}
+function paintHotW(){
+  var j=hotw.j; if(!j) return;
+  var ex=hotw.ex||{}, ok=function(x){ return !ex[x.w]; };
+  var cr=(j.creators||[]).filter(ok)[0], bu=(j.buyers||[]).filter(ok)[0], fu=(j.funders||[]).filter(ok)[0], c=[];
+  if(cr) c.push("<button type='button' class='w' data-analyze='"+esc(cr.w)+"'><span class='top'><span class='ad'>"+esc(short(cr.w))+"</span><span class='tag t-hi'>CREADOR EN SERIE</span></span>"+
+    "<span class='big'>"+cr.n+"<span>lanzamientos hoy</span></span>"+sparkHtml(cr.spark)+
+    "<span class='ft'><span>"+(cr.all&&cr.all.resolved?cr.all.dead24+" de "+cr.all.resolved+" muertos a 24 h":cr.hi+" en rojo hoy")+"</span><span>"+((cr.all&&cr.all.n)||cr.n)+" en total</span></span></button>");
+  if(bu) c.push("<button type='button' class='w' data-analyze='"+esc(bu.w)+"'><span class='top'><span class='ad'>"+esc(short(bu.w))+"</span><span class='tag t-me'>COMPRA AL NACER</span></span>"+
+    "<span class='big'>"+bu.n+"<span>compras en los primeros bloques</span></span>"+sparkHtml(bu.spark)+
+    "<span class='ft'><span>"+(bu.d0?bu.d0+" en el mismo bloque":"ninguna en el mismo bloque")+"</span><span>"+(bu.all||bu.n)+" en total</span></span></button>");
+  if(fu) c.push("<button type='button' class='w' data-analyze='"+esc(fu.w)+"'><span class='top'><span class='ad'>"+esc(short(fu.w))+"</span><span class='tag'>FINANCIADOR</span></span>"+
+    "<span class='big'>"+fu.creators+"<span>creadores financiados</span></span>"+sparkHtml(fu.spark)+
+    "<span class='ft'><span>"+fu.n+" lanzamientos detrás</span><span>en 24 h</span></span></button>");
+  $("#hotwl").innerHTML=c.join(""); $("#hotw").hidden=!c.length;
+  var d=(j.dex||[]).filter(function(x){ return x.n>0; });
+  $("#hotdl").innerHTML=d.map(function(x){
+    var pc=function(v){ return (100*v/x.n).toFixed(1)+"%"; }, an=x.hi+x.me+x.lo, red=an?Math.round(100*x.hi/an):null;
+    return "<div class='dr'><b>"+esc(DEXN[x.dex]||x.dex)+"</b><div class='bar' role='img' aria-label='"+esc(x.hi+" alto, "+x.me+" medio, "+x.lo+" bajo de "+x.n)+"'>"+
+      "<i style='width:"+pc(x.hi)+";background:var(--alto)'></i><i style='width:"+pc(x.me)+";background:var(--medio)'></i><i style='width:"+pc(x.lo)+";background:var(--bajo)'></i></div>"+
+      "<span class='num'>"+x.n.toLocaleString("de-DE")+"</span><span class='num c4'>"+(red===null?"—":red+" % rojo")+"</span></div>";
+  }).join("");
+  $("#hotd").hidden=$("#dexseam").hidden=!d.length;
+  var L=j.launches||{};
+  $("#hotdsrc").textContent=d.length?"Registro de SolFlag: "+(L.n||0).toLocaleString("de-DE")+" lanzamientos en las últimas 24 h, "+(L.analyzed||0).toLocaleString("de-DE")+" analizados. Se actualiza cada 5 min.":"";
+}
 function paintHome(){
   if(!trend.rows||Date.now()-trend.ts>300000) setTimeout(loadTrend,300); else paintTrend();
   if(Date.now()-fresh.ts>=30000) loadFresh(); else paintFresh(true);
   if(!fresh.timer) fresh.timer=setInterval(liveTick,10000);
-  loadDatos();
+  loadDatos(); loadHotW();
 }
 document.addEventListener("keydown",function(ev){ if((ev.key==="Enter"||ev.key===" ")&&ev.target&&ev.target.id==="smbox"){ ev.preventDefault(); ev.target.click(); } });
 document.addEventListener("touchstart",function(ev){ var c=$("#scinta"); if(c) c.classList.toggle("stop",!!(ev.target.closest&&ev.target.closest("#scinta"))); },{passive:true});

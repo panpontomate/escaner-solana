@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import { handle, V } from "./worker.js";
+import { handle, V, portada, DAY } from "./worker.js";
 import { SCHEMA } from "../caras/plano.mjs";
 
 const A = "PAY1111111111111111111111111111111", B = "FUND111111111111111111111111111111", C = "BUY1111111111111111111111111111111";
@@ -102,4 +102,23 @@ test("visto: over the rate limit answers 429 and stores nothing", async () => {
   const r = await handle(new Request("https://x/api/visto/" + M1, { method: "POST" }), e);
   assert.equal(r.status, 429);
   assert.equal(e.DB.raw.prepare("SELECT COUNT(*) AS c FROM pedidos").get().c, 0);
+});
+
+test("portada: last 24 h by DEX, serial creators, multi-creator funders and first-block buyers", async () => {
+  const p = await portada(env.DB, 3000 + DAY - 1);   // ventana (2999, …]: M1 y M2 se quedan fuera, solo M3
+  assert.equal(p.launches.n, 1);
+  const q = await portada(env.DB, 1500);             // las tres caben (t > 1500 - DAY)
+  assert.equal(q.v, V);
+  assert.deepEqual(q.launches, { n: 3, analyzed: 3, high: 2 });
+  assert.deepEqual(q.dex, [{ dex: "pump-fun", n: 3, hi: 2, me: 1, lo: 0 }]);
+  assert.equal(q.creators.length, 1);
+  assert.equal(q.creators[0].w, A);
+  assert.equal(q.creators[0].n, 2);
+  assert.deepEqual(q.creators[0].all, { n: 2, resolved: 1, dead24: 1 });
+  assert.equal(q.creators[0].spark.reduce((a, b) => a + b, 0), 2);
+  assert.deepEqual(q.funders.map((f) => [f.w, f.creators, f.n]), [[B, 2, 2]]);
+  assert.deepEqual(q.buyers.map((b) => [b.w, b.n, b.d0, b.all]), [[C, 2, 1, 2]]);
+  const r = await get("/api/portada");
+  assert.equal(r.status, 200);
+  assert.equal(r.body.v, V);
 });
