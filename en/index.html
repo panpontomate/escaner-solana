@@ -3003,6 +3003,9 @@ function track(name){
   try{ if(window.goatcounter&&goatcounter.count) goatcounter.count({path:name+(document.documentElement.lang==="en"?"-en":""),title:name,event:true}); }catch(e){}
 }
 function tokenLink(mint){ return location.origin+location.pathname+"?token="+mint; }
+// Enlace para compartir: la ficha pública del token (token.solflag.com), con su propia vista previa en X y Telegram.
+// Solo existe en español: la web en inglés sigue compartiendo el enlace que abre el análisis
+function fichaLink(mint){ return document.documentElement.lang==="en" ? tokenLink(mint) : "https://token.solflag.com/"+mint; }
 // Abre el bot de Telegram y empieza a vigilar esa dirección: el bot recibe "/start <dirección>"
 var TG_BOT="SolFlagBot";
 function tgLink(addr){ return "https://t.me/"+TG_BOT+"?start="+encodeURIComponent(addr); }
@@ -3031,14 +3034,14 @@ function xText(r){
   return "🔎 $"+r.sym+": "+(dataOnly(r)?"medium risk due to missing data":LEVELS[r.lvl].label.toLowerCase())+
     (bad?" ("+bad+(bad===1?" strong alert)":" strong alerts)"):"")+" by SolFlag (@solflagTeam)";
 }
-function xIntent(r){ return "https://x.com/intent/post?text="+encodeURIComponent(xText(r))+"&url="+encodeURIComponent(tokenLink(r.mint)); }
+function xIntent(r){ return "https://x.com/intent/post?text="+encodeURIComponent(xText(r))+"&url="+encodeURIComponent(fichaLink(r.mint)); }
 var X_ICON="<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-6.4L6.3 22H3.2l7.3-8.3L1 2h6.3l4.4 5.9L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z'/></svg>";
 // Botones del token: Seguir · Buscar ballenas · Compartir ▾ · Avisos en Telegram ▾. Lo que se usa menos va dentro de
 // los dos menús. En el ordenador, en una fila; en el móvil, en 2×2 y los menús suben como un panel desde abajo
 function deskActions(r,fav){
   var share=(r.lights?"<button type='button' class='pm-i' data-card='"+esc(r.mint)+"'>⬇ Download image</button>":"")+
     (r.lights?"<button type='button' class='pm-i' data-xshare='"+esc(r.mint)+"'>𝕏 Share on X</button>":"")+
-    "<button type='button' class='pm-i' data-copy='"+esc(tokenLink(r.mint))+"'>🔗 Copy link</button>";
+    "<button type='button' class='pm-i' data-copy='"+esc(fichaLink(r.mint))+"'>🔗 Copy link</button>";
   var avisos=r.par?"<a target='_blank' rel='noopener' href='"+esc(tgLink(r.mint))+"'>🔔 Watch this token<small>If the risk rises, liquidity drops or the creator sells</small></a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"a50"))+"'>📈 If it rises 50%</a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"b30"))+"'>📉 If it drops 30%</a>"+
@@ -3162,7 +3165,7 @@ function renderToken(noScroll){
       (r.lights?"<button class='btn small tmain' type='button' data-card='"+esc(r.mint)+"'>Download</button>":"")+
       "<div class='trow'>"+xBtn(r)+
       (r.par?tgBtn(r.mint,"Alerts you on Telegram if risk rises, liquidity drops or the creator sells")+priceMenu(r.mint):"")+"</div>"+
-      "<div class='tsub'><button class='btn ghost small' type='button' data-copy='"+esc(tokenLink(r.mint))+"' title='Copy a link that opens this analysis directly'><span class='ic'>🔗</span><span class='lb'>Copy link</span></button>"+
+      "<div class='tsub'><button class='btn ghost small' type='button' data-copy='"+esc(fichaLink(r.mint))+"' title='Copy a link that opens this analysis directly'><span class='ic'>🔗</span><span class='lb'>Copy link</span></button>"+
       (r.par?"<button class='btn ghost small tfav' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
       "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'>Find whales</span></button></div>"+
       "<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Everything around this token, full screen'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button>"+
@@ -5075,7 +5078,7 @@ async function shareX(mint,btn){
       var blob=await blobP, file=null;
       try{ file=new File([blob],name,{type:"image/png"}); }catch(e){}
       if(file&&navigator.canShare({files:[file]})){
-        try{ await navigator.share({files:[file],text:xText(r)+" "+tokenLink(r.mint)}); return; }
+        try{ await navigator.share({files:[file],text:xText(r)+" "+fichaLink(r.mint)}); return; }
         catch(e){ if(e.name==="AbortError") return; }
       }
     }
