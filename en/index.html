@@ -1707,7 +1707,7 @@ body.scanp #form .row .btn{border-radius:999px}
 .hrow .rk,.tchips span,.trust li,.f5 svg{background:rgba(139,92,246,.14)}
 .ml-ico{background:rgba(139,92,246,.16)}
 .track,.meter,.hbar,.bar:not(.dex .bar),.cf-bar,.cf-meter i,.cf-meter.bar{background:rgba(196,181,253,.12)}
-.btn.ghost,.segs,.cf-seg,.cf-sw,.chip{background:rgba(255,255,255,.04)}
+.btn.ghost:not(.wfav):not(.tfav),.segs,.cf-seg,.cf-sw:not([aria-checked="true"]),.chip{background:rgba(255,255,255,.04)}
 input[type=text],input[type=number],input[type=url],textarea,select{background:rgba(10,7,28,.85);border-color:var(--line2)}
 
 /* pie: fondo oscuro de lado a lado (la nebulosa verde de abajo a la izquierda no pasa por detrás) y letra más legible */
@@ -1723,6 +1723,9 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 .wkind .wk-g{font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);flex-basis:100%}
 .wkind.red{border-color:rgba(255,107,107,.45);background:rgba(255,107,107,.08)}.wkind.red b{color:var(--alto)}
 .wkind.id{border-color:rgba(122,184,196,.5);background:rgba(122,184,196,.08)}.wkind.id b{color:var(--kick)}
+
+/* tarjetas casi opacas en toda la app: la nebulosa de las esquinas no se ve a través del texto (wallet, ballenas, Mi lista, Confluencia) */
+.card,.tok,.lsec,.nm-group,.hrow,#lresults .card,#cresults .card{background:rgba(8,6,22,.92)}
 </style>
 </head>
 <body>
