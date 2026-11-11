@@ -24,6 +24,9 @@ const SITEMAP_MAX = 40000;      // el límite de un sitemap es 50.000 direccione
 const OTHERS = 8;               // otros tokens del creador que se enseñan
 const SERIE = 3;                // desde cuántos lanzamientos se habla de «en serie»
 const REPITE = 10;              // un comprador que entró en el primer bloque de 10 o más lanzamientos más: repetidor
+// Topes de lectura: D1 cobra por fila leída, y una wallet en serie puede tener miles de lanzamientos. Se cuenta
+// hasta el tope y la ficha dice «200+» o «1.000+». (11/11: Google leyó las 21.500 fichas en horas)
+export const TOPE_COMPRAS = 200, TOPE_HISTORIAL = 1000;
 
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const short = (a) => (a ? a.slice(0, 4) + "…" + a.slice(-4) : "");
@@ -167,11 +170,11 @@ export async function datosBase(db, m) {
   for (const c of ["py", "cr", "fu"]) {
     const w = r[c]; if (!w) continue;
     if (seen[w]) { seen[w].cols.push(c); continue; }
-    const h = (await all(db, "SELECT " + SUM + " FROM lanz WHERE " + c + " = ?1 AND m <> ?2", [w, m]))[0] || {};
-    seen[w] = { wallet: w, col: c, cols: [c], n: h.n || 0, resolved: h.resolved || 0, dead24: h.dead24 || 0 };
+    const h = (await all(db, "SELECT " + SUM + " FROM (SELECT dead24 FROM lanz WHERE " + c + " = ?1 AND m <> ?2 LIMIT " + TOPE_HISTORIAL + ")", [w, m]))[0] || {};
+    seen[w] = { wallet: w, col: c, cols: [c], n: h.n || 0, resolved: h.resolved || 0, dead24: h.dead24 || 0, tope: (h.n || 0) >= TOPE_HISTORIAL };
     out.roles.push(seen[w]);
   }
-  out.buyers = await all(db, "SELECT c.w, c.d, (SELECT COUNT(*) FROM compras x WHERE x.w = c.w AND x.m <> c.m) AS otros FROM compras c WHERE c.m = ?1 ORDER BY c.d, c.w", [m]);
+  out.buyers = await all(db, "SELECT c.w, c.d, (SELECT COUNT(*) FROM (SELECT 1 FROM compras x WHERE x.w = c.w AND x.m <> c.m LIMIT " + TOPE_COMPRAS + ")) AS otros FROM compras c WHERE c.m = ?1 ORDER BY c.d, c.w", [m]);
   if (r.cr) out.others = await all(db, "SELECT m, t, lvl, dead24 FROM lanz WHERE cr = ?1 AND m <> ?2 ORDER BY t DESC LIMIT " + OTHERS, [r.cr, m]);
   return out;
 }
@@ -202,8 +205,9 @@ async function getJSON(url, ttl) {
 function motivo(d, t, n) {
   const by = (c) => d.roles.find((x) => x.cols.includes(c));
   const cr = by("cr") || by("py"), fu = by("fu");
-  if (cr && cr.n && (cr.n >= SERIE || !(fu && fu.n >= SERIE))) return t.motCr(n(cr.n), cr.n === 1, cr.resolved ? n(cr.resolved) : 0, n(cr.dead24));
-  if (fu && fu.n >= SERIE) return t.motFu(n(fu.n), fu.resolved ? n(fu.resolved) : 0, n(fu.dead24));
+  const nn = (x) => n(x.n) + (x.tope ? "+" : "");
+  if (cr && cr.n && (cr.n >= SERIE || !(fu && fu.n >= SERIE))) return t.motCr(nn(cr), cr.n === 1, cr.resolved && !cr.tope ? n(cr.resolved) : 0, n(cr.dead24));
+  if (fu && fu.n >= SERIE) return t.motFu(nn(fu), fu.resolved && !fu.tope ? n(fu.resolved) : 0, n(fu.dead24));
   if (cr) return t.motNada;
   return "";
 }
@@ -277,14 +281,14 @@ export function pagina(m, d, mk, reg, now, lang) {
   // ---- 05 historial
   const evs = [];
   const fu = r && r.fu, py = r && r.py, cr = r && r.cr;
-  evs.push(fu ? ev(born ? t.antesDel(F.dm(born)) : t.antes, t.finTit, f(t.quienFin, wlink(fu)) + (fur ? f(t.haFinK, t.haFin(n(fur.n))) : ""))
+  evs.push(fu ? ev(born ? t.antesDel(F.dm(born)) : t.antes, t.finTit, f(t.quienFin, wlink(fu)) + (fur ? f(t.haFinK, t.haFin(n(fur.n) + (fur.tope ? "+" : ""))) : ""))
     : ev("—", t.finTit, na(r ? t.finNo : t.noDisp), "na-ev"));
   const quien = py && cr && py === cr ? f(t.pagoCreo, wlink(py)) : (py ? f(t.pago, wlink(py)) : "") + (cr ? f(t.creo, wlink(cr)) : "") + (!py ? f(t.quienPago, t.noDispMin, "dim") : "");
   evs.push(ev(born ? F.dm(born) + " · " + F.hora(born) : "—", t.creaTit, quien + (r ? f(t.plat, esc(platName(r.plat))) : "") + (r && r.liq ? f(t.liq, $(r.liq)) : "")));
   if (d.buyers.length) {
     const b0 = d.buyers.filter((b) => b.d === 0).length;
     evs.push(ev(t.mismoBloque, t.compTit, f(t.comp2, n(d.buyers.length)) + f(t.bloque0, n(b0)) +
-      (rep.length ? f(t.repK, t.repV(n(rep.length), rep.map((b) => n(b.otros)).join(t.y)), "hi") : "")));
+      (rep.length ? f(t.repK, t.repV(n(rep.length), rep.map((b) => n(b.otros) + (b.otros >= TOPE_COMPRAS ? "+" : "")).join(t.y)), "hi") : "")));
   } else evs.push(ev("—", t.compTit, na(r ? t.compNo : t.noDisp), "na-ev"));
   if (r && r.dead24 != null) evs.push(ev(born ? F.dm(born + DAY) : "24 h", t.h24Tit, f(t.murio, dead ? t.si : t.no, dead ? "hi" : "lo") + (r.mc24 != null ? f(t.cap, $(r.mc24)) : "")));
   else evs.push(ev("—", t.h24Tit, na(r && born && now - born < DAY ? t.aun24 : t.noSeguia), r ? "p" : "na-ev"));
@@ -313,13 +317,13 @@ export function pagina(m, d, mk, reg, now, lang) {
     const lab = x.cols.map((c) => t.roles[c]).join(t.y), serie = x.n >= SERIE;
     const chip = r.cara && x.col !== "fu" ? '<span class="chip hi">' + t.chipCara + "</span>" : serie ? '<span class="chip hi">' + (x.col === "fu" ? t.chipFinSerie : t.chipSerie) + "</span>" : '<span class="chip">' + (x.n ? t.chipHist : t.chipNada) + "</span>";
     return '<div class="per"><div class="r"><b>' + lab.charAt(0).toUpperCase() + lab.slice(1) + "</b>" + chip + '</div><div class="fields">' + f(t.wallet, wlink(x.wallet)) +
-      f(x.col === "fu" ? t.otrosFin : t.otrosLanz, n(x.n)) + (x.resolved ? f(t.muertos24, n(x.dead24) + t.de + n(x.resolved), x.dead24 === x.resolved ? "hi" : "") : "") + "</div></div>";
+      f(x.col === "fu" ? t.otrosFin : t.otrosLanz, n(x.n) + (x.tope ? "+" : "")) + (x.resolved && !x.tope ? f(t.muertos24, n(x.dead24) + t.de + n(x.resolved), x.dead24 === x.resolved ? "hi" : "") : "") + "</div></div>";
   }).join("") : '<div class="pad">' + na(r ? t.detrasNo : t.detrasNoBase) + "</div>";
 
   // ---- 09 primeros compradores
   let comp = '<table class="tb"><tr><th>#</th><th>' + t.wallet + "</th><th>" + t.thBloque + "</th><th>" + t.thOtros + "</th></tr>";
   comp += d.buyers.length ? d.buyers.map((b, i) => '<tr><td class="val">' + (i + 1) + '</td><td class="val">' + wlink(b.w) + '</td><td class="val">' + (b.d ? "+" + b.d : "0") +
-    '</td><td class="val ' + (b.otros >= REPITE ? "hi" : b.otros >= 3 ? "mi" : "") + '">' + n(b.otros) + "</td></tr>").join("")
+    '</td><td class="val ' + (b.otros >= REPITE ? "hi" : b.otros >= 3 ? "mi" : "") + '">' + n(b.otros) + (b.otros >= TOPE_COMPRAS ? "+" : "") + "</td></tr>").join("")
     : '<tr><td colspan="4" class="na">' + (r ? t.compNoTabla : t.compNoBase) + "</td></tr>";
   comp += "</table>";
 
@@ -401,7 +405,7 @@ export async function ficha(req, env, fetchJSON) {
   ]);
   const mk = mercado(pairs, m), reg = regDay && regDay.tokens ? regDay.tokens[m] || null : null;
   if (!d.lanz && !mk) return page(noEncontrado(m, lang), 404);
-  return page(pagina(m, d, mk, reg, Date.now(), lang), 200, 300);
+  return page(pagina(m, d, mk, reg, Date.now(), lang), 200, 21600);   // 6 h en la caché de Cloudflare
 }
 
 const LOGO = '<img class="ico" src="https://solflag.com/marca/solflag-icono.svg?v=1" alt="" width="42" height="42">';

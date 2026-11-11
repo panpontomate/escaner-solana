@@ -30,6 +30,7 @@ export const SCHEMA = [
   "CREATE INDEX IF NOT EXISTS lanz_cr ON lanz(cr)",
   "CREATE INDEX IF NOT EXISTS lanz_fu ON lanz(fu)",
   "CREATE INDEX IF NOT EXISTS lanz_t ON lanz(t)",
+  "CREATE INDEX IF NOT EXISTS lanz_cr_t ON lanz(cr, t)",   // la ficha: los últimos tokens de un creador sin leer todos
   "CREATE TABLE IF NOT EXISTS compras (m TEXT, w TEXT, d INTEGER, sig TEXT, PRIMARY KEY (m, w))",
   "CREATE INDEX IF NOT EXISTS compras_w ON compras(w)",
   PEDIDOS_SCHEMA

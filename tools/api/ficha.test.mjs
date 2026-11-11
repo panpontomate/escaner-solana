@@ -142,3 +142,18 @@ test("la ficha en español enlaza a su versión en inglés; el sitemap lleva las
   const root = await ficha(new Request("https://token.solflag.com/en"), env, fakeFetch({}));
   assert.equal(root.headers.get("location"), "https://solflag.com/en/");
 });
+
+test("topes de lectura: un comprador con muchos lanzamientos sale como «200+» y no se leen más filas", async () => {
+  const { TOPE_COMPRAS } = await import("./ficha.js");
+  const db = new DatabaseSync(":memory:");
+  SCHEMA.forEach((s) => db.exec(s));
+  db.prepare("INSERT INTO lanz (m,t,plat,dex,py,cr,fu,liq,lvl,cara,dead24,mc24,up) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)").run(M1, T, "pump_fun", "pump-fun", A, A, null, 0, "HIGH", null, 1, 0, 1);
+  const buy = db.prepare("INSERT INTO compras (m,w,d,sig) VALUES (?,?,?,?)");
+  buy.run(M1, C, 0, "s");
+  for (let i = 0; i < TOPE_COMPRAS + 50; i++) buy.run("Otro" + String(i).padStart(30, "0"), C, 0, "s" + i);
+  const e = { DB: { prepare: (sql) => ({ bind: (...a) => ({ all: async () => ({ results: db.prepare(sql).all(...a) }) }) }) } };
+  const r = await ficha(new Request("https://token.solflag.com/" + M1), e, fakeFetch({}));
+  const body = await r.text();
+  assert.ok(body.includes(">" + TOPE_COMPRAS + "+</td>"), "sale «200+»");
+  assert.match(r.headers.get("cache-control"), /max-age=21600/);
+});
