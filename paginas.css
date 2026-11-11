@@ -70,3 +70,7 @@ article h2{font-size:clamp(1.9rem,4.4vw,2.6rem);line-height:1.08}
 @media (max-width:760px){ .pnav a:not(.pbot){display:none} .pnav{gap:16px;font-size:.88rem} }
 @media (max-width:420px){ .pnav{display:none} .plang{margin-left:auto} }
 @media (max-width:620px){ article{padding:36px 0 4px;margin-top:32px} }
+
+/* pie: fondo oscuro de lado a lado para que la nebulosa no pase por detrás, y letra más clara */
+footer{position:relative;background:rgba(5,4,13,.94);box-shadow:0 0 0 100vmax rgba(5,4,13,.94);clip-path:inset(0 -100vmax -100vmax);padding-bottom:40px;color:#c9c1ea}
+footer p{color:#c9c1ea}
