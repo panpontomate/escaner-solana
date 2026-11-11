@@ -25,9 +25,8 @@ a:hover{color:#c3e2e7}
 .wrap{max-width:780px;margin:0 auto}
 header{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22)}
 .logo{display:flex;align-items:center;gap:11px;text-decoration:none}
-.logo svg{width:42px;height:42px;flex:none}
-.wm{font:700 30px/1 'Barlow Condensed','Arial Narrow',sans-serif}
-.wm-a{color:#fff}.wm-b{color:#c4b5fd}
+.logo svg,.logo .ico{width:42px;height:42px;flex:none}
+.wm{display:inline-block;font-family:Unbounded,'Arial Black',sans-serif;font-weight:700;line-height:1.15;letter-spacing:-.03em;background:linear-gradient(90deg,#7fd0dc,#9fb4f2 50%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));font-size:25px}
 .back{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:700;text-decoration:none}
 .back:hover{color:#140e31;filter:brightness(1.06)}
 .intro{padding:52px 0 18px}
@@ -55,11 +54,11 @@ article p.nota{border-left:3px solid var(--medio);background:rgba(251,191,36,.08
 .fig span{color:var(--muted);font-size:.88rem}
 .share{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;padding-top:16px;border-top:1px solid rgba(196,181,253,.22);font-size:.92rem}
 footer{margin-top:44px;padding-top:20px;border-top:1px solid rgba(196,181,253,.22);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;color:var(--muted);font-size:.92rem}
-footer .wm{font-size:22px}
+footer .wm{font-size:17px}
 footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
 @media (max-width:620px){
   body{font-size:16px}
-  .logo svg{width:36px;height:36px}.wm{font-size:26px}
+  .logo svg,.logo .ico{width:36px;height:36px}.wm{font-size:21px}
   article{padding:22px 20px}
   .toc time{width:78px}
 }
@@ -92,13 +91,14 @@ dl.fmt dd{margin:0;color:var(--soft)}
 @media (max-width:360px){#alive code{display:none} article code{font-size:.66rem} article td,article th{padding:6px 3px}}
 </style>
 <link href="/paginas.css?v=20261111c" rel="stylesheet">
+<link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
 </head>
 <body>
 <div class="wrap">
 <header>
   <a class="logo" href="/" title="SolFlag">
-    <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="22" fill="#3a2a80" stroke="#a78bfa" stroke-width="2"/><g fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M23 10.5l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M19 12.8l4 2.3 4-2.3M23 15.1v4.6"/><path d="M14 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M10 26.3l4 2.3 4-2.3M14 28.6v4.6"/><path d="M32 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M28 26.3l4 2.3 4-2.3M32 28.6v4.6"/><path d="M19 15.1l-4.6 2.6v6.3M27 15.1l4.6 2.6v6.3M18 30.9L23 33.8l5-2.9"/></g></svg>
-    <span class="wm" translate="no"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
+    <img class="ico" src="/marca/solflag-icono.svg?v=1" alt="" width="44" height="44">
+    <span class="wm" translate="no">Solflag</span>
   </a>
   <nav class="pnav" aria-label="Secciones"><a href="/?v=escaner">Escáner</a><a href="/?v=lista">Mi lista</a><a href="/?v=confluencia">Confluencia</a><a class="pbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a></nav>
   <a class="plang" href="/en/accuracy/" hreflang="en" title="English version">EN</a>
@@ -229,7 +229,7 @@ dl.fmt dd{margin:0;color:var(--soft)}
 </article>
 
 <footer>
-  <span class="wm" translate="no"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
+  <span class="wm" translate="no">Solflag</span>
   <a href="/">Escáner</a>
   <a href="/blog/">Blog</a>
   <a href="/acierto/">Datos y acierto</a>

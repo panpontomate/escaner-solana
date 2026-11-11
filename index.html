@@ -496,9 +496,8 @@ a{color:var(--kick)}
 .brand{gap:10px 26px;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22);flex-wrap:wrap}
 .logo{display:flex;align-items:center;gap:11px;text-decoration:none}
 .logo:hover{text-decoration:none}
-.logo svg{width:44px;height:44px;flex:none}
-.wm{font:700 32px/1 'Barlow Condensed','Arial Narrow',sans-serif;letter-spacing:-.01em}
-.wm-a{color:#fff} .wm-b{color:#c4b5fd}
+.logo svg,.logo .ico{width:44px;height:44px;flex:none}
+.wm{display:inline-block;font-family:Unbounded,'Arial Black',sans-serif;font-weight:700;line-height:1.15;letter-spacing:-.03em;background:linear-gradient(90deg,#7fd0dc,#9fb4f2 50%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));font-size:26px}
 .brand .tabs{margin:0 0 0 auto;padding:0;background:transparent;gap:2px;flex:0 1 auto}
 .brand .tab{flex:none;background:transparent;color:#e4dffa;padding:8px 12px;font-size:.95rem;font-weight:600;border-radius:10px;display:flex;align-items:center;gap:6px}
 .brand .tab:hover{color:#fff;background:rgba(196,181,253,.08)}
@@ -557,7 +556,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 /* pie */
 .sitefoot{border-top:1px solid rgba(196,181,253,.22);padding-top:20px}
 .sitefoot .credits{align-items:center}
-.sitefoot .credits .wm{font-size:22px;margin-right:6px}
+.sitefoot .credits .wm{font-size:17px;margin-right:6px}
 
 /* resultado de un token: aro a la izquierda, veredicto y cifras a la derecha */
 .tsum{display:flex;flex-wrap:wrap;gap:20px 34px;align-items:center}
@@ -632,8 +631,8 @@ a.rdc{transition:transform .15s,border-color .15s}
 @media (max-width:860px){.botlink{display:none}}
 @media (max-width:700px){
   .brand{padding:12px 0}
-  .logo svg{width:36px;height:36px}
-  .wm{font-size:28px}
+  .logo svg,.logo .ico{width:36px;height:36px}
+  .wm{font-size:22px}
   .brand .lang{margin-left:auto}
   /* la barra de secciones va abajo, como en una app, con iconos */
   .brand .tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;margin:0;border-radius:0;gap:4px;padding:8px 8px calc(10px + env(safe-area-inset-bottom));background:rgba(14,9,38,.97);border-top:1px solid rgba(196,181,253,.3);display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
@@ -1797,6 +1796,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 @media (max-width:960px){ .wnums span:nth-child(3){border-left:1px solid var(--line);padding-left:24px} .wnums span:nth-child(n+3){border-top:0} .wnums{grid-template-columns:repeat(3,minmax(0,1fr))} }
 @media (max-width:560px){ .wnums span{padding:14px 8px 12px} .wnums span:nth-child(3){padding-left:8px} .wnums b{font-size:1.45rem} }
 </style>
+<link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
 </head>
 <body>
 <svg class="bgfx" hidden aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
@@ -1831,8 +1831,8 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 
   <header class="brand" translate="no">
     <a class="logo" href="/" title="SolFlag, ir a la portada">
-      <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="22" fill="#3a2a80" stroke="#a78bfa" stroke-width="2"/><g fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M23 10.5l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M19 12.8l4 2.3 4-2.3M23 15.1v4.6"/><path d="M14 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M10 26.3l4 2.3 4-2.3M14 28.6v4.6"/><path d="M32 24l4 2.3v4.6l-4 2.3-4-2.3v-4.6z"/><path d="M28 26.3l4 2.3 4-2.3M32 28.6v4.6"/><path d="M19 15.1l-4.6 2.6v6.3M27 15.1l4.6 2.6v6.3M18 30.9L23 33.8l5-2.9"/></g></svg>
-      <span class="wm" translate="no"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
+      <img class="ico" src="/marca/solflag-icono.svg?v=1" alt="" width="44" height="44">
+      <span class="wm" translate="no">Solflag</span>
     </a>
     <div class="tabs" role="tablist" aria-label="Secciones">
       <button type="button" class="tab" id="tabW" role="tab" aria-selected="true"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span>Escáner</span></button>
@@ -2028,7 +2028,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
     <p class="foot">Es una ayuda para detectar señales de alerta, no una garantía ni consejo financiero. Un token con riesgo bajo puede seguir siendo una estafa. La concentración se calcula con wallets individuales (se excluyen pools y programas), pero un exchange o un fondo puede contar como persona.</p>
     <p class="foot">Contamos visitas y análisis de forma anónima, sin cookies ni datos personales. <a href="/privacidad/">Privacidad</a> · <a href="/terminos/">Términos de uso</a></p>
     <p class="foot credits">
-      <span class="wm" translate="no"><span class="wm-a">sol</span><span class="wm-b">flag</span></span>
+      <span class="wm" translate="no">Solflag</span>
       <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">X @solflagTeam</a>
       <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
       <a href="https://solflag.com/blog/">Blog · Avances</a>
@@ -4658,10 +4658,11 @@ function cardRound(ctx,x,y,w,h,r){
   ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
 }
 // Fondo, logo y piezas comunes de las dos imágenes, con el aspecto de solflag.com
-var CF={D:"Fraunces,Georgia,serif",B:"Manrope,'Segoe UI',sans-serif",W:"'Barlow Condensed','Arial Narrow',sans-serif",M:"'IBM Plex Mono',Consolas,monospace"};
+var CF={D:"Fraunces,Georgia,serif",B:"Manrope,'Segoe UI',sans-serif",W:"'Barlow Condensed','Arial Narrow',sans-serif",M:"'IBM Plex Mono',Consolas,monospace",L:"Unbounded,'Arial Black',sans-serif"};
 function cardFonts(){
-  return Promise.all(["800 80px Fraunces","700 40px Fraunces","700 26px Manrope","400 22px Manrope","700 40px 'Barlow Condensed'","400 20px 'IBM Plex Mono'"]
-    .map(function(f){ return document.fonts.load(f); })).catch(function(){});
+  var logo=LOGO_IMG.decode?LOGO_IMG.decode().catch(function(){}):Promise.resolve();
+  return Promise.all(["800 80px Fraunces","700 40px Fraunces","700 26px Manrope","400 22px Manrope","700 40px 'Barlow Condensed'","400 20px 'IBM Plex Mono'","700 34px Unbounded"]
+    .map(function(f){ return document.fonts.load(f); }).concat([logo])).catch(function(){});
 }
 // Fondo de las dos imágenes: la nebulosa del On-chain Map (gas magenta y violeta con franjas de polvo), estrellas y unas
 // burbujas de jabón del color del veredicto en los huecos libres (bubs: [x, y, radio]). Cada token tiene su nebulosa: sale de su dirección
@@ -4716,8 +4717,11 @@ function cardBubble(x,cx,cy,r,col){
   x.globalAlpha=.22; x.strokeStyle="#fff"; x.lineWidth=Math.max(1,r*.07); x.lineCap="round"; x.beginPath(); x.arc(0,0,r*.78,.6,2.0); x.stroke();
   x.restore();
 }
+// Logo nuevo (11/11/2026): el icono de los tres cubos sale del mismo SVG que la cabecera
+var LOGO_IMG=new Image(); LOGO_IMG.src="/marca/solflag-icono.svg?v=1";
 function cardLogo(x,px,py,s){
-  // el círculo lila con los tres cubos, dibujado sobre una cuadrícula de 46
+  if(LOGO_IMG.complete&&LOGO_IMG.naturalWidth){ x.drawImage(LOGO_IMG,px,py,s,s); return; }
+  // si el SVG no ha cargado: el dibujo antiguo, sobre una cuadrícula de 46
   x.save(); x.translate(px,py); x.scale(s/46,s/46);
   x.beginPath(); x.arc(23,23,22,0,Math.PI*2); x.fillStyle="#3a2a80"; x.fill(); x.lineWidth=2; x.strokeStyle="#a78bfa"; x.stroke();
   x.strokeStyle="#fff"; x.lineWidth=1.6; x.lineJoin="round"; x.lineCap="round";
@@ -4728,10 +4732,13 @@ function cardLogo(x,px,py,s){
 }
 function cardBrand(x,px,py,s){
   cardLogo(x,px,py-s*.78,s);
-  var tx=px+s+16; x.font="700 "+Math.round(s*.8)+"px "+CF.W;
-  x.fillStyle="#fff"; x.fillText("sol",tx,py); tx+=x.measureText("sol").width;
-  x.fillStyle="#c4b5fd"; x.fillText("flag",tx,py); tx+=x.measureText("flag").width;
-  x.fillStyle="#8ec5cf"; x.font="700 "+Math.round(s*.56)+"px "+CF.W; x.fillText(".com",tx,py);
+  // «Solflag» en Unbounded con el degradado de la nebulosa (turquesa → lila) y el final que se apaga, como en la cabecera
+  var tx=px+s+16; x.save(); x.font="700 "+Math.round(s*.6)+"px "+CF.L;
+  if("letterSpacing" in x) x.letterSpacing=(-Math.round(s*.6*.03))+"px";
+  var w=x.measureText("Solflag").width, g=x.createLinearGradient(tx,0,tx+w,0);
+  g.addColorStop(0,"#7fd0dc"); g.addColorStop(.5,"#9fb4f2"); g.addColorStop(.62,"#b5b4f8"); g.addColorStop(1,"rgba(196,181,253,.35)");
+  x.fillStyle=g; x.fillText("Solflag",tx,py); x.restore();
+  x.fillStyle="#8ec5cf"; x.font="700 "+Math.round(s*.5)+"px "+CF.B; x.fillText(".com",tx+w+4,py);
 }
 function cardKick(x,t,px,py,size,align){
   x.save(); x.font="700 "+size+"px "+CF.B; x.fillStyle="#8ec5cf";
