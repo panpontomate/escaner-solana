@@ -67,6 +67,26 @@ export function buyerCandidates(page) {
     .slice(0, BUYERS_MAX).map(function (s) { return { sig: s.signature, d: s.slot - s0 }; });
 }
 
+// Helius (getTransactionsForAddress con sortOrder "asc"): las transacciones más antiguas de una dirección en una sola
+// llamada, también en tokens con más de 3000 firmas (ahí earliest() se rinde). Lo pasa al formato de earliest():
+// signers de la primera, page como la de getSignaturesForAddress (de más nueva a más antigua), tx la primera entera y
+// txs firma -> firmantes, para que los compradores no cuesten una petición más cada uno. null si no viene nada
+export const HELIUS_LIMIT = 25;        // transacciones más antiguas que se piden: la creación y los primeros bloques
+export function fromHelius(res) {
+  const items = ((res && (res.data || res)) || []).filter(function (t) { return t && t.transaction && t.transaction.signatures; });
+  if (!items.length) return null;
+  const signersOf = function (t) { return (t.transaction.message.accountKeys || []).filter(function (k) { return k.signer; }).map(function (k) { return k.pubkey; }); };
+  const txs = {};
+  const page = items.map(function (t) { const sig = t.transaction.signatures[0]; txs[sig] = signersOf(t); return { signature: sig, slot: t.slot, err: t.meta ? t.meta.err : null, blockTime: t.blockTime }; }).reverse();
+  return { signers: signersOf(items[0]), page: page, tx: items[0], txs: txs, helius: true };
+}
+// Lanzamientos de la base sin pagador (tenían más de 3000 firmas cuando los vimos): se completan poco a poco con Helius
+export const SIN_PAGADOR = "SELECT m, cr FROM lanz WHERE py IS NULL ORDER BY t DESC LIMIT ?";
+export async function sinPagador(cfg, max) {
+  const r = await query(cfg, { sql: SIN_PAGADOR, params: [max] });
+  return ((r && r[0] && r[0].results) || []).map(function (x) { return { m: x.m, cr: x.cr }; });
+}
+
 // INSERT de varias filas a la vez, troceado para no pasar de MAX_PARAMS valores. En lanz, una fila repetida
 // completa la que había (COALESCE: lo nuevo manda si viene, lo viejo se queda si no); en compras se ignora.
 export function upsertStatements(table, cols, rows, now) {

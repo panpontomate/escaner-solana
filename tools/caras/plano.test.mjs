@@ -90,3 +90,18 @@ test("pedidos: pendientes por búsquedas sin los que ya están en lanz, y se mar
   db.prepare(none.sql).run(...none.params);
   assert.equal(db.prepare("SELECT COUNT(*) AS c FROM pedidos WHERE hecho IS NULL").get().c, 2);
 });
+
+test("fromHelius: las tx más antiguas de Helius en el formato de earliest(), con los firmantes de cada una", async () => {
+  const { fromHelius, buyerCandidates } = await import("./plano.mjs");
+  const tx = (sig, slot, signer, err) => ({ slot, blockTime: 1700000000 + slot, meta: { err: err || null },
+    transaction: { signatures: [sig], message: { accountKeys: [{ pubkey: signer, signer: true }, { pubkey: "Otra", signer: false }] } } });
+  const res = { data: [tx("crea", 100, "Pagador"), tx("c1", 100, "Sniper1"), tx("c2", 101, "Sniper2"), tx("mal", 101, "X", { e: 1 }), tx("tarde", 105, "Tarde")] };
+  const me = fromHelius(res);
+  assert.deepEqual(me.signers, ["Pagador"]);
+  assert.equal(me.page[me.page.length - 1].signature, "crea");      // de más nueva a más antigua, como getSignaturesForAddress
+  assert.equal(me.txs.c2[0], "Sniper2");
+  const b = buyerCandidates(me.page).map((x) => [me.txs[x.sig][0], x.d]);
+  assert.deepEqual(b, [["Sniper1", 0], ["Sniper2", 1]]);            // sin la creación, sin la fallida, solo 2 bloques
+  assert.equal(fromHelius({ data: [] }), null);
+  assert.equal(fromHelius(null), null);
+});

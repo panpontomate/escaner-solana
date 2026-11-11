@@ -18,7 +18,7 @@ import { DAY, oldToken, INFRA_PER_HOUR, rcWatch, emptyState, addToken, addRolesL
 import { emptyBase, observe, mergeAporte, pruneBase, publishBase } from "./base.mjs";
 import { regEntry, regDue, regResolve, regRecheck, regRejudge, regPrune, regPublish, regFill, regMissing, dayOf, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
-import { emptyQueue, queueLaunch, queueBuyers, buyerCandidates, trimQueue, d1Config, flush, pedidosPendientes, marcarPedidos, pedidoLaunch, PEDIDOS_MAX } from "./plano.mjs";
+import { emptyQueue, queueLaunch, queueBuyers, buyerCandidates, trimQueue, d1Config, flush, pedidosPendientes, marcarPedidos, pedidoLaunch, PEDIDOS_MAX, fromHelius, HELIUS_LIMIT, sinPagador } from "./plano.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const STATE = path.join(HERE, "estado.json");
@@ -106,7 +106,22 @@ async function earliest(addr) {
   }
   return null;
 }
-async function firstSigners(addr) { const e = await earliest(addr); return e && e.signers; }
+// Si el RPC es Helius y earliest() se rinde (más de 3000 firmas), una llamada a getTransactionsForAddress con las más
+// antiguas primero (10 créditos por cada 100 tx). Con tope por ejecución: el plan gratuito da 1 M de créditos al mes
+// y el recolector ya gasta ~500 k (11/11/2026). HELIUS_MAX llamadas por ejecución, como mucho
+const HELIUS = /helius/i.test(RPC), HELIUS_MAX = +process.env.HELIUS_MAX || 20;
+let heliusCalls = 0;
+async function heliusEarliest(addr) {
+  if (!HELIUS || heliusCalls >= HELIUS_MAX) return null;
+  heliusCalls++;
+  const res = await rpc("getTransactionsForAddress", [addr, { transactionDetails: "full", sortOrder: "asc", limit: HELIUS_LIMIT,
+    encoding: "jsonParsed", maxSupportedTransactionVersion: 1, filters: { status: "any" } }]);
+  return fromHelius(res);
+}
+async function earliestDeep(addr) { return (await earliest(addr)) || (await heliusEarliest(addr)); }
+async function firstSigners(addr) { const e = await earliestDeep(addr); return e && e.signers; }
+// firmantes de un comprador: de lo que ya trajo Helius o, si no, una petición
+async function buyerSigners(me, sig) { return (me.txs && me.txs[sig]) || (await signersOf(sig)); }
 
 // la primera vez (caché vacía) arranca con los tokens del estudio del 28/10
 const SEED = path.join(HERE, "semilla.json");
@@ -165,7 +180,7 @@ for (const f of fresh.slice(0, MAX_NEW)) {
     // sin respuesta: se apunta igual (nrc) y se vuelve a pedir en las siguientes ejecuciones
     if (!rc) { nrc = true; log.sinRugCheck = (log.sinRugCheck || 0) + 1; state.rcQ[f.mint] = { n: 0 }; }
     if (rc) { const i = rcInfo(rc); t.creator = i.creator; t.rug = i.rug; t.plat = i.plat; }
-    const me = await earliest(f.mint);                      // quien pagó la creación del token
+    const me = await earliestDeep(f.mint);                  // quien pagó la creación del token (Helius si hay > 3000 firmas)
     // un token viejo que estrena pool no es un lanzamiento: fuera del registro, de las 24 h y de quién está detrás
     if (oldToken(f.t, rc && rc.detectedAt, me && me.page)) {
       state.seen[f.mint] = now; delete state.rcQ[f.mint]; log.viejos = (log.viejos || 0) + 1;
@@ -180,7 +195,7 @@ for (const f of fresh.slice(0, MAX_NEW)) {
     if (D1 && me && log.registro < REG_MAX) {
       const buyers = [];
       for (const b of buyerCandidates(me.page)) {
-        try { const s = await signersOf(b.sig); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
+        try { const s = await buyerSigners(me, b.sig); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
       }
       queueBuyers(state.planoQ, f.mint, buyers);
       log.compras = (log.compras || 0) + buyers.length;
@@ -324,14 +339,14 @@ if (D1 && PED_MAX > 0) {
       if (!isMint) { if (acc) pedidosOk.push(m); continue; }   // sin respuesta del RPC: se reintenta en la siguiente
       const rc = await rugcheck(m, log);
       if (rc) { const i = rcInfo(rc); info.creator = i.creator; info.plat = i.plat; }
-      const me = await earliest(m);
+      const me = await earliestDeep(m);
       if (me && me.page && me.page.length && me.page[me.page.length - 1].blockTime) info.t = me.page[me.page.length - 1].blockTime * 1000;
       if (me && me.signers && me.signers[0]) info.payer = me.signers[0];
       if (!info.creator) { const c = pumpCreator(me && me.tx, m); if (c) info.creator = c; }
       if (me) {
         const buyers = [];
         for (const b of buyerCandidates(me.page)) {
-          try { const s = await signersOf(b.sig); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
+          try { const s = await buyerSigners(me, b.sig); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
         }
         queueBuyers(state.planoQ, m, buyers);
       }
@@ -347,6 +362,36 @@ if (D1 && PED_MAX > 0) {
   }
   if (ms.length) log.pedidos = guardados + " de " + ms.length + " tokens pedidos";
 }
+
+// 5c. fichas antiguas sin pagador (más de 3000 firmas cuando las vimos): con lo que sobre del tope de Helius, unas
+// pocas por ejecución. Solo se completa quién pagó, quién financió y los primeros compradores (nunca la fecha, el nivel
+// ni las 24 h). state.heliusHechos recuerda las intentadas para no repetirlas
+if (D1 && HELIUS) {
+  const hh = state.heliusHechos || (state.heliusHechos = {});
+  let rows = [];
+  try { rows = (await sinPagador(D1, 80)).filter(function (r) { return !hh[r.m]; }); } catch (e) { log.completadas = "D1 falló al leer"; }
+  let hechas = 0;
+  for (const r of rows) {
+    if (heliusCalls + 2 > HELIUS_MAX) break;               // cada ficha: la creación y, si hace falta, el financiador
+    hh[r.m] = now;
+    try {
+      const me = await heliusEarliest(r.m);
+      if (!me || !me.signers || !me.signers[0]) continue;
+      const row = { m: r.m, py: me.signers[0] };
+      const cr = r.cr || pumpCreator(me.tx, r.m);
+      if (cr && !r.cr) row.cr = cr;
+      const fs = await firstSigners(cr || row.py);
+      if (fs && fs[0] && fs[0] !== cr && fs[0] !== row.py) row.fu = fs[0];
+      queueLaunch(state.planoQ, row);
+      const buyers = [];
+      for (const b of buyerCandidates(me.page)) { const w = me.txs[b.sig]; if (w && w[0]) buyers.push({ w: w[0], d: b.d, sig: b.sig }); }
+      queueBuyers(state.planoQ, r.m, buyers);
+      hechas++;
+    } catch (e) { log.errores++; }
+  }
+  if (hechas) log.completadas = hechas;
+}
+if (heliusCalls) log.helius = heliusCalls;
 
 // plano del dinero: subir a D1 lo pendiente; si falla, se queda en la cola para la siguiente ejecución
 if (D1) {
