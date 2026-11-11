@@ -5,3 +5,6 @@ tools/caras/node_modules/
 /caras.json
 /datos/
 tools/momento/node_modules/
+
+# cachés locales de wrangler (llevan el id de la cuenta)
+.wrangler/

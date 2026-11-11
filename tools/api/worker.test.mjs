@@ -122,3 +122,10 @@ test("portada: last 24 h by DEX, serial creators, multi-creator funders and firs
   assert.equal(r.status, 200);
   assert.equal(r.body.v, V);
 });
+
+test("errors are never cached", async () => {
+  const r = await get("/api/other/" + A);
+  assert.equal(r.status, 404);
+  assert.equal(r.h.get("cache-control"), "no-store");
+  assert.match((await get("/api/portada")).h.get("cache-control"), /max-age=300/);
+});

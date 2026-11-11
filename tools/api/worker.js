@@ -25,7 +25,8 @@ const HEAD = {
   "x-content-type-options": "nosniff"
 };
 const json = (body, status) => new Response(JSON.stringify(body), { status: status || 200, headers: HEAD });
-const fail = (status, error) => json({ v: V, error: error }, status);
+// los errores no se guardan en ninguna caché: un 404 o un 503 de paso no debe quedarse en el navegador
+const fail = (status, error) => new Response(JSON.stringify({ v: V, error: error }), { status: status, headers: Object.assign({}, HEAD, { "cache-control": "no-store" }) });
 
 // Resumen de un grupo de lanzamientos: cuántos, cuántos tienen ya el resultado de 24 h y cuántos murieron
 const SUM = "COUNT(*) AS n, SUM(dead24 IS NOT NULL) AS resolved, SUM(dead24 = 1) AS dead24";
