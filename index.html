@@ -1674,6 +1674,29 @@ body:not(.landing):not(.scanp) #form .row .btn{min-height:40px;border-radius:999
   #results.tview:not(.wview) .tchips span{padding:16px 12px 14px}
   .tnav button{flex:none}
 }
+
+/* ---- fondo común (fondo.js, maqueta fondo-paginas-aprobado): esquinas lila y verde en Escáner, Mi lista y Confluencia.
+   En la portada y en el resultado de un token no sale: allí va la nebulosa de puntos.js ---- */
+body.landing #fondo,body:has(#results.tview:not(.wview):not([hidden])) #fondo{display:none}
+body:not(.landing) .hero>.neb{display:none}
+/* pestaña Escáner: buscador sin caja y listas en filas finas, como «Tokens calientes» */
+body.scanp .hero>.scan{background:none!important;border:0;box-shadow:none}
+body.scanp .hero>.scan::after{display:none}
+body.scanp .scan-t2{font-size:clamp(2rem,3.2vw,2.9rem);line-height:1.02;letter-spacing:-.02em}
+body.scanp .scan-t2 em{display:block;font-style:normal;font-weight:300;color:#e6e0ff}
+body.scanp #form .row{border:1.5px solid rgba(241,238,255,.5);background:rgba(10,7,28,.85);border-radius:16px}
+body.scanp #form .row .btn{border-radius:999px}
+#scanpage .card{background:rgba(14,10,36,.45);border-color:var(--line);border-radius:20px}
+#scanpage h2{font:700 1.5rem/1.15 var(--f-display);letter-spacing:-.01em}
+#scanpage .trows,#scanpage .nrows{gap:0!important;border-top:1px solid var(--line)}
+#scanpage .tr{background:none;border:0;border-bottom:1px solid var(--line);border-left:3px solid var(--c,transparent);border-radius:0;min-height:58px}
+#scanpage .tr:hover{background:rgba(139,92,246,.08)}
+#scanpage .rc{background:rgba(14,10,36,.35);border-color:var(--line)}
+#scanpage .lbase{background:rgba(122,184,196,.06)}
+/* Mi lista y Confluencia: titular en dos tonos y tarjetas más ligeras */
+.ml-h1,.cf-h1{letter-spacing:-.02em;line-height:1.02}
+.ml-h1 em,.cf-h1 em{display:block;font-style:normal;font-weight:300;color:#e6e0ff;-webkit-text-fill-color:#e6e0ff;background:none}
+#lresults .card,#cresults .card{background:rgba(14,10,36,.45);border-color:var(--line)}
 </style>
 </head>
 <body>
@@ -2136,7 +2159,7 @@ function renderLista(noLive){
   var chg=toks.filter(function(t){ return mlChanges(t).length; });
   var cnt={ALTO:0,MEDIO:0,BAJO:0}; toks.forEach(function(t){ if(cnt[t.lvl]!==undefined) cnt[t.lvl]++; });
   var lf=state.lf||"all";
-  var h=storageWarningHtml()+"<header class='ml-head'><p class='kick'>Mi lista</p><h2 class='ml-h1'>Lo que sigues, <em>de un vistazo</em></h2>"+
+  var h=storageWarningHtml()+"<header class='ml-head'><p class='kick'>Mi lista</p><h2 class='ml-h1'>Lo que sigues, <em>de un vistazo.</em></h2>"+
     "<p class='ml-sub'>Tus tokens y wallets, con lo que ha cambiado desde la última vez. Se guarda solo en este navegador.</p>";
   if(toks.length||favs.length) h+="<div class='ml-tiles'>"+
     "<button class='ml-tile' type='button' data-lf='all' aria-pressed='"+(lf==="all")+"'><b>"+toks.length+"</b><span>"+(toks.length===1?"token que sigues":"tokens que sigues")+"</span></button>"+
@@ -2399,7 +2422,7 @@ function renderConf(){
   var nfav=Object.keys(lista.w).filter(function(k){ return lista.w[k].fav; }).length;
   var h=storageWarningHtml()+
     "<header class='cf-hero'><div><p class='kick'>"+CF_MINI+"Confluencia</p>"+
-      "<h2 class='cf-h1'>¿Qué tokens tienen <em>en común</em> tus wallets?</h2>"+
+      "<h2 class='cf-h1'>¿Qué tokens tienen <em>en común tus wallets?</em></h2>"+
       "<p class='cf-sub'>Junta las wallets que te interesan (ballenas, traders que sigues, las que entraron pronto en un token) y mira dónde coinciden. Cada token sale con su riesgo, como en el escáner.</p></div>"+
       cfVenn(done?state.cres.rows.filter(function(r){ return conf.showAll||!(r.known||r.type==="STABLE"); }).length:"?")+"</header>"+
     "<ol class='cf-steps'>"+
@@ -5880,5 +5903,6 @@ updateLanding();
 })();
 </script>
 <script src="/puntos.js" defer></script>
+<script src="/fondo.js" defer></script>
 </body>
 </html>
