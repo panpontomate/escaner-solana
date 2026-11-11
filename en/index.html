@@ -1783,6 +1783,19 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
   /* la lista de lanzamientos no se alarga sin fin: se desplaza dentro */
   #w-who #wwhobox{max-height:620px;overflow:auto;scrollbar-width:thin;padding-right:4px}
 }
+
+/* «Quién es» va arriba, junto a qué es la wallet (11/11): un solo recuadro con sus números del registro */
+#results.wview #wnum{display:none!important}
+.wnums{grid-template-columns:repeat(3,minmax(0,1fr))}
+.wtop .wkind{max-width:900px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;padding:14px 16px}
+.wkind .wtiles{flex-basis:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
+.wkind .wtile{background:rgba(5,4,13,.6)!important;border:1px solid var(--line)!important;border-top-width:3px!important;padding:10px 12px}
+.wkind .wtile.r{border-top-color:var(--alto)!important}.wkind .wtile.y{border-top-color:var(--medio)!important}
+.wkind .wtile b{font-size:1.5rem;color:var(--fg)!important}.wkind .wtile.r b{color:var(--alto)!important}.wkind .wtile.y b{color:var(--medio)!important}.wkind .wface b{color:var(--alto)!important}
+.wkind .wface{flex-basis:100%;margin:8px 0 0}
+@media (max-width:760px){ .wkind .wtiles{grid-template-columns:1fr 1fr} }
+@media (max-width:960px){ .wnums span:nth-child(3){border-left:1px solid var(--line);padding-left:24px} .wnums span:nth-child(n+3){border-top:0} .wnums{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:560px){ .wnums span{padding:14px 8px 12px} .wnums span:nth-child(3){padding-left:8px} .wnums b{font-size:1.45rem} }
 </style>
 </head>
 <body>
@@ -3279,7 +3292,7 @@ function render(again){
     "<div id='pnlbox'>"+((lista.w[state.wallet]&&lista.w[state.wallet].pnl)?"<div class='hint'>Last estimated result: "+pnlTag(lista.w[state.wallet].pnl)+"</div>":"")+"</div>"+
     // cuatro cifras grandes, como en el resultado de token
     "<div class='wnums'><span><b>"+esc(state.sol.toLocaleString('en-US',{maximumFractionDigits:3}))+"</b>SOL</span><span><b>"+n+"</b>Tokens"+(state.hidden?"<em>"+state.hidden+(state.hidden===1?" hidden under $1":" hidden under $1")+"</em>":"")+"</span>"+
-      "<span><b>"+esc(usd(total))+"</b>Value in tokens</span><span id='wnlz'><b>…</b>Launches behind<em>searching the registry</em></span></div>";
+      "<span><b>"+esc(usd(total))+"</b>Value in tokens</span></div>";
   // el reparto por riesgo va con «Sus tokens»
   var wtb=$("#w-tok"); if(wtb&&n) wtb.querySelector("h2").insertAdjacentHTML("afterend","<div class='bar' role='img' aria-label='Tokens by risk level'>"+segs+"</div><div class='legend'>"+legend+"</div>");
 
@@ -3537,10 +3550,8 @@ async function loadWalletWho(a){
   var F={}; try{ F=(await loadCaras()).faces||{}; }catch(e){}
   if(state.token||state.wallet!==a||!$("#wwhobox")) return;
   var j=wwho[a];
+  wwhoFace[a]=F[a];
   $("#wnum").innerHTML="<h2>Who it is<span class='tnew'>new</span> <small>in numbers</small></h2>"+wnumHtml(j,F[a]);
-  var wl=$("#wnlz");
-  if(wl){ var RR=(j&&j.roles)||{}, rk=["payer","creator","funder"].sort(function(x,y){ return ((RR[y]||{}).n||0)-((RR[x]||{}).n||0); })[0], rn=(RR[rk]||{}).n||0;
-    wl.innerHTML="<b>"+(j&&j.roles?rn:"—")+"</b>Launches behind<em>"+esc(j&&j.roles?(rn?{payer:"paid for",creator:"created",funder:"funded"}[rk]+" · registry since 10/29":"none in the registry"):"could not be checked")+"</em>"; }
   $("#wwhobox").innerHTML=wwhoHtml(j);
   fillSyms();
   paintWKind(a);   // con el registro ya se sabe si la mayoría de sus lanzamientos murió (rojo) o no (ámbar)
@@ -4204,18 +4215,31 @@ var BASE_TXT={"exchange":"Exchange-like activity","granja":"Pays for launches","
 // Qué es la wallet, en su resumen: «Identificada» (nombre comprobado) o «Por su comportamiento» (con el motivo)
 function paintWKind(a){
   var box=$("#wkind"); if(!box) return;
-  var kw=SRE.knownWallet&&SRE.knownWallet(a);
-  if(kw&&(kw.t==="exchange"||kw.t==="market_maker")){
-    if($("#wav")){ $("#wav").textContent=kw.t==="exchange"?"🏦":"🏛️"; $("#wav").className="wav id"; }
-    box.innerHTML="<p class='wkind id'><span class='wk-g'>Identified</span><b>"+(kw.t==="exchange"?"🏦 ":"🏛️ ")+esc(kw.n)+"</b> · "+(kw.t==="exchange"?"exchange: holds its users' funds":"market maker: it is their inventory and they can sell it")+"</p>"; return; }
-  var t=baseType(a); if(!t){ box.innerHTML=""; return; }
-  var IC={"exchange":"🏦","granja":"🧾","repartidor":"📦","creador en serie":"🚀","sniper":"🎯"}, j=wwho[a], R=(j&&j.roles)||{}, res=0, dd=0;
+  var kw=SRE.knownWallet&&SRE.knownWallet(a), t=baseType(a), j=wwho[a], ok=j&&j.roles&&j!=="err"&&j!=="loading";
+  var R=ok?j.roles:{}, fb=ok?(j.firstBuys||{}):{}, res=0, dd=0;
   ["payer","creator","funder"].forEach(function(k){ res+=(R[k]||{}).resolved||0; dd+=(R[k]||{}).dead24||0; });
-  var cls=t==="exchange"?" id":(res>=3&&dd/res>=.5?" red":""), why=baseWhy(a);
-  if($("#wav")){ $("#wav").textContent=IC[t]||"👛"; $("#wav").className="wav"+cls; }
-  box.innerHTML="<p class='wkind"+cls+"'><span class='wk-g'>By its behaviour</span><b>"+(IC[t]||"")+" "+esc(BASE_TXT[t]||t)+"</b>"+
-    "<small>"+esc((why?why.charAt(0).toUpperCase()+why.slice(1)+". ":"")+"It is an on-chain fact, not an accusation.")+"</small></p>";
+  var any=ok&&((R.payer||{}).n||(R.creator||{}).n||(R.funder||{}).n||fb.n);
+  // sus números del registro (solo si sale en él); el motivo de la base se omite entonces para no dar dos cifras distintas
+  var nums=any?wnumHtml(j,wwhoFace[a]):"";
+  var IC={"exchange":"🏦","granja":"🧾","repartidor":"📦","creador en serie":"🚀","sniper":"🎯"}, cls="", head="", lead="", why="";
+  if(kw&&(kw.t==="exchange"||kw.t==="market_maker")){
+    cls=" id"; head="Who it is · Identified";
+    lead=(kw.t==="exchange"?"🏦 ":"🏛️ ")+esc(kw.n);
+    why=kw.t==="exchange"?"Exchange: it holds its users funds.":"Market maker: it is their inventory and they can sell it.";
+    if($("#wav")){ $("#wav").textContent=kw.t==="exchange"?"🏦":"🏛️"; $("#wav").className="wav id"; }
+  }else if(t){
+    cls=t==="exchange"?" id":(res>=3&&dd/res>=.5?" red":"");
+    head="Who it is · By its behaviour"; lead=(IC[t]||"")+" "+esc(BASE_TXT[t]||t);
+    var bw=nums?"":baseWhy(a);
+    why=(bw?bw.charAt(0).toUpperCase()+bw.slice(1)+". ":"")+"It is an on-chain fact, not an accusation.";
+    if($("#wav")){ $("#wav").textContent=IC[t]||"👛"; $("#wav").className="wav"+cls; }
+  }else if(any){
+    cls=res>=3&&dd/res>=.5?" red":""; head="Who it is · In the SolFlag registry";
+    why="What it has done in the launches we track. These are facts, not accusations.";
+  }else{ box.innerHTML=""; return; }
+  box.innerHTML="<div class='wkind"+cls+"'><span class='wk-g'>"+esc(head)+"</span>"+(lead?"<b>"+lead+"</b>":"")+"<small>"+esc(why)+"</small>"+nums+"</div>";
 }
+var wwhoFace={};
 // El motivo, con los números de la base de wallets
 function baseWhy(a){
   var w=wbase.data&&wbase.data.wallets&&wbase.data.wallets[a]; if(!w) return "";
@@ -5752,7 +5776,7 @@ function omTok(m){
     if(used[h.addr]) return;
     var kw=SRE.knownWallet&&SRE.knownWallet(h.addr), ex=h.type==="exchange"||baseType(h.addr)==="exchange";
     if(h.type==="pool"){ used[h.addr]=1; out.push({id:"P"+(np++),k:"o",name:"Pool or program",n:1,pct:h.pct,desc:"the token's liquidity: not counted as a holder",pool:1,addr:h.addr}); }
-    else if(ex){ used[h.addr]=1; out.push({id:"X"+(nx++),k:"t",name:kw&&kw.n||"Exchange",n:1,pct:h.pct,desc:"exchange: holds its users' funds",exch:1,addr:h.addr}); }
+    else if(ex){ used[h.addr]=1; out.push({id:"X"+(nx++),k:"t",name:kw&&kw.n||"Exchange",n:1,pct:h.pct,desc:"exchange: it holds its users funds",exch:1,addr:h.addr}); }
     else if(m.creator===h.addr&&h.pct>=1){ used[h.addr]=1; out.push({id:"C",k:"r",name:"Token creator",n:1,pct:h.pct,desc:note(h.addr),addr:h.addr}); }
   });
   var rest=hs.filter(function(h){ return !used[h.addr]; });
