@@ -1,5 +1,5 @@
 // Fondo común (maqueta fondo-paginas-aprobado.html, 11/11): nebulosa de puntos solo en dos esquinas, lila arriba a la
-// derecha y verde abajo a la izquierda; el centro queda limpio para que no tape las letras. Va fijo y se pinta una vez
+// derecha y turquesa abajo a la izquierda (sin verde: recordaba a Solana y el verde es «riesgo bajo»); el centro queda limpio para que no tape las letras. Va fijo y se pinta una vez
 // (y al cambiar el ancho): no gasta nada mientras se lee. Lo usan las páginas sueltas y, en la app, Escáner, Mi lista y
 // Confluencia (en la portada y en el resultado de un token se esconde: allí va la nebulosa de puntos.js).
 (function(){
@@ -20,7 +20,7 @@ function makeNoise(seed){
 }
 function sm(a, b, x){ x = Math.max(0, Math.min(1, (x-a)/(b-a))); return x*x*(3-2*x); }
 function mix(a, b, t){ return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t]; }
-var VI = [139,92,246], MG = [192,38,211], TQ = [122,184,196], GR = [94,200,150];
+var VI = [139,92,246], MG = [192,38,211], TQ = [122,184,196], TQ2 = [160,214,224];
 function paint(){
   var W = innerWidth, H = innerHeight, D = Math.min(2, devicePixelRatio || 1), step = W > 960 ? 6 : 5;
   cv.width = W*D; cv.height = H*D; var x = cv.getContext("2d"); x.setTransform(D, 0, 0, D, 0, 0); x.clearRect(0, 0, W, H);
@@ -39,7 +39,7 @@ function paint(){
       var b = sm(.36, .76, g)*shape*(1 - dust*.75)*1.35; if (b < .04) continue;
       var h = N.fbm(X*.6 + 31, Y*.6 + 3, 3), c;
       if (tr >= bl) c = mix(VI, MG, sm(.3, .75, h + (1 - dtr)*.3));      // arriba a la derecha: lila con toques magenta
-      else c = mix(GR, TQ, sm(.3, .7, h));                              // abajo a la izquierda: verde con toques turquesa
+      else c = mix(TQ, TQ2, sm(.3, .7, h));                             // abajo a la izquierda: turquesa con toques más claros
       x.fillStyle = "rgba(" + (c[0]+b*60|0) + "," + (c[1]+b*50|0) + "," + (c[2]+b*40|0) + "," + Math.min(1, .25 + b*.9) + ")";
       x.beginPath(); x.arc(px, py, Math.min(step*.62, .35 + b*step*.6), 0, 6.283); x.fill();
     }
