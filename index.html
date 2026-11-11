@@ -3003,9 +3003,8 @@ function track(name){
   try{ if(window.goatcounter&&goatcounter.count) goatcounter.count({path:name+(document.documentElement.lang==="en"?"-en":""),title:name,event:true}); }catch(e){}
 }
 function tokenLink(mint){ return location.origin+location.pathname+"?token="+mint; }
-// Enlace para compartir: la ficha pública del token (token.solflag.com), con su propia vista previa en X y Telegram.
-// Solo existe en español: la web en inglés sigue compartiendo el enlace que abre el análisis
-function fichaLink(mint){ return document.documentElement.lang==="en" ? tokenLink(mint) : "https://token.solflag.com/"+mint; }
+// Enlace para compartir: la ficha pública del token (token.solflag.com, y /en/ en inglés), con su propia vista previa en X y Telegram
+function fichaLink(mint){ return "https://token.solflag.com/"+(document.documentElement.lang==="en"?"en/":"")+mint; }
 // Abre el bot de Telegram y empieza a vigilar esa dirección: el bot recibe "/start <dirección>"
 var TG_BOT="SolFlagBot";
 function tgLink(addr){ return "https://t.me/"+TG_BOT+"?start="+encodeURIComponent(addr); }

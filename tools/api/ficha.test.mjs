@@ -111,3 +111,34 @@ test("mercado: el par principal es el de más liquidez y solo cuentan los pares 
   assert.equal(usd(2503), "2.503 $");
   assert.equal(usd(5.64e6), "5,64 M$");
 });
+
+test("ficha en inglés: /en/<mint> con textos y números en inglés y enlaces a la web en inglés", async () => {
+  const { status, body } = await get("/en/" + M1, { [M1]: [pair(M1)] });
+  assert.equal(status, 200);
+  assert.match(body, /<html lang="en">/);
+  assert.match(body, /<title>Slignal Coin \(\$SLIGNAL\) · Token file · SolFlag<\/title>/);
+  assert.match(body, /HIGH RISK/);
+  assert.match(body, /<b>Paid and created<\/b>/);
+  assert.match(body, /Its creator has launched 2 more tokens: of the 1 that already turned 24 h, 1 died\./);
+  assert.match(body, /\$2,503/);
+  assert.match(body, /href="https:\/\/solflag\.com\/en\/\?wallet=BUY1111/);
+  assert.match(body, /href="https:\/\/token\.solflag\.com\/en\/Mint2222/);            // otro token del creador, en inglés
+  assert.match(body, /<link rel="canonical" href="https:\/\/token\.solflag\.com\/en\/Mint1111/);
+  assert.match(body, /hreflang="es" href="https:\/\/token\.solflag\.com\/Mint1111/);
+  assert.match(body, /class="plang" href="https:\/\/token\.solflag\.com\/Mint1111[^"]*"[^>]*>ES</);
+  assert.doesNotMatch(body, /Pagó|Quién está detrás|Capitalización/);
+});
+
+test("la ficha en español enlaza a su versión en inglés; el sitemap lleva las dos", async () => {
+  const { body } = await get("/" + M1, { [M1]: [pair(M1)] });
+  assert.match(body, /hreflang="en" href="https:\/\/token\.solflag\.com\/en\/Mint1111/);
+  assert.match(body, />EN<\/a>/);
+  const s = await get("/sitemap.xml");
+  assert.match(s.body, /xmlns:xhtml=/);
+  assert.match(s.body, /<xhtml:link rel="alternate" hreflang="en" href="https:\/\/token\.solflag\.com\/en\/Mint3333/);
+  const nf = await get("/en/" + NADA, {});
+  assert.equal(nf.status, 404);
+  assert.match(nf.body, /We couldn't find this token/);
+  const root = await ficha(new Request("https://token.solflag.com/en"), env, fakeFetch({}));
+  assert.equal(root.headers.get("location"), "https://solflag.com/en/");
+});

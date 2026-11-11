@@ -3003,9 +3003,8 @@ function track(name){
   try{ if(window.goatcounter&&goatcounter.count) goatcounter.count({path:name+(document.documentElement.lang==="en"?"-en":""),title:name,event:true}); }catch(e){}
 }
 function tokenLink(mint){ return location.origin+location.pathname+"?token="+mint; }
-// Enlace para compartir: la ficha pública del token (token.solflag.com), con su propia vista previa en X y Telegram.
-// Solo existe en español: la web en inglés sigue compartiendo el enlace que abre el análisis
-function fichaLink(mint){ return document.documentElement.lang==="en" ? tokenLink(mint) : "https://token.solflag.com/"+mint; }
+// Enlace para compartir: la ficha pública del token (token.solflag.com, y /en/ en inglés), con su propia vista previa en X y Telegram
+function fichaLink(mint){ return "https://token.solflag.com/"+(document.documentElement.lang==="en"?"en/":"")+mint; }
 // Abre el bot de Telegram y empieza a vigilar esa dirección: el bot recibe "/start <dirección>"
 var TG_BOT="SolFlagBot";
 function tgLink(addr){ return "https://t.me/"+TG_BOT+"?start="+encodeURIComponent(addr); }
@@ -3165,7 +3164,7 @@ function renderToken(noScroll){
       (r.lights?"<button class='btn small tmain' type='button' data-card='"+esc(r.mint)+"'>Download</button>":"")+
       "<div class='trow'>"+xBtn(r)+
       (r.par?tgBtn(r.mint,"Alerts you on Telegram if risk rises, liquidity drops or the creator sells")+priceMenu(r.mint):"")+"</div>"+
-      "<div class='tsub'><button class='btn ghost small' type='button' data-copy='"+esc(fichaLink(r.mint))+"' title='Copy a link that opens this analysis directly'><span class='ic'>🔗</span><span class='lb'>Copy link</span></button>"+
+      "<div class='tsub'><button class='btn ghost small' type='button' data-copy='"+esc(fichaLink(r.mint))+"' title='Copy the link to this token&#39;s public file'><span class='ic'>🔗</span><span class='lb'>Copy link</span></button>"+
       (r.par?"<button class='btn ghost small tfav' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
       "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'>Find whales</span></button></div>"+
       "<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Everything around this token, full screen'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button>"+

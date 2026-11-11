@@ -591,7 +591,7 @@ export const TEXT = {
   " Si te pasa a menudo, una URL de Helius (gratis) en Ajustes lo hace más fiable.": " If it happens often, a free Helius URL in Settings makes it more reliable.",
   "riesgo medio por falta de datos": "medium risk due to missing data",
   "'>Descargar</button>": "'>Download</button>",
-  "' title='Copia el enlace a la ficha pública de este token'><span class='ic'>🔗</span><span class='lb'>Copiar enlace</span></button>": "' title='Copy a link that opens this analysis directly'><span class='ic'>🔗</span><span class='lb'>Copy link</span></button>",
+  "' title='Copia el enlace a la ficha pública de este token'><span class='ic'>🔗</span><span class='lb'>Copiar enlace</span></button>": "' title='Copy the link to this token&#39;s public file'><span class='ic'>🔗</span><span class='lb'>Copy link</span></button>",
   "Seguir token": "Follow token",
   "'><span class='ic'>🐳</span><span class='lb'>Buscar ballenas</span></button></div>": "'><span class='ic'>🐳</span><span class='lb'>Find whales</span></button></div>",
 
