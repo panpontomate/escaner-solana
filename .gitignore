@@ -8,3 +8,7 @@ tools/momento/node_modules/
 
 # cachés locales de wrangler (llevan el id de la cuenta)
 .wrangler/
+
+# claves locales (Helius…): nunca a git
+.env
+**/.env
