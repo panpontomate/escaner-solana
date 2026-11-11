@@ -1604,7 +1604,7 @@ body.landing #adv{margin-top:10px}
 .rneb{height:640px;top:-120px}
 .rseam{display:none;height:150px}
 #results.tview:not(.wview) .rseam{display:block;order:2}
-#results.wview .rneb{display:none}
+#results.wview .rneb{height:560px}
 #results.tview:not(.wview) #summary{background:none;border:0;padding:30px 0 0;box-shadow:none}
 #results.tview:not(.wview) .tsum2 .thd{padding-right:0;min-height:0}
 #results.tview:not(.wview) .tidr .stamp{position:relative;top:auto;right:auto;flex:none;margin-left:14px}
@@ -1726,6 +1726,63 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 
 /* tarjetas casi opacas en toda la app: la nebulosa de las esquinas no se ve a través del texto (wallet, ballenas, Mi lista, Confluencia) */
 .card,.tok,.lsec,.nm-group,.hrow,#lresults .card,#cresults .card{background:rgba(8,6,22,.92)}
+
+/* ---- análisis de una wallet (maqueta wallet-resultado-aprobado, 11/11): cabecera grande, cuatro cifras, «Sus tokens» a la izquierda
+   y «Sus lanzamientos» + «Quién es» a la derecha; recuadros sólidos para que la aurora no se vea dentro ---- */
+#results .card{background:#09071c}
+#results.wview .rseam{display:block;order:2}
+#results.wview #summary{background:none;border:0;padding:24px 0 0;box-shadow:none}
+.wtop .kick{margin:0}
+.widr{display:flex;align-items:center;gap:22px;margin-top:14px}
+.wav{flex:none;width:80px;height:80px;border-radius:50%;display:grid;place-items:center;font-size:2.1rem;border:2px solid var(--line2);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.14),transparent 40%),rgba(139,92,246,.1)}
+.wav.red{border-color:var(--alto);background-color:rgba(255,107,107,.08)}.wav.id{border-color:var(--kick)}
+.wname{margin:0;font:500 clamp(2.4rem,5vw,4.4rem)/1 var(--f-mono);letter-spacing:-.03em;color:var(--fg)}
+.wtop .taddr{margin-top:12px}
+.wtop .wkind{max-width:760px;background:#140a14}
+.wtop .wkind.id{background:#0a1418}.wtop .wkind:not(.red):not(.id){background:#17120a}
+.wverd{margin:22px 0 0!important;font:300 clamp(1.4rem,2.1vw,1.8rem)/1.3 var(--f-display)!important;max-width:860px;color:var(--fg)}
+.wverd.lv-alto{color:#ffb3b3}.wverd.lv-medio{color:#fde3a0}.wverd.lv-bajo{color:#bdf5d3}
+#results.wview .take{max-width:860px;margin-top:16px}
+#results.wview .wacts{margin-top:22px;border-top:0;padding-top:0}
+#results.wview .wacts .btn{border-radius:999px}
+.wnums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:30px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#06050f}
+.wnums span{display:flex;flex-direction:column;gap:6px;padding:22px 24px 20px;border-left:1px solid var(--line);font-weight:700;font-size:.88rem}
+.wnums span:first-child{border-left:0;padding-left:0}
+.wnums b{font:300 clamp(1.8rem,3vw,2.6rem)/1.05 var(--f-display);letter-spacing:-.02em;overflow-wrap:anywhere}
+.wnums em{font-style:normal;font-weight:400;color:var(--muted);font-size:.8rem;margin-top:-2px}
+#w-tok>.bar{margin:4px 0 0}
+#w-tok>.legend{margin:10px 0 14px}
+#results.wview .tdc h2 small{display:block}
+@media (min-width:1100px){
+  #results.tview.wview{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);grid-auto-flow:row dense;column-gap:24px;row-gap:24px;max-width:1320px}
+  #results.tview.wview #tside,#results.tview.wview #tdetail{display:contents!important;position:static;max-height:none;overflow:visible}
+  #results.tview.wview #summary,#results.tview.wview .rseam{grid-column:1/-1}
+  #results.tview.wview .tnav{display:none}
+  #results.tview.wview #w-tok{grid-column:1;grid-row:span 2;order:3}
+  #results.tview.wview #w-who{grid-column:2;order:3}
+  #results.tview.wview #wnum{grid-column:2;order:4}
+}
+@media (max-width:960px){
+  .wnums{grid-template-columns:1fr 1fr}
+  .wnums span:nth-child(3){border-left:0;padding-left:0}
+  .wnums span:nth-child(n+3){border-top:1px solid var(--line)}
+}
+@media (max-width:560px){ .widr{gap:12px} .wav{width:52px;height:52px;font-size:1.4rem} .wname{font-size:2rem} .wnums span{padding:16px 12px 14px} }
+
+@media (min-width:1100px){
+  /* filas de «Sus tokens»: token, valor, riesgo y botones en una línea; el motivo debajo */
+  #results.wview .wt1{grid-template-columns:34px minmax(0,1fr) 110px 150px auto;grid-template-areas:"av n v p a" "av w w w w";gap:4px 12px}
+  #results.wview .wp{display:block}#results.wview .wn small .pill{display:none}
+  #results.wview .ww{margin-top:0;color:var(--muted)}
+  /* botones en una fila de pastillas, como en la maqueta */
+  #results.wview .wacts{display:flex;flex-wrap:wrap;gap:10px;max-width:none}
+  #results.wview .wacts>.btn,#results.wview .wacts .wrow>.btn{flex-direction:row;gap:8px;min-height:44px;padding:0 18px;border-radius:999px;font-size:.9rem;width:auto}
+  #results.wview .wacts>.wmain{flex:none;min-height:44px;font-size:.9rem;border-radius:999px}
+  #results.wview .wacts .lg{display:inline}
+  #results.wview .wacts>.wconf{font-size:.9rem;letter-spacing:0;padding-inline:18px}
+  /* la lista de lanzamientos no se alarga sin fin: se desplaza dentro */
+  #w-who #wwhobox{max-height:620px;overflow:auto;scrollbar-width:thin;padding-right:4px}
+}
 </style>
 </head>
 <body>
@@ -3203,18 +3260,15 @@ function render(again){
   $("#results").classList.add("wmode"); walletDetail();
   var wa=state.wallet; loadBase().then(function(){ if(state.wallet===wa) paintWKind(wa); }).catch(function(){});
   var hid=state.hidden?(state.hidden===1?" Se ha ocultado 1 token de menos de 1 $.":" Se han ocultado "+state.hidden+" tokens de menos de 1 $."):"";
+  var wlv=c.ALTO>0?"alto":c.MEDIO>0||c.SPAM>0?"medio":n?"bajo":"nm";
   $("#summary").innerHTML=
-    "<div class='sum-head'>"+
-      "<div><div class='eyebrow'>Wallet</div><button type='button' class='mono tmint2' style='margin-top:4px' data-copy='"+esc(state.wallet)+"' title='Copiar dirección de la wallet'>"+esc(state.wallet)+"</button><div id='wkind'></div></div>"+
-      "<div class='stats'>"+
-        "<div class='stat'><div class='eyebrow'>SOL</div><div class='v'>"+state.sol.toLocaleString('de-DE',{maximumFractionDigits:3})+"</div></div>"+
-        "<div class='stat'><div class='eyebrow'>Tokens</div><div class='v'>"+n+"</div></div>"+
-        "<div class='stat'><div class='eyebrow'>Valor en tokens</div><div class='v'>"+usd(total)+"</div></div>"+
-      "</div>"+
-    "</div>"+
-    "<h2 class='verdict'>"+esc(verdict(c))+"</h2>"+
+    "<div class='wtop'><p class='kick'>Wallet</p>"+
+      "<div class='widr'><span class='wav' id='wav' aria-hidden='true'>👛</span><h2 class='wname'>"+esc(short(state.wallet))+"</h2></div>"+
+      "<div class='taddr'><button type='button' class='mono tmint2' data-copy='"+esc(state.wallet)+"' title='Copiar dirección de la wallet'>"+esc(state.wallet)+"</button>"+
+        "<button class='copy' type='button' data-copy='"+esc(state.wallet)+"' title='Copiar dirección de la wallet'>copiar</button></div>"+
+      "<div id='wkind'></div>"+
+      "<h2 class='verdict wverd lv-"+wlv+"'>"+esc(verdict(c))+"</h2></div>"+
     (n?takeHtml(c,hid):"<p class='sub'>"+esc(tip)+esc(hid)+"</p>")+
-    (n?"<div class='bar' role='img' aria-label='Reparto de tokens por nivel de riesgo'>"+segs+"</div><div class='legend'>"+legend+"</div>":"")+
     "<div class='actions wacts'><button class='btn ghost small wmain' type='button' id='estPnl'>Ver ganancias y pérdidas</button>"+
     "<button class='btn ghost small wfav' type='button' data-long data-favw='"+esc(state.wallet)+"' aria-pressed='"+(!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"'>"+starHtml("wallet",!!(lista.w[state.wallet]&&lista.w[state.wallet].fav))+"</button>"+
     "<button class='btn ghost small wconf' type='button' data-long data-addc='"+esc(state.wallet)+"' aria-pressed='"+inCart(state.wallet)+"'>"+(inCart(state.wallet)?"✓ En Confluencia":"⊕ A Confluencia")+"</button><i class='wbr' aria-hidden='true'></i>"+
@@ -3222,7 +3276,12 @@ function render(again){
     "<button class='btn small wshare' type='button' data-wshare><span class='ic'>↗</span><span class='lb'>Compartir</span></button>"+
     "<button class='btn small wcopy' id='copySum' type='button'><span class='ic'>📋</span><span class='lb'>Copiar<span class='lg'> resumen</span></span></button>"+
     "<a class='btn ghost small wsol' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(state.wallet)+"'><span class='ic'>🔗</span><span class='lb'><span class='lg'>Ver en </span>Solscan</span></a></div></div>"+
-    "<div id='pnlbox'>"+((lista.w[state.wallet]&&lista.w[state.wallet].pnl)?"<div class='hint'>Último resultado estimado: "+pnlTag(lista.w[state.wallet].pnl)+"</div>":"")+"</div>";
+    "<div id='pnlbox'>"+((lista.w[state.wallet]&&lista.w[state.wallet].pnl)?"<div class='hint'>Último resultado estimado: "+pnlTag(lista.w[state.wallet].pnl)+"</div>":"")+"</div>"+
+    // cuatro cifras grandes, como en el resultado de token
+    "<div class='wnums'><span><b>"+esc(state.sol.toLocaleString('de-DE',{maximumFractionDigits:3}))+"</b>SOL</span><span><b>"+n+"</b>Tokens"+(state.hidden?"<em>"+state.hidden+(state.hidden===1?" oculto de menos de 1 $":" ocultos de menos de 1 $")+"</em>":"")+"</span>"+
+      "<span><b>"+esc(usd(total))+"</b>Valor en tokens</span><span id='wnlz'><b>…</b>Lanzamientos detrás<em>buscando en el registro</em></span></div>";
+  // el reparto por riesgo va con «Sus tokens»
+  var wtb=$("#w-tok"); if(wtb&&n) wtb.querySelector("h2").insertAdjacentHTML("afterend","<div class='bar' role='img' aria-label='Reparto de tokens por nivel de riesgo'>"+segs+"</div><div class='legend'>"+legend+"</div>");
 
   var chips=[["TODOS","Todos",n]].concat(ORDER.map(function(k){ return [k,LEVELS[k].short,c[k]]; }));
   $("#filters").innerHTML=chips.filter(function(x){return x[0]==="TODOS"||x[2]>0;}).map(function(x){
@@ -3479,8 +3538,12 @@ async function loadWalletWho(a){
   if(state.token||state.wallet!==a||!$("#wwhobox")) return;
   var j=wwho[a];
   $("#wnum").innerHTML="<h2>Quién es<span class='tnew'>nuevo</span> <small>en números</small></h2>"+wnumHtml(j,F[a]);
+  var wl=$("#wnlz");
+  if(wl){ var RR=(j&&j.roles)||{}, rk=["payer","creator","funder"].sort(function(x,y){ return ((RR[y]||{}).n||0)-((RR[x]||{}).n||0); })[0], rn=(RR[rk]||{}).n||0;
+    wl.innerHTML="<b>"+(j&&j.roles?rn:"—")+"</b>Lanzamientos detrás<em>"+esc(j&&j.roles?(rn?{payer:"pagó",creator:"creó",funder:"financió"}[rk]+" · registro desde el 29/10":"ninguno en el registro"):"no se pudo consultar")+"</em>"; }
   $("#wwhobox").innerHTML=wwhoHtml(j);
   fillSyms();
+  paintWKind(a);   // con el registro ya se sabe si la mayoría de sus lanzamientos murió (rojo) o no (ámbar)
 }
 function wtile(n,lbl,x){
   var res=x?x.resolved||0:0, dead=x?x.dead24||0:0, fr=res?dead/res:0;
@@ -4143,11 +4206,13 @@ function paintWKind(a){
   var box=$("#wkind"); if(!box) return;
   var kw=SRE.knownWallet&&SRE.knownWallet(a);
   if(kw&&(kw.t==="exchange"||kw.t==="market_maker")){
+    if($("#wav")){ $("#wav").textContent=kw.t==="exchange"?"🏦":"🏛️"; $("#wav").className="wav id"; }
     box.innerHTML="<p class='wkind id'><span class='wk-g'>Identificada</span><b>"+(kw.t==="exchange"?"🏦 ":"🏛️ ")+esc(kw.n)+"</b> · "+(kw.t==="exchange"?"exchange: guarda fondos de sus usuarios":"creador de mercado: es su inventario y lo puede vender")+"</p>"; return; }
   var t=baseType(a); if(!t){ box.innerHTML=""; return; }
   var IC={"exchange":"🏦","granja":"🧾","repartidor":"📦","creador en serie":"🚀","sniper":"🎯"}, j=wwho[a], R=(j&&j.roles)||{}, res=0, dd=0;
   ["payer","creator","funder"].forEach(function(k){ res+=(R[k]||{}).resolved||0; dd+=(R[k]||{}).dead24||0; });
   var cls=t==="exchange"?" id":(res>=3&&dd/res>=.5?" red":""), why=baseWhy(a);
+  if($("#wav")){ $("#wav").textContent=IC[t]||"👛"; $("#wav").className="wav"+cls; }
   box.innerHTML="<p class='wkind"+cls+"'><span class='wk-g'>Por su comportamiento</span><b>"+(IC[t]||"")+" "+esc(BASE_TXT[t]||t)+"</b>"+
     "<small>"+esc((why?why.charAt(0).toUpperCase()+why.slice(1)+". ":"")+"Es un hecho de la cadena, no una acusación.")+"</small></p>";
 }

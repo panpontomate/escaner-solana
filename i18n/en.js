@@ -67,6 +67,14 @@ export const CODE = [
 
 export const TEXT = {
   // portada y resultado nuevos (11/11)
+  "' title='Copiar dirección de la wallet'>copiar</button></div>": "' title='Copy wallet address'>copy</button></div>",
+  " oculto de menos de 1 $": " hidden under $1",
+  " ocultos de menos de 1 $": " hidden under $1",
+  "</b>Valor en tokens</span><span id='wnlz'><b>…</b>Lanzamientos detrás<em>buscando en el registro</em></span></div>": "</b>Value in tokens</span><span id='wnlz'><b>…</b>Launches behind<em>searching the registry</em></span></div>",
+  "</b>Lanzamientos detrás<em>": "</b>Launches behind<em>",
+  " · registro desde el 29/10": " · registry since 10/29",
+  "ninguno en el registro": "none in the registry",
+  "no se pudo consultar": "could not be checked",
   "<p class='wkind id'><span class='wk-g'>Identificada</span><b>": "<p class='wkind id'><span class='wk-g'>Identified</span><b>",
   "creador de mercado: es su inventario y lo puede vender": "market maker: it is their inventory and they can sell it",
   "'><span class='wk-g'>Por su comportamiento</span><b>": "'><span class='wk-g'>By its behaviour</span><b>",
@@ -617,7 +625,6 @@ export const TEXT = {
   " tokens que parecen spam (sin mercado y con autoridades activas): no los vendas ni entres en webs que aparezcan a su nombre.": " tokens that look like spam (no market and active authorities): do not sell them or visit websites under their name.",
   " token no se pudo comprobar por un fallo de red: vuelve a analizar la wallet para revisarlo.": " token could not be checked because of a network error: analyse the wallet again to review it.",
   " tokens no se pudieron comprobar por un fallo de red: vuelve a analizar la wallet para revisarlos.": " tokens could not be checked because of a network error: analyse the wallet again to review them.",
-  "<div class='stat'><div class='eyebrow'>Valor en tokens</div><div class='v'>": "<div class='stat'><div class='eyebrow'>Value in tokens</div><div class='v'>",
   " Se ha ocultado 1 token de menos de 1 $.": " 1 token worth under $1 is hidden.",
   " Se han ocultado ": " Hidden: ",
   " tokens de menos de 1 $.": " tokens worth under $1.",
