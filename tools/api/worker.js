@@ -6,11 +6,14 @@
 //   GET  /api/token/<mint>         un lanzamiento: quién está detrás (con su historial) y sus primeros compradores
 //   GET  /api/portada              lo de las últimas 24 h para la portada: lanzamientos por DEX y nivel, creadores
 //                                  en serie, financiadores de varios creadores y quién compra en los primeros bloques
+//   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
 //   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
 //                                  veces (tabla pedidos), nada de quién. El recolector lo analiza después él mismo
 //
 // Formato versión 1 (v: 1). Si cambia de forma incompatible, sube v.
 // Cada respuesta se guarda 5 min en la caché de Cloudflare para no repetir consultas a D1.
+
+import { ficha, HOST as FICHA_HOST } from "./ficha.js";
 
 export const V = 1;
 export const LIST = 25;            // lanzamientos y compras que se devuelven, los más recientes
@@ -108,12 +111,16 @@ export async function portada(db, now) {
 }
 
 const PEDIDOS = "CREATE TABLE IF NOT EXISTS pedidos (m TEXT PRIMARY KEY, n INTEGER, t0 INTEGER, t1 INTEGER, hecho INTEGER)";
+// un token ya procesado que no llegó a la base (o se quitó, como los viejos que estrenaban pool) vuelve a la cola si
+// alguien lo escanea otra vez: así la ficha puede decir «escanéalo y lo analizaremos» sin mentir
 const SEEN = "INSERT INTO pedidos (m, n, t0, t1) VALUES (?1, 1, ?2, ?2) ON CONFLICT(m) DO UPDATE SET n = n + 1, t1 = ?2";
+const AGAIN = "UPDATE pedidos SET hecho = NULL WHERE m = ?1 AND hecho IS NOT NULL AND NOT EXISTS (SELECT 1 FROM lanz WHERE lanz.m = ?1)";
 
 // Apunta un token escaneado. Si la tabla aún no existe (antes de la primera ejecución del recolector), la crea
 export async function seen(db, m, now) {
   try { await db.prepare(SEEN).bind(m, now).run(); }
   catch (e) { await db.prepare(PEDIDOS).bind().run(); await db.prepare(SEEN).bind(m, now).run(); }
+  try { await db.prepare(AGAIN).bind(m).run(); } catch (e) { /* sin tabla lanz todavía: no hay nada que repetir */ }
 }
 
 async function visto(req, env, m) {
@@ -155,7 +162,8 @@ export default {
       const hit = await cache.match(req);
       if (hit) return hit;
     }
-    const res = await handle(req, env);
+    // token.solflag.com: la ficha pública de cada token (ficha.js); el resto, la API
+    const res = new URL(req.url).hostname === FICHA_HOST ? await ficha(req, env) : await handle(req, env);
     if (cache && req.method === "GET" && res.status === 200) ctx.waitUntil(cache.put(req, res.clone()));
     return res;
   }

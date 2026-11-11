@@ -89,6 +89,19 @@ test("visto: counts each scan of a token, stores nothing about who", async () =>
   assert.deepEqual(Object.keys(rows[0]).sort(), ["hecho", "m", "n", "t0", "t1"]);
 });
 
+test("visto: a token already processed but not in lanz goes back to the queue; one in lanz stays done", async () => {
+  const e = { DB: d1() };
+  const post = (m) => handle(new Request("https://api.solflag.com/api/visto/" + m, { method: "POST" }), e);
+  const OUT = "Mint999999999999999999999999999999";
+  await post(OUT); await post(M1);
+  e.DB.raw.prepare("UPDATE pedidos SET hecho = 5").run();
+  await post(OUT); await post(M1);
+  const h = (m) => e.DB.raw.prepare("SELECT hecho, n FROM pedidos WHERE m = ?").get(m);
+  assert.equal(h(OUT).hecho, null);       // back in the queue
+  assert.equal(h(OUT).n, 2);
+  assert.equal(h(M1).hecho, 5);           // already in lanz: nothing to redo
+});
+
 test("visto creates the table if the collector has not yet", async () => {
   const db = new DatabaseSync(":memory:");
   const e = { DB: { raw: db, prepare: (sql) => ({ bind: (...a) => ({ run: async () => db.prepare(sql).run(...a) }) }) } };
