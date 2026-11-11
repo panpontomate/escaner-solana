@@ -54,3 +54,19 @@ article tbody tr:hover td{background:rgba(139,92,246,.06)}
   #detras{padding-top:40px}
   #detras .tw{padding:2px 8px}
 }
+
+/* 11/11 (2): la misma cabecera que la web, a lo ancho, y los apartados sin caja, separados por una línea */
+header{width:min(1180px,calc(100vw - 32px));margin-left:50%;transform:translateX(-50%);min-height:68px;gap:10px 26px}
+.pnav{display:flex;align-items:center;gap:4px 24px;margin-left:auto;font-weight:700;font-size:.95rem}
+.pnav a{color:#d8d2f5;text-decoration:none;padding:8px 0}
+.pnav a:hover{color:var(--fg)}
+.plang{width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line2);border-radius:50%;color:var(--kick);font-size:.8rem;font-weight:700;text-decoration:none;flex:none}
+.plang:hover{border-color:var(--kick)}
+.intro .lang{display:none}
+h1 .thin{font-weight:300}
+article{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:52px 0 8px;margin-top:44px}
+article h2{font-size:clamp(1.9rem,4.4vw,2.6rem);line-height:1.08}
+.toc{background:rgba(14,10,36,.35)}
+@media (max-width:760px){ .pnav a:not(.pbot){display:none} .pnav{gap:16px;font-size:.88rem} }
+@media (max-width:420px){ .pnav{display:none} .plang{margin-left:auto} }
+@media (max-width:620px){ article{padding:36px 0 4px;margin-top:32px} }
