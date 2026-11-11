@@ -1449,10 +1449,205 @@ iframe.mm{border:0;aspect-ratio:8/5;pointer-events:none;background:#0b0722}
 @media (max-width:700px){ #tabM .tbeta{position:absolute;top:1px;right:1px;margin:0;padding:0 3px;font-size:.42rem;letter-spacing:.02em} }
 .om-betan{position:absolute;left:12px;bottom:10px;margin:0;max-width:calc(100% - 24px);font-size:.72rem;color:var(--muted,#b8b0d8);background:rgba(20,14,49,.72);padding:4px 10px;border-radius:8px;pointer-events:auto}
 .om-betan a{color:#c4b5fd}
+/* ===== Estilo del 11/11 (maquetas portada-aprobada y resultado-aprobado): fondo casi negro, nebulosa de puntos
+   (puntos.js), separaciones que se abren del centro y titulares en dos tonos (Fraunces 700 + segunda línea en 300) ===== */
+html:root:root:root:root{
+  --bg:#05040d; --surface:#0e0a24; --surface-2:#140f33; --line:rgba(196,181,253,.16); --line2:rgba(196,181,253,.3);
+  --muted:#a99fd6; --mut2:#8a81b8; --vi:#8b5cf6; --tq2:#7ab8c4;
+}
+html{background:var(--bg);overflow-x:clip}
+body{background:none!important;overflow-x:clip}
+.bgfx{display:none!important}
+.card,.tok,.lsec,.nm-group,.hrow{background:rgba(14,10,36,.55);border-color:var(--line)}
+.card{border-radius:20px}
+.thin{display:block;font-weight:300;color:#e6e0ff}
+.neb{position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);z-index:-1;pointer-events:none}
+.seam{position:relative;height:200px;pointer-events:none;width:100vw;margin-left:calc(50% - 50vw)}
+.seam canvas{position:absolute;inset:0;width:100%;height:100%}
+
+/* cabecera fija con cristal (en el móvil las pestañas van abajo y el cristal las rompería: allí sin desenfoque) */
+.brand{position:sticky;top:0;z-index:40;background:rgba(5,4,13,.92);border-bottom-color:var(--line);min-height:68px}
+@media (min-width:701px){ .brand{background:rgba(5,4,13,.6);box-shadow:0 0 0 100vmax rgba(5,4,13,.6);clip-path:inset(0 -100vmax);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)} .tnav{top:84px} }
+.brand .tab{font-weight:700;color:#d8d2f5}
+.brand .lang{width:40px;height:40px;padding:0;display:grid;place-items:center;border-radius:50%;border-color:var(--line2)}
+
+/* ---- portada ---- */
+.hero{position:relative}
+.hero-txt .kick{font-size:.95rem;letter-spacing:.24em}
+.hero-txt h1{font:700 clamp(2.6rem,6vw,5.75rem)/.98 var(--f-display);letter-spacing:-.02em;margin:20px 0 26px}
+.hero-sub{font-size:1.19rem;color:#d6cff2;max-width:520px}
+.trust li{background:rgba(5,4,13,.55);border-color:var(--line2);color:#e4defc}
+.lab2{display:none}
+.whale{display:none}
+body.landing .hero{width:min(1380px,calc(100vw - 48px));align-self:center;flex-wrap:nowrap;align-items:stretch;gap:48px;padding:40px 0 70px;min-height:calc(100vh - 80px)}
+body.landing .hero-txt{flex:1.1 1 0;align-self:start;padding-top:10px}
+body.landing .hero-txt h1{white-space:nowrap;width:max-content;text-wrap:nowrap}
+body.landing .hero>.scan{flex:.9 1 0;align-self:end;margin:150px 0 70px;padding:8px 0 8px 40px;background:none;border:0;border-left:1px solid var(--line2);border-radius:0;box-shadow:none}
+body.landing .scan>.kick{font:700 34px/1 'Barlow Condensed',sans-serif;letter-spacing:.03em;text-transform:none;color:var(--fg);margin-bottom:16px}
+body.landing .scan-t,body.landing #form .eyebrow,body.landing #setup{display:none}
+body.landing .lab2{display:block;font-size:13px;font-weight:700;color:#e4defc;margin:0 0 8px}
+body.landing #form .row{flex-wrap:nowrap;align-items:center;gap:10px;border:1.5px solid rgba(241,238,255,.5);border-radius:16px;background:rgba(10,7,28,.85);padding:8px 8px 8px 18px;box-shadow:0 0 0 5px rgba(122,184,196,.08);transition:border-color .2s}
+body.landing #form .row:hover,body.landing #form .row:focus-within{border-color:var(--kick)}
+body.landing #form .row input{flex:1 1 auto;min-width:0;border:0;background:transparent;padding:10px 0;font-size:1.06rem;outline:none;box-shadow:none}
+body.landing #form .row .btn{flex:none;min-height:48px;padding:0 24px;border-radius:999px;font-weight:700}
+body.landing .tryw{margin-top:18px;gap:8px 18px}
+body.landing .tryw .chip{border:0;border-bottom:1px dashed var(--line2);border-radius:0;padding:0;background:none;color:var(--fg);font-weight:700}
+body.landing .whale{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
+.whale span{color:var(--muted);font-size:.94rem}
+.whale .lnk{border:0;background:none;color:var(--kick);font:inherit;font-weight:700;cursor:pointer;padding:6px 0;min-height:44px}
+.whale .lnk:hover{text-decoration:underline}
+body.landing .safe{margin-top:18px;color:var(--mut2)}
+body.landing #adv{margin-top:10px}
+@media (max-width:960px){
+  body.landing .hero{flex-direction:column;flex-wrap:wrap;width:auto;min-height:0;gap:20px;padding:40px 0 50px}
+  body.landing .hero-txt{flex:none}
+  body.landing .hero-txt h1{white-space:normal;width:auto;text-wrap:balance}
+  body.landing .hero>.scan{flex:none;margin:0;padding:24px 0 0;border-left:0;border-top:1px solid var(--line2);align-self:stretch}
+}
+
+#landing{gap:0;padding:0 0 16px}
+.lblk{padding:60px 0 80px}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:40px}
+.sec-head h2{font:700 clamp(2.1rem,4.4vw,3.5rem)/1.04 var(--f-display);letter-spacing:-.02em;margin:0;color:var(--fg)}
+.sec-head p{color:var(--muted);max-width:440px;margin:0}
+.syn{font-size:.8rem;color:var(--mut2);margin:14px 0 0}
+.syn a{color:var(--kick)}
+.term{display:grid;grid-template-columns:220px minmax(0,1fr);border:1px solid var(--line);border-radius:20px;overflow:hidden;background:rgba(14,10,36,.35)}
+.cats{display:flex;flex-direction:column;border-right:1px solid var(--line)}
+.cat{display:flex;align-items:center;gap:12px;padding:0 22px;height:62px;border:0;border-bottom:1px solid var(--line);background:none;color:#cfc8ee;font:inherit;font-size:1rem;text-align:left;cursor:pointer}
+.cat[aria-pressed="true"]{background:rgba(139,92,246,.16);color:var(--fg);font-weight:700;box-shadow:inset 3px 0 0 var(--vi)}
+.cat small{margin-left:auto;color:var(--mut2);font-size:.8rem}
+.hrows .hint{padding:22px}
+.hr{display:grid;grid-template-columns:56px minmax(0,1fr) 110px 150px 170px 110px;align-items:center;min-height:62px;width:100%;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:0}
+.hr:last-child{border-bottom:0}
+.hr:not(.hh):hover{background:rgba(139,92,246,.08)}
+.hr.hh{min-height:44px;font-size:.75rem;letter-spacing:.1em;color:var(--mut2);font-weight:700;cursor:default}
+.hr>*{padding:0 14px;min-width:0}
+.hr .n{color:var(--mut2);font:500 .82rem var(--f-mono);text-align:center}
+.hr .tk{display:flex;align-items:center;gap:12px;font-size:1rem}
+.hr .tk .lav{width:32px;height:32px;flex:none}
+.hr .tk b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hr .tk small{display:block;color:var(--mut2);font-size:.75rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.num{font:500 .88rem var(--f-mono);color:#e4defc}
+.hr .num,.hr.hh span{white-space:nowrap}
+.num.up{color:var(--bajo)}.num.dn{color:var(--alto)}
+.hr .sg{font-size:.88rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hseal{justify-self:start;margin-left:14px;font:700 .69rem var(--f-body);letter-spacing:.1em;padding:5px 11px!important;border-radius:999px;border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
+.hseal.s-alto{color:var(--alto);background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.4)}
+.hseal.s-medio{color:var(--medio);background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4)}
+.hseal.s-bajo{color:var(--bajo);background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.4)}
+.hseal.go{color:var(--kick);border-color:rgba(122,184,196,.5)}
+.lstats .sgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.stat{padding:4px 26px;border-left:1px solid var(--line2)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{display:block;font:300 clamp(2.2rem,3.8vw,3.1rem)/1.05 var(--f-display);letter-spacing:-.02em;color:var(--fg)}
+.stat span{display:block;margin-top:10px;font-weight:700;font-size:.94rem}
+.stat em{display:block;font-style:normal;color:var(--mut2);font-size:.82rem;margin-top:2px}
+.lcta{padding:30px 0 70px}
+.cpanel{position:relative;overflow:hidden;border-radius:28px;padding:84px 64px;border:1px solid var(--line);background:#07051a}
+.cpanel canvas{position:absolute;inset:0;width:100%;height:100%}
+.cpanel .in{position:relative;z-index:1;max-width:820px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:end}
+.cpanel h2{font:700 clamp(2.1rem,4.4vw,3.5rem)/1.04 var(--f-display);letter-spacing:-.02em;margin:0}
+.cpanel p{color:#d6cff2;font-size:1.12rem;margin:0 0 24px}
+.big-btn{display:inline-flex;align-items:center;gap:12px;min-height:54px;padding:0 10px 0 26px;border:0;border-radius:999px;background:var(--fg);color:#0e0926;font:inherit;font-weight:700;font-size:1.06rem;cursor:pointer}
+.big-btn i{width:36px;height:36px;border-radius:50%;background:#0e0926;color:var(--fg);display:grid;place-items:center;font-style:normal}
+.sitefoot{border-top-color:var(--line);color:var(--mut2)}
+@media (max-width:960px){
+  .sec-head{flex-direction:column;align-items:flex-start}
+  .term{grid-template-columns:minmax(0,1fr)}
+  .cats{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .cat{flex:none;border-bottom:0;border-right:1px solid var(--line);height:52px}
+  .cat small{display:none}
+  .hr{grid-template-columns:40px minmax(0,1fr) 92px 100px}.hr .c4,.hr .c5{display:none}
+  .lstats .sgrid{grid-template-columns:1fr 1fr;row-gap:30px}.stat:nth-child(3){border-left:0;padding-left:0}
+  .cpanel{padding:56px 24px}.cpanel .in{grid-template-columns:1fr}
+  .seam{height:140px}
+}
+@media (max-width:560px){
+  .hr{grid-template-columns:34px minmax(0,1fr) 84px}.hr .c3{display:none}.hr>*{padding:0 8px}
+  .hseal{margin-left:0}
+  .lblk{padding:40px 0 56px}
+}
+
+/* ---- resultado de un token: cabecera grande con la nebulosa, sello redondo, cuatro cifras grandes;
+   banderas a la izquierda junto a la gráfica y, debajo, Quién está detrás y Ballenas a todo el ancho ---- */
+#results{position:relative}
+.rneb{height:640px;top:-120px}
+.rseam{display:none;height:150px}
+#results.tview:not(.wview) .rseam{display:block;order:2}
+#results.wview .rneb{display:none}
+#results.tview:not(.wview) #summary{background:none;border:0;padding:30px 0 0;box-shadow:none}
+#results.tview:not(.wview) .tsum2 .thd{padding-right:230px;min-height:200px}
+#results.tview:not(.wview) .tname{font:700 clamp(2.8rem,6vw,5.5rem)/.98 var(--f-display);letter-spacing:-.02em}
+#results.tview:not(.wview) .tsum2 .tidr{display:flex;align-items:center;gap:22px}
+#results.tview:not(.wview) .tsum2 .tidr .lav{width:88px;height:88px;font-size:1.6rem}
+#results.tview:not(.wview) .tsum2 .sub{font:300 clamp(1.25rem,1.9vw,1.6rem)/1.35 var(--f-display);color:var(--fg);max-width:820px;margin-top:24px}
+#results.tview:not(.wview) .tsum2 .sub .tvl{font-weight:700}
+.tvl.lv-alto{color:var(--alto)!important}.tvl.lv-medio{color:var(--medio)!important}.tvl.lv-bajo{color:var(--bajo)!important}
+#results.tview:not(.wview) .stamp{width:190px;height:190px;top:20px;right:0;transform:rotate(-8deg);animation-name:stampIn2}
+@keyframes stampIn2{from{opacity:0;transform:rotate(-8deg) scale(1.5)}to{opacity:.95;transform:rotate(-8deg) scale(1)}}
+#results.tview:not(.wview) .stamp b{font:700 3.25rem/1 'Barlow Condensed',sans-serif;letter-spacing:.04em}
+#results.tview:not(.wview) .stamp.long b{font-size:1.6rem}
+#results.tview:not(.wview) .st-k{font-size:.62rem}
+#results.tview:not(.wview) .st-s{font-size:.8rem;max-width:130px}
+#results.tview:not(.wview) .tchips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin-top:32px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+#results.tview:not(.wview) .tchips span{display:flex;flex-direction:column-reverse;justify-content:flex-end;gap:8px;padding:24px 24px 22px;border-left:1px solid var(--line);border-radius:0;background:none;font-weight:700;font-size:.88rem;color:var(--fg)}
+#results.tview:not(.wview) .tchips span:first-child{border-left:0;padding-left:0}
+#results.tview:not(.wview) .tchips b{font:300 clamp(1.7rem,2.8vw,2.6rem)/1.05 var(--f-display);letter-spacing:-.02em;overflow-wrap:anywhere}
+#results.tview:not(.wview) #summary .tacts{border-top:0;padding-top:24px}
+#results.tview:not(.wview) #summary .btn{border-radius:999px}
+.tdc h2{font:700 clamp(1.6rem,2.6vw,2.2rem)/1.08 var(--f-display);letter-spacing:-.02em;margin-bottom:18px}
+.tdc h2 small{display:block;margin:2px 0 0!important;font:300 clamp(1.2rem,2vw,1.6rem)/1.15 var(--f-display)!important;color:#e6e0ff!important;letter-spacing:-.01em}
+.tnav{top:76px;background:rgba(10,7,28,.85);border-color:var(--line);border-radius:16px;padding:0;gap:0}
+.tnav button{flex:1 0 auto;border-radius:0;min-height:52px;padding:0 16px;border-right:1px solid var(--line)}
+.tnav button:last-child{border-right:0}
+.tnav button.on{background:rgba(139,92,246,.16);color:var(--fg);box-shadow:inset 0 -2px 0 var(--vi)}
+#results.tview .tok.one .lights{display:block;border-top:1px solid var(--line)}
+#results.tview .tok.one .lt{display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px;padding:16px 0;border-bottom:1px solid var(--line);font-size:.94rem}
+#results.tview .tok.one .lt b{font-size:1rem;letter-spacing:0;text-transform:none;color:var(--fg);font-weight:700}
+#results.tview .tok.one .lt .lfl{float:right;margin-left:10px;font:700 .66rem var(--f-body);letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:999px;border:1px solid currentColor}
+#results.tview .tok.one .lt span{color:var(--muted)}
+#results.tview .tok.one .lt{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:16px 0}
+/* con un resultado abierto, el buscador va sin caja, como en la maqueta */
+body:not(.landing):not(.scanp) .hero>.scan{background:none;border:0;box-shadow:none;padding:8px 0 0}
+body:not(.landing):not(.scanp) #form .eyebrow{display:none}
+body:not(.landing):not(.scanp) #form .row{flex-wrap:nowrap;align-items:center;border:1.5px solid rgba(241,238,255,.4);border-radius:14px;background:rgba(10,7,28,.85);padding:6px 6px 6px 16px}
+body:not(.landing):not(.scanp) #form .row input{border:0;background:transparent;padding:8px 0;outline:none;box-shadow:none}
+body:not(.landing):not(.scanp) #form .row .btn{min-height:40px;border-radius:999px;padding:0 20px}
+@media (min-width:1100px){
+  #results.tview:not(.wview){grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-auto-flow:row dense;column-gap:28px;row-gap:16px;max-width:1320px}
+  #results.tview:not(.wview) #tside,#results.tview:not(.wview) #tdetail{display:contents}
+  #results.tview:not(.wview) #summary,#results.tview:not(.wview) .rseam,#results.tview:not(.wview) #t-who,#results.tview:not(.wview) #t-hold{grid-column:1/-1}
+  #results.tview:not(.wview) #list{grid-column:1;grid-row:span 2;order:3}
+  #results.tview:not(.wview) .tnav{grid-column:2;order:3;position:static}
+  #results.tview:not(.wview) #t-chart{grid-column:2;order:4}
+  #results.tview:not(.wview) .tnav .tnv{display:none}
+}
+@media (max-width:960px){
+  #results.tview:not(.wview) .tchips{grid-template-columns:1fr 1fr}
+  #results.tview:not(.wview) .tchips span:nth-child(3){border-left:0;padding-left:0}
+  #results.tview:not(.wview) .tchips span:nth-child(n+3){border-top:1px solid var(--line)}
+  #results.tview:not(.wview) .tsum2 .thd{padding-right:150px;min-height:150px}
+  #results.tview:not(.wview) .stamp{width:140px;height:140px;top:0}
+  #results.tview:not(.wview) .stamp b{font-size:2.4rem}
+  .rseam{height:110px}
+}
+@media (max-width:560px){
+  #results.tview:not(.wview) .tsum2 .thd{padding-right:100px;min-height:110px}
+  #results.tview:not(.wview) .stamp{width:100px;height:100px;top:-6px;right:-4px}
+  #results.tview:not(.wview) .stamp b{font-size:1.6rem}
+  #results.tview:not(.wview) .stamp.long b{font-size:.9rem}
+  #results.tview:not(.wview) .st-k{font-size:.5rem}
+  #results.tview:not(.wview) .st-s{font-size:.56rem;max-width:76px}
+  #results.tview:not(.wview) .tsum2 .tidr{gap:12px}
+  #results.tview:not(.wview) .tsum2 .tidr .lav{width:56px;height:56px;font-size:1.1rem}
+  #results.tview:not(.wview) .tchips span{padding:16px 12px 14px}
+  .tnav button{flex:none}
+}
 </style>
 </head>
 <body>
-<svg class="bgfx" aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+<svg class="bgfx" hidden aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
   <defs>
     <radialGradient id="gL" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#a78bfa" stop-opacity=".08"/><stop offset="62%" stop-color="#a78bfa" stop-opacity=".22"/><stop offset="88%" stop-color="#c4b5fd" stop-opacity=".75"/><stop offset="100%" stop-color="#7c3aed" stop-opacity=".2"/></radialGradient>
     <radialGradient id="gT" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#9fd3dc" stop-opacity=".08"/><stop offset="62%" stop-color="#9fd3dc" stop-opacity=".22"/><stop offset="88%" stop-color="#b9e3ea" stop-opacity=".75"/><stop offset="100%" stop-color="#3b8796" stop-opacity=".2"/></radialGradient>
@@ -1500,12 +1695,12 @@ iframe.mm{border:0;aspect-ratio:8/5;pointer-events:none;background:#0b0722}
   </header>
 
   <section class="hero" id="hero">
+  <canvas class="neb" data-neb="hero" aria-hidden="true"></canvas>
   <div class="hero-txt">
     <p class="kick">Mira las banderas antes de comprar</p>
-    <h1>Una segunda mirada antes de dar el salto</h1>
+    <h1>Una segunda mirada<span class="thin">antes de dar el salto.</span></h1>
     <p class="hero-sub">SolFlag analiza cualquier token o wallet de Solana y te explica sus red flags con palabras claras: el creador, quién lo tiene, la liquidez y cómo se lanzó.</p>
     <ul class="trust"><li>Gratis</li><li>Sin registro</li><li>Sin conectar tu wallet</li><li>Código abierto</li></ul>
-    <p class="motto"><span></span>Primero comprueba. Después decide.</p>
   </div>
   <section class="card scan">
     <p class="kick sk">Escáner de Solana</p>
@@ -1515,13 +1710,14 @@ iframe.mm{border:0;aspect-ratio:8/5;pointer-events:none;background:#0b0722}
     <ul class="scan-trust"><li>Gratis</li><li>Sin registro</li><li>Sin conectar tu wallet</li><li>Solo datos públicos</li></ul>
     <form id="form" autocomplete="off">
       <label class="eyebrow" for="wallet">Dirección</label>
+      <label class="lab2" for="wallet">Pega aquí la dirección del token o la wallet</label>
       <div class="row">
         <input id="wallet" type="text" spellcheck="false" placeholder="Pega aquí la dirección del token o la wallet">
         <button class="btn" id="go" type="submit">Analizar</button>
-        <button class="btn ghost" id="goH" type="button">Buscar ballenas</button>
       </div>
       <p class="hint" id="whint" hidden></p>
       <div class="tryw"><span>Prueba con</span><button type="button" class="chip" data-try="DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263">BONK</button><button type="button" class="chip" data-try="JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN">JUP</button><button type="button" class="chip" data-trynew>Un token recién lanzado</button></div>
+      <div class="whale"><span>¿Quieres ver quién tiene más de un token?</span><button type="button" class="lnk" id="goH">Buscar ballenas →</button></div>
       <p class="hint safe">Solo leemos datos públicos. Nunca te pediremos claves, frases de recuperación ni firmar nada.</p>
     </form>
     <form id="hform" autocomplete="off" hidden>
@@ -1573,6 +1769,8 @@ iframe.mm{border:0;aspect-ratio:8/5;pointer-events:none;background:#0b0722}
   </section>
 
   <section id="results" hidden>
+    <canvas class="neb rneb" data-neb="head" aria-hidden="true"></canvas>
+    <div class="seam rseam"><canvas data-seam="2" aria-hidden="true"></canvas></div>
     <div id="tside">
     <div class="card" id="summary"></div>
     <section class="card tdc" id="wnum" hidden></section>
@@ -1632,37 +1830,27 @@ iframe.mm{border:0;aspect-ratio:8/5;pointer-events:none;background:#0b0722}
   </div>
 
   <div id="landing">
-    <section class="lsect" id="radar">
-      <div class="lhead"><p class="kick">En tiempo real</p><h2>Radar de red flags.</h2><p>Los últimos tokens lanzados en Solana, revisados con las 5 banderas. Arriba, los más peligrosos.</p></div>
-      <div class="rdgrid" id="rdlist"></div>
-      <p class="rdfoot"><span id="rdstat"></span><a href="#" data-trynew>Ver todos los tokens nuevos →</a></p>
-    </section>
-    <section class="lsect">
-      <div class="lhead"><div><p class="kick">Las 5 banderas</p><h2>Las señales que importan.</h2></div><p>Cada bandera sale verde, amarilla o roja, y siempre con su motivo en una frase.</p></div>
-      <div class="flags5">
-        <div class="f5"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><h3>01 / Creador</h3><p>Si puede crear más tokens o congelar los tuyos.</p></div>
-        <div class="f5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg><h3>02 / Concentración</h3><p>Pocas wallets con mucho, aunque se escondan en grupos.</p></div>
-        <div class="f5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7c3.5 4 6 7.4 6 10.3a6 6 0 0 1-12 0c0-2.9 2.5-6.3 6-10.3z"/></svg><h3>03 / Liquidez</h3><p>Real, inflada o que se puede retirar de golpe.</p></div>
-        <div class="f5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg><h3>04 / Dependencia</h3><p>Puentes y programas en los que hay que confiar.</p></div>
-        <div class="f5"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 15-3-3a22 22 0 0 1 2-3.9A12.9 12.9 0 0 1 22 2c0 2.7-.8 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9a2.2 2.2 0 0 0-2.9-.1z"/></svg><h3>05 / Lanzamiento</h3><p>Bundles al nacer y creadores que lanzan en serie.</p></div>
+    <div class="seam"><canvas data-seam="1" aria-hidden="true"></canvas></div>
+    <section class="lblk" id="hot">
+      <div class="sec-head"><h2>Tokens calientes<span class="thin">ahora mismo.</span></h2><p>Lo que más se mueve en Solana, con su nivel de riesgo al lado. Antes de entrar, mira las banderas.</p></div>
+      <div class="term">
+        <div class="cats" role="group" aria-label="Lista de tokens"><button type="button" class="cat" data-hot="t" aria-pressed="true">En tendencia <small id="hotnt"></small></button><button type="button" class="cat" data-hot="n" aria-pressed="false">Recién lanzados <small id="hotnn"></small></button></div>
+        <div class="hrows" id="hotrows"><p class="hint">Cargando la tendencia…</p></div>
       </div>
+      <p class="syn" id="hotsrc"></p>
     </section>
-    <section class="lsect two">
-      <div class="card">
-        <p class="kick">Por qué fiarte</p><h2>Sin trucos.</h2>
-        <ul class="checks">
-          <li><b>Código abierto.</b> El motor es público en GitHub y npm: cualquiera puede revisarlo.</li>
-          <li><b>Nunca conectas tu wallet.</b> Solo lees datos públicos de la blockchain.</li>
-          <li><b>Explica, no solo puntúa.</b> Cada bandera dice por qué.</li>
-          <li><b>En español y en inglés.</b></li>
-        </ul>
-      </div>
-      <div class="card">
-        <p class="kick">Bot de Telegram</p><h2>Que te avise el bot, no la pérdida.</h2>
-        <div class="chat"><div class="me">/vigilar $TOKEN</div><div class="bot"><b>El creador está vendiendo</b><br>$TOKEN: riesgo medio → riesgo alto</div></div>
-        <a class="btn" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Abrir el bot</a>
-      </div>
+    <section class="lblk lstats" id="lstats" hidden>
+      <div class="sec-head"><h2>Lo que hemos visto<span class="thin">hasta hoy.</span></h2><p>Cada lanzamiento queda guardado: quién lo creó, quién lo pagó y cómo acabó a las 24 horas.</p></div>
+      <div class="sgrid" id="lsgrid"></div>
+      <p class="syn"><a href="/acierto/">Ver datos y acierto →</a></p>
     </section>
+    <section class="lcta"><div class="cpanel">
+      <canvas data-neb="panel" aria-hidden="true"></canvas>
+      <div class="in">
+        <h2>Primero comprueba.<span class="thin">Después decide.</span></h2>
+        <div><p>Pega una dirección y en unos segundos sabrás quién lo lanzó, quién lo tiene y qué más ha hecho antes.</p><button type="button" class="big-btn" id="ctaGo">Analizar un token <i aria-hidden="true">→</i></button></div>
+      </div>
+    </div></section>
   </div>
 
   <footer class="sitefoot">
@@ -2796,7 +2984,7 @@ function renderToken(noScroll){
     "<div class='tidr'>"+tokAv(r.img,r.sym)+"<h2 class='tname'>"+esc(r.sym)+(r.name&&!sameName(r.name,r.sym)?"<small>"+esc(r.name)+"</small>":"")+"</h2></div>"+
     "<div class='taddr'><button class='mono tmint2' type='button' data-copy='"+esc(r.mint)+"' title='Copiar dirección del token'>"+esc(r.mint)+"</button>"+
       "<button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copiar dirección del token'>copiar</button></div></div>"+
-    "<p class='sub'><b class='tvl'>"+esc(dataOnly(r)?"Riesgo medio por falta de datos":L.label)+".</b> "+esc(tip)+"</p>"+
+    "<p class='sub'><b class='tvl lv-"+esc(L.cls)+"'>"+esc(dataOnly(r)?"Riesgo medio por falta de datos":L.label)+".</b> "+esc(tip)+"</p>"+
     (chips.length?"<div class='tchips'>"+chips.map(function(c){ return "<span>"+esc(c[0])+" <b>"+esc(c[1])+"</b></span>"; }).join("")+"</div>":"")+
     "</div></div>"+
     "<div class='actions tacts'>"+
@@ -3340,7 +3528,7 @@ async function loadTrend(){
     trend.rows=rows; paintTrend();
     var mk=await getMarkets(rows.map(function(x){ return x.mint; }));
     await pool(rows,2,async function(x){
-      if(run!==trend.run||!document.body.classList.contains("scanp")) return;
+      if(run!==trend.run||!liveOn()) return;
       var par=mk.data[x.mint]||x.gt;
       await fillLiquidity(par,x.liq);
       try{ x.r=await assess(x.mint,par,0,false); }catch(e){ x.r=null; }
@@ -3362,6 +3550,7 @@ function paintTrend(){
       "<span class='tx'>"+(ch!==null?"<em class='"+(ch>=0?"up":"dn")+"'>"+(ch>=0?"+":"")+esc(fmtPct(ch))+"</em>":"")+
       (x.st==="done"?(L?"<span class='tp'>"+esc(lvlLabel(x.r))+"</span>":"<span class='tp wait'>Sin veredicto</span>"):"<span class='tp wait'>Analizando…</span>")+"</span></button>";
   }).join("");
+  paintHot();
 }
 /* Recién lanzados: los 5 últimos pools nuevos de Solana. Cada 30 s, solo con la pestaña del navegador a la vista */
 var fresh={rows:null,seen:{},run:0,ts:0,err:false,timer:null};
@@ -3398,6 +3587,57 @@ function paintFresh(keepAnim){
   }).join("");
   if(!keepAnim) fresh.rows.forEach(function(x){ x.isNew=false; });
   $("#sftime").textContent=fresh.ts?"actualizado "+ftime(fresh.ts):"";
+  paintHot();
+}
+/* Portada: «Tokens calientes» con lo mismo que la página Escáner (En tendencia y Recién lanzados) */
+var hot={tab:"t"};
+function hotSeal(r){
+  var L=r&&LEVELS[r.lvl]; if(!L) return "<span class='hseal'>—</span>";
+  return "<span class='hseal s-"+esc(L.cls)+"'>"+esc((dataOnly(r)?LEVELS.MEDIO.short:L.short).toUpperCase())+"</span>";
+}
+function hotSignal(r){
+  if(!r||!r.lights) return "";
+  var b=r.lights.filter(function(l){ return l.s==="bad"; })[0]||r.lights.filter(function(l){ return l.s==="warn"; })[0];
+  return b?(LKEYS[b.k]||""):"Sin señales";
+}
+function paintHot(){
+  var box=$("#hotrows"); if(!box) return;
+  var tr=trend.rows||[], fr=fresh.rows||[];
+  $("#hotnt").textContent=tr.length||""; $("#hotnn").textContent=fr.length||"";
+  document.querySelectorAll("[data-hot]").forEach(function(b){ b.setAttribute("aria-pressed",String(b.getAttribute("data-hot")===hot.tab)); });
+  var src=$("#hotsrc");
+  if(hot.tab==="t"){
+    src.innerHTML="Fuente: tendencia de GeckoTerminal (por actividad real, sin puestos de pago). Que un token esté en tendencia solo dice que se mueve mucho: no es una recomendación de compra. <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a>.";
+    if(trend.err){ box.innerHTML="<p class='hint'>No se pudo cargar la tendencia ahora mismo. Se vuelve a intentar en unos minutos.</p>"; return; }
+    if(!trend.rows){ box.innerHTML="<p class='hint'>Cargando la tendencia…</p>"; return; }
+    if(!tr.length){ box.innerHTML="<p class='hint'>GeckoTerminal no tiene tokens en tendencia ahora mismo.</p>"; return; }
+    box.innerHTML="<div class='hr hh' aria-hidden='true'><span>#</span><span>TOKEN</span><span class='c3'>PRECIO 1 H</span><span class='c4'>VOLUMEN 24 H</span><span class='c5'>SEÑAL</span><span>RIESGO</span></div>"+
+      tr.map(function(x,i){ var ch=isFinite(x.chg)?x.chg:null;
+        return "<button type='button' class='hr' data-analyze='"+esc(x.mint)+"'><span class='n'>"+(i+1)+"</span><span class='tk'>"+tokAv(x.img,x.sym)+
+          "<span><b>$"+esc(x.sym)+"</b><small>"+esc([DEXN[x.dex]||x.dex,x.created?haceMin(x.created):""].filter(Boolean).join(" · "))+"</small></span></span>"+
+          "<span class='num c3"+(ch===null?"":ch>=0?" up":" dn")+"'>"+(ch!==null?(ch>=0?"+":"")+esc(fmtPct(ch)):"—")+"</span>"+
+          "<span class='num c4'>"+(x.vol?esc(usd(x.vol)):"—")+"</span>"+
+          "<span class='c5 sg'>"+(x.st==="done"?esc(hotSignal(x.r)):"Analizando…")+"</span>"+(x.st==="done"?hotSeal(x.r):"<span class='hseal wait'>…</span>")+"</button>";
+      }).join("");
+  } else {
+    src.innerHTML="Los 5 últimos de Solana (Pump.fun y otros). De lo que nace, <b>el 99 %</b> está muerto en 24 h (registro de SolFlag). <a href='#' data-trynew>Ver todos en Tokens nuevos →</a> · <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a>";
+    if(fresh.err){ box.innerHTML="<p class='hint'>No se pudieron cargar los últimos lanzamientos ahora mismo.</p>"; return; }
+    if(!fresh.rows){ box.innerHTML="<p class='hint'>Buscando los últimos lanzamientos…</p>"; return; }
+    box.innerHTML="<div class='hr hh' aria-hidden='true'><span>#</span><span>TOKEN</span><span class='c3'>EDAD</span><span class='c4'>LIQUIDEZ</span><span class='c5'>DEX</span><span>RIESGO</span></div>"+
+      fr.map(function(x,i){
+        return "<button type='button' class='hr' data-analyze='"+esc(x.mint)+"'><span class='n'>"+(i+1)+"</span><span class='tk'>"+tokAv(x.img,x.sym)+
+          "<span><b>$"+esc(x.sym)+"</b><small>"+esc(DEXN[x.dex]||x.dex)+"</small></span></span>"+
+          "<span class='num c3'>"+esc(x.created?haceMin(x.created):"—")+"</span><span class='num c4'>"+(x.liq?esc(usd(x.liq)):"—")+"</span>"+
+          "<span class='c5 sg'>"+esc(DEXN[x.dex]||x.dex)+"</span><span class='hseal go'>ANALIZAR</span></button>";
+      }).join("");
+  }
+}
+document.addEventListener("click",function(ev){ var b=ev.target.closest&&ev.target.closest("[data-hot]"); if(b){ hot.tab=b.getAttribute("data-hot"); paintHot(); } });
+function paintHome(){
+  if(!trend.rows||Date.now()-trend.ts>300000) setTimeout(loadTrend,300); else paintTrend();
+  if(Date.now()-fresh.ts>=30000) loadFresh(); else paintFresh(true);
+  if(!fresh.timer) fresh.timer=setInterval(liveTick,10000);
+  loadDatos();
 }
 document.addEventListener("keydown",function(ev){ if((ev.key==="Enter"||ev.key===" ")&&ev.target&&ev.target.id==="smbox"){ ev.preventDefault(); ev.target.click(); } });
 document.addEventListener("touchstart",function(ev){ var c=$("#scinta"); if(c) c.classList.toggle("stop",!!(ev.target.closest&&ev.target.closest("#scinta"))); },{passive:true});
@@ -3442,8 +3682,9 @@ function paintMoment(){
 }
 function mmSend(){ var fr=$("#smframe"); if(!mom.ready||!mom.tok||!fr||!fr.contentWindow) return;
   fr.contentWindow.postMessage({type:"om-data",lang:document.documentElement.lang==="en"?"en":"es",tok:mom.tok},location.origin); }
+function liveOn(){ var c=document.body.classList; return c.contains("scanp")||c.contains("landing"); }
 function liveTick(){
-  if(!document.body.classList.contains("scanp")||document.visibilityState!=="visible") return;
+  if(!liveOn()||document.visibilityState!=="visible") return;
   if(Date.now()-fresh.ts>=30000) loadFresh(); else paintFresh(true);
   if(Date.now()-trend.ts>300000) loadTrend();
 }
@@ -3473,20 +3714,30 @@ function paintScanPage(){
   var l=recentAll().slice(0,6);
   $("#srecent").hidden=!l.length;
   $("#srclist").innerHTML=l.map(recentHtml).join("");
+  loadDatos();
+}
+function loadDatos(){
   if(sdatos.ok||sdatos.run) return;
   sdatos.run=true;
   // los números de la página Datos y acierto: tokens nuevos vistos, cuántos mueren en un día y cómo van los verdes
   fetch("/datos/registro/indice.json",{cache:"no-cache"}).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(ix){
-    var n=0, h24=0, d24=0, g24=0, gd24=0;
+    var n=0, h24=0, d24=0, g24=0, gd24=0, a24=0, ad24=0, d0="";
     sdatos.green=[];
-    Object.keys(ix.days||{}).forEach(function(d){ var x=ix.days[d]; n+=x.n||0;
+    Object.keys(ix.days||{}).forEach(function(d){ var x=ix.days[d]; n+=x.n||0; if(x.n&&(!d0||d<d0)) d0=d;
       (x.alive||[]).forEach(function(a){ if(a.l==="LOW"&&a.m) sdatos.green.push(a); });
-      Object.keys(x.levels||{}).forEach(function(k){ var s=x.levels[k]; h24+=s.h24||0; d24+=s.dead24||0; if(k==="LOW"){ g24+=s.h24||0; gd24+=s.dead24||0; } }); });
+      Object.keys(x.levels||{}).forEach(function(k){ var s=x.levels[k]; h24+=s.h24||0; d24+=s.dead24||0; if(k==="LOW"){ g24+=s.h24||0; gd24+=s.dead24||0; } if(k==="HIGH"){ a24+=s.h24||0; ad24+=s.dead24||0; } }); });
     if(!n||!h24) return;
     var pc=(100*d24/h24), pt=(d24<h24&&pc>99.9?99.9:pc).toFixed(1).replace(".",",");
     $("#sdtxt").innerHTML="<b>"+n.toLocaleString("de-DE")+"</b> tokens nuevos analizados al verlos. Muere el <b>"+pt+" %</b> en un día."+
       (g24?" En verde: <b>"+(g24-gd24)+" de "+g24+"</b> siguen vivos a las 24 h.":"")+" <a href='/acierto/'>Ver datos y acierto</a>";
     $("#sdatos").hidden=false; sdatos.ok=true; paintCinta();
+    // portada: las mismas cifras en grande
+    var pct=function(a,b){ var v=100*a/b; return (a<b&&v>99.9?99.9:v).toFixed(1).replace(".",",")+" %"; }, dm=/^\d{4}-(\d{2})-(\d{2})$/.exec(d0);
+    var st=[[n.toLocaleString("de-DE"),"Lanzamientos registrados",dm?"desde el "+(+dm[2])+"/"+(+dm[1]):""],[pt+" %","Muertos a las 24 h","de todo lo que nace"]];
+    if(a24) st.push([pct(ad24,a24),"De los ALTO, muertos a 24 h",a24.toLocaleString("de-DE")+" tokens"]);
+    if(g24) st.push([(g24-gd24)+" de "+g24,"En verde y vivos a 24 h","los que pasaron los chequeos"]);
+    $("#lsgrid").innerHTML=st.map(function(x){ return "<div class='stat'><b>"+esc(x[0])+"</b><span>"+esc(x[1])+"</span>"+(x[2]?"<em>"+esc(x[2])+"</em>":"")+"</div>"; }).join("");
+    $("#lstats").hidden=false;
   }).catch(function(){}).then(function(){ sdatos.run=false; });
 }
 
@@ -5482,6 +5733,7 @@ document.addEventListener("change",function(ev){
 });
 $("#wallet").addEventListener("input",walletHint);
 // Portada: «Buscar ballenas» usa la misma dirección; «Prueba con» rellena y analiza
+$("#ctaGo").addEventListener("click",function(){ window.scrollTo({top:0,behavior:"smooth"}); setTimeout(function(){ $("#wallet").focus({preventScroll:true}); },400); });
 $("#goH").addEventListener("click",function(){
   var v=$("#wallet").value.trim(); setMode("H"); if(v){ $("#mint").value=v; holders(); } else $("#mint").focus();
 });
@@ -5497,14 +5749,13 @@ document.addEventListener("click",function(ev){
 // La portada (texto, banderas, bot) solo se ve en el escáner y mientras no hay un análisis abierto
 function updateLanding(){
   var free=state.mode==="W"&&$("#results").hidden&&$("#progress").hidden, on=free&&!state.scan;
+  if(on&&!document.body.classList.contains("landing")) setTimeout(paintHome,0);
   document.body.classList.toggle("landing",on);
   var sp=free&&state.scan;
   if(sp&&!document.body.classList.contains("scanp")) paintScanPage();
   document.body.classList.toggle("scanp",sp);
   // en la portada no hay ninguna pestaña elegida; en el Escáner (página o resultado), la suya
   if(state.mode==="W"){ var tw=$("#tabW"), sel=String(!on); if(tw.getAttribute("aria-selected")!==sel) tw.setAttribute("aria-selected",sel); }
-  // El radar se carga al ver la portada y se refresca si han pasado 5 minutos
-  if(on&&Date.now()-radar.ts>300000){ radar.ts=Date.now(); setTimeout(loadRadar,1500); }
 }
 new MutationObserver(updateLanding).observe(document.querySelector(".wrap"),{subtree:true,attributes:true,attributeFilter:["hidden","aria-selected"]});
 updateLanding();
@@ -5537,5 +5788,6 @@ updateLanding();
 })();
 })();
 </script>
+<script src="/puntos.js" defer></script>
 </body>
 </html>
