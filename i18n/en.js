@@ -26,8 +26,8 @@ export const CODE = [
   ["<p class=\"foot\">Contamos visitas y análisis de forma anónima, sin cookies ni datos personales. <a href=\"/privacidad/\">Privacidad</a> · <a href=\"/terminos/\">Términos de uso</a></p>", "<p class=\"foot\">We count visits and analyses anonymously, with no cookies and no personal data. <a href=\"/en/privacy/\">Privacy</a> · <a href=\"/en/terms/\">Terms of use</a></p>"],
   // link previews (X, Telegram, WhatsApp): English image and address
   ['<meta property="og:url" content="https://solflag.com/">', '<meta property="og:url" content="https://solflag.com/en/">'],
-  ['<meta property="og:image" content="https://solflag.com/og.png">', '<meta property="og:image" content="https://solflag.com/og-en.png">'],
-  ['<meta name="twitter:image" content="https://solflag.com/og.png">', '<meta name="twitter:image" content="https://solflag.com/og-en.png">'],
+  ['<meta property="og:image" content="https://solflag.com/og.png?v=2">', '<meta property="og:image" content="https://solflag.com/og-en.png?v=2">'],
+  ['<meta name="twitter:image" content="https://solflag.com/og.png?v=2">', '<meta name="twitter:image" content="https://solflag.com/og-en.png?v=2">'],
   ['<html lang="es">', '<html lang="en">'],
   ['<a class="lang" href="https://solflag.com/en/" hreflang="en" title="English version">EN</a>',
    '<a class="lang" href="https://solflag.com/" hreflang="es" title="Versión en español">ES</a>'],

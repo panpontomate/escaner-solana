@@ -333,7 +333,7 @@ export function pagina(m, d, mk, reg, now, lang) {
   const aviso = !r ? '<div class="warn">' + t.avisoNoBase('<a href="' + scan + '">' + t.escanealo + "</a>") + "</div>"
     : parcial ? '<div class="warn">' + t.avisoParcial + "</div>" : "";
   const hoy = F.fecha(now), S = t.secciones;
-  const img = mk && mk.image ? mk.image : "https://solflag.com/og.png";
+  const img = mk && mk.image ? mk.image : "https://solflag.com/" + (L === "en" ? "og-en.png" : "og.png") + "?v=2";
   const otroUrl = fichaUrl(m, L === "en" ? "es" : "en");
 
   return '<!doctype html><html lang="' + L + '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
