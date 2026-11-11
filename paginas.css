@@ -1,0 +1,56 @@
+/* Estilo del 11/11 para las páginas sueltas (blog, datos y acierto, privacidad, términos; también en inglés):
+   los mismos colores, letras y fondo de nebulosa de puntos (fondo.js) que la portada y el resultado del Escáner.
+   Va después de los estilos propios de cada página y solo cambia el aspecto. */
+:root{--bg:#05040d;--card:rgba(14,10,36,.55);--line:rgba(196,181,253,.16);--line2:rgba(196,181,253,.3);--muted:#a99fd6;--mut2:#8a81b8;--soft:#d6cff2;--vi:#8b5cf6}
+html{background:var(--bg);overflow-x:clip}
+body{background:none!important}
+.thin{display:block;font-weight:300;color:#e6e0ff}
+
+/* cabecera fija con cristal */
+header{position:sticky;top:0;z-index:20;background:rgba(5,4,13,.6);box-shadow:0 0 0 100vmax rgba(5,4,13,.6);clip-path:inset(0 -100vmax);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:var(--line)}
+.back{border-radius:999px;background:var(--fg);color:#0e0926}
+.back:hover{color:#0e0926}
+
+/* titulares como en la portada */
+.intro{padding:64px 0 22px}
+.kick{letter-spacing:.24em}
+h1{font-weight:700;letter-spacing:-.02em;font-size:clamp(2.6rem,6.4vw,4.2rem);line-height:1}
+article h2{letter-spacing:-.02em}
+article,[id]{scroll-margin-top:92px}
+
+/* tarjetas: más oscuras y con el borde fino */
+article,.toc{background:var(--card);border-color:var(--line);border-radius:20px}
+.tags span,.dl a{border-color:var(--line2)}
+footer,.share,article td,article th{border-color:var(--line)!important}
+
+/* cifras grandes en fila, separadas por una línea (como «Lo que hemos visto hasta hoy») */
+.fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;margin:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.fig div{background:none;border:0;border-left:1px solid var(--line);border-radius:0;padding:18px 18px 16px}
+.fig div:first-child{border-left:0;padding-left:0}
+.fig b{font:300 clamp(2rem,4vw,2.6rem)/1.05 Fraunces,Georgia,serif;letter-spacing:-.02em;color:var(--fg)}
+.fig span{display:block;margin-top:6px;font-weight:700;color:var(--fg);font-size:.86rem}
+
+/* tablas como la de «Tokens calientes» */
+article table{font-size:.93rem}
+article th{color:var(--mut2);font-size:.72rem;font-weight:700;letter-spacing:.1em;padding:10px 8px}
+article td{padding:12px 8px}
+article tr.base td{background:rgba(139,92,246,.12)}
+article tbody tr:hover td{background:rgba(139,92,246,.06)}
+.pill{letter-spacing:.06em}
+
+/* «Quién está detrás» de Datos y acierto: sin caja, a lo ancho del texto y con el titular en dos tonos */
+#detras{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:56px 0 8px;margin-top:48px}
+#detras>h2{font-size:clamp(2.1rem,5vw,3.2rem);line-height:1.04;margin-bottom:18px}
+#detras h3{font:700 1.5rem/1.15 Fraunces,Georgia,serif;letter-spacing:-.01em;margin:34px 0 10px}
+#detras .tw{border:1px solid var(--line);border-radius:20px;background:rgba(14,10,36,.35);padding:4px 14px}
+#detras table{margin:0}
+#detras tbody tr:first-child td{border-top:1px solid var(--line)}
+
+@media (max-width:620px){
+  header{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(5,4,13,.92)}
+  .fig{grid-template-columns:1fr 1fr}
+  .fig div:nth-child(odd){border-left:0;padding-left:0}
+  .fig div:nth-child(n+3){border-top:1px solid var(--line)}
+  #detras{padding-top:40px}
+  #detras .tw{padding:2px 8px}
+}
