@@ -149,7 +149,7 @@ export async function handle(req, env) {
     try {
       const a = await acciones(env), res = json(a);
       // si falta algún precio, que no se quede 5 min en la caché
-      if (a.filas.some((f) => f.precio === null || f.real === null)) res.headers.set("cache-control", "public, max-age=60");
+      if (a.filas.some((f) => f.precio === null || f.real === null) || (a.dolares || []).some((d) => d.valor === null)) res.headers.set("cache-control", "public, max-age=60");
       return res;
     } catch (e) { return fail(503, "prices unavailable"); }
   }
