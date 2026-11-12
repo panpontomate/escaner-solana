@@ -82,6 +82,9 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
   <h1>Lo que vamos<span class="thin">construyendo.</span></h1>
   <p>Novedades de SolFlag, pruebas con tokens reales y lo que aprendemos por el camino. Contado tal cual, también lo que sale mal.</p>
   <nav class="toc" aria-label="Entradas">
+    <a href="#claves-emisores"><time datetime="2026-11-12">12 nov 2026</time><b>Cuando un emisor cambia sus claves</b></a>
+    <a href="#fichas-y-portada"><time datetime="2026-11-11">11 nov 2026</time><b>Una ficha para cada token, una portada nueva y el bot en grupos</b></a>
+    <a href="#quien-esta-detras"><time datetime="2026-11-10">10 nov 2026</time><b>Quién está detrás, en los datos; y cada escaneo suma</b></a>
     <a href="#mapa-y-tarjetas"><time datetime="2026-11-07">7 nov 2026</time><b>El mapa, más fluido y para compartir; y tarjetas nuevas para tokens y wallets</b></a>
     <a href="#datos-y-acierto"><time datetime="2026-11-06">6 nov 2026</time><b>Datos y acierto: todos los números, también los fallos</b></a>
     <a href="#volver-atras"><time datetime="2026-11-05">5 nov 2026</time><b>Volver atrás sin perder el análisis, y un fondo nuevo</b></a>
@@ -99,6 +102,60 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
 
 <!-- Para añadir un avance: copia un <article> y ponlo el primero, con su enlace en el índice de arriba -->
 
+<article id="claves-emisores">
+  <time datetime="2026-11-12">12 de noviembre de 2026</time>
+  <h2>Cuando un emisor cambia sus claves</h2>
+  <div class="tags"><span>Emisores</span><span>Seguridad</span></div>
+  <p>SolFlag se fía de una lista corta de emisores: Circle, Paxos, Tether y xStocks. Cuando escaneas USDC no lo trata como una memecoin cuyo creador puede congelar tus tokens: comprueba que las claves que controlan el token son las que usa Circle.</p>
+  <p>Hace unos días alguien nos preguntó qué pasa si un emisor cambia sus claves. Contestamos rápido: «la cadena manda». Pero una clave nueva en la cadena demuestra que la clave cambió, no quién la cambió. Un cambio legítimo y una clave robada se ven igual desde fuera. Y había algo peor: si Circle rotaba una clave, SolFlag dejaba de reconocer USDC y lo marcaba como un token cualquiera.</p>
+  <h3>Lo que cambia</h3>
+  <ul>
+    <li><b>Si un token oficial de uno de estos emisores aparece con una clave que no conocemos, sale en ámbar:</b> «clave nueva, pendiente de revisar». Ni verde ni «falso».</li>
+    <li><b>Cada mañana leemos en la cadena las claves de USDC, EURC, USDT, PYUSD y USDG.</b> Si una cambia, nos llega un aviso con la clave, la transacción y quién la firmó.</li>
+    <li><b>Una persona lo comprueba en la web del propio emisor</b> antes de que el token vuelva a verde. La lista revisada es pública: <a href="/emisores.json">emisores.json</a>.</li>
+  </ul>
+  <p>Es más lento que automatizarlo del todo. Pero «todavía no lo sabemos» es una respuesta que preferimos dar antes que un verde sin comprobar.</p>
+  <p>Si ves algo raro, escríbenos a <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a> o en X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Cuando%20un%20emisor%20cambia%20sus%20claves&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23claves-emisores" target="_blank" rel="noopener">Compartir en X</a><a href="#claves-emisores">Enlace a esta entrada</a></div>
+</article>
+<article id="fichas-y-portada">
+  <time datetime="2026-11-11">11 de noviembre de 2026</time>
+  <h2>Una ficha para cada token, una portada nueva y el bot en grupos</h2>
+  <div class="tags"><span>Fichas</span><span>Diseño</span><span>Bot</span></div>
+  <p>El día más largo hasta ahora. Lo más importante: SolFlag deja de ser solo un semáforo y pasa a guardar la historia de cada token.</p>
+  <h3>Una ficha pública para cada token</h3>
+  <ul>
+    <li><b>En <a href="https://token.solflag.com">token.solflag.com</a> cada token tiene su ficha:</b> quién pagó el lanzamiento, quién lo creó y quién lo financió, con cómo acabaron sus otros lanzamientos; los primeros compradores; qué dijimos al verlo nacer y qué pasó después; y dónde cotiza hoy. Ya hay más de 23.000, en español y en inglés.</li>
+    <li><b>Compartir un token enlaza a su ficha,</b> con su propia vista previa en X y Telegram.</li>
+    <li><b>Un tropiezo:</b> al avisar a Google, leyó casi todas las fichas en unas horas y la base de datos se quedó sin lecturas del día. Las fichas, la API y las cifras de la portada estuvieron en blanco hasta medianoche. Ya está resuelto: un plan de pago (5 dólares al mes), menos lecturas por ficha y 6 horas de caché.</li>
+  </ul>
+  <h3>Portada y estilo nuevos</h3>
+  <ul>
+    <li><b>Primero lo que se mueve:</b> tokens calientes, las wallets que más lanzan hoy y en qué plataformas se lanza, con datos de las últimas 24 horas. Después, el escáner.</li>
+    <li><b>Logo nuevo:</b> los tres cubos de siempre, con el de arriba deshaciéndose en puntos.</li>
+    <li><b>Un fondo que no dice lo que no es:</b> el brillo de la esquina era verde, y aquí el verde significa «riesgo bajo». Ahora es una aurora azul petróleo.</li>
+    <li><b>El análisis de una wallet se ve como el de un token:</b> cabecera grande, cuatro cifras y dos columnas.</li>
+  </ul>
+  <h3>Nombres que describen, no que acusan</h3>
+  <p>Las wallets se clasifican como «Identificada» (un exchange o creador de mercado con nombre comprobado) o «Por su comportamiento», con nombres como «Paga lanzamientos», «Reparte SOL» o «Compra al nacer», y siempre el motivo con números. Palabras como «granja» o «sniper» sonaban a acusación.</p>
+  <h3>El bot, también en grupos</h3>
+  <p><a href="https://t.me/SolFlagBot" target="_blank" rel="noopener">@SolFlagBot</a> se puede añadir a un grupo de Telegram. Solo habla cuando alguien pega el contrato de un token: responde con el riesgo y la ficha. No guarda los mensajes del grupo.</p>
+  <p>Si ves algo raro, escríbenos a <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a> o en X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Una%20ficha%20para%20cada%20token%2C%20una%20portada%20nueva%20y%20el%20bot%20en%20grupos&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23fichas-y-portada" target="_blank" rel="noopener">Compartir en X</a><a href="#fichas-y-portada">Enlace a esta entrada</a></div>
+</article>
+<article id="quien-esta-detras">
+  <time datetime="2026-11-10">10 de noviembre de 2026</time>
+  <h2>Quién está detrás, en los datos; y cada escaneo suma</h2>
+  <div class="tags"><span>Registro</span><span>Datos abiertos</span></div>
+  <p>Dos días de trabajo menos vistoso, pero de los que más pesan.</p>
+  <ul>
+    <li><b>Nuevo apartado en <a href="/acierto/">Datos y acierto</a>: «Quién está detrás de los lanzamientos».</b> Las wallets que más tokens pagan, crean o financian, y cómo acabaron esos tokens.</li>
+    <li><b>Cada token que escaneas en la web pasa a la base de quién está detrás.</b> La web solo avisa del token y nuestro recolector lo analiza por su cuenta, así nadie puede meter datos falsos. Solo tokens: nunca wallets, porque pueden ser la tuya, y sin guardar tu IP.</li>
+    <li><b>Corregimos dos fallos que falseaban los números:</b> un bot muy activo contaba como exchange (ahora quien lanza más de 3 tokens propios no puede serlo), y un token viejo que estrenaba pool contaba como lanzamiento nuevo. Quitamos 52 de esos del registro.</li>
+  </ul>
+  <p>Si ves algo raro, escríbenos a <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a> o en X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Qui%C3%A9n%20est%C3%A1%20detr%C3%A1s%2C%20en%20los%20datos%3B%20y%20cada%20escaneo%20suma&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23quien-esta-detras" target="_blank" rel="noopener">Compartir en X</a><a href="#quien-esta-detras">Enlace a esta entrada</a></div>
+</article>
 <article id="mapa-y-tarjetas">
   <time datetime="2026-11-07">7 de noviembre de 2026</time>
   <h2>El mapa, más fluido y para compartir; y tarjetas nuevas para tokens y wallets</h2>
