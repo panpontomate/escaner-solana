@@ -158,12 +158,10 @@ export async function acciones(env, opts) {
       abierta: q ? q.abierta : null, prima: prima, liq: Math.round(d.liq || 0), vol24: Math.round(d.vol || 0) };
   });
   // dólares: circulación en Solana (de la cadena) y precio (el par con más liquidez)
-  const dexD = await precios(fetchFn, cache, DOLARES.map((d) => d[2]), "dolares");
+  // precio de los dólares: Jupiter (DexScreener no contestaba a esta consulta desde el Worker)
   const mejorD = {};
-  (Array.isArray(dexD) ? dexD : []).forEach((p) => {
-    const a = p.baseToken && p.baseToken.address, L = (p.liquidity && p.liquidity.usd) || 0;
-    if (a && (!mejorD[a] || L > mejorD[a].liq)) mejorD[a] = { precio: Number(p.priceUsd) || null, liq: L };
-  });
+  const jup = await fetchFn("https://lite-api.jup.ag/price/v3?ids=" + DOLARES.map((d) => d[2]).join(",")).then((r) => r.ok ? r.json() : null).catch(() => null);
+  if (jup && typeof jup === "object" && !Array.isArray(jup)) Object.keys(jup).forEach((m) => { const v = Number(jup[m] && jup[m].usdPrice); if (v > 0) mejorD[m] = { precio: Math.round(v * 1e4) / 1e4 }; });
   const dolares = DOLARES.map(([tok, emisor, mint, reservas]) => {
     const enSolana = mult["s:" + mint] || null, precio = (mejorD[mint] || {}).precio || null;
     return { tok: tok, emisor: emisor, mint: mint, reservas: reservas, enSolana: enSolana ? Math.round(enSolana) : null, precio: precio,
@@ -171,5 +169,5 @@ export async function acciones(env, opts) {
   });
   const abierta = Object.values(cot).some((q) => q.abierta);
   return { v: 1, t: Date.now(), multiplicadores: ACCIONES.every((a) => mult[a[3]] !== undefined), dolares: dolares, bolsa: Object.keys(cot).length ? (abierta ? "abierta" : "cerrada") : null, filas: filas,
-    fuentes: "Precio del token: DexScreener. Precio de la acción: Twelve Data." };
+    fuentes: "Precio del token: DexScreener (dólares: Jupiter). Precio de la acción: Twelve Data." };
 }
