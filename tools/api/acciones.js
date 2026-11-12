@@ -94,7 +94,7 @@ async function precios(fetchFn, cache, mints, clave) {
 // Multiplicador de cada token (extensión «scaled UI amount»): con un split (Netflix 10 por 1) o dividendos
 // reinvertidos, cada token pasa a valer varias acciones. DexScreener da el precio sin aplicarlo, así que el precio
 // comparable con la acción es precio / multiplicador. Se lee de la cadena y se guarda 6 h
-const MULT = "https://cache.solflag.internal/multiplicadores";
+const MULT = "https://cache.solflag.internal/multiplicadores-v2";   // v2: también la circulación de los dólares
 export function multiplicador(estado, ahora) {
   if (!estado) return 1;
   const nuevo = Number(estado.newMultiplier), viejo = Number(estado.multiplier), desde = Number(estado.newMultiplierEffectiveTimestamp) * 1000;
