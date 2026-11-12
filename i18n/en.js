@@ -68,6 +68,7 @@ export const CODE = [
 ];
 
 export const TEXT = {
+  "Seguir acción": "Follow stock",
   // «Frente a la acción real» en el análisis (12/11)
   "<p class='kick'>Frente a la acción real</p>": "<p class='kick'>Against the real stock</p>",
   " en bolsa <b>": " on the stock market <b>",
@@ -1251,7 +1252,7 @@ export const TEXT = {
   "<button type='button' data-tgo='t-chart'>Gráfica</button>": "<button type='button' data-tgo='t-chart'>Chart</button>",
   "'>◉ Mapa</button>": "'>◉ Map</button>",
   "<button type='button' data-tgo='t-who'>Quién está detrás</button>": "<button type='button' data-tgo='t-who'>Who is behind</button>",
-  "<button type='button' data-tgo='t-hold'>Ballenas</button></nav>": "<button type='button' data-tgo='t-hold'>Whales</button></nav>",
+  "<button type='button' data-tgo='t-hold'>Ballenas</button>": "<button type='button' data-tgo='t-hold'>Whales</button>",
   "<section class='card tdc' id='t-chart'><h2>Gráfica <small>precio en $</small></h2>": "<section class='card tdc' id='t-chart'><h2>Chart <small>price in $</small></h2>",
   "<section class='card tdc' id='t-who'><h2>Quién está detrás<span class='tnew'>nuevo</span> <small>lo que hicieron antes</small></h2>": "<section class='card tdc' id='t-who'><h2>Who is behind<span class='tnew'>new</span> <small>what they did before</small></h2>",
   "<div class='lights' style='margin:0 0 12px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>": "<div class='lights' style='margin:0 0 12px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Buys at launch</b><span>Checking who bought in the first second…</span></div></div></div>",

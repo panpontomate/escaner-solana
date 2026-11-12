@@ -2125,7 +2125,7 @@ function starOn(b,on){
 }
 // Botón largo de seguir: estrella y texto por separado para que en el móvil la estrella vaya encima
 function starHtml(kind,on){
-  return on?"<span class='ic'>★</span><span class='lb'>Siguiendo</span>":"<span class='ic'>☆</span><span class='lb'>"+(kind==="token"?"Seguir token":"Seguir wallet")+"</span>";
+  return on?"<span class='ic'>★</span><span class='lb'>Siguiendo</span>":"<span class='ic'>☆</span><span class='lb'>"+(kind==="accion"?"Seguir acción":kind==="token"?"Seguir token":"Seguir wallet")+"</span>";
 }
 function toggleWallet(addr){
   var e=lista.w[addr]||(lista.w[addr]={fav:false,name:""});
@@ -2837,9 +2837,14 @@ async function assess(mint,par,valor,unchecked,noConc,copies){
     mint:r.mint, sym:r.sym, name:r.name, pts:r.pts, sev:r.sev, lvl:SRE_LV[r.lvl]||r.lvl,
     why:lights?lightsWhy(lights):r.reasons.map(function(x){ return SRE.describe(x,"es"); }),
     warn:[], lights:lights, type:SRE_TY[r.type]||null, valor:valor, par:r.pair, imp:r.impostor, img:r.img,
-    cr:(r.creator&&r.creator.creator)||null
+    cr:(r.creator&&r.creator.creator)||null,
+    // token de un emisor verificado (Circle, Paxos, Ondo, xStocks…): sin mapa ni ballenas, que ahí no dicen nada (12/11)
+    emisor:!!(r.lights&&r.lights.some(function(l){ return l.items.some(function(x){ return EMISOR_COD.indexOf(x.code)>=0; }); }))
   };
 }
+var EMISOR_COD=["CTL_KNOWN_ISSUER","CTL_ISSUER_KEYS_CHANGED","DEP_TRUSTED_ISSUER","DEP_KNOWN_ISSUER"];
+// una acción tokenizada de un emisor verificado: «Seguir acción» en vez de «Seguir token»
+function esAccion(r){ return !!(r&&r.emisor&&r.type==="TOKENIZADO"); }
 
 // Control del creador sin lo que dice RugCheck del historial del creador (lanzador en serie, tokens previos que no
 // despegaron): cuando sale una cara conocida, nuestro dato lo sustituye. Mismo cálculo de color que el motor
@@ -3067,9 +3072,9 @@ function deskActions(r,fav){
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"b30"))+"'>📉 Si baja un 30%</a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"m20"))+"'>↕️ Cada vez que se mueva un 20%</a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,""))+"'>✏️ Otro precio (lo eliges en el bot)</a>":"";
-  return "<div class='actions tdesk'><button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span><span class='tmsub'> · todo lo que rodea a este token</span></button>"+
-    (r.par?"<button class='btn small tfav' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
-    "<button class='btn small twh' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'><span class='dl'>Buscar ballenas</span><span class='ds'>Ballenas</span></span></button>"+
+  return "<div class='actions tdesk'>"+(r.emisor?"":"<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span><span class='tmsub'> · todo lo que rodea a este token</span></button>")+
+    (r.par?"<button class='btn small tfav' type='button' data-long='"+(esAccion(r)?"accion":"token")+"' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml(esAccion(r)?"accion":"token",fav)+"</button>":"")+
+    (r.emisor?"":"<button class='btn small twh' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'><span class='dl'>Buscar ballenas</span><span class='ds'>Ballenas</span></span></button>")+
     "<a class='btn small tfic' href='"+esc(fichaLink(r.mint))+"' target='_blank' rel='noopener' title='Quién lo lanzó, quién lo financió, quién compró primero y qué pasó después'><span class='ic'>📄</span><span class='lb'>Ficha completa</span></a>"+
     "<details class='pmenu tshare'><summary class='btn small'><span class='ic'>↗</span><span class='lb'>Compartir</span><span class='car'>▾</span></summary><div class='pmenu-body'>"+share+"</div></details>"+
     (avisos?"<details class='pmenu tavisos'><summary class='btn small'><span class='ic'>🔔</span><span class='lb'><span class='dl'>Avisos en Telegram</span><span class='ds'>Avisos</span></span><span class='car'>▾</span></summary><div class='pmenu-body'>"+avisos+"</div></details>":"")+
@@ -3188,10 +3193,10 @@ function renderToken(noScroll){
       "<div class='trow'>"+xBtn(r)+
       (r.par?tgBtn(r.mint,"Te avisa en Telegram si sube el riesgo, cae la liquidez o el creador vende")+priceMenu(r.mint):"")+"</div>"+
       "<div class='tsub'><button class='btn ghost small' type='button' data-copy='"+esc(fichaLink(r.mint))+"' title='Copia el enlace a la ficha pública de este token'><span class='ic'>🔗</span><span class='lb'>Copiar enlace</span></button>"+
-      (r.par?"<button class='btn ghost small tfav' type='button' data-long='token' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml("token",fav)+"</button>":"")+
-      "<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'>Buscar ballenas</span></button>"+
+      (r.par?"<button class='btn ghost small tfav' type='button' data-long='"+(esAccion(r)?"accion":"token")+"' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml(esAccion(r)?"accion":"token",fav)+"</button>":"")+
+      (r.emisor?"":"<button class='btn ghost small' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'>Buscar ballenas</span></button>")+
       "<a class='btn ghost small tfic' href='"+esc(fichaLink(r.mint))+"' target='_blank' rel='noopener'><span class='ic'>📄</span><span class='lb'>Ficha completa</span></a></div>"+
-      "<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button>"+
+      (r.emisor?"":"<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button>")+
     "</div>"+deskActions(r,fav);
   $("#filters").style.display="none";
   stockVs(r.mint);
@@ -3466,19 +3471,20 @@ function tokenDetail(r){
   d.innerHTML="<nav class='tnav' aria-label='Apartados del token'>"+
       "<button type='button' class='tnv' data-tgo='summary'>Veredicto</button>"+
       "<button type='button' data-tgo='t-chart'>Gráfica</button>"+
-      "<button type='button' class='tnmap' data-map='"+esc(r.mint)+"'>◉ Mapa</button>"+
+      (r.emisor?"":"<button type='button' class='tnmap' data-map='"+esc(r.mint)+"'>◉ Mapa</button>")+
       "<button type='button' data-tgo='t-who'>Quién está detrás</button>"+
-      "<button type='button' data-tgo='t-hold'>Ballenas</button></nav>"+
+      (r.emisor?"":"<button type='button' data-tgo='t-hold'>Ballenas</button>")+"</nav>"+
     "<section class='card tdc' id='t-chart'><h2>Gráfica <small>precio en $</small></h2>"+
       (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("Sin mercado: no hay precio que dibujar.")+"</div>")+histHtml(r)+"</section>"+
     "<section class='card tdc' id='t-who'><h2>Quién está detrás<span class='tnew'>nuevo</span> <small>lo que hicieron antes</small></h2>"+
       (young?"<div class='lights' style='margin:0 0 12px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>":"")+
       "<div id='whobox'><p class='hint'>Buscando en el registro de SolFlag…</p></div>"+
       "<p class='wsrc'>Hechos del registro de SolFlag (desde el 29/10/2026): quién pagó, creó y financió cada lanzamiento y cómo acabó a las 24 h. Son datos, no acusaciones. ¿Un dato mal? <a href='mailto:solflag.team@gmail.com'>Escríbenos</a>.</p></section>"+
-    "<section class='card tdc' id='t-hold'><h2>Ballenas <small>las cuentas con más saldo</small></h2>"+
-      "<div class='tlazy' id='thlazy'><span>Mira quién tiene más de este token: personas, exchanges, pools y grupos que comparten financiador.</span><button type='button' class='btn small' data-hold='"+esc(r.mint)+"'>Ver las ballenas</button></div></section>";
+    (r.emisor?"":"<section class='card tdc' id='t-hold'><h2>Ballenas <small>las cuentas con más saldo</small></h2>"+
+      "<div class='tlazy' id='thlazy'><span>Mira quién tiene más de este token: personas, exchanges, pools y grupos que comparten financiador.</span><button type='button' class='btn small' data-hold='"+esc(r.mint)+"'>Ver las ballenas</button></div></section>");
   // si ya se buscaron las ballenas de este token, se enseñan otra vez sin repetir la búsqueda
-  if(state.hold&&state.hold.mint===r.mint){ whalesHere(); renderHolders(true); }
+  if(r.emisor){}   // sin apartado de ballenas
+  else if(state.hold&&state.hold.mint===r.mint){ whalesHere(); renderHolders(true); }
   else if(wasIn) whalesHere();   // la búsqueda de ballenas sigue en marcha: su progreso vuelve a su sitio
   loadWho(r.mint);
   if(!r.img) tokenLogo(r);
