@@ -1,0 +1,41 @@
+# Vigila una vez al día las claves de control de los tokens oficiales de emisores (emisores.json).
+# Si aparece una clave que no está en la lista, avisa por Telegram y abre un issue «Claves de emisor
+# cambiadas» con quién firmó el cambio. La lista solo se cambia a mano, tras comprobarlo con el emisor.
+name: emisores
+on:
+  schedule:
+    - cron: "15 7 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  vigilar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      SOLANA_RPC: ${{ secrets.SOLANA_RPC }}
+      TG_TOKEN: ${{ secrets.AVISO_TELEGRAM_TOKEN }}
+      TG_CHAT: ${{ secrets.AVISO_TELEGRAM_CHAT }}
+      TITULO: Claves de emisor cambiadas
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Leer las claves en la cadena
+        run: node tools/emisores/vigilar.mjs emisores.json
+      - name: Avisar
+        if: ${{ hashFiles('aviso.md') != '' }}
+        run: |
+          issue=$(gh issue list --state open --search "in:title \"$TITULO\"" --json number --jq '.[0].number // empty')
+          if [ -n "$issue" ]; then echo "Ya hay un issue abierto (#$issue)"; exit 0; fi
+          gh issue create --title "$TITULO" --body-file aviso.md
+          if [ -n "$TG_TOKEN" ] && [ -n "$TG_CHAT" ]; then
+            curl -s -o /dev/null "https://api.telegram.org/bot$TG_TOKEN/sendMessage" --data-urlencode "chat_id=$TG_CHAT" \
+              --data-urlencode "text=🔑 SolFlag: $(head -c 3500 aviso.md)"
+          fi
