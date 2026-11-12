@@ -2056,7 +2056,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="No se pudo cargar el motor del escáner desde cdn.jsdelivr.net. Revisa tu conexión a internet y recarga la página."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.5.3/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.5.4/src/index.js";
 window.__escOk=true;
 // Lista de emisores revisada (emisores.json): una rotación de claves aprobada no necesita otra versión del motor
 fetch("/emisores.json",{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j&&SRE.setIssuers) SRE.setIssuers(j.emisores); }).catch(function(){});
