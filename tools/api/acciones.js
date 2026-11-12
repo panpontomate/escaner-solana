@@ -40,6 +40,15 @@ export const ACCIONES = [
   ["AAPLon", "AAPL", "Ondo", "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo"]
 ];
 export const LOTE = 7;
+// dólares y fondos con emisor comprobado (emisores.json): [token, emisor, mint, página de reservas]
+export const DOLARES = [
+  ["USDC", "Circle", "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", "https://www.circle.com/transparency"],
+  ["USDT", "Tether", "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB", "https://tether.to/en/transparency"],
+  ["PYUSD", "Paxos", "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo", "https://www.paxos.com/pyusd-transparency"],
+  ["USDG", "Paxos", "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH", "https://paxos.com/usdg-transparency"],
+  ["EURC", "Circle", "HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr", "https://www.circle.com/transparency"],
+  ["USDY", "Ondo", "A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6", "https://ondo.finance/usdy"]
+];
 const CLAVE = (s) => "https://cache.solflag.internal/twelvedata/" + s;
 
 async function guardado(cache, s) {
@@ -68,9 +77,9 @@ async function pedir(syms, env, cache, fetchFn) {
 
 // DexScreener a veces no contesta a las IPs compartidas de Cloudflare: un reintento y, si sigue fallando, los
 // últimos precios buenos (guardados una hora)
-const DEX_OK = "https://cache.solflag.internal/dexscreener/acciones";
-async function precios(fetchFn, cache) {
-  const url = "https://api.dexscreener.com/tokens/v1/solana/" + ACCIONES.map((a) => a[3]).join(",");
+async function precios(fetchFn, cache, mints, clave) {
+  const url = "https://api.dexscreener.com/tokens/v1/solana/" + mints.join(",");
+  const DEX_OK = "https://cache.solflag.internal/dexscreener/" + clave;
   for (let n = 0; n < 2; n++) {
     const j = await fetchFn(url).then((r) => r.ok ? r.json() : null).catch(() => null);
     if (Array.isArray(j) && j.length) {
@@ -95,12 +104,13 @@ export function multiplicador(estado, ahora) {
 async function multiplicadores(env, fetchFn, cache, ahora) {
   const g = cache ? await cache.match(MULT) : null;
   if (g) return g.json();
+  const TODAS = ACCIONES.concat(DOLARES.map((d) => [d[0], null, d[1], d[2]]));
   // el RPC público de PublicNode admite 10 cuentas por consulta; si no contesta (desde Cloudflare puede
   // rechazarlo), el oficial de Solana
   const rpcs = [env.SOLANA_RPC, "https://solana-rpc.publicnode.com", "https://api.mainnet-beta.solana.com"].filter(Boolean);
   const out = {};
-  for (let i = 0; i < ACCIONES.length; i += 10) {
-    const lote = ACCIONES.slice(i, i + 10);
+  for (let i = 0; i < TODAS.length; i += 10) {
+    const lote = TODAS.slice(i, i + 10);
     let vals = null;
     for (const rpc of rpcs) {
       const j = await fetchFn(rpc, { method: "POST", headers: { "content-type": "application/json" },
@@ -114,6 +124,8 @@ async function multiplicadores(env, fetchFn, cache, ahora) {
       const ex = v && v.data && v.data.parsed && v.data.parsed.info && v.data.parsed.info.extensions;
       const sc = (ex || []).find((e) => e.extension === "scaledUiAmountConfig");
       out[lote[n][3]] = multiplicador(sc && sc.state, ahora);
+      const inf = v && v.data && v.data.parsed && v.data.parsed.info;
+      if (inf && inf.supply) out["s:" + lote[n][3]] = Number(inf.supply) / Math.pow(10, inf.decimals || 0);
     });
   }
   if (cache) await cache.put(MULT, new Response(JSON.stringify(out), { headers: { "cache-control": "public, max-age=21600" } }));
@@ -130,7 +142,7 @@ export async function acciones(env, opts) {
   Object.assign(cot, await pedir(unders.filter((s) => !cot[s]).slice(0, LOTE), env, cache, fetchFn));
 
   // precio, liquidez y volumen del token: el par con más liquidez de DexScreener
-  const dex = await precios(fetchFn, cache);
+  const dex = await precios(fetchFn, cache, ACCIONES.map((a) => a[3]), "acciones");
   const mejor = {};
   (Array.isArray(dex) ? dex : []).forEach((p) => {
     const a = p.baseToken && p.baseToken.address, L = (p.liquidity && p.liquidity.usd) || 0;
@@ -145,7 +157,19 @@ export async function acciones(env, opts) {
     return { tok: tok, accion: und, emisor: emisor, mint: mint, precio: precio ? Math.round(precio * 1e4) / 1e4 : null, mult: k, real: q ? q.p : null,
       abierta: q ? q.abierta : null, prima: prima, liq: Math.round(d.liq || 0), vol24: Math.round(d.vol || 0) };
   });
+  // dólares: circulación en Solana (de la cadena) y precio (el par con más liquidez)
+  const dexD = await precios(fetchFn, cache, DOLARES.map((d) => d[2]), "dolares");
+  const mejorD = {};
+  (Array.isArray(dexD) ? dexD : []).forEach((p) => {
+    const a = p.baseToken && p.baseToken.address, L = (p.liquidity && p.liquidity.usd) || 0;
+    if (a && (!mejorD[a] || L > mejorD[a].liq)) mejorD[a] = { precio: Number(p.priceUsd) || null, liq: L };
+  });
+  const dolares = DOLARES.map(([tok, emisor, mint, reservas]) => {
+    const enSolana = mult["s:" + mint] || null, precio = (mejorD[mint] || {}).precio || null;
+    return { tok: tok, emisor: emisor, mint: mint, reservas: reservas, enSolana: enSolana ? Math.round(enSolana) : null, precio: precio,
+      valor: enSolana && precio ? Math.round(enSolana * precio) : null };
+  });
   const abierta = Object.values(cot).some((q) => q.abierta);
-  return { v: 1, t: Date.now(), multiplicadores: Object.keys(mult).length === ACCIONES.length, bolsa: Object.keys(cot).length ? (abierta ? "abierta" : "cerrada") : null, filas: filas,
+  return { v: 1, t: Date.now(), multiplicadores: ACCIONES.every((a) => mult[a[3]] !== undefined), dolares: dolares, bolsa: Object.keys(cot).length ? (abierta ? "abierta" : "cerrada") : null, filas: filas,
     fuentes: "Precio del token: DexScreener. Precio de la acción: Twelve Data." };
 }
