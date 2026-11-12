@@ -3,7 +3,7 @@
 // abierta y la liquidez para salir. Solo tokens cuyas claves son las del emisor (comprobado con el motor el 12/11).
 //
 // Twelve Data gratis: 8 créditos por minuto y 800 al día, uno por acción. Cada precio se guarda en la caché de
-// Cloudflare (30 min, 15 si la bolsa está abierta) y en cada petición se refrescan como mucho LOTE acciones.
+// Cloudflare (20 min con la bolsa abierta; 6 h cerrada, cuando el precio apenas cambia: unas 23 consultas al día por acción) y en cada petición se refrescan como mucho LOTE acciones.
 
 export const ACCIONES = [
   // [token, acción, emisor, mint]
@@ -21,6 +21,21 @@ export const ACCIONES = [
   ["HOODx", "HOOD", "xStocks", "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg"],
   ["MSFTx", "MSFT", "xStocks", "XspzcW1PRtgf6Wj92HCiZdjzKCyFekVD8P5Ueh3dRMX"],
   ["GLDx", "GLD", "xStocks", "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re"],
+  // añadidas el 12/11 (claves de xStocks comprobadas con el motor; solo las de 10.000 $ de liquidez o más)
+  ["MCDx", "MCD", "xStocks", "XsqE9cRRpzxcGKDXj1BJ7Xmg4GRhZoyY1KpmGSxAWT2"],
+  ["GMEx", "GME", "xStocks", "Xsf9mBktVB9BSU5kf4nHxPq5hCBJ2j2ui3ecFGxPRGc"],
+  ["AVGOx", "AVGO", "xStocks", "XsgSaSvNSqLTtFuyWPBhK9196Xb9Bbdyjj4fH3cPJGo"],
+  ["INTCx", "INTC", "xStocks", "XshPgPdXFRWB8tP1j82rebb2Q9rPgGX37RuqzohmArM"],
+  ["TQQQx", "TQQQ", "xStocks", "XsjQP3iMAaQ3kQScQKthQpx9ALRbjKAjQtHg6TFomoc"],
+  ["PLTRx", "PLTR", "xStocks", "XsoBhf2ufR8fTyNSjqfU71DYGaE6Z3SUGAidpzriAA4"],
+  ["KOx", "KO", "xStocks", "XsaBXg8dU5cPM6ehmVctMkVqoiRG2ZjMo1cyBJ3AykQ"],
+  ["DFDVx", "DFDV", "xStocks", "Xs2yquAgsHByNzx68WJC55WHjHBvG9JsMB7CWjTLyPy"],
+  ["BRK.Bx", "BRK.B", "xStocks", "Xs6B6zawENwAbWVi7w92rjazLuAr5Az59qgWKcNb45x"],
+  ["PEPx", "PEP", "xStocks", "Xsv99frTRUeornyvCfvhnDesQDWuvns1M852Pez91vF"],
+  ["NFLXx", "NFLX", "xStocks", "XsEH7wWfJJu2ZT3UCFeVfALnVA6CP5ur7Ee11KmzVpL"],
+  ["ORCLx", "ORCL", "xStocks", "XsjFwUPiLofddX5cWFHW35GCbXcSu1BCUGfxoQAQjeL"],
+  ["UNHx", "UNH", "xStocks", "XszvaiXGPwvk2nwb3o9C1CX4K6zH8sez11E6uyup6fe"],
+  ["XOMx", "XOM", "xStocks", "XsaHND8sHyfMfsWPj6kSdd5VwvCayZvjYgKmmcNL5qh"],
   ["SPYon", "SPY", "Ondo", "k18WJUULWheRkSpSquYGdNNmtuE2Vbw1hpuUi92ondo"],
   ["AAPLon", "AAPL", "Ondo", "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo"]
 ];
@@ -46,7 +61,7 @@ async function pedir(syms, env, cache, fetchFn) {
     if (!q || q.code || !q.close) continue;   // error de Twelve Data (clave, límite, símbolo)
     const v = { p: Number(q.close), abierta: q.is_market_open === true, t: Number(q.timestamp) * 1000 || null };
     out[s] = v;
-    if (cache) await cache.put(CLAVE(s), new Response(JSON.stringify(v), { headers: { "cache-control": "public, max-age=" + (v.abierta ? 900 : 1800) } }));
+    if (cache) await cache.put(CLAVE(s), new Response(JSON.stringify(v), { headers: { "cache-control": "public, max-age=" + (v.abierta ? 1200 : 21600) } }));
   }
   return out;
 }
