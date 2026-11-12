@@ -40,6 +40,21 @@
       ]
     },
     {
+      "name": "Ondo",
+      "trusted": false,
+      "mints": {
+        "A1KLoBrKBde8Ty9qtNQUtq3C2ortoC3u7twggz7sEto6": "https://docs.ondo.finance/addresses",
+        "i7u4r16TcsJTgq1kAG8opmVZyVnAKBwLKu6ZPMwzxNc": "https://docs.ondo.finance/addresses",
+        "ZPFtoCe7WWqG4N3ZFRccS8T9SMBeHsd1Vmgv2i7ondo": "https://docs.ondo.finance/addresses"
+      },
+      "keys": [
+        "8n2uiRUd1A9NN78PKESkJe6k6zMqtKCZh3MrK1j9qkB1",
+        "51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK",
+        "6ViaRWzv7p56RfP1A9Hxy2ctu9kfE3XL43SxWuq3E4cE",
+        "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD"
+      ]
+    },
+    {
       "name": "Tether",
       "trusted": true,
       "mints": {
