@@ -225,7 +225,7 @@ tbody tr[data-m]{cursor:pointer}
 <script>
 const NOMBRE = { MCD: "McDonald's", GME: "GameStop", AVGO: "Broadcom", INTC: "Intel", TQQQ: "Nasdaq 100 ×3", PLTR: "Palantir", KO: "Coca-Cola", DFDV: "DeFi Development", "BRK.B": "Berkshire Hathaway", PEP: "PepsiCo", NFLX: "Netflix", ORCL: "Oracle", UNH: "UnitedHealth", XOM: "ExxonMobil", TSLA: "Tesla", NVDA: "Nvidia", AAPL: "Apple", SPY: "S&P 500", QQQ: "Nasdaq 100", MSTR: "Strategy", CRCL: "Circle", META: "Meta", GOOGL: "Alphabet", AMZN: "Amazon", COIN: "Coinbase", HOOD: "Robinhood", MSFT: "Microsoft", GLD: "Oro" };
 const COLOR = { MCD: "#da291c", GME: "#e4002b", AVGO: "#cc092f", INTC: "#0071c5", TQQQ: "#2a6fdb", PLTR: "#333", KO: "#f40009", DFDV: "#5b3fd1", "BRK.B": "#3b3b6d", PEP: "#004b93", NFLX: "#e50914", ORCL: "#c74634", UNH: "#002677", XOM: "#ed1b2f", TSLA: "#cc0000", NVDA: "#76b900", AAPL: "#555", SPY: "#1f3a93", QQQ: "#2a6fdb", MSTR: "#d9480f", CRCL: "#2775ca", META: "#0866ff", GOOGL: "#34a853", AMZN: "#ff9900", COIN: "#0052ff", HOOD: "#00c805", MSFT: "#00a4ef", GLD: "#c9a227" };
-const fx = (n, d) => n == null ? "—" : n.toLocaleString("es-ES", { minimumFractionDigits: d, maximumFractionDigits: d });
+const fx = (n, d) => n == null ? "—" : n.toLocaleString("es-ES", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always" });
 const usd = (n) => n == null ? "—" : n >= 1e6 ? fx(n / 1e6, 1) + " M$" : n >= 1e3 ? fx(n / 1e3, 0) + " k$" : fx(n, 0) + " $";
 const DCOL = { USDC: "#2775ca", USDT: "#26a17b", PYUSD: "#0e3d8c", USDG: "#1d1d1f", EURC: "#2775ca", USDY: "#1f2a44" };
 const PUEDE = { PYUSD: 1, USDG: 1 };
