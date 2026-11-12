@@ -95,15 +95,20 @@ export function multiplicador(estado, ahora) {
 async function multiplicadores(env, fetchFn, cache, ahora) {
   const g = cache ? await cache.match(MULT) : null;
   if (g) return g.json();
-  const rpc = env.SOLANA_RPC || "https://solana-rpc.publicnode.com";
+  // el RPC público de PublicNode admite 10 cuentas por consulta; si no contesta (desde Cloudflare puede
+  // rechazarlo), el oficial de Solana
+  const rpcs = [env.SOLANA_RPC, "https://solana-rpc.publicnode.com", "https://api.mainnet-beta.solana.com"].filter(Boolean);
   const out = {};
-  // el RPC público admite 10 cuentas por consulta
   for (let i = 0; i < ACCIONES.length; i += 10) {
     const lote = ACCIONES.slice(i, i + 10);
-    const j = await fetchFn(rpc, { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getMultipleAccounts", params: [lote.map((a) => a[3]), { encoding: "jsonParsed" }] }) })
-      .then((r) => r.json()).catch(() => null);
-    const vals = j && j.result && j.result.value;
+    let vals = null;
+    for (const rpc of rpcs) {
+      const j = await fetchFn(rpc, { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getMultipleAccounts", params: [lote.map((a) => a[3]), { encoding: "jsonParsed" }] }) })
+        .then((r) => r.json()).catch(() => null);
+      vals = j && j.result && j.result.value;
+      if (Array.isArray(vals)) break;
+    }
     if (!Array.isArray(vals)) return out;   // sin guardar: se reintenta en la siguiente petición
     vals.forEach((v, n) => {
       const ex = v && v.data && v.data.parsed && v.data.parsed.info && v.data.parsed.info.extensions;
@@ -141,6 +146,6 @@ export async function acciones(env, opts) {
       abierta: q ? q.abierta : null, prima: prima, liq: Math.round(d.liq || 0), vol24: Math.round(d.vol || 0) };
   });
   const abierta = Object.values(cot).some((q) => q.abierta);
-  return { v: 1, t: Date.now(), bolsa: Object.keys(cot).length ? (abierta ? "abierta" : "cerrada") : null, filas: filas,
+  return { v: 1, t: Date.now(), multiplicadores: Object.keys(mult).length === ACCIONES.length, bolsa: Object.keys(cot).length ? (abierta ? "abierta" : "cerrada") : null, filas: filas,
     fuentes: "Precio del token: DexScreener. Precio de la acción: Twelve Data." };
 }
