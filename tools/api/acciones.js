@@ -96,17 +96,21 @@ async function multiplicadores(env, fetchFn, cache, ahora) {
   const g = cache ? await cache.match(MULT) : null;
   if (g) return g.json();
   const rpc = env.SOLANA_RPC || "https://solana-rpc.publicnode.com";
-  const j = await fetchFn(rpc, { method: "POST", headers: { "content-type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getMultipleAccounts", params: [ACCIONES.map((a) => a[3]), { encoding: "jsonParsed" }] }) })
-    .then((r) => r.json()).catch(() => null);
-  const vals = j && j.result && j.result.value;
-  if (!Array.isArray(vals)) return {};
   const out = {};
-  vals.forEach((v, i) => {
-    const ex = v && v.data && v.data.parsed && v.data.parsed.info && v.data.parsed.info.extensions;
-    const sc = (ex || []).find((e) => e.extension === "scaledUiAmountConfig");
-    out[ACCIONES[i][3]] = multiplicador(sc && sc.state, ahora);
-  });
+  // el RPC público admite 10 cuentas por consulta
+  for (let i = 0; i < ACCIONES.length; i += 10) {
+    const lote = ACCIONES.slice(i, i + 10);
+    const j = await fetchFn(rpc, { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getMultipleAccounts", params: [lote.map((a) => a[3]), { encoding: "jsonParsed" }] }) })
+      .then((r) => r.json()).catch(() => null);
+    const vals = j && j.result && j.result.value;
+    if (!Array.isArray(vals)) return out;   // sin guardar: se reintenta en la siguiente petición
+    vals.forEach((v, n) => {
+      const ex = v && v.data && v.data.parsed && v.data.parsed.info && v.data.parsed.info.extensions;
+      const sc = (ex || []).find((e) => e.extension === "scaledUiAmountConfig");
+      out[lote[n][3]] = multiplicador(sc && sc.state, ahora);
+    });
+  }
   if (cache) await cache.put(MULT, new Response(JSON.stringify(out), { headers: { "cache-control": "public, max-age=21600" } }));
   return out;
 }
