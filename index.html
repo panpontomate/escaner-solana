@@ -200,6 +200,16 @@ details.guide .mono{overflow-wrap:anywhere}
 .nm-row .links{margin:0;flex:none}
 .more{text-align:center;color:var(--muted);font-size:.9rem;padding:8px}
 .tabs{display:flex;gap:4px;padding:4px;background:var(--surface-2);border-radius:12px;margin-bottom:18px}
+.vsreal{margin:18px 0 6px;padding:16px 18px;border:1px solid var(--line);border-radius:16px;background:rgba(14,10,36,.75)}
+.vsreal .kick{margin:0 0 10px}
+.vsr{display:flex;flex-wrap:wrap;align-items:center;gap:10px 26px;font-size:.98rem}
+.vsr b{font-variant-numeric:tabular-nums}.vsr small{color:var(--muted);margin-left:4px}
+.vsp{font-weight:700;border-radius:999px;padding:3px 12px;font-size:.88rem}
+.vsp.ok{color:#86efac;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3)}
+.vsp.wa{color:#fcd34d;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.35)}
+.vsp.no{color:#fca5a5;background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3)}
+.vsp.gr{color:#c9c1ea;background:rgba(196,181,253,.07);border:1px solid rgba(196,181,253,.2)}
+.vsh{margin:10px 0 0;font-size:.86rem;color:var(--muted)}
 .tab.tlink{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .tab{flex:1;border:0;background:transparent;border-radius:9px;padding:10px 8px;cursor:pointer;color:var(--muted);font-weight:600;font-size:.92rem}
 .tab[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgb(0 0 0 / .14)}
@@ -3172,6 +3182,7 @@ function renderToken(noScroll){
     "<p class='sub'><b class='tvl lv-"+esc(L.cls)+"'>"+esc(dataOnly(r)?"Riesgo medio por falta de datos":L.label)+".</b> "+esc(tip)+"</p>"+
     (chips.length?"<div class='tchips'>"+chips.map(function(c){ return "<span>"+esc(c[0])+" <b>"+esc(c[1])+"</b></span>"; }).join("")+"</div>":"")+
     "</div></div>"+
+    "<div class='vsreal' id='vsreal' hidden></div>"+
     "<div class='actions tacts'>"+
       (r.lights?"<button class='btn small tmain' type='button' data-card='"+esc(r.mint)+"'>Descargar</button>":"")+
       "<div class='trow'>"+xBtn(r)+
@@ -3183,12 +3194,39 @@ function renderToken(noScroll){
       "<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button>"+
     "</div>"+deskActions(r,fav);
   $("#filters").style.display="none";
+  stockVs(r.mint);
   tokenDetail(r);
   renderList();
   state.shown.W=true;
   if(state.mode==="W") $("#results").hidden=false;
   if(!noScroll) $("#results").scrollIntoView({behavior:"smooth",block:"start"});
   navGo();
+}
+
+// «Frente a la acción real» (12/11): si el token es una de las acciones tokenizadas de /acciones/, su precio frente al
+// de la bolsa, ya ajustado por el multiplicador de splits y dividendos (api.solflag.com/api/acciones, 5 min en memoria)
+var accMem={t:0,j:null};
+function accionesData(){
+  if(accMem.j&&Date.now()-accMem.t<300000) return Promise.resolve(accMem.j);
+  return fetch("https://api.solflag.com/api/acciones").then(function(x){ return x.ok?x.json():null; })
+    .then(function(j){ if(j&&j.filas){ accMem.j=j; accMem.t=Date.now(); } return j; }).catch(function(){ return null; });
+}
+function stockVs(mint){
+  accionesData().then(function(j){
+    var box=$("#vsreal");
+    if(!box||!j||!state.token||state.token.mint!==mint) return;
+    var f=(j.filas||[]).filter(function(x){ return x.mint===mint; })[0];
+    if(!f||f.precio==null||f.real==null||f.prima==null) return;
+    var p=f.prima, poco=f.liq<20000, c=poco?"gr":Math.abs(p)<1?"ok":Math.abs(p)<3?"wa":"no";
+    var msg=poco?"poco mercado: este precio puede no ser real":Math.abs(p)<1?"sigue a la acción":"se ha despegado de la acción";
+    box.innerHTML="<p class='kick'>Frente a la acción real</p>"+
+      "<div class='vsr'><span>"+esc(f.tok)+" <b>"+priceUsd(f.precio)+"</b></span>"+
+      "<span>"+esc(f.accion)+" en bolsa <b>"+priceUsd(f.real)+"</b> <small>"+(j.bolsa==="abierta"?"bolsa abierta":"bolsa cerrada")+"</small></span>"+
+      "<span class='vsp "+c+"'>"+(p>0?"+":"")+fmtPct(p)+" · "+msg+"</span></div>"+
+      "<p class='vsh'>"+(f.mult&&f.mult!==1?"Precio por token ajustado por splits y dividendos. ":"")+"Lo emite "+esc(f.emisor)+". "+
+      "<a href='/acciones/'>Ver todas las acciones tokenizadas →</a></p>";
+    box.hidden=false;
+  });
 }
 
 /* ---------- pintado ---------- */

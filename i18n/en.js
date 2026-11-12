@@ -68,6 +68,17 @@ export const CODE = [
 ];
 
 export const TEXT = {
+  // «Frente a la acción real» en el análisis (12/11)
+  "<p class='kick'>Frente a la acción real</p>": "<p class='kick'>Against the real stock</p>",
+  " en bolsa <b>": " on the stock market <b>",
+  "bolsa abierta": "market open",
+  "bolsa cerrada": "market closed",
+  "poco mercado: este precio puede no ser real": "thin market: this price may not be real",
+  "sigue a la acción": "tracks the stock",
+  "se ha despegado de la acción": "has drifted from the stock",
+  "Precio por token ajustado por splits y dividendos. ": "Price per token adjusted for splits and dividends. ",
+  "Lo emite ": "Issued by ",
+  "<a href='/acciones/'>Ver todas las acciones tokenizadas →</a></p>": "<a href='/en/stocks/'>See all tokenized stocks →</a></p>",
   "Acciones": "Stocks",
   // portada y resultado nuevos (11/11)
   "exchange: guarda fondos de sus usuarios": "exchange: it holds its users funds",
