@@ -172,3 +172,11 @@ test("acciones: prima frente a la acción real, con caché y como mucho LOTE acc
   const sin = await acciones({}, { fetch: fakeFetch, cache: null });
   assert.equal(sin.filas[0].real, null);
 });
+
+test("acciones: el multiplicador de split se aplica desde su fecha", async () => {
+  const { multiplicador } = await import("./acciones.js");
+  const e = { multiplier: "1", newMultiplier: "10", newMultiplierEffectiveTimestamp: 1000 };
+  assert.equal(multiplicador(e, 999 * 1000), 1);
+  assert.equal(multiplicador(e, 1000 * 1000), 10);
+  assert.equal(multiplicador(null, 0), 1);
+});

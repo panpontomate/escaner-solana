@@ -82,6 +82,35 @@ async function precios(fetchFn, cache) {
   return viejo ? viejo.json() : [];
 }
 
+// Multiplicador de cada token (extensión «scaled UI amount»): con un split (Netflix 10 por 1) o dividendos
+// reinvertidos, cada token pasa a valer varias acciones. DexScreener da el precio sin aplicarlo, así que el precio
+// comparable con la acción es precio / multiplicador. Se lee de la cadena y se guarda 6 h
+const MULT = "https://cache.solflag.internal/multiplicadores";
+export function multiplicador(estado, ahora) {
+  if (!estado) return 1;
+  const nuevo = Number(estado.newMultiplier), viejo = Number(estado.multiplier), desde = Number(estado.newMultiplierEffectiveTimestamp) * 1000;
+  const m = desde && ahora >= desde ? nuevo : viejo;
+  return m > 0 ? m : 1;
+}
+async function multiplicadores(env, fetchFn, cache, ahora) {
+  const g = cache ? await cache.match(MULT) : null;
+  if (g) return g.json();
+  const rpc = env.SOLANA_RPC || "https://solana-rpc.publicnode.com";
+  const j = await fetchFn(rpc, { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getMultipleAccounts", params: [ACCIONES.map((a) => a[3]), { encoding: "jsonParsed" }] }) })
+    .then((r) => r.json()).catch(() => null);
+  const vals = j && j.result && j.result.value;
+  if (!Array.isArray(vals)) return {};
+  const out = {};
+  vals.forEach((v, i) => {
+    const ex = v && v.data && v.data.parsed && v.data.parsed.info && v.data.parsed.info.extensions;
+    const sc = (ex || []).find((e) => e.extension === "scaledUiAmountConfig");
+    out[ACCIONES[i][3]] = multiplicador(sc && sc.state, ahora);
+  });
+  if (cache) await cache.put(MULT, new Response(JSON.stringify(out), { headers: { "cache-control": "public, max-age=21600" } }));
+  return out;
+}
+
 export async function acciones(env, opts) {
   opts = opts || {};
   const fetchFn = opts.fetch || fetch;
@@ -99,10 +128,12 @@ export async function acciones(env, opts) {
     if (a && (!mejor[a] || L > mejor[a].liq)) mejor[a] = { precio: Number(p.priceUsd) || null, liq: L, vol: (p.volume && p.volume.h24) || 0 };
   });
 
+  const mult = await multiplicadores(env, fetchFn, cache, Date.now());
   const filas = ACCIONES.map(([tok, und, emisor, mint]) => {
-    const d = mejor[mint] || {}, q = cot[und] || null;
-    const prima = d.precio && q && q.p ? Math.round((d.precio / q.p - 1) * 10000) / 100 : null;
-    return { tok: tok, accion: und, emisor: emisor, mint: mint, precio: d.precio || null, real: q ? q.p : null,
+    const d = mejor[mint] || {}, q = cot[und] || null, k = mult[mint] || 1;
+    const precio = d.precio ? d.precio / k : null;   // precio de lo que ves en tu wallet, comparable con la acción
+    const prima = precio && q && q.p ? Math.round((precio / q.p - 1) * 10000) / 100 : null;
+    return { tok: tok, accion: und, emisor: emisor, mint: mint, precio: precio ? Math.round(precio * 1e4) / 1e4 : null, mult: k, real: q ? q.p : null,
       abierta: q ? q.abierta : null, prima: prima, liq: Math.round(d.liq || 0), vol24: Math.round(d.vol || 0) };
   });
   const abierta = Object.values(cot).some((q) => q.abierta);
