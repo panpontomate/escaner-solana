@@ -51,6 +51,22 @@ async function pedir(syms, env, cache, fetchFn) {
   return out;
 }
 
+// DexScreener a veces no contesta a las IPs compartidas de Cloudflare: un reintento y, si sigue fallando, los
+// últimos precios buenos (guardados una hora)
+const DEX_OK = "https://cache.solflag.internal/dexscreener/acciones";
+async function precios(fetchFn, cache) {
+  const url = "https://api.dexscreener.com/tokens/v1/solana/" + ACCIONES.map((a) => a[3]).join(",");
+  for (let n = 0; n < 2; n++) {
+    const j = await fetchFn(url).then((r) => r.ok ? r.json() : null).catch(() => null);
+    if (Array.isArray(j) && j.length) {
+      if (cache) await cache.put(DEX_OK, new Response(JSON.stringify(j), { headers: { "cache-control": "public, max-age=3600" } }));
+      return j;
+    }
+  }
+  const viejo = cache ? await cache.match(DEX_OK) : null;
+  return viejo ? viejo.json() : [];
+}
+
 export async function acciones(env, opts) {
   opts = opts || {};
   const fetchFn = opts.fetch || fetch;
@@ -61,7 +77,7 @@ export async function acciones(env, opts) {
   Object.assign(cot, await pedir(unders.filter((s) => !cot[s]).slice(0, LOTE), env, cache, fetchFn));
 
   // precio, liquidez y volumen del token: el par con más liquidez de DexScreener
-  const dex = await fetchFn("https://api.dexscreener.com/tokens/v1/solana/" + ACCIONES.map((a) => a[3]).join(",")).then((r) => r.json()).catch(() => []);
+  const dex = await precios(fetchFn, cache);
   const mejor = {};
   (Array.isArray(dex) ? dex : []).forEach((p) => {
     const a = p.baseToken && p.baseToken.address, L = (p.liquidity && p.liquidity.usd) || 0;

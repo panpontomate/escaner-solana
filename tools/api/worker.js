@@ -146,7 +146,12 @@ export async function handle(req, env) {
     try { return json(await portada(env.DB, Date.now())); } catch (e) { return fail(503, "database unavailable"); }
   }
   if (p.length === 3 && p[1] === "api" && p[2] === "acciones") {
-    try { return json(await acciones(env)); } catch (e) { return fail(503, "prices unavailable"); }
+    try {
+      const a = await acciones(env), res = json(a);
+      // si falta algún precio, que no se quede 5 min en la caché
+      if (a.filas.some((f) => f.precio === null || f.real === null)) res.headers.set("cache-control", "public, max-age=60");
+      return res;
+    } catch (e) { return fail(503, "prices unavailable"); }
   }
   // /api/<tipo>/<dirección>
   if (p.length !== 4 || p[1] !== "api" || !/^(wallet|token)$/.test(p[2])) return fail(404, "use /api/wallet/<address> or /api/token/<mint>");
