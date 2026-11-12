@@ -142,3 +142,33 @@ test("errors are never cached", async () => {
   assert.equal(r.h.get("cache-control"), "no-store");
   assert.match((await get("/api/portada")).h.get("cache-control"), /max-age=300/);
 });
+
+test("acciones: prima frente a la acción real, con caché y como mucho LOTE acciones por petición", async () => {
+  const { acciones, ACCIONES, LOTE } = await import("./acciones.js");
+  const calls = [];
+  const fakeFetch = async (url) => {
+    calls.push(url);
+    if (url.includes("twelvedata")) {
+      const syms = new URL(url).searchParams.get("symbol").split(",");
+      const body = {}; syms.forEach((s) => { body[s] = { close: "100", is_market_open: false, timestamp: 1 }; });
+      return new Response(JSON.stringify(syms.length === 1 ? body[syms[0]] : body));
+    }
+    return new Response(JSON.stringify([{ baseToken: { address: ACCIONES[0][3] }, priceUsd: "101", liquidity: { usd: 5000 }, volume: { h24: 10 } }]));
+  };
+  const store = new Map();
+  const cache = { match: async (k) => store.has(k) ? new Response(store.get(k)) : undefined, put: async (k, r) => { store.set(k, await r.text()); } };
+  const r = await acciones({ TWELVE_DATA_KEY: "k" }, { fetch: fakeFetch, cache });
+  const td = calls.filter((u) => u.includes("twelvedata"));
+  assert.equal(td.length, 1);
+  assert.equal(new URL(td[0]).searchParams.get("symbol").split(",").length, LOTE);
+  assert.equal(r.filas[0].prima, 1);          // 101 frente a 100
+  assert.equal(r.bolsa, "cerrada");
+  // la segunda petición usa lo guardado y pide solo las que faltan
+  calls.length = 0;
+  await acciones({ TWELVE_DATA_KEY: "k" }, { fetch: fakeFetch, cache });
+  const td2 = calls.filter((u) => u.includes("twelvedata"));
+  assert.ok(!new URL(td2[0]).searchParams.get("symbol").split(",").includes("TSLA"));
+  // sin clave: filas sin precio real, sin romperse
+  const sin = await acciones({}, { fetch: fakeFetch, cache: null });
+  assert.equal(sin.filas[0].real, null);
+});

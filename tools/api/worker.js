@@ -6,6 +6,7 @@
 //   GET  /api/token/<mint>         un lanzamiento: quién está detrás (con su historial) y sus primeros compradores
 //   GET  /api/portada              lo de las últimas 24 h para la portada: lanzamientos por DEX y nivel, creadores
 //                                  en serie, financiadores de varios creadores y quién compra en los primeros bloques
+//   GET  /api/acciones             acciones tokenizadas frente a la acción real: prima, bolsa abierta, liquidez (acciones.js)
 //   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
 //   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
 //                                  veces (tabla pedidos), nada de quién. El recolector lo analiza después él mismo
@@ -14,6 +15,7 @@
 // Cada respuesta se guarda 5 min en la caché de Cloudflare para no repetir consultas a D1.
 
 import { ficha, HOST as FICHA_HOST } from "./ficha.js";
+import { acciones } from "./acciones.js";
 
 export const V = 1;
 export const LIST = 25;            // lanzamientos y compras que se devuelven, los más recientes
@@ -142,6 +144,9 @@ export async function handle(req, env) {
   if (req.method !== "GET") return fail(405, "only GET");
   if (p.length === 3 && p[1] === "api" && p[2] === "portada") {
     try { return json(await portada(env.DB, Date.now())); } catch (e) { return fail(503, "database unavailable"); }
+  }
+  if (p.length === 3 && p[1] === "api" && p[2] === "acciones") {
+    try { return json(await acciones(env)); } catch (e) { return fail(503, "prices unavailable"); }
   }
   // /api/<tipo>/<dirección>
   if (p.length !== 4 || p[1] !== "api" || !/^(wallet|token)$/.test(p[2])) return fail(404, "use /api/wallet/<address> or /api/token/<mint>");
