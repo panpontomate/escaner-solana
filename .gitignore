@@ -12,3 +12,5 @@ tools/momento/node_modules/
 # claves locales (Helius…): nunca a git
 .env
 **/.env
+
+.impeccable/
