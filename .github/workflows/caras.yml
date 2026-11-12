@@ -46,6 +46,9 @@ jobs:
         env:
           SOLANA_RPC: ${{ secrets.SOLANA_RPC }}
           PUB_DIR: _pub
+          # tokens nuevos analizados con el motor por vuelta (12/11/2026: de 40 a 70, todos los que entran; Helius
+          # iba por ~15.000 créditos al día de 1 M al mes. Si un ciclo entero se acerca al millón, bajarlo a 55)
+          REG_MAX: "70"
           # plano del dinero (tools/caras/plano.mjs): enlaces de cada lanzamiento a Cloudflare D1
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
