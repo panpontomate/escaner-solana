@@ -62,10 +62,13 @@ export const CODE = [
   ['if(/^(solo |no se pudieron leer)/.test(m))', 'if(/^(only |could not read)/.test(m))'],
   // pie: enlace a la página de datos (6/11/2026)
   ['<a href="/acierto/">Datos y acierto</a>', '<a href="/en/accuracy/">Data and accuracy</a>'],
-  ['<a href="/acierto/#licencia">', '<a href="/en/accuracy/#license">']
+  ['<a href="/acierto/#licencia">', '<a href="/en/accuracy/#license">'],
+  // pestaña de acciones tokenizadas (12/11/2026)
+  ['<a class="tab tlink" href="/acciones/">', '<a class="tab tlink" href="/en/stocks/">']
 ];
 
 export const TEXT = {
+  "Acciones": "Stocks",
   // portada y resultado nuevos (11/11)
   "exchange: guarda fondos de sus usuarios": "exchange: it holds its users funds",
   "</b>Valor en tokens</span></div>": "</b>Value in tokens</span></div>",

@@ -200,6 +200,7 @@ details.guide .mono{overflow-wrap:anywhere}
 .nm-row .links{margin:0;flex:none}
 .more{text-align:center;color:var(--muted);font-size:.9rem;padding:8px}
 .tabs{display:flex;gap:4px;padding:4px;background:var(--surface-2);border-radius:12px;margin-bottom:18px}
+.tab.tlink{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .tab{flex:1;border:0;background:transparent;border-radius:9px;padding:10px 8px;cursor:pointer;color:var(--muted);font-weight:600;font-size:.92rem}
 .tab[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgb(0 0 0 / .14)}
 .hint{color:var(--muted);font-size:.88rem;margin:10px 0 0}
@@ -1221,8 +1222,8 @@ body.om-open{overflow:hidden}
 .btn.tmap:hover{box-shadow:0 0 26px rgba(192,132,252,.38)}
 .btn.tmap .ic{font-size:1.1rem}
 /* con la pestaña On-chain Map son seis: en el móvil caben en una sola fila */
-@media (max-width:700px){ .brand .tabs,.tabs{grid-template-columns:repeat(3,minmax(0,1fr))} .brand .tab,.tab{font-size:.72rem;padding:8px 2px} }
-/* con 3 pestañas ya cabe «Confluencia» entera a 320 px */
+@media (max-width:700px){ .brand .tabs,.tabs{grid-template-columns:repeat(4,minmax(0,1fr))} .brand .tab,.tab{font-size:.72rem;padding:8px 2px} }
+/* con la pestaña Acciones (12/11) son 4 visibles: caben en una fila a 320 px */
 .tab[hidden]{display:none!important}
 /* ===== Buscador de la página Escáner: titular a la izquierda y buscador grande a la derecha (ordenador) */
 .scan-t2,.scan-sub,.scan-trust{display:none}
@@ -1845,6 +1846,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
       <button type="button" class="tab" id="tabN" role="tab" aria-selected="false" hidden><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg><span class="tl-lg">Tokens nuevos</span><span class="tl-sm">Nuevos</span></button>
       <button type="button" class="tab" id="tabL" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Mi lista <span id="lcount"></span></span></button>
       <button type="button" class="tab" id="tabC" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg><span>Confluencia <span id="ccount"></span></span></button>
+      <a class="tab tlink" href="/acciones/"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M6 16l4-5 3 3 5-7"/><path d="M15 7h3v3"/></svg><span>Acciones</span></a>
     </div>
     <a class="botlink" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a>
     <a class="lang" href="https://solflag.com/en/" hreflang="en" title="English version">EN</a>

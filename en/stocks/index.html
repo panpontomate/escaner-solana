@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tokenized stocks on Solana · SolFlag</title>
+<meta name="description" content="Tesla, Nvidia, the S&amp;P 500 and digital dollars on Solana: whether the token is the official one, whether its price matches the stock market and what the issuer can do with your tokens. Live data.">
+<meta property="og:title" content="Wall Street, 24/7 in your wallet · SolFlag">
+<meta property="og:description" content="Tokenized stocks on Solana against the real stock, digital dollars and their fine print. Live data.">
+<meta property="og:url" content="https://solflag.com/en/stocks/">
+<meta property="og:image" content="https://solflag.com/og-en.png?v=2">
+<link rel="canonical" href="https://solflag.com/en/stocks/">
+<link rel="alternate" hreflang="es" href="https://solflag.com/acciones/">
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
+<style>
+/* Página de acciones y dólares tokenizados (maqueta aprobada el 12/11: maquetas/escaner/activos-tokenizados.html).
+   Los datos salen en vivo de https://api.solflag.com/api/acciones (tools/api/acciones.js). */
+
+:root{--bg:#05040d;--card:rgba(10,8,24,.96);--line:rgba(196,181,253,.16);--line2:rgba(196,181,253,.3);--tx:#f1eeff;--mut:#a99fd6;--tq:#8ec5cf;--hi:#ff6b6b;--md:#fbbf24;--lo:#4ade80}
+html{background:var(--bg);overflow-x:clip}body{margin:0;color:var(--tx);font:400 16px/1.5 Manrope,sans-serif;overflow-x:clip}
+a{color:var(--tq)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px 80px}
+/* cabecera con la nebulosa de la portada */
+.hero{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:end;padding:64px 0 54px}
+.neb{position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);z-index:-1;pointer-events:none}
+.k{font:700 13px Manrope;letter-spacing:.24em;color:var(--tq);margin:0}
+h1{font:700 clamp(2.6rem,5.4vw,5rem)/.98 Fraunces,serif;letter-spacing:-.02em;margin:18px 0 22px}
+h1 .thin{display:block;font-weight:300;color:#e6e0ff}
+.lead{font-size:19px;color:#d6cff2;max-width:560px;margin:0}
+.trust{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0 0;padding:0;list-style:none}
+.trust li{border:1px solid var(--line2);background:rgba(5,4,13,.55);border-radius:999px;padding:7px 15px;font-weight:700;font-size:14px;color:#e4defc}
+.find{border-left:1px solid var(--line2);padding:6px 0 6px 40px}
+.find .t{font:700 34px/1 'Barlow Condensed',Manrope,sans-serif;letter-spacing:.03em;margin:0 0 14px}
+.find label{display:block;font-size:13px;font-weight:700;color:#e4defc;margin:0 0 8px}
+.box{display:flex;align-items:center;gap:10px;border:1.5px solid rgba(241,238,255,.5);border-radius:16px;background:rgba(10,7,28,.85);padding:8px 8px 8px 18px;box-shadow:0 0 0 5px rgba(122,184,196,.08)}
+.box input{flex:1;min-width:0;border:0;background:transparent;color:var(--tx);font:500 17px Manrope;padding:10px 0;outline:none}
+.box button{border:0;border-radius:999px;background:#8ec5cf;color:#0b1418;font:700 15px Manrope;padding:0 22px;min-height:46px}
+.try{margin-top:16px;display:flex;gap:8px 18px;flex-wrap:wrap;font-size:14px;color:var(--mut)}
+.try b{color:var(--tx);border-bottom:1px dashed var(--line2);cursor:pointer}
+/* cinta */
+.cinta{overflow:hidden;margin:0 -28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;-webkit-mask:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.ctrack{display:flex;gap:0;width:max-content;animation:cinta 95s linear infinite;padding:4px 0}
+.cinta:hover .ctrack{animation-play-state:paused}
+@keyframes cinta{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.ctrack{animation:none}.cinta{overflow-x:auto}}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font:700 9px Manrope;color:#fff;flex:none;overflow:hidden;letter-spacing:-.03em}
+.ci{display:flex;align-items:center;gap:10px;white-space:nowrap;padding:6px 26px 6px 0;border-right:1px solid rgba(196,181,253,.14);margin-right:14px}
+.ci .av{width:26px;height:26px;font-size:7.5px}
+.ci b{font:700 15px Manrope;display:inline;line-height:1.1}.ci .n{font-size:13px;color:var(--mut);margin-left:2px}
+.chain{font:700 9.5px Manrope;letter-spacing:.14em;color:#a99fd6}
+.ci .pill{background:none;border:0;padding:0}
+.ci .p{font:700 15px Manrope;font-variant-numeric:tabular-nums}
+/* tablas */
+.sec{margin-top:56px}
+.sh{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+h2{font:700 34px/1.05 Fraunces,serif;margin:6px 0 0}h2 span{font-weight:300;color:#e6e0ff}
+.bolsa{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(74,222,128,.35);background:rgba(74,222,128,.06);border-radius:12px;padding:9px 14px;font-size:14px}
+.bolsa i{width:9px;height:9px;border-radius:50%;background:var(--lo);box-shadow:0 0 10px var(--lo)}
+.bolsa.off{border-color:rgba(196,181,253,.3);background:rgba(196,181,253,.06)}.bolsa.off i{background:#8a81b8;box-shadow:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th{text-align:left;font:700 11px Manrope;letter-spacing:.15em;color:var(--tq);padding:13px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid rgba(196,181,253,.08);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:rgba(196,181,253,.04)}
+.r{text-align:right}
+.tk{display:flex;align-items:center;gap:11px}.tk b{font:700 15.5px Manrope;display:block;line-height:1.15}.tk span{font-size:12.5px;color:var(--mut)}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.s{font-size:12.5px;color:var(--mut)}
+.pill{display:inline-block;font:700 12px Manrope;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.ok{color:#86efac;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3)}
+.wa{color:#fcd34d;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.35)}
+.no{color:#fca5a5;background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.3)}
+.gr{color:#c9c1ea;background:rgba(196,181,253,.07);border:1px solid rgba(196,181,253,.2)}
+.can{display:flex;gap:5px;flex-wrap:wrap}
+.can i{font-style:normal;font:700 11.5px Manrope;border-radius:7px;padding:3px 8px;white-space:nowrap}
+.c1{background:rgba(196,181,253,.08);color:#d6cff2}.c2{background:rgba(251,191,36,.1);color:#fcd34d}
+.cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+.lp{padding:22px 24px}
+.tag{font:700 11px Manrope;letter-spacing:.16em;color:var(--tq);margin:0 0 6px}
+.fp{display:flex;gap:12px;padding:10px 0;border-top:1px solid rgba(196,181,253,.08)}
+.fp .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none;font-size:13px}
+.fp .ic.y{background:rgba(251,191,36,.12)}.fp .ic.g{background:rgba(74,222,128,.1)}.fp .ic.p{background:rgba(196,181,253,.1)}
+.fp b{font:700 14px Manrope;display:block}.fp span{font-size:13px;color:#cfc7ea}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:10px 14px}
+.pager button{border:1px solid var(--line2);background:rgba(196,181,253,.05);color:var(--tq);font:700 14px Manrope;border-radius:999px;padding:8px 16px;margin-left:8px;cursor:pointer}.pager button:hover{background:rgba(196,181,253,.1)}.pager button[hidden]{display:none}
+.more{display:block;width:100%;border:0;border-top:1px solid var(--line);background:rgba(196,181,253,.04);color:var(--tq);font:700 14px Manrope;padding:13px;cursor:pointer}.more:hover{background:rgba(196,181,253,.08)}
+tr.extra{display:none}.open tr.extra{display:table-row}
+.stx{display:grid;grid-template-columns:.75fr 1.25fr;gap:40px;align-items:center;padding:8px 0 4px}
+.stx .tt{display:flex;flex-direction:column;gap:8px}.stx .tt b{font:700 64px/1 Fraunces,serif;letter-spacing:-.02em}
+.sf{display:grid;grid-template-columns:repeat(3,1fr);row-gap:22px}
+.sf>div{display:flex;align-items:center;gap:12px;padding:2px 18px;border-left:1px solid rgba(196,181,253,.16)}
+.sf b{display:block;font:700 26px/1.1 Fraunces,serif}.sf em{font-style:normal;font-size:12.5px;color:var(--mut)}
+.sky{position:fixed;inset:0;width:100vw;height:100vh;z-index:-2;pointer-events:none}
+.seam{position:relative;height:170px;pointer-events:none;width:100vw;margin-left:calc(50% - 50vw)}
+.seam canvas{position:absolute;inset:0;width:100%;height:100%}
+.sec{position:relative}
+.sec .neb.side{height:100%}
+@media(max-width:860px){.stx{grid-template-columns:1fr;gap:22px}.stx .tt b{font-size:48px}.sf{grid-template-columns:1fr 1fr}.sf>div{padding:2px 12px}.sf b{font-size:21px}.seam{height:110px}}
+.note{margin-top:18px;font-size:13px;color:#e5d9b0;border:1px solid rgba(251,191,36,.3);background:rgba(251,191,36,.05);border-radius:12px;padding:10px 14px}
+.foot{margin-top:24px;font-size:12.5px;color:var(--mut)}
+@media(max-width:960px){.hero{grid-template-columns:1fr;gap:30px;padding:40px 0}.find{border-left:0;padding:0}.cols{grid-template-columns:1fr}}
+@media(max-width:700px){.wrap{padding:0 16px 60px}.cinta{margin:0 -16px}*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+:focus-visible{outline:2px solid #7ab8c4;outline-offset:2px;border-radius:6px}
+a:hover{color:#c3e2e7}
+/* cabecera y pie de las páginas sueltas */
+header{display:flex;align-items:center;gap:10px 26px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;background:rgba(5,4,13,.6);box-shadow:0 0 0 100vmax rgba(5,4,13,.6);clip-path:inset(0 -100vmax);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);min-height:68px}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo .ico{width:42px;height:42px;flex:none}
+.wm{display:inline-block;font:700 26px/1.15 Unbounded,'Arial Black',sans-serif;letter-spacing:-.03em;background:linear-gradient(90deg,#7fd0dc,#9fb4f2 50%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3))}
+.pnav{display:flex;align-items:center;gap:4px 24px;margin-left:auto;font-weight:700;font-size:.95rem}
+.pnav a{color:#d8d2f5;text-decoration:none;padding:8px 0}
+.pnav a:hover,.pnav a[aria-current]{color:#f1eeff}
+.pnav a[aria-current]{box-shadow:inset 0 -2px 0 #8ec5cf}
+.plang{width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line2);border-radius:50%;color:var(--tq);font-size:.8rem;font-weight:700;text-decoration:none;flex:none}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;font-size:.92rem;position:relative;background:rgba(5,4,13,.94);box-shadow:0 0 0 100vmax rgba(5,4,13,.94);clip-path:inset(0 -100vmax -100vmax);padding-bottom:40px;color:#c9c1ea}
+footer .wm{font-size:17px}
+footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem;color:#c9c1ea}
+tbody tr[data-m]{cursor:pointer}
+.hint{margin:10px 0 0;font-size:13.5px;color:#fcd34d}
+.try button{background:none;border:0;padding:0;cursor:pointer}
+@media (max-width:760px){ .pnav a:not(.pbot):not([aria-current]){display:none} .pnav{gap:16px;font-size:.88rem} header{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(5,4,13,.92)} }
+@media (max-width:420px){ .pnav{display:none} .plang{margin-left:auto} .logo .ico{width:36px;height:36px} .wm{font-size:21px} }
+</style>
+</head>
+<body>
+<canvas class="sky" id="sky" aria-hidden="true"></canvas>
+<div class="wrap">
+<header>
+  <a class="logo" href="/en/" title="SolFlag">
+    <img class="ico" src="/marca/solflag-icono.svg?v=1" alt="" width="44" height="44">
+    <span class="wm" translate="no">Solflag</span>
+  </a>
+  <nav class="pnav" aria-label="Sections"><a href="/en/?v=escaner">Scanner</a><a href="/en/?v=lista">My list</a><a href="/en/?v=confluencia">Confluence</a><a href="/en/stocks/" aria-current="page">Stocks</a><a class="pbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Telegram bot</a></nav>
+  <a class="plang" href="/acciones/" hreflang="es" title="Versión en español">ES</a>
+</header>
+<section class="hero">
+  <canvas class="neb" data-neb="hero" aria-hidden="true"></canvas>
+  <div>
+    <p class="k">STOCKS AND DOLLARS ON SOLANA</p>
+    <h1>Wall Street, 24/7<span class="thin">in your wallet.</span></h1>
+    <p class="lead">Tesla, Nvidia, the S&amp;P 500 or gold as tokens that move at any hour. Before you buy, check whether it is the official one, whether its price matches the stock market and what the issuer can do with it.</p>
+    <ul class="trust"><li>Official tokens only</li><li>Price vs. the stock market</li><li>Keys checked every day</li></ul>
+  </div>
+  <div class="find">
+    <p class="t">Find an asset</p>
+    <label for="q">Name, ticker or address</label>
+    <form id="buscar" autocomplete="off"><div class="box"><input id="q" placeholder="Tesla, NVDAx, SPY…" spellcheck="false"><button type="submit">Search</button></div></form>
+    <p class="hint" id="qhint" hidden></p>
+    <div class="try"><span>Try</span><button type="button" class="tq"><b>TSLAx</b></button><button type="button" class="tq"><b>NVDAx</b></button><button type="button" class="tq"><b>SPYx</b></button><button type="button" class="tq"><b>USDC</b></button></div>
+  </div>
+</section>
+
+<div class="cinta" aria-label="Tokenized assets on Solana"><div class="ctrack" id="cinta"></div></div>
+
+<section class="sec">
+  <div class="sh">
+    <div><p class="k">TOKENIZED STOCKS</p><h2>What the token is worth, <span>and what the stock is worth.</span></h2></div>
+    <div class="bolsa" id="bolsa"><i></i><span>Checking the stock market…</span></div>
+  </div>
+  <div class="card"><table>
+    <thead><tr><th>Token</th><th class="r">Token price</th><th class="r hm">Stock price</th><th class="r">Difference</th><th class="r">Liquidity</th><th class="r hm">24 h volume</th><th class="hm">Issuer</th></tr></thead>
+    <tbody id="acc"><tr><td colspan="7" class="s">Loading prices…</td></tr></tbody>
+  </table>
+  <div class="pager" id="pager" hidden><span class="s" id="pinfo"></span><span><button id="prev">← Previous</button><button id="next">Next →</button></span></div></div>
+</section>
+
+<div class="seam"><canvas data-seam="2" aria-hidden="true"></canvas></div>
+<section class="sec" style="margin-top:0">
+  <div class="sh"><div><p class="k">DOLLARS AND FUNDS</p><h2>Digital dollars, <span>and their fine print.</span></h2></div></div>
+  <div class="stx">
+    <div class="tt"><span class="k">ON SOLANA TODAY</span><b id="dtot">—</b><span class="s">in digital dollars and euros<br>from verified issuers</span></div>
+    <div class="sf" id="dfig"></div>
+  </div>
+  <div class="card" style="margin-top:26px"><table>
+  <thead><tr><th>Token</th><th class="r">On Solana</th><th class="r">Price</th><th>The issuer can…</th><th class="hm">Keys</th><th class="hm">Reserves</th></tr></thead>
+  <tbody id="dol"><tr><td colspan="6" class="s">Loading…</td></tr></tbody></table></div>
+</section>
+
+<div class="seam"><canvas data-seam="1" aria-hidden="true"></canvas></div>
+<section class="sec" style="margin-top:0">
+  <div class="sh"><div><p class="k">THE FINE PRINT</p><h2>What the issuer can do <span>with your tokens.</span></h2></div></div>
+  <div class="cols">
+    <div class="card lp">
+      <p class="tag">XSTOCKS · STOCKS</p>
+      <div class="fp"><span class="ic y">↔</span><div><b>Move or burn your tokens without your signature</b><span>It has a “permanent delegate”.</span></div></div>
+      <div class="fp"><span class="ic y">⏸</span><div><b>Pause every transfer</b><span>Not paused today.</span></div></div>
+      <div class="fp"><span class="ic p">×</span><div><b>Adjusts for splits and dividends</b><span>A multiplier changes what each token is worth: Netflix is at 10 after its split, and dividends are reinvested (McDonald's, 1.02).</span></div></div>
+      <div class="fp"><span class="ic p">❄</span><div><b>Freeze your account and mint more</b><span>Like any regulated issuer.</span></div></div>
+    </div>
+    <div class="card lp">
+      <p class="tag">ONDO · STOCKS</p>
+      <div class="fp"><span class="ic g">✓</span><div><b>Cannot move your tokens</b><span>No permanent delegate, unlike xStocks.</span></div></div>
+      <div class="fp"><span class="ic y">⏸</span><div><b>Pause every transfer</b><span>Not paused today.</span></div></div>
+      <div class="fp"><span class="ic p">×</span><div><b>Adjusts for splits and dividends</b><span>The same multiplier system.</span></div></div>
+      <div class="fp"><span class="ic y">$</span><div><b>Thin market on Solana</b><span>Its price here may not follow the stock.</span></div></div>
+    </div>
+    <div class="card lp">
+      <p class="tag">DIGITAL DOLLARS</p>
+      <div class="fp"><span class="ic p">❄</span><div><b>All of them can freeze your account</b><span>On a court order or sanctions.</span></div></div>
+      <div class="fp"><span class="ic y">↔</span><div><b>PYUSD and USDG can move your tokens</b><span>USDC and USDT cannot.</span></div></div>
+      <div class="fp"><span class="ic y">%</span><div><b>PYUSD and USDG can charge a fee</b><span>0% today. We will flag it if it changes.</span></div></div>
+      <div class="fp"><span class="ic g">✓</span><div><b>Keys checked every morning</b><span>If they change, the token turns amber until reviewed.</span></div></div>
+    </div>
+  </div>
+  <div class="note">The chain cannot show whether the real stock or money exists behind the token: that depends on the issuer, its custodian and its reserve reports.</div>
+  <p class="foot">Only tokens whose keys are the issuer’s. Token price: DexScreener. Stock price: Twelve Data. Data, not recommendations.</p>
+</section>
+</div>
+<footer class="wrap">
+  <span class="wm" translate="no">Solflag</span>
+  <a href="/en/">Scanner</a>
+  <a href="/en/stocks/">Stocks</a>
+  <a href="/en/accuracy/">Data and accuracy</a>
+  <a href="/en/privacy/">Privacy</a>
+  <a href="/en/terms/">Terms</a>
+  <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Open source</a>
+  <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
+  <p>Token price: DexScreener. Stock price: Twelve Data. SolFlag is a guidance tool, not financial advice.</p>
+</footer>
+<script>
+const NOMBRE = { MCD: "McDonald's", GME: "GameStop", AVGO: "Broadcom", INTC: "Intel", TQQQ: "Nasdaq 100 ×3", PLTR: "Palantir", KO: "Coca-Cola", DFDV: "DeFi Development", "BRK.B": "Berkshire Hathaway", PEP: "PepsiCo", NFLX: "Netflix", ORCL: "Oracle", UNH: "UnitedHealth", XOM: "ExxonMobil", TSLA: "Tesla", NVDA: "Nvidia", AAPL: "Apple", SPY: "S&P 500", QQQ: "Nasdaq 100", MSTR: "Strategy", CRCL: "Circle", META: "Meta", GOOGL: "Alphabet", AMZN: "Amazon", COIN: "Coinbase", HOOD: "Robinhood", MSFT: "Microsoft", GLD: "Gold" };
+const COLOR = { MCD: "#da291c", GME: "#e4002b", AVGO: "#cc092f", INTC: "#0071c5", TQQQ: "#2a6fdb", PLTR: "#333", KO: "#f40009", DFDV: "#5b3fd1", "BRK.B": "#3b3b6d", PEP: "#004b93", NFLX: "#e50914", ORCL: "#c74634", UNH: "#002677", XOM: "#ed1b2f", TSLA: "#cc0000", NVDA: "#76b900", AAPL: "#555", SPY: "#1f3a93", QQQ: "#2a6fdb", MSTR: "#d9480f", CRCL: "#2775ca", META: "#0866ff", GOOGL: "#34a853", AMZN: "#ff9900", COIN: "#0052ff", HOOD: "#00c805", MSFT: "#00a4ef", GLD: "#c9a227" };
+const fx = (n, d) => n == null ? "—" : n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const usd = (n) => n == null ? "—" : n >= 1e6 ? "$" + fx(n / 1e6, 1) + "M" : n >= 1e3 ? "$" + fx(n / 1e3, 0) + "K" : "$" + fx(n, 0);
+const DCOL = { USDC: "#2775ca", USDT: "#26a17b", PYUSD: "#0e3d8c", USDG: "#1d1d1f", EURC: "#2775ca", USDY: "#1f2a44" };
+const PUEDE = { PYUSD: 1, USDG: 1 };
+const DSUB = { PYUSD: "Paxos · PayPal", EURC: "Circle · euro", USDY: "Ondo · earns interest" };
+const DPRECIO = { EURC: " <span class='s'>≈ 1 €</span>", USDY: " <span class='s'>rises with interest</span>" };
+const av = (f) => `<span class="av" style="background:${COLOR[f.accion] || "#333"}">${f.accion.slice(0, 4)}</span>`;
+function prima(f) {
+  if (f.prima == null) return '<span class="s">—</span>';
+  const c = f.liq < 20000 ? "gr" : Math.abs(f.prima) < 1 ? "ok" : Math.abs(f.prima) < 3 ? "wa" : "no";
+  return `<span class="pill ${c}">${f.prima > 0 ? "+" : ""}${fx(f.prima, 2)}%</span>`;
+}
+let todos = [];
+fetch("https://api.solflag.com/api/acciones", { cache: "no-cache" }).then((r) => r.json()).then((j) => {
+  const b = document.getElementById("bolsa");
+  b.classList.toggle("off", j.bolsa !== "abierta");
+  b.querySelector("span").innerHTML = j.bolsa === "abierta" ? "<b>US stock market open</b> · prices less than 20 min old" : "<b>US stock market closed</b> · the token can drift from the stock";
+  const filas = j.filas.slice().sort((a, b) => b.liq - a.liq);
+  const VER = 10;
+  const fila = (f) => `<tr data-m="${f.mint}">
+    <td><div class="tk">${av(f)}<div><b>${f.tok}</b><span>${NOMBRE[f.accion] || f.accion}</span></div></div></td>
+    <td class="num r">$${fx(f.precio, 2)}</td><td class="num r hm">$${fx(f.real, 2)}</td><td class="r">${prima(f)}</td>
+    <td class="num r">${f.liq < 20000 ? `<span class="pill wa">${usd(f.liq)}</span>` : usd(f.liq)}</td><td class="num r hm">${usd(f.vol24)}</td>
+    <td class="hm s">${f.emisor}</td></tr>`;
+  let pag = 0;
+  const pager = document.getElementById("pager"), prev = document.getElementById("prev"), next = document.getElementById("next");
+  function pinta() {
+    const ini = pag * VER, fin = Math.min(filas.length, ini + VER);
+    document.getElementById("acc").innerHTML = filas.slice(ini, fin).map(fila).join("");
+    document.getElementById("pinfo").textContent = (ini + 1) + "–" + fin + " of " + filas.length;
+    prev.hidden = pag === 0; next.hidden = fin >= filas.length;
+  }
+  if (filas.length > VER) pager.hidden = false;
+  prev.onclick = () => { pag--; pinta(); };
+  next.onclick = () => { pag++; pinta(); };
+  pinta();
+  const item = (f) => `<div class="ci">${av(f)}<span><b>${f.tok}</b><span class="n">${NOMBRE[f.accion] || f.accion}</span></span><span class="chain">SOLANA</span><span class="p">$${fx(f.precio, 2)}</span>${prima(f)}</div>`;
+  const dol = (j.dolares || []).filter((d) => d.enSolana);
+  const tot = dol.reduce((a, d) => a + (d.valor || 0), 0);
+  document.getElementById("dtot").textContent = tot ? "$" + fx(tot / 1e6, 0) + "M" : "—";
+  document.getElementById("dfig").innerHTML = dol.map((d) => `<div><span class="av" style="background:${DCOL[d.tok]}">${d.tok.slice(0, 4)}</span><span><b>$${fx((d.valor || 0) / 1e6, 0)}M</b><em>${d.tok} · ${d.emisor} · ${fx(tot ? d.valor / tot * 100 : 0, tot && d.valor / tot < .01 ? 1 : 0)} %</em></span></div>`).join("");
+  document.getElementById("dol").innerHTML = dol.map((d) => `<tr data-m="${d.mint}">
+    <td><div class="tk"><span class="av" style="background:${DCOL[d.tok]}">${d.tok.slice(0, 4)}</span><div><b>${d.tok}</b><span>${DSUB[d.tok] || d.emisor}</span></div></div></td>
+    <td class="num r">${fx(d.enSolana / 1e6, d.enSolana < 1e8 ? 1 : 0)} M</td><td class="num r">$${fx(d.precio, 4)}${DPRECIO[d.tok] || ""}</td>
+    <td><div class="can"><i class="c1">mint</i><i class="c1">freeze</i>${PUEDE[d.tok] ? '<i class="c2">move your tokens</i><i class="c2">add a fee</i>' : ""}</div></td>
+    <td class="hm"><span class="pill ok">watched</span></td><td class="hm"><a href="${d.reservas}" target="_blank" rel="noopener">${new URL(d.reservas).hostname.replace("www.", "")} ↗</a></td></tr>`).join("");
+  const st = dol.filter((d) => d.tok !== "EURC").map((d) => `<div class="ci"><span class="av" style="background:${DCOL[d.tok]}">${d.tok.slice(0, 4)}</span><span><b>${d.tok}</b><span class="n">${d.emisor}</span></span><span class="chain">SOLANA</span><span class="p">$${fx(d.precio, 4)}</span></div>`).join("");
+  todos = filas.map((f) => ({ m: f.mint, k: [f.tok, f.accion, NOMBRE[f.accion] || ""] })).concat(dol.map((d) => ({ m: d.mint, k: [d.tok, d.emisor] })));
+  const una = filas.filter((f) => f.liq >= 20000).map(item).join("") + st;
+  document.getElementById("cinta").innerHTML = una + una;
+}).catch(() => { document.getElementById("acc").innerHTML = '<tr><td colspan="7" class="s">Prices could not be loaded. Try reloading in a moment.</td></tr>'; });
+// una fila lleva al análisis del token en el escáner
+document.addEventListener("click", (e) => { const tr = e.target.closest("tr[data-m]"); if (tr && !e.target.closest("a")) location.href = "/en/?token=" + tr.dataset.m; });
+// buscador: nombre, ticker o dirección
+const norm = (t) => String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9.]/g, "");
+function busca(q) {
+  const h = document.getElementById("qhint"); h.hidden = true;
+  q = q.trim(); if (!q) return;
+  if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(q)) { location.href = "/en/?token=" + q; return; }
+  const n = norm(q), hit = todos.find((t) => t.k.some((k) => norm(k) === n)) || todos.find((t) => t.k.some((k) => norm(k).startsWith(n)));
+  if (hit) { location.href = "/en/?token=" + hit.m; return; }
+  h.textContent = "It is not on the list of official tokens. If you have its address, paste it here and we will analyse it.";
+  h.hidden = false;
+}
+document.getElementById("buscar").addEventListener("submit", (e) => { e.preventDefault(); busca(document.getElementById("q").value); });
+document.querySelectorAll(".tq").forEach((b) => b.addEventListener("click", () => busca(b.textContent)));
+</script>
+<script>
+// cielo de estrellas detrás de toda la página (como el de las nebulosas de la portada, pero fijo y en todo el alto)
+(function(){ const cv = document.getElementById("sky"), x = cv.getContext("2d");
+  function paint(){ const D = Math.min(2, devicePixelRatio || 1), W = innerWidth, H = innerHeight; cv.width = W*D; cv.height = H*D; x.setTransform(D,0,0,D,0,0);
+    let s = 7; const r = () => (s = s*16807 % 2147483647) / 2147483647;
+    for (let i = 0; i < W*H/2600; i++){ const a = .12 + r()*.55, z = r() < .06 ? 1.8 : 1.1; x.fillStyle = (r() < .12 ? "rgba(170,200,255," : "rgba(241,238,255,") + a + ")"; x.fillRect(r()*W, r()*H, z, z); } }
+  paint(); addEventListener("resize", paint); })();
+</script>
+<script src="/puntos.js?v=20261111b" defer></script>
+</body>
+</html>
