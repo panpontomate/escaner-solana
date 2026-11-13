@@ -55,13 +55,22 @@ async function quienCambio(mint, nuevas) {
 const corto = (k) => k.slice(0, 6) + "…" + k.slice(-4);
 const avisos = [];
 for (const e of lista) {
-  for (const [mint, fuente] of Object.entries(e.mints || {})) {
-    const cuenta = await rpc("getAccountInfo", [mint, { encoding: "jsonParsed" }]);
-    const p = cuenta && cuenta.value && cuenta.value.data && cuenta.value.data.parsed && cuenta.value.data.parsed.info;
+  // Lee los tokens de 100 en 100 (xStocks tiene más de 1.500). La fuente va en cada mint (URL) o, si el
+  // emisor lleva «fuente», es esa URL + el símbolo que guarda el mint
+  const tokens = Object.entries(e.mints || {});
+  const leidos = [];
+  for (let i = 0; i < tokens.length; i += 100) {
+    const lote = tokens.slice(i, i + 100);
+    const r = await rpc("getMultipleAccounts", [lote.map(([m]) => m), { encoding: "jsonParsed" }]);
+    lote.forEach(([m, v], n) => leidos.push([m, e.fuente && !/^https?:/.test(v) ? e.fuente + v : v, r.value[n]]));
+  }
+  let bien = 0;
+  for (const [mint, fuente, cuenta] of leidos) {
+    const p = cuenta && cuenta.data && cuenta.data.parsed && cuenta.data.parsed.info;
     if (!p) { avisos.push(`• ${e.name} ${corto(mint)}: no se pudo leer el token`); continue; }
     const nuevas = claves(p).filter((k) => !e.keys.includes(k));
-    console.log(e.name, corto(mint), nuevas.length ? "CLAVES NUEVAS: " + nuevas.join(", ") : "ok");
-    if (!nuevas.length) continue;
+    if (!nuevas.length) { bien++; continue; }
+    console.log(e.name, corto(mint), "CLAVES NUEVAS: " + nuevas.join(", "));
     const cambios = await quienCambio(mint, nuevas).catch(() => []);
     const lineas = [`• ${e.name}, token ${mint}`, `  Claves nuevas: ${nuevas.join(", ")}`, `  Fuente oficial para comprobarlo: ${fuente}`];
     for (const c of cambios) {
@@ -73,6 +82,7 @@ for (const e of lista) {
     if (!cambios.length) lineas.push("  No encontré la transacción del cambio en las 100 últimas del token.");
     avisos.push(lineas.join("\n"));
   }
+  console.log(`${e.name}: ${bien} de ${tokens.length} tokens con las claves de la lista`);
 }
 
 if (avisos.length) {
