@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dónde cotiza · SolFlag</title>
+<meta name="description" content="Dónde se compra y se vende un token de Solana: en la cadena y en exchanges, lo que cuesta entrar y salir, si piden identidad y si tienen licencia MiCA.">
+<meta name="robots" content="noindex">
+<link rel="alternate" hreflang="en" href="https://solflag.com/en/markets/">
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
+<style>
+/* «Dónde cotiza · todos» (maqueta aprobada el 13/11: maquetas\web\donde-cotiza-todos.html).
+   Datos en vivo: https://api.solflag.com/api/cotiza/<mint> (tools/api/cotiza.js) y el coste en la cadena con Jupiter.
+   ?t=<mint> el token · ?r=1 riesgo alto (sin botones para ir a comprar) */
+:root{--bg:#05040d;--card:rgba(10,8,24,.96);--line:rgba(196,181,253,.16);--line2:rgba(196,181,253,.3);--tx:#f1eeff;--mut:#a99fd6;--mut2:#7d74a8;--tq:#8ec5cf;--hi:#ff6b6b;--md:#fbbf24;--lo:#4ade80;--vi:#8b5cf6}
+html{background:var(--bg);overflow-x:clip}body{margin:0;color:var(--tx);font:400 16px/1.5 Manrope,sans-serif;overflow-x:clip}
+a{color:var(--tq)}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px 80px}
+.sky{position:fixed;inset:0;width:100vw;height:100vh;z-index:-2;pointer-events:none}
+.neb{position:absolute;top:0;left:50%;width:100vw;height:100%;transform:translateX(-50%);z-index:-1;pointer-events:none}
+.k{font:700 13px Manrope;letter-spacing:.24em;color:var(--tq);margin:0}
+.hero{position:relative;padding:40px 0 30px}
+.back{display:inline-block;margin-bottom:22px;font-weight:700;text-decoration:none}
+.who{display:flex;align-items:center;gap:18px;margin-top:14px}
+.lt{flex:none;width:76px;height:76px;border-radius:50%;overflow:hidden;border:2px solid var(--line2);display:grid;place-items:center;font:700 32px Fraunces,serif;background:#0e0926}
+.lt img{width:100%;height:100%;object-fit:cover;display:block}
+h1{font:700 clamp(2.4rem,5vw,4.4rem)/1 Fraunces,serif;letter-spacing:-.02em;margin:0}
+h1 small{display:block;font:500 15px Manrope;color:var(--mut);letter-spacing:0;margin-top:6px}
+.addr{margin-top:12px;font:500 13px 'IBM Plex Mono',monospace;color:#d8d2f5;word-break:break-all}.addr b{color:var(--tq)}
+.verdict{margin:22px 0 0;max-width:820px;font:300 clamp(1.3rem,2.2vw,1.8rem)/1.3 Fraunces,serif}
+.verdict b{font-weight:700;color:var(--lo)}
+.stop{margin-top:18px;padding:12px 16px;border:1px solid var(--hi);border-radius:14px;background:rgba(60,14,24,.9);max-width:820px}.stop b{color:var(--hi)}
+.nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:30px}
+.nums div{padding:22px 22px 20px;border-left:1px solid var(--line)}.nums div:first-child{border-left:0;padding-left:0}
+.nums b{display:block;font:300 clamp(26px,2.8vw,38px)/1.05 Fraunces,serif;font-variant-numeric:tabular-nums}
+.nums span{display:block;margin-top:8px;font-weight:700;font-size:14px}.nums em{font-style:normal;color:var(--mut2);font-size:13px}
+.sec{margin-top:60px}
+.sh{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:22px;flex-wrap:wrap}
+.sh p{color:var(--mut);max-width:470px;margin:0}
+h2{font:700 clamp(30px,3.6vw,44px)/1.04 Fraunces,serif;letter-spacing:-.02em;margin:0}h2 span{display:block;font-weight:300;color:#e6e0ff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.podg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--line)}
+.pr{display:grid;grid-template-columns:36px minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}.pr:last-child{border-bottom:0}
+.rk{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:700 15px Fraunces,serif;border:1.5px solid var(--line2)}.rk1{border-color:var(--lo);color:var(--lo)}
+.pn b{display:block;font-size:16px}.pn small,.pc small{display:block;color:var(--mut2);font-size:12px}
+.pc{text-align:right}.pc b{font:300 24px/1.1 Fraunces,serif;font-variant-numeric:tabular-nums}
+.go{display:inline-flex;align-items:center;min-height:34px;padding:0 14px;border:1px solid rgba(122,184,196,.55);border-radius:999px;color:var(--tq);font-weight:700;font-size:13px;white-space:nowrap;text-decoration:none}
+.go.main{background:var(--tx);color:#0e0926;border-color:var(--tx)}
+.tg{display:inline-block;margin-top:4px;font:700 10.5px Manrope;letter-spacing:.08em;padding:3px 8px;border-radius:999px;white-space:nowrap;text-decoration:none;border:1px solid var(--line2);color:var(--mut)}
+.tg.no{color:var(--lo);border-color:rgba(74,222,128,.45)}.tg.si{color:var(--md);border-color:rgba(251,191,36,.45)}.tg.lim{color:var(--tq);border-color:rgba(122,184,196,.5)}
+.tg.mica{color:#c4b5fd;border-color:rgba(139,92,246,.6)}.tg.av{color:var(--hi);border-color:rgba(255,107,107,.5)}
+.good{color:var(--lo)}.mid{color:var(--md)}.bad{color:var(--hi)}.muted{color:var(--mut2);font-size:13px}
+.micag{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mc{border:1px solid var(--line);border-radius:18px;padding:16px 18px;background:var(--card);display:flex;flex-direction:column;gap:7px}
+.mc .t{display:flex;justify-content:space-between;align-items:center;gap:10px}.mc .t b{font-size:17px}
+.mc .c{font:300 22px/1 Fraunces,serif}.mc .c small{font:500 12px Manrope;color:var(--mut2);margin-left:6px}
+.mc p{margin:0;color:var(--mut);font-size:13px;line-height:1.45}
+.mc .f{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto}.mc .f a.w{font-weight:700;font-size:13px}
+.nomica{margin-top:14px;border:1px solid rgba(251,191,36,.35);border-radius:18px;padding:16px 18px;background:rgba(40,28,8,.92)}.nomica b{color:var(--md)}.nomica p{margin:6px 0 0;color:#eadfc4;font-size:14px}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.chip{min-height:40px;padding:0 16px;border:1px solid var(--line2);border-radius:999px;background:rgba(5,4,13,.5);color:#d8d2f5;font:700 14px Manrope;cursor:pointer}
+.chip.on{background:rgba(139,92,246,.22);border-color:var(--vi);color:var(--tx)}
+.filters .sp{flex:1}.filters label{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#d8d2f5;cursor:pointer}
+.filters input{accent-color:#8b5cf6;width:18px;height:18px}
+.lr{display:grid;grid-template-columns:36px minmax(0,1.5fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,1.2fr) minmax(0,1fr) 76px;gap:12px;align-items:center;min-height:58px;padding:8px 20px;border-bottom:1px solid var(--line);font-size:15px}
+.lr.h{min-height:40px;font:700 11.5px Manrope;letter-spacing:.1em;color:var(--mut2)}
+.lr .n{color:var(--mut2);font:500 13px 'IBM Plex Mono',monospace}.lr small{display:block;color:var(--mut2);font-size:12px}
+.lr .r{text-align:right}.lr .num{font-variant-numeric:tabular-nums}.lr .go{justify-self:end}
+.lr.route{background:rgba(74,222,128,.06)}.lr.unk{opacity:.8}
+.grp{padding:12px 20px;border-bottom:1px solid var(--line);font:700 12px Manrope;letter-spacing:.14em;color:var(--tq);background:rgba(5,4,13,.35)}
+.grp small{display:block;margin-top:3px;font:500 12px Manrope;letter-spacing:0;color:var(--mut2)}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px;font-size:14px;color:var(--mut)}
+.pager button{min-height:40px;padding:0 18px;border:1px solid var(--line2);border-radius:999px;background:rgba(5,4,13,.5);color:var(--tx);font:700 14px Manrope;cursor:pointer}.pager button:disabled{opacity:.35;cursor:default}
+.fine{margin:14px 0 0;font-size:13px;color:var(--mut2);max-width:920px}.fine b{color:var(--mut)}
+.load{padding:30px 20px;color:var(--mut)}
+@media (max-width:960px){.podg,.micag{grid-template-columns:minmax(0,1fr)}.nums{grid-template-columns:1fr 1fr}.nums div:nth-child(3){border-left:0;padding-left:0}.nums div:nth-child(n+3){border-top:1px solid var(--line)}
+  .lr{grid-template-columns:28px minmax(0,1.4fr) minmax(0,1fr) minmax(0,1.1fr) 70px}.lr .c4,.lr .c6{display:none}}
+@media (max-width:560px){.wrap{padding:0 16px 60px}.lr{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 66px;padding:8px 14px}.lr .n,.lr .c5{display:none}.grp,.pager{padding-left:14px;padding-right:14px}
+  .pr{grid-template-columns:28px minmax(0,1fr) auto;padding:12px 14px}.pr .go{grid-column:3}.lt{width:56px;height:56px}}
+/* cabecera y pie: los de las páginas sueltas (acciones/index.html) */
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+:focus-visible{outline:2px solid #7ab8c4;outline-offset:2px;border-radius:6px}
+a:hover{color:#c3e2e7}
+/* cabecera y pie de las páginas sueltas */
+header{display:flex;align-items:center;gap:10px 26px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;background:rgba(5,4,13,.6);box-shadow:0 0 0 100vmax rgba(5,4,13,.6);clip-path:inset(0 -100vmax);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);min-height:68px}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo .ico{width:42px;height:42px;flex:none}
+.wm{display:inline-block;font:700 26px/1.15 Unbounded,'Arial Black',sans-serif;letter-spacing:-.03em;background:linear-gradient(90deg,#7fd0dc,#9fb4f2 50%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3))}
+.pnav{display:flex;align-items:center;gap:4px 24px;margin-left:auto;font-weight:700;font-size:.95rem}
+.pnav a{color:#d8d2f5;text-decoration:none;padding:8px 0}
+.pnav a:hover,.pnav a[aria-current]{color:#f1eeff}
+.pnav a[aria-current]{box-shadow:inset 0 -2px 0 #8ec5cf}
+.plang{width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line2);border-radius:50%;color:var(--tq);font-size:.8rem;font-weight:700;text-decoration:none;flex:none}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;font-size:.92rem;position:relative;background:rgba(5,4,13,.94);box-shadow:0 0 0 100vmax rgba(5,4,13,.94);clip-path:inset(0 -100vmax -100vmax);padding-bottom:40px;color:#c9c1ea}
+footer .wm{font-size:17px}
+footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem;color:#c9c1ea}
+tbody tr[data-m]{cursor:pointer}
+.hint{margin:10px 0 0;font-size:13.5px;color:#fcd34d}
+.try button{background:none;border:0;padding:0;cursor:pointer}
+@media (max-width:760px){ .pnav a:not(.pbot):not([aria-current]){display:none} .pnav{gap:16px;font-size:.88rem} header{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(5,4,13,.92)} }
+@media (max-width:420px){ .pnav{display:none} .plang{margin-left:auto} .logo .ico{width:36px;height:36px} .wm{font-size:21px} }
+
+</style>
+</head>
+<body>
+<canvas class="sky" id="sky" aria-hidden="true"></canvas>
+<div class="wrap">
+<header>
+  <a class="logo" href="/" title="SolFlag">
+    <img class="ico" src="/marca/solflag-icono.svg?v=1" alt="" width="44" height="44">
+    <span class="wm" translate="no">Solflag</span>
+  </a>
+  <nav class="pnav" aria-label="Secciones"><a href="/?v=escaner" aria-current="page">Escáner</a><a href="/?v=lista">Mi lista</a><a href="/?v=confluencia">Confluencia</a><a href="/acciones/">Acciones</a><a class="pbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a></nav>
+  <a class="plang" id="lang" href="/en/markets/" hreflang="en" title="English version">EN</a>
+</header>
+
+<section class="hero">
+  <canvas class="neb" data-neb="hero" aria-hidden="true"></canvas>
+  <a class="back" id="back" href="/">← Volver al análisis</a>
+  <p class="k">DÓNDE COTIZA · TODOS LOS SITIOS</p>
+  <div class="who"><span class="lt" id="lt">?</span><h1 id="tn">Cargando…</h1></div>
+  <div class="addr" id="addr"></div>
+  <p class="verdict" id="verdict"></p>
+  <div class="stop" id="stop" hidden><b>Riesgo alto:</b> no enlazamos sitios para comprarlo. Te enseñamos dónde se negocia y, sobre todo, lo que cuesta salir.</div>
+</section>
+
+<div class="nums" id="nums"></div>
+
+<section class="sec">
+  <div class="sh"><h2>Los mejores<span>para entrar y salir.</span></h2><p>Los tres más baratos de cada lado. En la cadena compras desde tu wallet; en un exchange, desde tu cuenta allí.</p></div>
+  <div class="podg">
+    <div class="card"><div class="ph"><span class="k" style="font-size:12px">EN LA CADENA</span><span class="tg no">NO PIDE IDENTIDAD</span></div><div id="podD"><p class="load">Cargando…</p></div></div>
+    <div class="card"><div class="ph"><span class="k" style="font-size:12px">EN EXCHANGES</span><span class="tg">CON IDENTIDAD COMPROBADA</span></div><div id="podX"><p class="load">Cargando…</p></div></div>
+  </div>
+</section>
+
+<section class="sec" id="micaSec" hidden>
+  <div class="sh"><h2>MiCA<span>quién tiene licencia en la UE.</span></h2><p>MiCA es la ley europea de criptoactivos. Desde julio de 2026, como tarde, solo las empresas autorizadas pueden ofrecer estos servicios en la UE. Lo comprobamos en el <a id="esma" href="#" target="_blank" rel="noopener">registro oficial de la ESMA</a>.</p></div>
+  <div class="micag" id="micaG"></div>
+  <div class="nomica" id="noMica" hidden></div>
+</section>
+
+<section class="sec">
+  <div class="sh"><h2>Todos los sitios<span>por grupos.</span></h2><p>Coste = diferencia entre precio de compra y de venta + lo que cobra el sitio al comprar y al vender. Identidad, según su propia ayuda: pulsa la etiqueta para verla.</p></div>
+  <div class="filters">
+    <button class="chip on" data-f="all">Todos</button><button class="chip" data-f="d">En la cadena</button><button class="chip" data-f="x">Exchanges</button>
+    <span class="sp"></span>
+    <label><input type="checkbox" id="onlyMica"> Solo con licencia MiCA</label>
+    <label><input type="checkbox" id="noId"> Sin identidad (o hasta un tope)</label>
+  </div>
+  <div class="card" id="tbl"><p class="load">Cargando…</p></div>
+  <p class="fine"><b>Cómo se calcula.</b> En la cadena, la cotización de Jupiter ya incluye la comisión de cada pool; falta la de tu app. En un exchange: diferencia de su par más barato + comisión al comprar + comisión al vender, del nivel normal y sin descuentos por su token. No incluye lo que cobran por retirar a tu wallet. «Hasta un tope»: deja operar y retirar sin identidad hasta esa cantidad al día, según su web. Comisión, identidad y MiCA revisadas a mano el <span id="rev"></span>. El volumen lo declara cada exchange.</p>
+  <p class="fine">Los botones «Ir» llevan directamente al par en cada sitio. SolFlag no cobra nada de ninguno y el orden nunca depende de eso. Es información, no una recomendación de compra. Pools: DexScreener · Exchanges: <a href="https://www.coingecko.com/" target="_blank" rel="noopener">Powered by CoinGecko</a></p>
+</section>
+</div>
+<footer class="wrap">
+  <span class="wm" translate="no">Solflag</span>
+  <a href="/">Escáner</a>
+  <a href="/acciones/">Acciones</a>
+  <a href="/blog/">Blog</a>
+  <a href="/acierto/">Datos y acierto</a>
+  <a href="/privacidad/">Privacidad</a>
+  <a href="/terminos/">Términos</a>
+  <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
+  <p>Pools: DexScreener. Exchanges: CoinGecko. Coste en la cadena: Jupiter. SolFlag es una herramienta orientativa, no consejo financiero.</p>
+</footer>
+<script>
+const Q = new URLSearchParams(location.search), MINT = (Q.get("t") || "").trim(), RISKY = Q.get("r") === "1";
+const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", $ = (s) => document.getElementById(s);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fx = (n, d) => n.toLocaleString("es-ES", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always" });
+const money = (n) => fx(Math.round(n), 0) + " $";
+const pct = (p) => fx(p, 2) + " %";
+const tone = (p) => p < 0.3 ? "good" : p < 1 ? "mid" : "bad";
+const go = (u, main) => RISKY || !u ? "<span></span>" : `<a class="go${main ? " main" : ""}" href="${esc(u)}" target="_blank" rel="noopener">Ir ↗</a>`;
+function idTag(x) {
+  if (x.id === "no") return '<span class="tg no">NO PIDE</span>';
+  if (x.id === "obligatoria") return `<a class="tg si" href="${esc(x.src)}" target="_blank" rel="noopener">OBLIGATORIA ↗</a>`;
+  if (x.id === "limite") return `<a class="tg lim" href="${esc(x.src)}" target="_blank" rel="noopener">HASTA UN TOPE ↗</a><small>sin ella: ${esc(x.lim || "")}</small>`;
+  return '<span class="tg">SIN COMPROBAR</span>';
+}
+function micaTag(x) {
+  if (x.mica) return ` <span class="tg mica" title="${esc(x.mica[0] + " · " + x.mica[1])}">MiCA ✓</span>`;
+  if (x.aviso) return ` <a class="tg av" href="${esc(x.aviso[2])}" target="_blank" rel="noopener" title="Aviso público del regulador">AVISO ${esc(x.aviso[0].split(" ")[0])} ↗</a>`;
+  return "";
+}
+async function jup(a, b, amount) { return fetch(`https://lite-api.jup.ag/swap/v1/quote?inputMint=${a}&outputMint=${b}&amount=${amount}&slippageBps=300`).then((r) => r.ok ? r.json() : null).catch(() => null); }
+async function idaVuelta(usd) {
+  if (MINT === USDC) return null;
+  const buy = await jup(USDC, MINT, usd * 1e6); if (!buy || !buy.outAmount) return null;
+  const sell = await jup(MINT, USDC, buy.outAmount); if (!sell || !sell.outAmount) return null;
+  return (usd - Number(sell.outAmount) / 1e6) / usd * 100;
+}
+
+let D = null, ROUTE = null, filt = "all", page = 0;
+const PER = 12;
+function grupos() {
+  const X = D.cex || [];
+  return { ok: X.filter((x) => x.g === "ok"), sinfee: X.filter((x) => x.g === "sinfee").sort((a, b) => a.sp - b.sp || b.vol - a.vol),
+    local: X.filter((x) => x.g === "local").sort((a, b) => a.sp - b.sp), dudoso: X.filter((x) => x.g === "dudoso") };
+}
+function cabecera() {
+  const t = D.token || {};
+  $("tn").innerHTML = esc(t.sym ? "$" + t.sym : MINT.slice(0, 4) + "…" + MINT.slice(-4)) + (t.name && t.name !== t.sym ? `<small>${esc(t.name)}</small>` : "");
+  document.title = "Dónde cotiza " + (t.sym ? "$" + t.sym : "") + " · SolFlag";
+  $("lt").innerHTML = t.img ? `<img src="${esc(t.img)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : esc((t.sym || "?").slice(0, 1));
+  $("addr").innerHTML = "La dirección buena: " + esc(MINT.slice(0, -4)) + "<b>" + esc(MINT.slice(-4)) + "</b>";
+  $("stop").hidden = !RISKY;
+}
+function resumen() {
+  const G = grupos(), con = G.ok.filter((x) => x.id !== "?"), lim = (D.cex || []).filter((x) => x.id === "limite").length;
+  const best = con[0];
+  let v = ROUTE != null ? `<b>${ROUTE <= (best ? best.cost : 99) ? "Lo más barato y lo más privado: en la cadena." : "En la cadena, sin identidad."}</b> Comprar y vender 1.000 $ cuesta un ${pct(ROUTE)} y nadie te pide identidad.` : D.pools.length ? "<b>Se negocia en la cadena.</b> Comprar y vender ahí no pide identidad." : "<b>Sin mercado en la cadena.</b>";
+  if (best) v += ` En los exchanges, lo más barato ronda el ${pct(best.cost)} (${esc(best.n)}).`;
+  else if (D.cex && !D.cex.length) v += " No cotiza en ningún exchange centralizado.";
+  $("verdict").innerHTML = v;
+  $("nums").innerHTML =
+    `<div><b>${ROUTE != null ? pct(ROUTE) : "—"}</b><span>En la cadena</span><em class="good">ida y vuelta · sin identidad</em></div>` +
+    `<div><b>${D.pools.length}${D.pools.length >= 30 ? "+" : ""}</b><span>Pools</span><em>con 1.000 $ de liquidez o más</em></div>` +
+    `<div><b>${D.cex ? D.cex.length : "—"}</b><span>Exchanges</span><em>con 25.000 $ al día o más</em></div>` +
+    `<div><b>${lim}</b><span>Sin identidad hasta un tope</span><em class="mid">los demás la piden</em></div>`;
+}
+function podio() {
+  const row = (i, n, sub, cost, extra, u) => `<div class="pr"><span class="rk ${i === 1 ? "rk1" : ""}">${i}</span><span class="pn"><b>${n}</b><small>${sub}</small>${extra || ""}</span><span class="pc">${cost}</span>${go(u, i === 1)}</div>`;
+  $("podD").innerHTML = D.pools.length ? row(1, "Mejor ruta de Jupiter", "reparte tu compra entre todos los pools", ROUTE != null ? `<b class="${tone(ROUTE)}">${pct(ROUTE)}</b><small>ida y vuelta</small>` : "<small>sin ruta ahora</small>", "", D.ruta) +
+    D.pools.slice(0, 2).map((p, i) => row(i + 2, esc(p.dex), esc(p.par) + " · el pool con más liquidez" + (i ? " tras el anterior" : ""), `<b>${money(p.liq)}</b><small>liquidez</small>`, "", p.url)).join("") : '<p class="load">Sin pools con liquidez.</p>';
+  const con = grupos().ok.filter((x) => x.id !== "?").slice(0, 3);
+  $("podX").innerHTML = D.cex === null ? '<p class="load">No se pudo consultar ahora. Vuelve a probar en un rato.</p>' : !D.cex.length ? '<p class="load">No cotiza en ningún exchange centralizado.</p>' : !con.length ? '<p class="load">Cotiza en exchanges que aún no hemos revisado.</p>' :
+    con.map((x, i) => row(i + 1, esc(x.n) + micaTag(x), esc(x.par) + " · comisión " + (x.feeNote ? "hasta " : "") + pct(x.fee), `<b class="${tone(x.cost)}">~${pct(x.cost)}</b><small>ida y vuelta</small>`, "<div>" + idTag(x) + "</div>", x.url)).join("");
+}
+function mica() {
+  const X = D.cex || [], si = X.filter((x) => x.mica).sort((a, b) => (a.cost == null) - (b.cost == null) || (a.cost || 0) - (b.cost || 0));
+  if (!X.length) return;
+  $("micaSec").hidden = false; $("esma").href = D.mica;
+  $("micaG").innerHTML = si.length ? si.map((x) => `<div class="mc"><div class="t"><b>${esc(x.n)}</b><span class="tg mica">MiCA ✓</span></div>
+    <div class="c ${x.cost != null ? tone(x.cost) : ""}">${x.cost != null ? "~" + pct(x.cost) + "<small>ida y vuelta</small>" : '<span class="muted">comisión sin publicar</span>'}</div>
+    <p>${esc(x.mica[0])} · autoriza ${esc(x.mica[1])} · desde el ${esc(x.mica[2])}</p>
+    <div class="f"><a class="w" href="https://${esc(x.mica[3])}" target="_blank" rel="noopener">${esc(x.mica[3])} ↗</a>${go(x.url)}</div></div>`).join("") : '<p class="muted">Ninguno de los exchanges donde cotiza tiene licencia MiCA.</p>';
+  const no = X.filter((x) => !x.mica && x.g !== "dudoso" && x.g !== "local").sort((a, b) => b.vol - a.vol);
+  if (no.length) {
+    const nom = no.filter((x) => x.aviso).concat(no.filter((x) => !x.aviso)).slice(0, 4).map((x) => esc(x.n) + (x.aviso ? ` (<a href="${esc(x.aviso[2])}" target="_blank" rel="noopener">aviso público de la ${esc(x.aviso[0])} del ${esc(x.aviso[1])}</a>)` : ""));
+    $("noMica").innerHTML = `<b>Sin licencia MiCA: ${no.length} ${no.length === 1 ? "exchange" : "exchanges"} de esta lista.</b><p>Entre ellos ${nom.join(", ")}. No estar en el registro no quiere decir que sean una estafa: quiere decir que no están autorizados para ofrecer servicios en la UE, y si algo sale mal no tienes la protección de la ley europea.</p>`;
+    $("noMica").hidden = false;
+  }
+}
+function lista() {
+  const noId = $("noId").checked, onlyMica = $("onlyMica").checked, G = grupos(), out = [];
+  const f = (a) => { a = onlyMica ? a.filter((x) => x.mica) : a; return noId ? a.filter((x) => x.id === "limite") : a; };
+  const grp = (t, sub, a) => { if (!a.length) return; out.push({ grp: t, sub }); a.forEach((x) => out.push(x)); };
+  if (filt !== "x" && !onlyMica && D.pools.length) { out.push({ grp: "En la cadena", sub: "desde tu wallet · no piden identidad" }); out.push({ route: true }); D.pools.forEach((p) => out.push(Object.assign({ pool: true }, p))); }
+  if (filt !== "d" && D.cex) {
+    grp("Exchanges", "del más barato al más caro", f(G.ok));
+    grp("Sin comisión publicada", "solo sabemos su diferencia de precio · por diferencia", f(G.sinfee));
+    if (!noId && !onlyMica) { grp("Locales", "solo en su moneda (lira turca, rupia…)", G.local); grp("Precio poco fiable", "diferencia de compra-venta de más del 1 %: su volumen no cuadra", G.dudoso); }
+  }
+  return out;
+}
+function fila(r, i) {
+  if (r.grp) return `<div class="grp">${esc(r.grp.toUpperCase())}<small>${esc(r.sub)}</small></div>`;
+  if (r.route) return `<div class="lr route"><span class="n">★</span><span><b>Mejor ruta de Jupiter</b><small>reparte tu compra entre los pools de abajo</small></span><span class="r num ${ROUTE != null ? tone(ROUTE) : ""}">${ROUTE != null ? pct(ROUTE) : "—"}</span><span class="r c4 muted">incluida</span><span class="c5"><span class="tg no">NO PIDE</span></span><span class="r num c6">—</span>${go(D.ruta, true)}</div>`;
+  if (r.pool) return `<div class="lr"><span class="n">${i}</span><span>${esc(r.dex)}<small>${esc(r.par)}</small></span><span class="r num">${money(r.liq)}<small>de liquidez · en la ruta</small></span><span class="r c4 muted">incluida</span><span class="c5"><span class="tg no">NO PIDE</span></span><span class="r num c6">${money(r.vol)}</span>${go(r.url)}</div>`;
+  const cost = r.cost != null ? `<span class="r num ${tone(r.cost)}">~${pct(r.cost)}</span>` : `<span class="r muted">dif. ${pct(r.sp)}<small>+ comisión ?</small></span>`;
+  return `<div class="lr${r.g !== "ok" ? " unk" : ""}"><span class="n">${i}</span><span>${esc(r.n)}${micaTag(r)}<small>${esc(r.par)}${r.pais ? " · " + esc(r.pais) : ""}</small></span>${cost}<span class="r c4 ${r.fee == null ? "muted" : "num"}">${r.fee == null ? "?" : (r.feeNote ? "≤ " : "") + pct(r.fee)}</span><span class="c5">${idTag(r)}</span><span class="r num c6">${money(r.vol)}</span>${r.g === "dudoso" ? "<span></span>" : go(r.url)}</div>`;
+}
+function pinta() {
+  const L = lista(), items = L.filter((r) => !r.grp), pages = Math.max(1, Math.ceil(items.length / PER));
+  page = Math.min(page, pages - 1);
+  const from = page * PER, to = from + PER; let n = 0, last = null;
+  const h = ['<div class="lr h"><span class="n">#</span><span>DÓNDE · PAR</span><span class="r">IDA Y VUELTA</span><span class="r c4">COMISIÓN</span><span class="c5">IDENTIDAD</span><span class="r c6">VOL. 24 H</span><span></span></div>'];
+  L.forEach((r) => { if (r.grp) { last = r; return; } n++; if (n <= from || n > to) return; if (last) { h.push(fila(last)); last = null; } h.push(fila(r, n)); });
+  if (!items.length) h.push('<p class="load">Nada con estos filtros.</p>');
+  h.push(`<div class="pager"><button id="prev" ${page ? "" : "disabled"}>← Anterior</button><span>${items.length ? from + 1 : 0}–${Math.min(to, items.length)} de ${items.length}</span><button id="next" ${page < pages - 1 ? "" : "disabled"}>Siguiente →</button></div>`);
+  $("tbl").innerHTML = h.join("");
+  $("prev").onclick = () => { page--; pinta(); }; $("next").onclick = () => { page++; pinta(); };
+}
+function todo() { cabecera(); resumen(); podio(); mica(); pinta(); $("rev").textContent = D.revisado.split("-").reverse().join("/"); }
+document.querySelectorAll(".chip").forEach((b) => b.onclick = () => { filt = b.dataset.f; page = 0; document.querySelectorAll(".chip").forEach((c) => c.classList.toggle("on", c === b)); pinta(); });
+$("noId").onchange = $("onlyMica").onchange = () => { page = 0; pinta(); };
+if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(MINT)) { $("tn").textContent = "Falta el token"; $("verdict").innerHTML = 'Abre esta página desde el análisis de un token en el <a href="/">Escáner</a>.'; }
+else {
+  $("back").href = "/?token=" + encodeURIComponent(MINT); $("lang").href = "/en/markets/?t=" + encodeURIComponent(MINT) + (RISKY ? "&r=1" : "");
+  fetch("https://api.solflag.com/api/cotiza/" + MINT).then((r) => r.ok ? r.json() : null).then((j) => {
+    if (!j) throw 0;
+    D = j; todo();
+    idaVuelta(1000).then((p) => { ROUTE = p; resumen(); podio(); if (D) pinta(); });
+  }).catch(() => { $("tn").textContent = "No se pudo cargar"; $("verdict").textContent = "Prueba a recargar en un momento."; });
+}
+</script>
+<script>
+// cielo de estrellas detrás de toda la página (el mismo que Acciones)
+(function(){ const cv = document.getElementById("sky"), x = cv.getContext("2d");
+  function paint(){ const D = Math.min(2, devicePixelRatio || 1), W = innerWidth, H = innerHeight; cv.width = W*D; cv.height = H*D; x.setTransform(D,0,0,D,0,0);
+    let s = 7; const r = () => (s = s*16807 % 2147483647) / 2147483647;
+    for (let i = 0; i < W*H/2600; i++){ const a = .12 + r()*.55, z = r() < .06 ? 1.8 : 1.1; x.fillStyle = (r() < .12 ? "rgba(170,200,255," : "rgba(241,238,255,") + a + ")"; x.fillRect(r()*W, r()*H, z, z); } }
+  paint(); addEventListener("resize", paint); })();
+</script>
+<script src="/puntos.js?v=20261111b" defer></script>
+</body>
+</html>

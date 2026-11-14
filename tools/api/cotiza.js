@@ -62,6 +62,16 @@ export function exchanges(tickers) {
   }).sort((a, b) => (a.cost == null) - (b.cost == null) || (a.cost || 0) - (b.cost || 0) || b.vol - a.vol);
 }
 
+// Nombre, símbolo y logo del token, del par con más liquidez en el que aparece
+export function ficha(pairs, mint) {
+  const ps = (Array.isArray(pairs) ? pairs : []).filter((p) => p && p.baseToken && p.quoteToken && (p.baseToken.address === mint || p.quoteToken.address === mint))
+    .sort((a, b) => ((b.liquidity && b.liquidity.usd) || 0) - ((a.liquidity && a.liquidity.usd) || 0));
+  if (!ps.length) return null;
+  const t = ps[0].baseToken.address === mint ? ps[0].baseToken : ps[0].quoteToken;
+  const conLogo = ps.find((p) => p.baseToken.address === mint && p.info && p.info.imageUrl);
+  return { sym: t.symbol || null, name: t.name || null, img: conLogo ? conLogo.info.imageUrl : null };
+}
+
 async function dexscreener(fetchFn, cache, mint) {
   for (let n = 0; n < 2; n++) {
     const j = await fetchFn("https://api.dexscreener.com/token-pairs/v1/solana/" + mint).then((r) => r.ok ? r.json() : null).catch(() => null);
@@ -91,6 +101,7 @@ export async function cotiza(env, mint, opts) {
   return {
     v: 1, mint: mint, t: Date.now(),
     ruta: rutaJupiter(mint),
+    token: ficha(pares, mint),
     pools: pools(pares, mint),
     cex: cg ? exchanges(cg.tickers) : null,      // null: CoinGecko no contestó (no es lo mismo que «no cotiza»)
     revisado: REVISADO, mica: MICA_FUENTE,

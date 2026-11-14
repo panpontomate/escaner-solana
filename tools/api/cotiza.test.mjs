@@ -46,3 +46,10 @@ test("si CoinGecko no contesta, cex es null; si no tiene el token, lista vacía"
   const nada = await cotiza({}, M, { cache: null, fetch: f({ ok: false, status: 404 }) });
   assert.deepEqual(nada.cex, []);
 });
+
+test("ficha: nombre, símbolo y logo del par con más liquidez", async () => {
+  const { ficha } = await import("./cotiza.js");
+  const f = ficha([par("orca", "wp", 5000), par("meteora", "DLMM", 9e4, { info: { imageUrl: "https://x/logo.png" }, baseToken: { address: M, symbol: "JUP", name: "Jupiter" } })], M);
+  assert.deepEqual(f, { sym: "JUP", name: "Jupiter", img: "https://x/logo.png" });
+  assert.equal(ficha([], M), null);
+});
