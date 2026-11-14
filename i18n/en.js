@@ -10,6 +10,8 @@
 // wallet, token, con, spam, hoy, cancelado, helius, sol, dex) are deliberately not here.
 
 export const CODE = [
+  // Dónde cotiza (14/11): porcentajes en formato inglés
+  ['function cqPct(p){ return (Math.round(p*100)/100).toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+" %"; }', 'function cqPct(p){ return (Math.round(p*100)/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+"%"; }'],
   // portada 11/11: cifras del registro en formato inglés
   ['return (a<b&&v>99.9?99.9:v).toFixed(1).replace(".",",")+" %"; }', 'return (a<b&&v>99.9?99.9:v).toFixed(1)+"%"; }'],
   ['dm?"desde el "+(+dm[2])+"/"+(+dm[1]):""', 'dm?"since "+(+dm[1])+"/"+(+dm[2]):""'],
@@ -1283,5 +1285,48 @@ export const TEXT = {
   "bloque +": "block +",
   "mismo bloque": "same block",
   "<span class='hint' style='align-self:center'>y ": "<span class='hint' style='align-self:center'>and ",
-  " más</span>": " more</span>"
+  " más</span>": " more</span>",
+  // Dónde cotiza (14/11)
+  "<button type='button' data-tgo='t-quote'>Dónde cotiza</button>": "<button type='button' data-tgo='t-quote'>Where it trades</button>",
+  "<section class='card tdc' id='t-quote'><h2>Dónde cotiza <small>y cuánto cuesta entrar y salir</small></h2>": "<section class='card tdc' id='t-quote'><h2>Where it trades <small>and what it costs to get in and out</small></h2>",
+  "<div id='quotebox'><p class='hint'>Buscando dónde se negocia…</p></div></section>": "<div id='quotebox'><p class='hint'>Looking for where it trades…</p></div></section>",
+  "<span class='cq-tag no'>NO PIDE IDENTIDAD</span>": "<span class='cq-tag no'>NO ID NEEDED</span>",
+  "' target='_blank' rel='noopener'>PIDE IDENTIDAD ↗</a>": "' target='_blank' rel='noopener'>ASKS FOR ID ↗</a>",
+  "' target='_blank' rel='noopener' title='Sin identidad: ": "' target='_blank' rel='noopener' title='Without ID: ",
+  "'>SIN IDENTIDAD HASTA UN TOPE ↗</a>": "'>NO ID UP TO A LIMIT ↗</a>",
+  "' target='_blank' rel='noopener'>AVISO ": "' target='_blank' rel='noopener'>WARNING ",
+  "<span class='k'>Entrar y salir</span><span class='v'>Comprar y vender 1.000 $ al momento te costaría un <b class='": "<span class='k'>In and out</span><span class='v'>Buying and selling $1,000 right away would cost you <b class='",
+  " pools o más": " pools or more",
+  "<a data-tgo='t-quote'>Dónde cotiza →</a>": "<a data-tgo='t-quote'>Where it trades →</a>",
+  "<div class='cq-row'><span><b>Mejor ruta de Jupiter</b><small>reparte la compra entre todos los pools · no pide identidad</small></span><span class='n' id='cqroute'>…</span>": "<div class='cq-row'><span><b>Best Jupiter route</b><small>splits the trade across every pool · no ID needed</small></span><span class='n' id='cqroute'>…</span>",
+  "<small>liquidez</small></span>": "<small>liquidity</small></span>",
+  "<p class='hint'>No se pudo consultar ahora. Vuelve a probar en un rato.</p>": "<p class='hint'>Could not check right now. Try again in a while.</p>",
+  "<p class='hint'>No cotiza en ningún exchange centralizado: solo se compra y vende en la cadena.</p>": "<p class='hint'>Not listed on any centralized exchange: it is only bought and sold on-chain.</p>",
+  " · comisión ": " · fee ",
+  "hasta ": "up to ",
+  "<small>ida y vuelta</small></span>": "<small>round trip</small></span>",
+  "<p class='hint'>Cotiza en ": "<p class='hint'>Listed on ",
+  " exchanges que aún no hemos revisado.</p>": " exchanges we have not reviewed yet.</p>",
+  "<div class='cq-top'><b>Si compras y vendes al momento</b><span class='cq-amts'>": "<div class='cq-top'><b>If you buy and sell right away</b><span class='cq-amts'>",
+  "100 $": "$100",
+  "<div class='cq-big' id='cqbig'><span class='hint'>Calculando con Jupiter…</span></div>": "<div class='cq-big' id='cqbig'><span class='hint'>Getting a Jupiter quote…</span></div>",
+  "<div class='cq-mini'><div><b id='cqb'>…</b><span>al comprar</span></div><div><b id='cqs'>…</b><span>al vender</span></div><div><b id='cqr'>…</b><span>ida y vuelta</span></div></div>": "<div class='cq-mini'><div><b id='cqb'>…</b><span>buying</span></div><div><b id='cqs'>…</b><span>selling</span></div><div><b id='cqr'>…</b><span>round trip</span></div></div>",
+  "<p class='hint'>Sin mercado en la cadena: no hay dónde comprar ni vender.</p>": "<p class='hint'>No on-chain market: there is nowhere to buy or sell.</p>",
+  "<p class='cq-stop'><b>Riesgo alto:</b> no enlazamos sitios para comprarlo. Te enseñamos dónde se negocia y, sobre todo, lo que cuesta salir.</p>": "<p class='cq-stop'><b>High risk:</b> we do not link to places to buy it. We show where it trades and, above all, what it costs to get out.</p>",
+  "<div class='cq-cols'><div class='cq-col'><h3>En la cadena</h3>": "<div class='cq-cols'><div class='cq-col'><h3>On-chain</h3>",
+  "<p class='hint'>Sin pools con liquidez.</p>": "<p class='hint'>No pools with liquidity.</p>",
+  "<div class='cq-col'><h3>En exchanges</h3>": "<div class='cq-col'><h3>On exchanges</h3>",
+  "'>Ver ": "'>See ",
+  ", con comisión, identidad y MiCA →</a>": ", with fees, ID and MiCA →</a>",
+  "<p class='wsrc'>La dirección buena termina en <b>…": "<p class='wsrc'>The right address ends in <b>…",
+  "</b>: otro token con el mismo nombre es otro token. Coste en la cadena: cotización de Jupiter (ya incluye la comisión de los pools; no la de tu app). ": "</b>: another token with the same name is a different token. On-chain cost: Jupiter quote (it already includes pool fees, not your app fee). ",
+  "Exchanges: diferencia de precio + comisión al comprar y al vender, revisado a mano el ": "Exchanges: bid-ask spread + fee to buy and to sell, checked by hand on ",
+  ". SolFlag no cobra de ningún sitio. Es información, no una recomendación de compra. ": ". SolFlag is not paid by any of them. This is information, not a recommendation to buy. ",
+  "<span class='hint'>Jupiter no encuentra ruta para ": "<span class='hint'>Jupiter finds no route for ",
+  " ahora mismo.</span>": " right now.</span>",
+  "Pones <b>": "You put in <b>",
+  "</b> y recuperas <b class='": "</b> and get back <b class='",
+  "<small>ida y vuelta</small>": "<small>round trip</small>",
+  "<span class='hint'>Calculando con Jupiter…</span>": "<span class='hint'>Getting a Jupiter quote…</span>",
+  "' target='_blank' rel='noopener'>Ir ↗</a>": "' target='_blank' rel='noopener'>Go ↗</a>"
 };

@@ -1304,6 +1304,33 @@ body.scanp #form .eyebrow{margin-bottom:8px}
 #t-hold{order:6}
 .tdc{scroll-margin-top:72px}
 .tdc h2{margin:0 0 12px;font-size:1.15rem}
+/* Dónde cotiza (14/11, maqueta maquetas\web\donde-cotiza.html): coste de entrar y salir, mejores sitios y enlace a todos */
+.ctrade{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin:14px 0 2px;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:rgba(14,10,36,.75)}
+.ctrade .k{font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--kick)}
+.ctrade .v{color:var(--fg);font-size:.95rem}
+.ctrade a{margin-left:auto;color:var(--accent);font-weight:700;font-size:.9rem;white-space:nowrap;cursor:pointer}
+.cq-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.cq-amts{display:flex;gap:6px}
+.cq-amts button{min-height:36px;padding:0 13px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:.85rem;cursor:pointer}
+.cq-amts button.on{background:var(--surface-2);color:var(--fg);border-color:var(--accent)}
+.cq-big{margin:12px 0 4px;font-size:1.35rem;line-height:1.25}
+.cq-big b{font-variant-numeric:tabular-nums}
+.cq-mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--line);border-radius:12px;margin-top:10px}
+.cq-mini div{padding:10px 14px;border-left:1px solid var(--line)}.cq-mini div:first-child{border-left:0}
+.cq-mini b{display:block;font-size:1.15rem;font-variant-numeric:tabular-nums}.cq-mini span{font-size:.8rem;color:var(--muted)}
+.cq-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:16px}
+.cq-col h3{margin:0 0 6px;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cq-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.cq-row small{display:block;color:var(--muted);font-size:.78rem}
+.cq-row .n{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+.cq-row .ir{min-height:32px;padding:0 12px;display:inline-flex;align-items:center;border:1px solid var(--accent);border-radius:999px;color:var(--accent);font-weight:700;font-size:.8rem;white-space:nowrap}
+.cq-tag{display:inline-block;white-space:nowrap;margin-top:3px;font-size:.66rem;font-weight:800;letter-spacing:.08em;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.cq-tag.no{color:var(--bajo);border-color:var(--bajo)}.cq-tag.si{color:var(--medio);border-color:var(--medio)}.cq-tag.lim{color:var(--accent);border-color:var(--accent)}
+.cq-tag.mica{color:#c4b5fd;border-color:#8b5cf6}.cq-tag.av{color:var(--alto);border-color:var(--alto)}
+.cq-stop{margin:12px 0 0;padding:10px 14px;border:1px solid var(--alto);border-radius:12px;background:var(--alto-bg);font-size:.9rem}
+.cq-all{display:inline-block;margin-top:14px;color:var(--accent);font-weight:700}
+.cq-good{color:var(--bajo)}.cq-mid{color:var(--medio)}.cq-bad{color:var(--alto)}
+@media (max-width:640px){.cq-cols{grid-template-columns:minmax(0,1fr)}.cq-mini{grid-template-columns:minmax(0,1fr)}.cq-mini div{border-left:0;border-top:1px solid var(--line)}.cq-mini div:first-child{border-top:0}.ctrade a{margin-left:0}}
 .tdc h2 small{font-weight:600;font-size:.82rem;color:var(--muted);margin-left:6px}
 .tdc .pchart{margin-top:0}
 .tnew{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:.66rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:rgba(122,184,196,.16);color:var(--kick);vertical-align:2px}
@@ -3186,6 +3213,7 @@ function renderToken(noScroll){
       "<button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copy token address'>copy</button></div></div>"+
     "<p class='sub'><b class='tvl lv-"+esc(L.cls)+"'>"+esc(dataOnly(r)?"Medium risk due to missing data":L.label)+".</b> "+esc(tip)+"</p>"+
     (chips.length?"<div class='tchips'>"+chips.map(function(c){ return "<span>"+esc(c[0])+" <b>"+esc(c[1])+"</b></span>"; }).join("")+"</div>":"")+
+    "<div class='ctrade' id='ctrade' hidden></div>"+
     "</div></div>"+
     "<div class='vsreal' id='vsreal' hidden></div>"+
     "<div class='actions tacts'>"+
@@ -3471,11 +3499,14 @@ function tokenDetail(r){
   d.innerHTML="<nav class='tnav' aria-label='Token sections'>"+
       "<button type='button' class='tnv' data-tgo='summary'>Verdict</button>"+
       "<button type='button' data-tgo='t-chart'>Chart</button>"+
+      "<button type='button' data-tgo='t-quote'>Where it trades</button>"+
       (r.emisor?"":"<button type='button' class='tnmap' data-map='"+esc(r.mint)+"'>◉ Map</button>")+
       "<button type='button' data-tgo='t-who'>Who is behind</button>"+
       (r.emisor?"":"<button type='button' data-tgo='t-hold'>Whales</button>")+"</nav>"+
     "<section class='card tdc' id='t-chart'><h2>Chart <small>price in $</small></h2>"+
       (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("No market: there is no price to draw.")+"</div>")+histHtml(r)+"</section>"+
+    "<section class='card tdc' id='t-quote'><h2>Where it trades <small>and what it costs to get in and out</small></h2>"+
+      "<div id='quotebox'><p class='hint'>Looking for where it trades…</p></div></section>"+
     "<section class='card tdc' id='t-who'><h2>Who is behind<span class='tnew'>new</span> <small>what they did before</small></h2>"+
       (young?"<div class='lights' style='margin:0 0 12px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Buys at launch</b><span>Checking who bought in the first second…</span></div></div></div>":"")+
       "<div id='whobox'><p class='hint'>Looking in the SolFlag registry…</p></div>"+
@@ -3487,6 +3518,7 @@ function tokenDetail(r){
   else if(state.hold&&state.hold.mint===r.mint){ whalesHere(); renderHolders(true); }
   else if(wasIn) whalesHere();   // la búsqueda de ballenas sigue en marcha: su progreso vuelve a su sitio
   loadWho(r.mint);
+  loadQuote(r);
   if(!r.img) tokenLogo(r);
   tnavSpy();
 }
@@ -3523,6 +3555,101 @@ async function whalesInline(mint){
   await holders();
   if(state.hin===mint) $("#progress").hidden=true;
 }
+/* ---------- Dónde cotiza (14/11): dónde se negocia y cuánto cuesta entrar y salir ----------
+   Pools y exchanges: api.solflag.com/api/cotiza (exchanges con comisión, identidad y MiCA revisadas a mano).
+   Coste en la cadena: Jupiter, comprar X $ con USDC y vender al momento lo recibido (lo que vuelve ya lleva las
+   comisiones de los pools; falta la de la app). En riesgo alto no se enlaza dónde comprar. */
+var JUPQ="https://lite-api.jup.ag/swap/v1/quote", quoteMem={}, quoteData={};
+function jupQuote(a,b,amount){
+  return fetch(JUPQ+"?inputMint="+a+"&outputMint="+b+"&amount="+amount+"&slippageBps=300").then(function(x){ return x.ok?x.json():null; }).catch(function(){ return null; });
+}
+// Ida y vuelta: {back: dólares que vuelven, b: impacto al comprar %, s: impacto al vender %} o null
+function roundTrip(mint,usdAmt){
+  var k=mint+":"+usdAmt;
+  if(quoteMem[k]&&Date.now()-quoteMem[k].t<60000) return Promise.resolve(quoteMem[k].v);
+  if(mint===USDC) return Promise.resolve(null);
+  return jupQuote(USDC,mint,usdAmt*1e6).then(function(buy){
+    if(!buy||!buy.outAmount) return null;
+    return jupQuote(mint,USDC,buy.outAmount).then(function(sell){
+      if(!sell||!sell.outAmount) return null;
+      var v={back:Number(sell.outAmount)/1e6,b:Number(buy.priceImpactPct)*100||0,s:Number(sell.priceImpactPct)*100||0};
+      quoteMem[k]={t:Date.now(),v:v}; return v;
+    });
+  });
+}
+function cqTone(p){ return p<0.3?"cq-good":p<1?"cq-mid":"cq-bad"; }
+function cqPct(p){ return (Math.round(p*100)/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+"%"; }
+function cqId(x){
+  var t=x.id==="no"?"<span class='cq-tag no'>NO ID NEEDED</span>":
+    x.id==="obligatoria"?"<a class='cq-tag si' href='"+esc(x.src)+"' target='_blank' rel='noopener'>ASKS FOR ID ↗</a>":
+    x.id==="limite"?"<a class='cq-tag lim' href='"+esc(x.src)+"' target='_blank' rel='noopener' title='Without ID: "+esc(x.lim||"")+"'>NO ID UP TO A LIMIT ↗</a>":"";
+  if(x.mica) t+=" <span class='cq-tag mica' title='"+esc(x.mica[0]+" · "+x.mica[1])+"'>MiCA ✓</span>";
+  else if(x.aviso) t+=" <a class='cq-tag av' href='"+esc(x.aviso[2])+"' target='_blank' rel='noopener'>WARNING "+esc(x.aviso[0].split(" ")[0])+" ↗</a>";
+  return t;
+}
+function quoteRiesgo(r){ return r.lvl==="ALTO"||r.lvl==="SPAM"; }
+function quoteAllLink(r){ return "/cotiza/?t="+encodeURIComponent(r.mint); }
+async function loadQuote(r){
+  var mint=r.mint;
+  var j=quoteData[mint]&&Date.now()-quoteData[mint].t<300000?quoteData[mint].j:
+    await fetch(API+"cotiza/"+mint).then(function(x){ return x.ok?x.json():null; }).catch(function(){ return null; });
+  if(j) quoteData[mint]={t:Date.now(),j:j};
+  if(!state.token||state.token.mint!==mint) return;
+  paintQuote(r,j,1000);
+  var rt=r.par?await roundTrip(mint,1000):null;
+  if(!state.token||state.token.mint!==mint) return;
+  paintQuoteCost(r,rt,1000);
+  var tr=$("#ctrade");
+  if(tr&&rt){
+    var p=(1000-rt.back)/1000*100, nx=j&&j.cex?j.cex.length:0, np=j?j.pools.length:0;
+    tr.innerHTML="<span class='k'>In and out</span><span class='v'>Buying and selling $1,000 right away would cost you <b class='"+cqTone(p)+"'>"+cqPct(p)+"</b>"+
+      (np||nx?" · "+(np?np+(np>=30?" pools or more":np===1?" pool":" pools"):"")+(np&&nx?" and ":"")+(nx?nx+(nx===1?" exchange":" exchanges"):""):"")+"</span>"+
+      "<a data-tgo='t-quote'>Where it trades →</a>";
+    tr.hidden=false;
+  }
+}
+function paintQuote(r,j,amt){
+  var box=$("#quotebox"); if(!box) return;
+  var risky=quoteRiesgo(r), pools=j?j.pools:[], cex=j&&j.cex?j.cex:[];
+  var go=function(u){ return risky||!u?"":"<a class='ir' href='"+esc(u)+"' target='_blank' rel='noopener'>Go ↗</a>"; };
+  var chain=(r.par?"<div class='cq-row'><span><b>Best Jupiter route</b><small>splits the trade across every pool · no ID needed</small></span><span class='n' id='cqroute'>…</span>"+go(j&&j.ruta)+"</div>":"")+
+    pools.slice(0,2).map(function(p){ return "<div class='cq-row'><span>"+esc(p.dex)+"<small>"+esc(p.par)+"</small></span><span class='n'>"+esc(usd(p.liq))+"<small>liquidity</small></span>"+go(p.url)+"</div>"; }).join("");
+  var best=cex.filter(function(x){ return x.g==="ok"&&x.id!=="?"; }).slice(0,3);
+  var ex=!j||j.cex===null?"<p class='hint'>Could not check right now. Try again in a while.</p>":
+    !cex.length?"<p class='hint'>Not listed on any centralized exchange: it is only bought and sold on-chain.</p>":
+    best.length?best.map(function(x){ return "<div class='cq-row'><span>"+esc(x.n)+"<small>"+esc(x.par)+" · fee "+(x.feeNote?"up to ":"")+cqPct(x.fee)+"</small>"+cqId(x)+"</span><span class='n "+cqTone(x.cost)+"'>~"+cqPct(x.cost)+"<small>round trip</small></span>"+go(x.url)+"</div>"; }).join(""):
+    "<p class='hint'>Listed on "+cex.length+" exchanges we have not reviewed yet.</p>";
+  box.innerHTML=
+    (r.par?"<div class='cq-top'><b>If you buy and sell right away</b><span class='cq-amts'>"+[100,1000,10000].map(function(a){ return "<button type='button' data-cqamt='"+a+"' class='"+(a===amt?"on":"")+"'>"+(a===100?"$100":usd(a))+"</button>"; }).join("")+"</span></div>"+
+      "<div class='cq-big' id='cqbig'><span class='hint'>Getting a Jupiter quote…</span></div>"+
+      "<div class='cq-mini'><div><b id='cqb'>…</b><span>buying</span></div><div><b id='cqs'>…</b><span>selling</span></div><div><b id='cqr'>…</b><span>round trip</span></div></div>":
+      "<p class='hint'>No on-chain market: there is nowhere to buy or sell.</p>")+
+    (risky?"<p class='cq-stop'><b>High risk:</b> we do not link to places to buy it. We show where it trades and, above all, what it costs to get out.</p>":"")+
+    "<div class='cq-cols'><div class='cq-col'><h3>On-chain</h3>"+(chain||"<p class='hint'>No pools with liquidity.</p>")+"</div>"+
+      "<div class='cq-col'><h3>On exchanges</h3>"+ex+"</div></div>"+
+    (pools.length+cex.length>3?"<a class='cq-all' href='"+esc(quoteAllLink(r))+"'>See "+(pools.length?pools.length+(pools.length>=30?"+ pools":" pools"):"")+(pools.length&&cex.length?" and ":"")+(cex.length?cex.length+" exchanges":"")+", with fees, ID and MiCA →</a>":"")+
+    "<p class='wsrc'>The right address ends in <b>…"+esc(r.mint.slice(-4))+"</b>: another token with the same name is a different token. On-chain cost: Jupiter quote (it already includes pool fees, not your app fee). "+
+      "Exchanges: bid-ask spread + fee to buy and to sell, checked by hand on "+(j?esc(j.revisado.split("-").reverse().join("/")):"")+". SolFlag is not paid by any of them. This is information, not a recommendation to buy. "+
+      "Pools: DexScreener · Exchanges: <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a></p>";
+}
+function paintQuoteCost(r,rt,amt){
+  var big=$("#cqbig"); if(!big) return;
+  document.querySelectorAll("[data-cqamt]").forEach(function(b){ b.classList.toggle("on",Number(b.getAttribute("data-cqamt"))===amt); });
+  if(!rt){ big.innerHTML="<span class='hint'>Jupiter finds no route for "+usd(amt)+" right now.</span>"; ["#cqb","#cqs","#cqr"].forEach(function(s){ $(s).textContent="—"; }); return; }
+  var p=(amt-rt.back)/amt*100;
+  big.innerHTML="You put in <b>"+usd(amt)+"</b> and get back <b class='"+cqTone(p)+"'>"+usd(rt.back)+"</b>";
+  $("#cqb").textContent=cqPct(rt.b); $("#cqb").className=cqTone(rt.b);
+  $("#cqs").textContent=cqPct(rt.s); $("#cqs").className=cqTone(rt.s);
+  $("#cqr").textContent=cqPct(p); $("#cqr").className=cqTone(p);
+  var ro=$("#cqroute"); if(ro){ ro.innerHTML=cqPct(p)+"<small>round trip</small>"; ro.className="n "+cqTone(p); }
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest&&e.target.closest("[data-cqamt]"); if(!b||!state.token) return;
+  var r=state.token, amt=Number(b.getAttribute("data-cqamt"));
+  $("#cqbig").innerHTML="<span class='hint'>Getting a Jupiter quote…</span>";
+  roundTrip(r.mint,amt).then(function(rt){ if(state.token===r) paintQuoteCost(r,rt,amt); });
+});
+
 // Quién está detrás: la API pública de SolFlag (registro de lanzamientos en D1)
 var API="https://api.solflag.com/api/", who={};
 // avisa a la API de que se escaneó este token (solo el token, nada de quién; ver /privacidad/). Nunca wallets
