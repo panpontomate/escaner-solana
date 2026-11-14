@@ -130,6 +130,16 @@ prune(state, now);
 // tokens ya vistos (2 días) para no apuntar dos veces uno que ya se resolvió
 state.seen = state.seen || {};
 Object.keys(state.seen).forEach((m) => { if (now - state.seen[m] > 2 * DAY) delete state.seen[m]; });
+// Compras en los primeros bloques: cuentan como «sniper» en la base (una vez por token y wallet; con 3 o más
+// lanzamientos, classify() la marca como sniper y el motor la reconoce entre las ballenas). Antes del 14/11
+// solo se guardaban en D1 y la base no tenía ningún sniper
+function sniperSeen(m, buyers, at) {
+  buyers.forEach(function (b) {
+    const w = state.base.wallets[b.w];
+    if (w && w.tokens.indexOf(m) >= 0) return;
+    observe(state.base, { addr: b.w, role: "sniper", token: m, at: at || now }, now);
+  });
+}
 const log = { nuevos: 0, resueltos: 0, infra: 0, errores: 0, aportes: 0, registro: 0, regResueltos: 0 };
 // base de wallets: vive en el mismo estado; los aportes nuevos se suman una vez
 state.base = state.base || emptyBase();
@@ -198,6 +208,7 @@ for (const f of fresh.slice(0, MAX_NEW)) {
         try { const s = await buyerSigners(me, b.sig); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
       }
       queueBuyers(state.planoQ, f.mint, buyers);
+      sniperSeen(f.mint, buyers, f.t);
       log.compras = (log.compras || 0) + buyers.length;
     }
     if (t.creator) {
@@ -349,6 +360,7 @@ if (D1 && PED_MAX > 0) {
           try { const s = await buyerSigners(me, b.sig); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
         }
         queueBuyers(state.planoQ, m, buyers);
+        sniperSeen(m, buyers, info.t);
       }
       if (info.creator) {
         const cs = await firstSigners(info.creator);
@@ -386,6 +398,7 @@ if (D1 && HELIUS) {
       const buyers = [];
       for (const b of buyerCandidates(me.page)) { const w = me.txs[b.sig]; if (w && w[0]) buyers.push({ w: w[0], d: b.d, sig: b.sig }); }
       queueBuyers(state.planoQ, r.m, buyers);
+      sniperSeen(r.m, buyers, r.t);
       hechas++;
     } catch (e) { log.errores++; }
   }
