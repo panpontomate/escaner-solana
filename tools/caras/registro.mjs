@@ -45,6 +45,8 @@ export function regEntry(mint, launch, r, now, face, ev) {
   if (r) {
     if (r.sym && r.sym.length <= 24) e.s = r.sym;
     e.l = r.lvl; e.v = r.sev; if (r.type) e.ty = r.type;
+    // los cinco niveles (motor 0.6.0, 14/11): diamante, verde, amarillo, naranja, rojo; tc = con el techo de 7 días
+    if (r.tier) { e.tr = r.tier; if (r.tierCap) e.tc = 1; }
     const f = [];
     (r.lights || []).forEach(function (l) {
       (l.items || []).forEach(function (i) {

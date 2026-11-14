@@ -211,3 +211,11 @@ test("summary: launches picked by the entry filter stay out of the percentages, 
   assert.equal(sum.alive.length, 2);
   assert.equal(daySummary({ a: tokens.a }).filtro, undefined);
 });
+
+test("an entry keeps the five-tier level (engine 0.6.0) and whether it was capped for being new", () => {
+  const e = regEntry("M5", { t: NOW }, Object.assign({}, result, { tier: "YELLOW", tierCap: true }), NOW);
+  assert.equal(e.tr, "YELLOW"); assert.equal(e.tc, 1);
+  const f = regEntry("M6", { t: NOW }, Object.assign({}, result, { tier: "RED", tierCap: false }), NOW);
+  assert.equal(f.tr, "RED"); assert.equal(f.tc, undefined);
+  assert.equal(regEntry("M7", { t: NOW }, result, NOW).tr, undefined);
+});
