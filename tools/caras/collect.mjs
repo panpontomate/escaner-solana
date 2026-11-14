@@ -151,11 +151,13 @@ if (fs.existsSync(APORTES)) {
 }
 pruneBase(state.base, now);
 // Grupos de wallets conectadas (base.mjs, desde el estudio del 14/11). Un lanzamiento en el que paga, crea o financia
-// una wallet de un grupo pasa a contar para el grupo, y las otras wallets de detrás entran en él (sin exchanges).
+// una wallet de un grupo pasa a contar para el grupo, y las otras wallets de detrás entran en él. Ni exchanges ni
+// granjas (pagan la creación de tokens de mucha gente, como un servicio): meterían en el grupo a creadores sin relación.
 // Si el grupo ya tiene EQ_MIN lanzamientos, el token se analiza y se le buscan los primeros compradores aunque esta
 // ejecución ya haya llegado a REG_MAX (como mucho EQ_EXTRA de más)
 const EQ = equipos(state.base), EQ_EXTRA = 10;
-const eqDe = (a) => { const w = a && state.base.wallets[a]; return w && w.eq && classify(w) !== "exchange" ? w.eq : null; };
+const sinGrupo = (w) => { const c = classify(w); return c === "exchange" || c === "granja"; };
+const eqDe = (a) => { const w = a && state.base.wallets[a]; return w && w.eq && !sinGrupo(w) ? w.eq : null; };
 const eqFuerte = (a) => { const e = eqDe(a); return e && EQ[e] && EQ[e].n >= EQ_MIN ? e : null; };
 state.reg = regPrune(state.reg || {}, now);
 state.regPub = state.regPub || {};
@@ -228,7 +230,7 @@ for (const f of fresh.slice(0, MAX_NEW)) {
   } catch (e) { log.errores++; }
   const detras = [t.payer, t.creator, t.funder].filter(Boolean), eqT = detras.map(eqDe).find(Boolean);
   if (eqT) {
-    detras.forEach((a) => { if (classify(state.base.wallets[a]) !== "exchange") observe(state.base, { addr: a, eq: eqT, token: f.mint, at: f.t }, now); });
+    detras.forEach((a) => { if (!sinGrupo(state.base.wallets[a])) observe(state.base, { addr: a, eq: eqT, token: f.mint, at: f.t }, now); });
     log.grupo = (log.grupo || 0) + 1;
   }
   addToken(state, f.mint, t); state.seen[f.mint] = now; log.nuevos++;
