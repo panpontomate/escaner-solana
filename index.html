@@ -3867,7 +3867,7 @@ function wnumHtml(j,face){
 var WLV={HIGH:"ALTO",MEDIUM:"MEDIO",LOW:"BAJO",SPAM:"SPAM",NO_DATA:"SIN DATOS",NO_MARKET:"SIN MERCADO"};
 var WROLE={payer:"pagó",creator:"creó",funder:"financió"};
 function wlaunchRow(x,what){
-  var lv=WLV[x.lvl], L=lv?LEVELS[lv]:null;
+  var lv=(x.tr&&SRE_TIER[x.tr])||WLV[x.lvl], L=lv?LEVELS[lv]:null;
   var res=x.dead24===true?"<span class='dd'>muerto a las 24 h</span>":x.dead24===false?"<span class='al'>vivo a las 24 h"+(x.mc24?" · cap. "+esc(usd(x.mc24)):"")+"</span>":"sin resultado aún";
   return "<button type='button' class='wli' data-analyze='"+esc(x.m)+"'"+(L?" style='--c:var(--"+L.cls+")'":"")+">"+tokAv("",short(x.m))+
     "<span style='min-width:0'><b data-sym='"+esc(x.m)+"'>"+esc(short(x.m))+"</b><small>"+esc(what)+(x.t?" · "+esc(fdate(x.t)):"")+"</small></span>"+

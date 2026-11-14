@@ -294,7 +294,7 @@ for (const c of cand) {
   state.reg[m].sel = elegido;                               // por qué se analizó: prio, azar o grupo
   if (state.reg[m].liq) t.liq = state.reg[m].liq;           // la liquidez del análisis, si la hay, es la buena
   log.registro++;
-  if (D1) queueLaunch(state.planoQ, { m, t: t.t, liq: t.liq, lvl: state.reg[m].l });
+  if (D1) queueLaunch(state.planoQ, { m, t: t.t, liq: t.liq, lvl: state.reg[m].l, tr: state.reg[m].tr });
 }
 
 // 1d. RugCheck otra vez para los que se quedaron sin respuesta: se completan creador, lanzador, financiador y rug

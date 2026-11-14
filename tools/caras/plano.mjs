@@ -18,14 +18,14 @@ export const BUYERS_SLOTS = 2;        // hasta cuántos bloques después de la c
 export const QUEUE_MAX = 20000;       // filas pendientes como mucho, por si D1 está caído muchos días
 const MAX_PARAMS = 100;               // límite de D1 de valores por consulta
 
-export const LANZ = ["m", "t", "plat", "dex", "py", "cr", "fu", "liq", "lvl", "cara", "dead24", "mc24"];
+export const LANZ = ["m", "t", "plat", "dex", "py", "cr", "fu", "liq", "lvl", "tr", "cara", "dead24", "mc24"];
 export const COMPRAS = ["m", "w", "d", "sig"];
 
 export const PEDIDOS_SCHEMA = "CREATE TABLE IF NOT EXISTS pedidos (m TEXT PRIMARY KEY, n INTEGER, t0 INTEGER, t1 INTEGER, hecho INTEGER)";
 export const PEDIDOS_MAX = 10;        // tokens pedidos que se procesan por ejecución, los más buscados primero
 
 export const SCHEMA = [
-  "CREATE TABLE IF NOT EXISTS lanz (m TEXT PRIMARY KEY, t INTEGER, plat TEXT, dex TEXT, py TEXT, cr TEXT, fu TEXT, liq INTEGER, lvl TEXT, cara TEXT, dead24 INTEGER, mc24 INTEGER, up INTEGER)",
+  "CREATE TABLE IF NOT EXISTS lanz (m TEXT PRIMARY KEY, t INTEGER, plat TEXT, dex TEXT, py TEXT, cr TEXT, fu TEXT, liq INTEGER, lvl TEXT, tr TEXT, cara TEXT, dead24 INTEGER, mc24 INTEGER, up INTEGER)",
   "CREATE INDEX IF NOT EXISTS lanz_py ON lanz(py)",
   "CREATE INDEX IF NOT EXISTS lanz_cr ON lanz(cr)",
   "CREATE INDEX IF NOT EXISTS lanz_fu ON lanz(fu)",

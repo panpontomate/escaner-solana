@@ -157,3 +157,15 @@ test("topes de lectura: un comprador con muchos lanzamientos sale como «200+» 
   assert.ok(body.includes(">" + TOPE_COMPRAS + "+</td>"), "sale «200+»");
   assert.match(r.headers.get("cache-control"), /max-age=21600/);
 });
+
+test("the public page shows the five-tier level when the collector saved it, and the old one otherwise", async () => {
+  const { pagina, nivelDe } = await import("./ficha.js");
+  assert.equal(nivelDe({ lvl: "HIGH", tr: "ORANGE" }), "ORANGE");
+  assert.equal(nivelDe({ lvl: "HIGH" }), "HIGH");
+  assert.equal(nivelDe(null), null);
+  const d = { lanz: { m: "M1", t: Date.UTC(2026, 10, 14), lvl: "HIGH", tr: "RED" }, roles: [], buyers: [], others: [] };
+  const es = pagina("M1", d, null, null, Date.UTC(2026, 10, 15), "es");
+  assert.match(es, /class="sello RED"><b>ROJO</);
+  const en = pagina("M1", Object.assign({}, d, { lanz: Object.assign({}, d.lanz, { tr: "DIAMOND" }) }), null, null, Date.UTC(2026, 10, 15), "en");
+  assert.match(en, /class="sello DIAMOND"><b>DIAMOND</);
+});
