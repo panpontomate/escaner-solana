@@ -18,6 +18,7 @@ import { DAY, oldToken, INFRA_PER_HOUR, rcWatch, emptyState, addToken, addRolesL
 import { emptyBase, observe, classify, mergeAporte, pruneBase, publishBase, equipos, EQ_MIN } from "./base.mjs";
 import { regEntry, regDue, regResolve, regRecheck, regRejudge, regPrune, regPublish, regFill, regMissing, dayOf, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
+import { puntos, elegir } from "./prioridad.mjs";
 import { emptyQueue, queueLaunch, queueBuyers, buyerCandidates, trimQueue, d1Config, flush, pedidosPendientes, marcarPedidos, pedidoLaunch, PEDIDOS_MAX, fromHelius, HELIUS_LIMIT, sinPagador } from "./plano.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -187,20 +188,24 @@ for (let p = 1; p <= 5 && fresh.length < MAX_NEW; p++) {
     const mint = id && id.replace(/^solana_/, "");
     if (!mint || QUOTES.includes(mint) || state.tokens[mint] || state.seen[mint] || fresh.some((f) => f.mint === mint)) return;
     fresh.push({ mint, t: Date.parse(pool.attributes.pool_created_at) || now, dex: pool.relationships.dex && pool.relationships.dex.data.id,
-      liq: Math.round(parseFloat(pool.attributes.reserve_in_usd)) || undefined });
+      liq: Math.round(parseFloat(pool.attributes.reserve_in_usd)) || undefined,
+      // para el filtro de entrada (prioridad.mjs): capitalización y compradores distintos en su primera hora
+      mc: Math.round(parseFloat(pool.attributes.market_cap_usd || pool.attributes.fdv_usd)) || 0,
+      buyers: ((pool.attributes.transactions || {}).h1 || {}).buyers || 0 });
   });
   await sleep(2500);   // GeckoTerminal: 30 peticiones por minuto
 }
+// 1a. mirada barata a todos: RugCheck, quién pagó la creación, creador y financiador
+const vistos = [];
 for (const f of fresh.slice(0, MAX_NEW)) {
   const t = { t: f.t, seen: now, dex: f.dex, liq: f.liq };
-  let nrc = false, prio = false;
-  const extra = () => log.registro >= REG_MAX && (log.grupoExtra || 0) < EQ_EXTRA;
+  let nrc = false, me = null;
   try {
     const rc = await rugcheck(f.mint, log);
     // sin respuesta: se apunta igual (nrc) y se vuelve a pedir en las siguientes ejecuciones
     if (!rc) { nrc = true; log.sinRugCheck = (log.sinRugCheck || 0) + 1; state.rcQ[f.mint] = { n: 0 }; }
     if (rc) { const i = rcInfo(rc); t.creator = i.creator; t.rug = i.rug; t.plat = i.plat; }
-    const me = await earliestDeep(f.mint);                  // quien pagó la creación del token (Helius si hay > 3000 firmas)
+    me = await earliestDeep(f.mint);                        // quien pagó la creación del token (Helius si hay > 3000 firmas)
     // un token viejo que estrena pool no es un lanzamiento: fuera del registro, de las 24 h y de quién está detrás
     if (oldToken(f.t, rc && rc.detectedAt, me && me.page)) {
       state.seen[f.mint] = now; delete state.rcQ[f.mint]; log.viejos = (log.viejos || 0) + 1;
@@ -211,9 +216,27 @@ for (const f of fresh.slice(0, MAX_NEW)) {
     // creador y lanzador leídos de la cadena cuando RugCheck no los da (caído, o el token es de hace minutos)
     if (!t.creator) { const c = pumpCreator(me && me.tx, f.mint); if (c) { t.creator = c; log.creadorCadena = (log.creadorCadena || 0) + 1; } }
     if (!t.plat || t.plat === "unknown") t.plat = platFromDex(f.dex) || t.plat;
-    if (extra() && (eqFuerte(t.payer) || eqFuerte(t.creator))) prio = true;
+    if (t.creator) {
+      const cs = await firstSigners(t.creator);             // quien pagó la primera transacción del creador
+      if (cs && cs[0] && cs[0] !== t.creator && cs[0] !== t.payer) t.funder = cs[0];
+    }
+  } catch (e) { log.errores++; }
+  vistos.push({ f, t, nrc, me, p: puntos(f, t, state.base).p });
+}
+// 1b. filtro de entrada (prioridad.mjs): los REG_MAX análisis completos, a los que más prometen (y AZAR al azar). Un
+// lanzamiento de un grupo conectado con EQ_MIN lanzamientos entra además, como mucho EQ_EXTRA de más
+const sel = elegir(vistos.map((v) => ({ mint: v.f.mint, p: v.p })), REG_MAX);
+for (const v of vistos) {
+  if (sel[v.f.mint] || (log.grupoExtra || 0) >= EQ_EXTRA) continue;
+  if (eqFuerte(v.t.payer) || eqFuerte(v.t.creator) || eqFuerte(v.t.funder)) { sel[v.f.mint] = "grupo"; log.grupoExtra = (log.grupoExtra || 0) + 1; }
+}
+log.filtro = { vistos: vistos.length, analizados: Object.keys(sel).length, descartadosGranja: vistos.filter((v) => v.p <= -4 && !sel[v.f.mint]).length };
+// 1c. lo de cada lanzamiento: grupos, compradores y análisis (solo los elegidos), registro, plano y base de wallets
+for (const { f, t, nrc, me } of vistos) {
+  const elegido = sel[f.mint];
+  try {
     // compradores de los primeros bloques, solo en los que se analizan (cada uno es una petición más)
-    if (D1 && me && (log.registro < REG_MAX || prio)) {
+    if (D1 && me && elegido) {
       const buyers = [];
       for (const b of buyerCandidates(me.page)) {
         try { const s = await buyerSigners(me, b.sig); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
@@ -222,11 +245,6 @@ for (const f of fresh.slice(0, MAX_NEW)) {
       sniperSeen(f.mint, buyers, f.t);
       log.compras = (log.compras || 0) + buyers.length;
     }
-    if (t.creator) {
-      const cs = await firstSigners(t.creator);             // quien pagó la primera transacción del creador
-      if (cs && cs[0] && cs[0] !== t.creator && cs[0] !== t.payer) t.funder = cs[0];
-    }
-    if (!prio && extra() && eqFuerte(t.funder)) prio = true;
   } catch (e) { log.errores++; }
   const detras = [t.payer, t.creator, t.funder].filter(Boolean), eqT = detras.map(eqDe).find(Boolean);
   if (eqT) {
@@ -234,14 +252,14 @@ for (const f of fresh.slice(0, MAX_NEW)) {
     log.grupo = (log.grupo || 0) + 1;
   }
   addToken(state, f.mint, t); state.seen[f.mint] = now; log.nuevos++;
-  if (prio) log.grupoExtra = (log.grupoExtra || 0) + 1;
-  if (log.registro < REG_MAX || prio) {
+  if (elegido) {
     let r = null;
     try {
       // cada token con su propio límite de tiempo: uno que se atasque no se come la ejecución
       r = await analyzeToken(createClient({ rpcUrl: RPC, signal: AbortSignal.timeout(45000) }), f.mint);
     } catch (e) { log.errores++; }
     state.reg[f.mint] = regEntry(f.mint, Object.assign({ plat: t.plat, dex: f.dex, nrc: nrc }, t), r, Date.now(), faceOf(t), ENGINE_V);
+    state.reg[f.mint].sel = elegido;                        // por qué se analizó: prio, azar o grupo
     if (state.reg[f.mint].liq) t.liq = state.reg[f.mint].liq;   // la liquidez del análisis, si la hay, es la buena
     log.registro++;
   }
@@ -253,7 +271,7 @@ for (const f of fresh.slice(0, MAX_NEW)) {
   else if (t.creator) observe(state.base, { addr: t.creator, role: "own", at: f.t }, now);
 }
 
-// 1b. RugCheck otra vez para los que se quedaron sin respuesta: se completan creador, lanzador, financiador y rug
+// 1d. RugCheck otra vez para los que se quedaron sin respuesta: se completan creador, lanzador, financiador y rug
 // en el registro (sin tocar el nivel), las caras, la base de wallets y el plano. Cada uno se intenta RC_TRIES veces
 const recovered = {};                                      // día -> entradas del registro completadas
 for (const m of Object.keys(state.rcQ).slice(0, RC_RETRY)) {
