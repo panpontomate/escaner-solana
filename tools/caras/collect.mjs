@@ -188,10 +188,7 @@ for (let p = 1; p <= 5 && fresh.length < MAX_NEW; p++) {
     const mint = id && id.replace(/^solana_/, "");
     if (!mint || QUOTES.includes(mint) || state.tokens[mint] || state.seen[mint] || fresh.some((f) => f.mint === mint)) return;
     fresh.push({ mint, t: Date.parse(pool.attributes.pool_created_at) || now, dex: pool.relationships.dex && pool.relationships.dex.data.id,
-      liq: Math.round(parseFloat(pool.attributes.reserve_in_usd)) || undefined,
-      // para el filtro de entrada (prioridad.mjs): capitalización y compradores distintos en su primera hora
-      mc: Math.round(parseFloat(pool.attributes.market_cap_usd || pool.attributes.fdv_usd)) || 0,
-      buyers: ((pool.attributes.transactions || {}).h1 || {}).buyers || 0 });
+      liq: Math.round(parseFloat(pool.attributes.reserve_in_usd)) || undefined });
   });
   await sleep(2500);   // GeckoTerminal: 30 peticiones por minuto
 }
@@ -221,54 +218,83 @@ for (const f of fresh.slice(0, MAX_NEW)) {
       if (cs && cs[0] && cs[0] !== t.creator && cs[0] !== t.payer) t.funder = cs[0];
     }
   } catch (e) { log.errores++; }
-  vistos.push({ f, t, nrc, me, p: puntos(f, t, state.base).p });
+  vistos.push({ f, t, nrc, me });
 }
-// 1b. filtro de entrada (prioridad.mjs): los REG_MAX análisis completos, a los que más prometen (y AZAR al azar). Un
-// lanzamiento de un grupo conectado con EQ_MIN lanzamientos entra además, como mucho EQ_EXTRA de más
-const sel = elegir(vistos.map((v) => ({ mint: v.f.mint, p: v.p })), REG_MAX);
-for (const v of vistos) {
-  if (sel[v.f.mint] || (log.grupoExtra || 0) >= EQ_EXTRA) continue;
-  if (eqFuerte(v.t.payer) || eqFuerte(v.t.creator) || eqFuerte(v.t.funder)) { sel[v.f.mint] = "grupo"; log.grupoExtra = (log.grupoExtra || 0) + 1; }
-}
-log.filtro = { vistos: vistos.length, analizados: Object.keys(sel).length, descartadosGranja: vistos.filter((v) => v.p <= -4 && !sel[v.f.mint]).length };
-// 1c. lo de cada lanzamiento: grupos, compradores y análisis (solo los elegidos), registro, plano y base de wallets
+// 1b. datos básicos de cada lanzamiento visto (grupos, caras, plano y base de wallets) y a la espera de la segunda mirada
+state.espera = state.espera || {};
 for (const { f, t, nrc, me } of vistos) {
-  const elegido = sel[f.mint];
-  try {
-    // compradores de los primeros bloques, solo en los que se analizan (cada uno es una petición más)
-    if (D1 && me && elegido) {
-      const buyers = [];
-      for (const b of buyerCandidates(me.page)) {
-        try { const s = await buyerSigners(me, b.sig); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
-      }
-      queueBuyers(state.planoQ, f.mint, buyers);
-      sniperSeen(f.mint, buyers, f.t);
-      log.compras = (log.compras || 0) + buyers.length;
-    }
-  } catch (e) { log.errores++; }
   const detras = [t.payer, t.creator, t.funder].filter(Boolean), eqT = detras.map(eqDe).find(Boolean);
   if (eqT) {
     detras.forEach((a) => { if (!sinGrupo(state.base.wallets[a])) observe(state.base, { addr: a, eq: eqT, token: f.mint, at: f.t }, now); });
     log.grupo = (log.grupo || 0) + 1;
   }
   addToken(state, f.mint, t); state.seen[f.mint] = now; log.nuevos++;
-  if (elegido) {
-    let r = null;
-    try {
-      // cada token con su propio límite de tiempo: uno que se atasque no se come la ejecución
-      r = await analyzeToken(createClient({ rpcUrl: RPC, signal: AbortSignal.timeout(45000) }), f.mint);
-    } catch (e) { log.errores++; }
-    state.reg[f.mint] = regEntry(f.mint, Object.assign({ plat: t.plat, dex: f.dex, nrc: nrc }, t), r, Date.now(), faceOf(t), ENGINE_V);
-    state.reg[f.mint].sel = elegido;                        // por qué se analizó: prio, azar o grupo
-    if (state.reg[f.mint].liq) t.liq = state.reg[f.mint].liq;   // la liquidez del análisis, si la hay, es la buena
-    log.registro++;
-  }
-  if (D1) queueLaunch(state.planoQ, { m: f.mint, t: f.t, plat: t.plat, dex: f.dex, py: t.payer, cr: t.creator, fu: t.funder, liq: t.liq,
-    lvl: state.reg[f.mint] && state.reg[f.mint].l, cara: faceOf(t) || undefined });
+  // los primeros compradores se leen solo si se analiza: aquí se guardan sus firmas (y sus firmantes, si Helius los trajo)
+  const c = buyerCandidates(me && me.page).map((b) => Object.assign({}, b, me.txs && me.txs[b.sig] ? { s: me.txs[b.sig] } : {}));
+  state.espera[f.mint] = { at: now, nrc: nrc ? 1 : 0, c };
+  if (D1) queueLaunch(state.planoQ, { m: f.mint, t: f.t, plat: t.plat, dex: f.dex, py: t.payer, cr: t.creator, fu: t.funder, liq: t.liq, cara: faceOf(t) || undefined });
   if (t.payer) observe(state.base, { addr: t.payer, role: "payer", token: f.mint, at: f.t }, now);
   if (t.funder) observe(state.base, { addr: t.funder, role: "funder", token: f.mint, at: f.t }, now);
   if (t.creator && t.creator !== t.payer) observe(state.base, { addr: t.creator, role: "creator", token: f.mint, at: f.t }, now);
   else if (t.creator) observe(state.base, { addr: t.creator, role: "own", at: f.t }, now);
+}
+// 1c. segunda mirada y filtro de entrada (prioridad.mjs). Los vistos en una ejecución anterior (al menos ESPERA_MIN) se
+// vuelven a mirar en DexScreener: cuánto valen, su liquidez y cuántas compras llevan en la última hora. Los REG_MAX
+// análisis completos van a los que más prometen (y AZAR al azar); los de un grupo conectado con EQ_MIN lanzamientos
+// entran además, como mucho EQ_EXTRA de más. Cada lanzamiento tiene una sola segunda mirada: el resto queda con sus
+// datos básicos. Así el nivel del registro se pone a los ~30–60 min de vida, no a los pocos minutos
+const ESPERA_MIN = process.env.ESPERA_MIN_MS ? +process.env.ESPERA_MIN_MS : 20 * 60e3;   // ESPERA_MIN_MS=0: para probar en local
+const listos = Object.keys(state.espera).filter((m) => now - state.espera[m].at >= ESPERA_MIN);
+listos.filter((m) => !state.tokens[m]).forEach((m) => { delete state.espera[m]; });   // ya resuelto u olvidado
+const cand = [];
+const porMirar = listos.filter((m) => state.tokens[m]);
+for (let i = 0; i < porMirar.length; i += 30) {
+  const part = porMirar.slice(i, i + 30);
+  const pairs = await getJson("https://api.dexscreener.com/tokens/v1/solana/" + part.join(","));
+  if (!Array.isArray(pairs)) { log.esperaFallo = (log.esperaFallo || 0) + part.length; continue; }   // en la siguiente
+  part.forEach((m) => {
+    const ps = pairs.filter((p) => p.baseToken && p.baseToken.address === m);
+    const f = { par: ps.length > 0, mc: ps.reduce((s, p) => Math.max(s, p.marketCap || p.fdv || 0), 0),
+      liq: ps.reduce((s, p) => Math.max(s, (p.liquidity && p.liquidity.usd) || 0), 0),
+      buys: ps.reduce((s, p) => s + (((p.txns || {}).h1 || {}).buys || 0), 0) };
+    cand.push({ mint: m, p: puntos(f, state.tokens[m], state.base).p });
+  });
+  await sleep(400);
+}
+const sel = elegir(cand, REG_MAX);
+for (const c of cand) {
+  if (sel[c.mint] || (log.grupoExtra || 0) >= EQ_EXTRA) continue;
+  const t = state.tokens[c.mint];
+  if (eqFuerte(t.payer) || eqFuerte(t.creator) || eqFuerte(t.funder)) { sel[c.mint] = "grupo"; log.grupoExtra = (log.grupoExtra || 0) + 1; }
+}
+log.filtro = { espera: Object.keys(state.espera).length - cand.length, mirados: cand.length, analizados: Object.keys(sel).length,
+  conGranja: cand.filter((c) => c.p <= -4).length };
+for (const c of cand) {
+  const m = c.mint, t = state.tokens[m], w = state.espera[m], elegido = sel[m];
+  delete state.espera[m];
+  if (!elegido) continue;
+  try {
+    // compradores de los primeros bloques (cada uno es una petición más, salvo los que ya trajo Helius)
+    if (D1) {
+      const buyers = [];
+      for (const b of w.c || []) {
+        try { const s = b.s || (await signersOf(b.sig)); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
+      }
+      queueBuyers(state.planoQ, m, buyers);
+      sniperSeen(m, buyers, t.t);
+      log.compras = (log.compras || 0) + buyers.length;
+    }
+  } catch (e) { log.errores++; }
+  let r = null;
+  try {
+    // cada token con su propio límite de tiempo: uno que se atasque no se come la ejecución
+    r = await analyzeToken(createClient({ rpcUrl: RPC, signal: AbortSignal.timeout(45000) }), m);
+  } catch (e) { log.errores++; }
+  state.reg[m] = regEntry(m, Object.assign({ plat: t.plat, dex: t.dex, nrc: !!w.nrc }, t), r, Date.now(), faceOf(t), ENGINE_V);
+  state.reg[m].sel = elegido;                               // por qué se analizó: prio, azar o grupo
+  if (state.reg[m].liq) t.liq = state.reg[m].liq;           // la liquidez del análisis, si la hay, es la buena
+  log.registro++;
+  if (D1) queueLaunch(state.planoQ, { m, t: t.t, liq: t.liq, lvl: state.reg[m].l });
 }
 
 // 1d. RugCheck otra vez para los que se quedaron sin respuesta: se completan creador, lanzador, financiador y rug
