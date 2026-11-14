@@ -10,6 +10,8 @@
 // wallet, token, con, spam, hoy, cancelado, helius, sol, dex) are deliberately not here.
 
 export const CODE = [
+  // Dónde cotiza (14/11): la lista completa en inglés
+  ['function quoteAllLink(r){ return "/cotiza/?t="', 'function quoteAllLink(r){ return "/en/markets/?t="'],
   // Dónde cotiza (14/11): porcentajes en formato inglés
   ['function cqPct(p){ return (Math.round(p*100)/100).toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+" %"; }', 'function cqPct(p){ return (Math.round(p*100)/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+"%"; }'],
   // portada 11/11: cifras del registro en formato inglés

@@ -3588,7 +3588,7 @@ function cqId(x){
   return t;
 }
 function quoteRiesgo(r){ return r.lvl==="ALTO"||r.lvl==="SPAM"; }
-function quoteAllLink(r){ return "/cotiza/?t="+encodeURIComponent(r.mint); }
+function quoteAllLink(r){ return "/en/markets/?t="+encodeURIComponent(r.mint)+(quoteRiesgo(r)?"&r=1":""); }
 async function loadQuote(r){
   var mint=r.mint;
   var j=quoteData[mint]&&Date.now()-quoteData[mint].t<300000?quoteData[mint].j:
