@@ -156,52 +156,89 @@ dl.fmt dd{margin:0;color:var(--soft)}
 </article>
 <article id="detras">
   <h2>Who is behind<span class="thin">the launches.</span></h2>
-  <p>For every new token we store which wallet paid for its creation, which one created it, who funded it and who bought in the first blocks. This is what shows up when you put it all together, since 30 October. Figures from 9/11/2026.</p>
+  <p>For every new token we record which wallet paid for its creation, which one created it, who funded it and who bought in the first blocks. This is what shows up when you put it all together, since October 30. Figures from 11/14/2026.</p>
   <div class="fig">
-    <div><b>18,141</b><span>launches stored</span></div>
-    <div><b>7,916</b><span>different wallets paid for them</span></div>
-    <div><b>225</b><span>wallets paid for 30% of them all</span></div>
+    <div><b>26,733</b><span>launches recorded</span></div>
+    <div><b>11,384</b><span>different wallets paid for them</span></div>
+    <div><b>52</b><span>really went far (out of 13,344 analyzed at birth)</span></div>
   </div>
-  <h3>The repeat launchers</h3>
-  <p>One in four wallets has paid for more than one launch, and together they account for <b>64%</b>. The survivors come mostly from people launching for the first time.</p>
+
+  <h3>The ones that went far</h3>
+  <p>Of the 13,344 tokens we analyzed at birth between 10/29 and 11/12, only <b>52</b> went above $250,000 of market cap in their first 7 days, and <b>20</b> above $1M. We only count hours with real volume: a spike from a single buy in an almost empty pool does not count. What sets them apart the most is the liquidity they had when we saw them:</p>
   <div class="tw"><table>
-    <thead><tr><th>Launches paid for</th><th class="n">Wallets</th><th class="n">Launches</th><th class="n">Alive at 24 h</th></tr></thead>
+    <thead><tr><th>Liquidity when we saw them</th><th class="n">Tokens</th><th class="n">Reached $250,000</th></tr></thead>
     <tbody>
-      <tr class="base"><td>All</td><td class="n">7,916</td><td class="n">16,765</td><td class="n">1.2% (184)</td></tr>
-      <tr><td>Only 1</td><td class="n">5,959</td><td class="n">5,959</td><td class="n"><b>2.2%</b> (118)</td></tr>
-      <tr><td>2 to 9</td><td class="n">1,732</td><td class="n">5,837</td><td class="n"><b>0.6%</b> (34)</td></tr>
-      <tr><td>10 to 49</td><td class="n">214</td><td class="n">3,781</td><td class="n"><b>0.9%</b> (30)</td></tr>
-      <tr><td>50 or more</td><td class="n">11</td><td class="n">1,188</td><td class="n"><b>0.2%</b> (2)</td></tr>
+      <tr><td>Under $10,000</td><td class="n">12,384</td><td class="n"><b>3</b> (0.02%)</td></tr>
+      <tr><td>$10,000 to $25,000</td><td class="n">534</td><td class="n"><b>9</b> (1.7%)</td></tr>
+      <tr><td>$25,000 to $50,000</td><td class="n">309</td><td class="n"><b>22</b> (7.1%)</td></tr>
+      <tr><td>$50,000 or more</td><td class="n">117</td><td class="n"><b>18</b> (15.4%)</td></tr>
     </tbody>
   </table></div>
-  <p style="color:var(--muted);font-size:.9rem">“Alive” is calculated over those that already have a 24 h result. “Only 1” means once since 30/10: they may have launched before.</p>
-  <h3>Known faces</h3>
-  <p>SolFlag warns you when whoever is behind a launch already has a history. This is how those launches ended:</p>
+  <p>Going far is not lasting either: <b>37 of the 52</b> hit their peak in the first hour and <b>32</b> were dead after 24 h. And of the <b>1,449</b> launches paid for by wallets with more than 20, <b>none</b> went far.</p>
+
+  <h3>Who was behind the ones that went far</h3>
+  <p>We followed the first 10 buyers of each of the 52 and where they sent their SOL afterwards:</p>
+  <div class="fig">
+    <div><b>10 of 52</b><span>have buyers who later sent SOL to the wallet that created or paid for the token (1,205 SOL in total)</span></div>
+    <div><b>12 of 52</b><span>come in pairs: the same groups of wallets, which send SOL to each other, bought them early</span></div>
+  </div>
   <div class="tw"><table>
-    <thead><tr><th>At first sight</th><th class="n">Launches</th><th class="n">Alive at 24 h</th></tr></thead>
+    <thead><tr><th>Pair of tokens</th><th class="n">Wallets in the group</th><th class="hide-s">Dates</th></tr></thead>
     <tbody>
-      <tr><td>No known face</td><td class="n">13,997</td><td class="n"><b>1.6%</b> (203)</td></tr>
-      <tr><td>Known face, yellow</td><td class="n">1,883</td><td class="n"><b>0.6%</b> (10)</td></tr>
-      <tr><td>Known face, red</td><td class="n">2,261</td><td class="n"><b>0.6%</b> (11)</td></tr>
+      <tr><td><a href="https://token.solflag.com/en/Gip5JH2FC6uXaSt8TR7oRhKdsxuPwrn2La1wGckFpump">Gemini</a> and <a href="https://token.solflag.com/en/7PYqsvKbA19WWtm8SScg1en2pfbds2qLCBL684xZpump">Rockstar</a></td><td class="n">11</td><td class="hide-s">10/31 and 11/1</td></tr>
+      <tr><td><a href="https://token.solflag.com/en/GDeavmTiCYpAqDDwPsWC2JWvgBdAeUBE9DY76Kvopump">FOMO</a> and <a href="https://token.solflag.com/en/Fz6AqbUaRB3xv4FZASxTNTEZc1T1AREZ5po9xJ9ppump">Grok</a></td><td class="n">8</td><td class="hide-s">11/1, the same day</td></tr>
+      <tr><td><a href="https://token.solflag.com/en/8aCw3SSD5Hg2QKLLSmf9ApsRwmHKVDH4mWqJPPU6pump">fomo</a> and <a href="https://token.solflag.com/en/J32Qr74Noip5QbUMwamVacC9n95h4nDDrAPhmV28pump">Trump Meme</a></td><td class="n">8</td><td class="hide-s">11/4 and 11/7</td></tr>
+      <tr><td><a href="https://token.solflag.com/en/EftWZnHXkGTgZFTvdmxeiAwkauQoKMBxqSGcYaSapump">MrBeast</a> and <a href="https://token.solflag.com/en/GwVgAEdH1zLJJGqjE2TqxoeEB6h6P4nw1PciEJNEpump">HYPE</a></td><td class="n">8</td><td class="hide-s">11/6 and 11/11</td></tr>
+      <tr><td><a href="https://token.solflag.com/en/HYFKrEeNi42vUj72cmniG9ZwMcBxZmqiX1PFt4GaoTgk">puter</a> and <a href="https://token.solflag.com/en/5uDGSgXTjWYiHjoH9T6yEX8KhCy79JhFzHmiFzu41ded">GIGANTOR</a></td><td class="n">14</td><td class="hide-s">11/7 and 11/8</td></tr>
+      <tr><td><a href="https://token.solflag.com/en/7agRANc8N6H6xfZYPoZHA1zHkXWESiSkrP33XN1egZKr">AKE</a> and <a href="https://token.solflag.com/en/Dh4ggtcozftXgxasx8RAWYRemPSyQ3xqWSDcdt7DmYeX">MONERO</a></td><td class="n">2</td><td class="hide-s">11/4 and 11/6</td></tr>
     </tbody>
   </table></div>
+  <p>One example: two buyers of Gemini send SOL to a wallet that, <b>six minutes later</b>, funds the creator of Rockstar. The same buyers get into both.</p>
+  <p class="nota">This is what surprised us the most: <b>many of the tokens that go far are not luck</b>, the same group of wallets moves them. That is why we look at who is behind a token and not only at its chart.</p>
+
+  <h3>The repeat payers</h3>
+  <p>One in four wallets has paid for more than one launch, and together they account for two out of three. The survivors mostly come from first-time launchers.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Paid for</th><th class="n">Wallets</th><th class="n">Total</th><th class="n">Alive at 24 h</th></tr></thead>
+    <tbody>
+      <tr class="base"><td>All</td><td class="n">11,384</td><td class="n">24,962</td><td class="n">1.1% (259)</td></tr>
+      <tr><td>Just 1</td><td class="n">8,589</td><td class="n">8,589</td><td class="n"><b>2.1%</b> (167)</td></tr>
+      <tr><td>2 to 9</td><td class="n">2,444</td><td class="n">8,319</td><td class="n"><b>0.6%</b> (45)</td></tr>
+      <tr><td>10 to 49</td><td class="n">326</td><td class="n">5,709</td><td class="n"><b>0.7%</b> (36)</td></tr>
+      <tr><td>50 or more</td><td class="n">25</td><td class="n">2,345</td><td class="n"><b>0.5%</b> (11)</td></tr>
+    </tbody>
+  </table></div>
+  <p style="color:var(--muted);font-size:.9rem">«Alive» is counted over those that already have a 24 h result. «Just 1» means once since 10/30: it may have launched before.</p>
+
+  <h3>The known faces</h3>
+  <p>SolFlag warns you when whoever is behind a token already has a track record. This is how those launches ended:</p>
+  <div class="tw"><table>
+    <thead><tr><th>When we saw it</th><th class="n">Launches</th><th class="n">Alive at 24 h</th></tr></thead>
+    <tbody>
+      <tr><td>No known face</td><td class="n">19,652</td><td class="n"><b>1.4%</b> (256)</td></tr>
+      <tr><td>Known face in yellow</td><td class="n">3,077</td><td class="n"><b>0.6%</b> (18)</td></tr>
+      <tr><td>Known face in red</td><td class="n">4,004</td><td class="n"><b>0.5%</b> (19)</td></tr>
+    </tbody>
+  </table></div>
+
   <h3>The wallets that paid for the most launches</h3>
   <div class="tw"><table>
-    <thead><tr><th>Wallet</th><th class="n">Paid</th><th class="n">With result</th><th class="n">Dead at 24 h</th></tr></thead>
+    <thead><tr><th>Wallet</th><th class="n">Paid for</th><th class="n">With a result</th><th class="n">Dead at 24 h</th></tr></thead>
     <tbody>
-      <tr><td><a class="mono" href="/en/?wallet=K6Eh9fwKkrhVNq6SpRtJn7F4Myi3HUst5QP8x5BKHnR">K6Eh…KHnR</a></td><td class="n">313</td><td class="n">270</td><td class="n">270</td></tr>
-      <tr><td><a class="mono" href="/en/?wallet=6c1Dmi9L4rTXT5GcTbTv8p3BuBEn8SJbo37UGJ3f6yfj">6c1D…6yfj</a></td><td class="n">144</td><td class="n">144</td><td class="n">144</td></tr>
-      <tr><td><a class="mono" href="/en/?wallet=ArLugmai8XHkZY4cvz3hM3jPeEwz7FA7CgZUSXQtZq1X">ArLu…Zq1X</a></td><td class="n">131</td><td class="n">111</td><td class="n">110</td></tr>
-      <tr><td><a class="mono" href="/en/?wallet=EjcwXG6ywzorxLcX7565C614LdhxiHF6uJhkYyRTDVgZ">Ejcw…DVgZ</a></td><td class="n">130</td><td class="n">122</td><td class="n">121</td></tr>
+      <tr><td><a class="mono" href="/en/?wallet=K6Eh9fwKkrhVNq6SpRtJn7F4Myi3HUst5QP8x5BKHnR">K6Eh…KHnR</a></td><td class="n">387</td><td class="n">372</td><td class="n">372</td></tr>
+      <tr><td><a class="mono" href="/en/?wallet=6c1Dmi9L4rTXT5GcTbTv8p3BuBEn8SJbo37UGJ3f6yfj">6c1D…6yfj</a></td><td class="n">191</td><td class="n">176</td><td class="n">175</td></tr>
+      <tr><td><a class="mono" href="/en/?wallet=ArLugmai8XHkZY4cvz3hM3jPeEwz7FA7CgZUSXQtZq1X">ArLu…Zq1X</a></td><td class="n">176</td><td class="n">169</td><td class="n">168</td></tr>
+      <tr><td><a class="mono" href="/en/?wallet=EjcwXG6ywzorxLcX7565C614LdhxiHF6uJhkYyRTDVgZ">Ejcw…DVgZ</a></td><td class="n">158</td><td class="n">153</td><td class="n">151</td></tr>
+      <tr><td><a class="mono" href="/en/?wallet=7FVfSdnR9VPGjMtmBP1Hz9C2DFTpoNX8gVVRmnimnGt9">7FVf…nGt9</a></td><td class="n">112</td><td class="n">106</td><td class="n">105</td></tr>
+      <tr><td><a class="mono" href="/en/?wallet=38qy9n81zMDWKVJsQY1hjps8qPScGPL45VFAhxWgBrs7">38qy…Brs7</a></td><td class="n">106</td><td class="n">106</td><td class="n">105</td></tr>
       <tr><td><a class="mono" href="/en/?wallet=CXe9CgTE2xePNdvMpFEYyuNxhRYfTY7FL2vWFiBbMQQo">CXe9…MQQo</a></td><td class="n">95</td><td class="n">95</td><td class="n">95</td></tr>
-      <tr><td><a class="mono" href="/en/?wallet=38qy9n81zMDWKVJsQY1hjps8qPScGPL45VFAhxWgBrs7">38qy…Brs7</a></td><td class="n">90</td><td class="n">82</td><td class="n">82</td></tr>
-      <tr><td><a class="mono" href="/en/?wallet=7FVfSdnR9VPGjMtmBP1Hz9C2DFTpoNX8gVVRmnimnGt9">7FVf…nGt9</a></td><td class="n">61</td><td class="n">61</td><td class="n">61</td></tr>
-      <tr><td><a class="mono" href="/en/?wallet=5SFhHYXG5Rxwh9oFFARLseG61i3XfL1YC7ionxMktCrs">5SFh…tCrs</a></td><td class="n">59</td><td class="n">59</td><td class="n">59</td></tr>
+      <tr><td><a class="mono" href="/en/?wallet=5SFhHYXG5Rxwh9oFFARLseG61i3XfL1YC7ionxMktCrs">5SFh…tCrs</a></td><td class="n">91</td><td class="n">76</td><td class="n">76</td></tr>
     </tbody>
   </table></div>
+
   <h3>The first buyers</h3>
-  <p>We have seen <b>3,136 wallets</b> buying in the first blocks of <b>3,649 tokens</b> (among those we analyse, up to 5 per token). The most frequent one was in <b>652</b> of them.</p>
-  <p class="nota">These are facts, not accusations. Paying for a launch does not prove who keeps the money: it may be a service launching for others, and a dead token is not a scam in itself. Something off? <a href="mailto:solflag.team@gmail.com">Write to us</a> and we will fix it.</p>
+  <p>We have seen <b>4,906 wallets</b> buying in the first blocks of <b>6,138 tokens</b> (of the ones we analyze, up to 5 per token). The most frequent one was in <b>1,110</b> of them.</p>
+  <p class="nota">These are facts, not accusations. Paying for a launch or sending SOL to its creator does not prove who keeps the money: it can be a service that launches for others, and a dead token is not a scam by itself. Something doesn't add up? <a href="mailto:solflag.team@gmail.com">Write to us</a> and we will fix it.</p>
 </article>
 <article id="vivos">
   <h2>The ones still alive</h2>
