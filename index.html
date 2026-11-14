@@ -3678,7 +3678,8 @@ function cqId(x){
   else if(x.aviso) t+=" <a class='cq-tag av' href='"+esc(x.aviso[2])+"' target='_blank' rel='noopener'>AVISO "+esc(x.aviso[0].split(" ")[0])+" ↗</a>";
   return t;
 }
-function quoteRiesgo(r){ return r.lvl==="ALTO"||r.lvl==="SPAM"; }
+// sin enlaces para comprar: rojo (trampa) y naranja (peligro), y los antiguos alto y spam
+function quoteRiesgo(r){ return /^(ROJO|NARANJA|ALTO|SPAM)$/.test(r.lvl); }
 function quoteAllLink(r){ return "/cotiza/?t="+encodeURIComponent(r.mint)+"&r="+(quoteRiesgo(r)?1:0); }
 async function loadQuote(r){
   var mint=r.mint;
