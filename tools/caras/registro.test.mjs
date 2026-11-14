@@ -194,3 +194,20 @@ test("dry also when liquidity is tiny next to the market cap (under 0.2 %)", () 
   assert.equal(xto.dead, false);
   assert.equal(regResolve({}, "h24", [{ dexId: "pump-fun", marketCap: 50000, liquidity: { usd: 0 } }]).h24.dead, false);   // on the curve
 });
+
+test("summary: launches picked by the entry filter stay out of the percentages, the random sample counts", () => {
+  const tokens = {
+    a: { m: "a", l: "HIGH", h24: { dead: true } },
+    b: { m: "b", l: "HIGH", sel: "azar", h24: { dead: false } },
+    c: { m: "c", l: "HIGH", sel: "prio", h24: { dead: false }, f: ["MKT_NEW:w"] },
+    d: { m: "d", l: "MEDIUM", sel: "grupo", h24: { dead: true } }
+  };
+  const sum = daySummary(tokens);
+  assert.equal(sum.n, 4);
+  assert.deepEqual(sum.levels, { HIGH: { n: 2, h24: 2, dead24: 1, d7: 0, dead7: 0 } });
+  assert.deepEqual(sum.sig, {});
+  assert.deepEqual(sum.filtro, { prio: 1, grupo: 1 });
+  // the ones still alive are listed whatever the reason they were analysed
+  assert.equal(sum.alive.length, 2);
+  assert.equal(daySummary({ a: tokens.a }).filtro, undefined);
+});
