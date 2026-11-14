@@ -2,10 +2,11 @@
 // para ir trazando poco a poco un mapa propio de Solana. Todo son datos públicos de la cadena.
 //
 //   wallets: { addr: { first, last, ph (transacciones por hora, si se midió), roles: {payer, funder, creator, group,
-//              sniper, own (pagó y creó el mismo token)...}, tokens: [últimos mints], nTok (tokens distintos), label (si se sabe a mano) } }
+//              sniper, own (pagó y creó el mismo token)...}, tokens: [últimos mints], nTok (tokens distintos), label (si se sabe a mano),
+//              eq (grupo de wallets conectadas por envíos de SOL, ver equipos()) } }
 //   merged:  aportes ya sumados (archivos de tools/caras/aportes)
 //
-// Una observación es { addr, ph?, role?, token?, at?, label? }.
+// Una observación es { addr, ph?, role?, token?, at?, label?, eq? }.
 
 export const DAY = 86400e3;
 export const EXCHANGE_PH = 100;     // igual que el motor: los orígenes de grupos reales hacen de 0 a 50 por hora
@@ -13,6 +14,10 @@ export const PLATFORM_PH = 300;     // por encima, exchange o plataforma, salvo 
 export const OWN_MAX_EXCHANGE = 3;  // con más lanzamientos propios (pagó y creó) no es un exchange: BNB o PUMP son uno; un bot, decenas
 export const KEEP_UNKNOWN_DAYS = 3; // una wallet vista una vez y sin nada especial se olvida pronto
 export const KEEP_KNOWN_DAYS = 180;
+// Grupos (14/11): wallets que se mandan SOL entre sí y aparecen detrás o entre los primeros compradores de varios
+// lanzamientos (cada token con una wallet creadora nueva). Se publican solo a partir de EQ_MIN lanzamientos: con 2 o 3
+// puede ser casualidad
+export const EQ_MIN = 5;
 export const TYPES = ["exchange", "granja", "repartidor", "creador en serie", "sniper"];
 
 export function emptyBase() { return { v: 1, wallets: {}, merged: [] }; }
@@ -29,6 +34,20 @@ export function observe(base, o, now) {
     if (w.tokens.length > 20) w.tokens.shift();
   }
   if (o.label) w.label = o.label;
+  if (o.eq && !w.eq) w.eq = o.eq;
+}
+
+// Grupos: { id: { w (wallets), n (lanzamientos distintos en los que sale alguna) } }
+export function equipos(base) {
+  const by = {};
+  Object.keys(base.wallets).forEach(function (a) {
+    const w = base.wallets[a]; if (!w.eq) return;
+    const g = by[w.eq] || (by[w.eq] = { w: 0, tok: {} });
+    g.w++; w.tokens.forEach(function (m) { g.tok[m] = 1; });
+  });
+  const out = {};
+  Object.keys(by).forEach(function (k) { out[k] = { w: by[k].w, n: Object.keys(by[k].tok).length }; });
+  return out;
 }
 
 // Qué es una wallet según lo que se sabe de ella (null si nada la distingue de una persona normal)
@@ -49,7 +68,7 @@ export function classify(w) {
 
 export function pruneBase(base, now) {
   Object.keys(base.wallets).forEach(function (a) {
-    const w = base.wallets[a], age = now - w.last, known = !!classify(w);
+    const w = base.wallets[a], age = now - w.last, known = !!classify(w) || !!w.eq;
     if ((!known && w.nTok < 2 && age > KEEP_UNKNOWN_DAYS * DAY) || age > (known ? KEEP_KNOWN_DAYS : 30) * DAY) delete base.wallets[a];
   });
   return base;
@@ -65,16 +84,18 @@ export function mergeAporte(base, name, list, now) {
 
 // Lo que se publica: las wallets que se sabe qué son, y aparte la lista de exchanges (lo más útil para la web)
 export function publishBase(base, now) {
-  const wallets = {}, exchanges = {}, count = {};
+  const wallets = {}, exchanges = {}, count = {}, eqs = {}, eqAll = equipos(base);
+  Object.keys(eqAll).forEach(function (k) { if (eqAll[k].n >= EQ_MIN) eqs[k] = eqAll[k]; });
   Object.keys(base.wallets).forEach(function (a) {
-    const w = base.wallets[a], t = classify(w);
-    if (!t) return;
-    count[t] = (count[t] || 0) + 1;
+    const w = base.wallets[a], t = classify(w), eq = w.eq && eqs[w.eq] ? w.eq : undefined;
+    if (!t && !eq) return;
+    if (t) count[t] = (count[t] || 0) + 1;
     wallets[a] = { t: t, ph: w.ph === undefined ? null : w.ph, n: w.nTok, roles: w.roles, last: w.last };
+    if (eq) wallets[a].eq = eq;
     if (t === "exchange") exchanges[a] = w.ph === undefined ? null : w.ph;
   });
   return {
-    base: { v: 1, updated: now, seen: Object.keys(base.wallets).length, count: count, wallets: wallets },
+    base: { v: 1, updated: now, seen: Object.keys(base.wallets).length, count: count, wallets: wallets, equipos: eqs },
     exchanges: { v: 1, updated: now, exchanges: exchanges }
   };
 }

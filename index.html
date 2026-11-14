@@ -1353,6 +1353,9 @@ body.scanp #form .eyebrow{margin-bottom:8px}
 .buyers{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .buyers button{border:1px solid var(--line);background:var(--surface-2);color:var(--muted);border-radius:999px;padding:5px 10px;font:inherit;font-size:.8rem;cursor:pointer;min-height:32px}
 .buyers button:hover{color:var(--fg);border-color:var(--kick)}
+.whr small.eqn{display:block;color:var(--medio);font-weight:600}
+.buyers button.sn{color:var(--medio);border-color:var(--medio)}
+.bnote{margin:8px 0 0;font-size:.8rem;color:var(--muted)}
 .wsrc{margin:14px 0 0;font-size:.8rem;color:var(--muted)}
 .tlazy{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
 .tlazy span{color:var(--muted);flex:1 1 260px}
@@ -1547,6 +1550,11 @@ body.landing #adv{margin-top:10px}
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:40px}
 .sec-head h2{font:700 clamp(2.1rem,4.4vw,3.5rem)/1.04 var(--f-display);letter-spacing:-.02em;margin:0;color:var(--fg)}
 .sec-head p{color:var(--muted);max-width:440px;margin:0}
+/* enlaces a «Cómo funciona» desde el resultado (14/11) */
+.lwhy,.lt .lwhy{display:inline;margin-left:4px;font-size:.82rem;font-weight:700;font-style:normal;color:var(--kick);text-decoration:none;white-space:nowrap}
+.lwhy:hover{text-decoration:underline}
+.lhow{display:inline-block;margin:0 0 12px;font-size:.86rem;font-weight:700;color:var(--kick);text-decoration:none}
+.lhow:hover{text-decoration:underline}
 .syn{font-size:.8rem;color:var(--mut2);margin:14px 0 0}
 .syn a{color:var(--kick)}
 .term{display:grid;grid-template-columns:220px minmax(0,1fr);border:1px solid var(--line);border-radius:20px;overflow:hidden;background:rgba(14,10,36,.35)}
@@ -2057,7 +2065,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
     <section class="lblk lstats" id="lstats" hidden>
       <div class="sec-head"><h2>Lo que hemos visto<span class="thin">hasta hoy.</span></h2><p>Cada lanzamiento queda guardado: quién lo creó, quién lo pagó y cómo acabó a las 24 horas.</p></div>
       <div class="sgrid" id="lsgrid"></div>
-      <p class="syn"><a href="/acierto/">Ver datos y acierto →</a></p>
+      <p class="syn"><a href="/acierto/">Ver datos y acierto →</a> · <a href="/como-funciona/">Cómo funciona cada bandera →</a></p>
     </section>
     <section class="lcta"><div class="cpanel">
       <canvas data-neb="panel" aria-hidden="true"></canvas>
@@ -2077,6 +2085,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
       <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
       <a href="https://solflag.com/blog/">Blog · Avances</a>
       <a href="/acierto/">Datos y acierto</a>
+      <a href="/como-funciona/">Cómo funciona</a>
       <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
     </p>
     <p class="foot">Datos de mercado: DexScreener y GeckoTerminal (<a href="https://www.coingecko.com/" target="_blank" rel="noopener">Powered by CoinGecko</a>) · análisis de RugCheck · Solana vía Helius. Nuestros datos, con <a href="/acierto/#licencia">licencia CC BY-NC 4.0</a>.</p>
@@ -2095,7 +2104,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="No se pudo cargar el motor del escáner desde cdn.jsdelivr.net. Revisa tu conexión a internet y recarga la página."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.5.4/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.5.6/src/index.js";
 window.__escOk=true;
 // Lista de emisores revisada (emisores.json): una rotación de claves aprobada no necesita otra versión del motor
 fetch("/emisores.json",{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j&&SRE.setIssuers) SRE.setIssuers(j.emisores); }).catch(function(){});
@@ -2946,6 +2955,8 @@ var TYPES={
   ABIERTO:{label:"Token abierto",note:"Sin autoridades del creador, típico de memecoins y proyectos nuevos. Pesan sobre todo la concentración en personas y la liquidez."}
 };
 var LKEYS={ctl:"Control del creador",con:"Concentración",mkt:"Mercado y salida",dep:"Dependencia"};
+// cada semáforo enlaza a su apartado de «Cómo funciona» (14/11)
+var LHOW="/como-funciona/", LANCH={ctl:"control",con:"concentracion",mkt:"mercado",dep:"dependencia"};
 var FLAGTXT={ok:"green flag",warn:"precaución",bad:"red flag",na:"sin comprobar"};
 var RANKS={ok:0,na:0,warn:1,bad:2};
 // "Medio" sin ninguna señal concreta: solo porque algún chequeo no se pudo hacer (p. ej. holders sin Helius).
@@ -3435,7 +3446,7 @@ function renderList(){
         "<div class='meta'>"+meta.join("")+"</div>"+
         (function(){
           var ORD={bad:0,warn:1,na:2,ok:3};
-          function ltHtml(l){ var t=l.tv!=null?l.tv:l.t; return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div style='min-width:0;flex:1'><b>"+LKEYS[l.k]+" <em class='lfl'>"+esc(FLAGTXT[l.s]||"")+"</em></b>"+(t?"<span>"+esc(t)+"</span>":"")+(l.x||"")+"</div></div>"; }
+          function ltHtml(l){ var t=l.tv!=null?l.tv:l.t; return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div style='min-width:0;flex:1'><b>"+LKEYS[l.k]+" <em class='lfl'>"+esc(FLAGTXT[l.s]||"")+"</em></b>"+(t?"<span>"+esc(t)+" <a class='lwhy' href='"+LHOW+"#"+(LANCH[l.k]||"nivel")+"' target='_blank' rel='noopener'>"+"¿Por qué?"+"</a></span>":"")+(l.x||"")+"</div></div>"; }
           var sorted=r.lights?r.lights.slice().sort(function(a,b){ return (ORD[a.s]==null?2:ORD[a.s])-(ORD[b.s]==null?2:ORD[b.s]); }):[];
           var oks=sorted.filter(function(l){ return l.s==="ok"; }), rest=sorted.filter(function(l){ return l.s!=="ok"; });
           // en el móvil, si hay algo que no está en verde, las verdes van plegadas en una línea
@@ -3445,7 +3456,7 @@ function renderList(){
           :"<ul class='why'>"+why+"</ul>";
           // Un token suelto: banderas a la izquierda y gráfica, lanzamiento e historial a la derecha
           if(state.token!==r) return lh;
-          return "<div class='tgrid'><div class='tcol'><p class='kick'>Las 5 banderas</p><h3 class='tgt'>Por qué sale así</h3>"+lh+"</div></div>";
+          return "<div class='tgrid'><div class='tcol'><p class='kick'>Las 5 banderas</p><h3 class='tgt'>Por qué sale así</h3>"+"<a class='lhow' href='"+LHOW+"#nivel' target='_blank' rel='noopener'>"+"Cómo se decide el nivel →"+"</a>"+lh+"</div></div>";
         })()+
         "<div class='links'>"+links+"</div>"+
       "</div></article>";
@@ -3660,21 +3671,25 @@ async function loadWho(mint){
   if(who[mint]===undefined){
     who[mint]="loading";
     try{
-      var res=await fetch(API+"token/"+mint);
+      // la base de wallets se carga a la vez: marca a los snipers conocidos entre los primeros compradores
+      var pr=await Promise.all([fetch(API+"token/"+mint),loadBase()]), res=pr[0];
       who[mint]=res.status===404?"none":(res.ok?await res.json():"err");
     }catch(e){ who[mint]="err"; }
   }else if(who[mint]==="loading") return;
   var b=box(); if(!b) return;
   b.innerHTML=whoHtml(who[mint]);
 }
+// grupos de wallets conectadas por envíos de SOL (base de wallets, 14/11): solo vienen los de 5 lanzamientos o más
+function eqOf(a){ var b=wbase.data, w=b&&b.wallets&&b.wallets[a]; return w&&w.eq&&b.equipos&&b.equipos[w.eq]||null; }
+function eqTxt(g){ return "Forma parte de un grupo de "+g.w+" wallets que se mandan SOL entre ellas y que ha estado detrás o entre los primeros compradores de "+g.n+" lanzamientos"; }
 function whoRow(roles,x,cara){
-  var n=x.n||0, res=x.resolved||0, dead=x.dead24||0, fr=res?dead/res:0;
+  var n=x.n||0, g=eqOf(x.wallet), res=x.resolved||0, dead=x.dead24||0, fr=res?dead/res:0;
   var cls=res>=3&&fr>=0.9?" r":(res&&fr>=0.5?" y":"");
   var txt=!n?"Primera vez que la vemos en un lanzamiento":
     n+(n===1?" lanzamiento":" lanzamientos")+" antes que este · "+dead+(dead===1?" muerto":" muertos")+" a las 24 h"+(n>res?" · "+(n-res)+" sin resultado aún":"");
   return "<div class='whr"+cls+"'>"+tokAv("",x.wallet)+
     "<div style='min-width:0'><span class='role'>"+esc(roles)+(cara?"<span class='wkf'>Cara conocida</span>":"")+"</span>"+
-    "<b class='mono wk' tabindex='0' data-wk='"+esc(x.wallet)+"'"+(cara?" data-cara='1'":"")+">"+esc(short(x.wallet))+"</b><small>"+esc(txt)+"</small>"+(res?"<div class='wbar'><i style='width:"+Math.round(fr*100)+"%'></i></div>":"")+"</div>"+
+    "<b class='mono wk' tabindex='0' data-wk='"+esc(x.wallet)+"'"+(cara?" data-cara='1'":"")+">"+esc(short(x.wallet))+"</b><small>"+esc(txt)+"</small>"+(g?"<small class='eqn'>🔗 "+esc(eqTxt(g))+"</small>":"")+(res?"<div class='wbar'><i style='width:"+Math.round(fr*100)+"%'></i></div>":"")+"</div>"+
     "<button type='button' class='btn small ghost' data-analyze='"+esc(x.wallet)+"'>Ver esta wallet</button></div>";
 }
 function whoHtml(j){
@@ -3691,9 +3706,13 @@ function whoHtml(j){
   var h=rows.length?"<div class='who'>"+rows.map(function(o){ return whoRow(o.roles.join(" y "),o.x,j.cara&&j.cara===o.x.wallet); }).join("")+"</div>":
     "<p class='hint'>El registro tiene este token, pero no sabe quién pagó, creó o financió el lanzamiento.</p>";
   var fb=j.firstBuyers||[];
-  if(fb.length) h+="<h3 style='margin:16px 0 0;font-size:1rem'>Compraron en los primeros bloques <small style='font-weight:600;color:var(--muted)'>"+fb.length+"</small></h3><div class='buyers'>"+
-    fb.slice(0,16).map(function(b){ return "<button type='button' data-analyze='"+esc(b.wallet)+"' title='Analizar esta wallet'>"+esc(short(b.wallet))+" · "+(b.blocks?"bloque +"+b.blocks:"mismo bloque")+"</button>"; }).join("")+
-    (fb.length>16?"<span class='hint' style='align-self:center'>y "+(fb.length-16)+" más</span>":"")+"</div>";
+  // snipers conocidos (base de wallets, 14/11): compran en el primer bloque de muchos lanzamientos
+  var snN=function(w){ var x=wbase.data&&wbase.data.wallets&&wbase.data.wallets[w]; return x&&x.t==="sniper"?((x.roles&&x.roles.sniper)||x.n||3):0; };
+  var nsn=fb.filter(function(b){ return snN(b.wallet); }).length, neq=fb.filter(function(b){ return eqOf(b.wallet); }).length;
+  if(fb.length) h+="<h3 style='margin:16px 0 0;font-size:1rem'>Compraron en los primeros bloques <small style='font-weight:600;color:var(--muted)'>"+fb.length+(nsn?" · "+nsn+(nsn===1?" compra al nacer en serie":" compran al nacer en serie"):"")+(neq?" · "+neq+(neq===1?" de un grupo conectado":" de grupos conectados"):"")+"</small></h3><div class='buyers'>"+
+    fb.slice(0,16).map(function(b){ var k=snN(b.wallet), g=eqOf(b.wallet); return "<button type='button'"+(k||g?" class='sn'":"")+" data-analyze='"+esc(b.wallet)+"' title='"+(g?esc(eqTxt(g))+" · ":"")+(k?"Ha comprado al nacer en "+k+" lanzamientos · ":"")+"Analizar esta wallet'>"+(g?"🔗 ":"")+(k?"🎯 ":"")+esc(short(b.wallet))+" · "+(b.blocks?"bloque +"+b.blocks:"mismo bloque")+"</button>"; }).join("")+
+    (fb.length>16?"<span class='hint' style='align-self:center'>y "+(fb.length-16)+" más</span>":"")+"</div>"+
+    "<p class='bnote'>Quien compra en los primeros bloques suele ser un bot que vende enseguida: en los tokens que llegaron al millón, el 93 % de estos compradores vendió, la mitad en poco más de un minuto (registro de SolFlag, 14/11).</p>";
   return h;
 }
 /* ---------- wallet en el Escáner: resumen y «Quién es en números» a la izquierda; Sus lanzamientos y Sus tokens a la derecha ---------- */

@@ -40,10 +40,12 @@ T = [
   <a href="/acciones/">Acciones</a>
   <a href="/blog/">Blog</a>
   <a href="/acierto/">Datos y acierto</a>
+  <a href="/como-funciona/">Cómo funciona</a>
   <a href="/privacidad/">Privacidad</a>
   <a href="/terminos/">Términos</a>""", """  <a href="/en/">Scanner</a>
   <a href="/en/stocks/">Stocks</a>
   <a href="/en/accuracy/">Data and accuracy</a>
+  <a href="/en/how-it-works/">How it works</a>
   <a href="/en/privacy/">Privacy</a>
   <a href="/en/terms/">Terms</a>"""),
   ("<p>Pools: DexScreener. Exchanges: CoinGecko. Coste en la cadena: Jupiter. SolFlag es una herramienta orientativa, no consejo financiero.</p>", "<p>Pools: DexScreener. Exchanges: CoinGecko. On-chain cost: Jupiter. SolFlag is a guidance tool, not financial advice.</p>"),
