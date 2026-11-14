@@ -1283,5 +1283,12 @@ export const TEXT = {
   "bloque +": "block +",
   "mismo bloque": "same block",
   "<span class='hint' style='align-self:center'>y ": "<span class='hint' style='align-self:center'>and ",
-  " más</span>": " more</span>"
+  " más</span>": " more</span>",
+  // primeros compradores: snipers conocidos (14/11)
+  "<p class='bnote'>Quien compra en los primeros bloques suele ser un bot que vende enseguida: en los tokens que llegaron al millón, el 93 % de estos compradores vendió, la mitad en poco más de un minuto (registro de SolFlag, 14/11).</p>": "<p class='bnote'>Whoever buys in the first blocks is usually a bot that sells right away: in tokens that reached $1M, 93% of these buyers sold, half of them within about a minute (SolFlag registry, 11/14).</p>",
+  " compra al nacer en serie": " buys at launch time after time",
+  " compran al nacer en serie": " buy at launch time after time",
+  "Ha comprado al nacer en ": "Bought at launch in ",
+  " lanzamientos · ": " launches · ",
+  "Analizar esta wallet'>": "Analyze this wallet'>"
 };
