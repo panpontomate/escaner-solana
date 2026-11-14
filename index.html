@@ -1528,6 +1528,22 @@ body.landing #adv{margin-top:10px}
 .lwhy:hover{text-decoration:underline}
 .lhow{display:inline-block;margin:0 0 12px;font-size:.86rem;font-weight:700;color:var(--kick);text-decoration:none}
 .lhow:hover{text-decoration:underline}
+/* cuadro de la curva de Pump.fun (14/11): contexto bajo el nivel, no una señal */
+.curva{margin:18px 0 6px;border:1px solid var(--line);border-left:3px solid var(--kick,var(--accent));border-radius:16px;background:var(--surface);padding:16px 18px}
+.curva .kick{display:flex;align-items:center;gap:8px;margin:0}
+.curva .kick i{width:8px;height:8px;border-radius:50%;background:var(--kick,var(--accent));box-shadow:0 0 10px var(--kick,var(--accent))}
+.curva p{margin:8px 0 0}
+.cfacts{display:grid;grid-template-columns:1fr 1fr;margin-top:12px;border-top:1px solid var(--line)}
+.cfacts div{padding:12px 16px 0 0;min-width:0}
+.cfacts div+div{border-left:1px solid var(--line);padding-left:16px}
+.cfacts b{display:block;font:300 1.9rem/1.05 var(--f-display);letter-spacing:-.02em}
+.cfacts span{display:block;margin-top:6px;font-size:.88rem;color:var(--muted)}
+.cfast{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.cfast .tg{font:700 .7rem var(--f-body);letter-spacing:.12em;padding:5px 10px;border-radius:999px;color:var(--medio);background:var(--medio-bg);border:1px solid var(--medio);white-space:nowrap;margin-top:2px}
+.cfast p{margin:0}
+.csrc{font-size:.8rem;color:var(--muted)}
+.csrc a{color:var(--kick,var(--accent));font-weight:700;text-decoration:none}
+@media (max-width:520px){.cfacts{grid-template-columns:1fr}.cfacts div+div{border-left:0;padding-left:0;border-top:1px solid var(--line)}.cfast{grid-template-columns:1fr}}
 .syn{font-size:.8rem;color:var(--mut2);margin:14px 0 0}
 .syn a{color:var(--kick)}
 .term{display:grid;grid-template-columns:220px minmax(0,1fr);border:1px solid var(--line);border-radius:20px;overflow:hidden;background:rgba(14,10,36,.35)}
@@ -2848,8 +2864,30 @@ async function assess(mint,par,valor,unchecked,noConc,copies){
     warn:[], lights:lights, type:SRE_TY[r.type]||null, valor:valor, par:r.pair, imp:r.impostor, img:r.img,
     cr:(r.creator&&r.creator.creator)||null,
     // token de un emisor verificado (Circle, Paxos, Ondo, xStocks…): sin mapa ni ballenas, que ahí no dicen nada (12/11)
-    emisor:!!(r.lights&&r.lights.some(function(l){ return l.items.some(function(x){ return EMISOR_COD.indexOf(x.code)>=0; }); }))
+    emisor:!!(r.lights&&r.lights.some(function(l){ return l.items.some(function(x){ return EMISOR_COD.indexOf(x.code)>=0; }); })),
+    curva:curvaInfo(r)
   };
+}
+// Sigue en la curva de Pump.fun (14/11, estudio de la curva: tools/estudio/curva.md). «Muy deprisa» solo con la regla
+// comprobada con días aparte: vale 15.000 $ o más, sube 5.000 $ o más por minuto de vida (en su primera media hora) y
+// detrás no hay un lanzador en serie. Es contexto: no cambia el nivel
+var CURVA_SERIE=["CTL_SERIAL_CREATOR","CTL_SERIAL_PAYER","CTL_CREATOR_HISTORY"];
+function curvaInfo(r){
+  var p=r.pair; if(!p||!/^pump-?fun$/i.test(p.dexId||"")) return null;
+  var mc=Number(p.marketCap||p.fdv)||0, min=p.pairCreatedAt?(Date.now()-p.pairCreatedAt)/60000:0;
+  var serie=!!(r.lights&&r.lights.some(function(l){ return l.items.some(function(x){ return CURVA_SERIE.indexOf(x.code)>=0; }); }));
+  var ritmo=min>0?mc/Math.max(1,min):0;
+  return {mc:mc, ritmo:ritmo, min:min, fast:mc>=15000&&min>0&&min<=30&&ritmo>=5000&&!serie};
+}
+function curvaHtml(r){
+  var c=r.curva; if(!c) return "";
+  var m=Math.max(1,Math.round(c.min));
+  return "<div class='curva'><p class='kick'><i></i>"+"Sigue en la curva de Pump.fun"+"</p>"+
+    "<p>"+"Todavía no ha graduado: se compra y se vende contra la curva de Pump.fun, no en un pool normal."+"</p>"+
+    "<div class='cfacts'><div><b>"+"Menos de 2 de 100"+"</b><span>"+"tokens que vemos en la curva llegan a graduar"+"</span></div>"+
+    "<div><b>"+"9 de cada 10"+"</b><span>"+"de los que gradúan mueren en un día"+"</span></div></div>"+
+    (c.fast?"<div class='cfast'><span class='tg'>"+"MUY DEPRISA"+"</span><p>"+"Ya vale "+usd(c.mc)+" a los "+m+(m===1?" minuto":" minutos")+" ("+usd(c.ritmo)+" por minuto). "+"De los que iban así, más de la mitad graduó. "+"<b>"+"Graduar no es ir bien:"+"</b> "+"la mayoría muere igual ese mismo día."+"</p></div>":"")+
+    "<p class='csrc'>"+"Datos del registro de SolFlag, 1–12/11"+" · <a href='"+LACIERTO+"' target='_blank' rel='noopener'>"+"Datos y acierto"+"</a> · <a href='"+LHOW+"#mercado' target='_blank' rel='noopener'>"+"Cómo funciona"+"</a></p></div>";
 }
 var EMISOR_COD=["CTL_KNOWN_ISSUER","CTL_ISSUER_KEYS_CHANGED","DEP_TRUSTED_ISSUER","DEP_KNOWN_ISSUER"];
 // una acción tokenizada de un emisor verificado: «Seguir acción» en vez de «Seguir token»
@@ -2929,7 +2967,7 @@ var TYPES={
 };
 var LKEYS={ctl:"Control del creador",con:"Concentración",mkt:"Mercado y salida",dep:"Dependencia"};
 // cada semáforo enlaza a su apartado de «Cómo funciona» (14/11)
-var LHOW="/como-funciona/", LANCH={ctl:"control",con:"concentracion",mkt:"mercado",dep:"dependencia"};
+var LACIERTO="/acierto/", LHOW="/como-funciona/", LANCH={ctl:"control",con:"concentracion",mkt:"mercado",dep:"dependencia"};
 var FLAGTXT={ok:"green flag",warn:"precaución",bad:"red flag",na:"sin comprobar"};
 var RANKS={ok:0,na:0,warn:1,bad:2};
 // "Medio" sin ninguna señal concreta: solo porque algún chequeo no se pudo hacer (p. ej. holders sin Helius).
@@ -3428,7 +3466,7 @@ function renderList(){
           :"<ul class='why'>"+why+"</ul>";
           // Un token suelto: banderas a la izquierda y gráfica, lanzamiento e historial a la derecha
           if(state.token!==r) return lh;
-          return "<div class='tgrid'><div class='tcol'><p class='kick'>Las 5 banderas</p><h3 class='tgt'>Por qué sale así</h3>"+"<a class='lhow' href='"+LHOW+"#nivel' target='_blank' rel='noopener'>"+"Cómo se decide el nivel →"+"</a>"+lh+"</div></div>";
+          return curvaHtml(r)+"<div class='tgrid'><div class='tcol'><p class='kick'>Las 5 banderas</p><h3 class='tgt'>Por qué sale así</h3>"+"<a class='lhow' href='"+LHOW+"#nivel' target='_blank' rel='noopener'>"+"Cómo se decide el nivel →"+"</a>"+lh+"</div></div>";
         })()+
         "<div class='links'>"+links+"</div>"+
       "</div></article>";

@@ -66,7 +66,9 @@ export const CODE = [
   // «Cómo funciona» (14/11/2026): pie, portada y enlaces de cada semáforo
   ['<a href="/como-funciona/">Cómo funciona</a>', '<a href="/en/how-it-works/">How it works</a>'],
   ['<p class="syn"><a href="/acierto/">Ver datos y acierto →</a> · <a href="/como-funciona/">Cómo funciona cada bandera →</a></p>', '<p class="syn"><a href="/en/accuracy/">See data and accuracy →</a> · <a href="/en/how-it-works/">How each flag works →</a></p>'],
-  ['var LHOW="/como-funciona/"', 'var LHOW="/en/how-it-works/"'],
+  ['var LACIERTO="/acierto/", LHOW="/como-funciona/"', 'var LACIERTO="/en/accuracy/", LHOW="/en/how-it-works/"'],
+  // cuadro de la curva de Pump.fun (14/11/2026)
+  ['" minuto":" minutos")+" ("', '" minute":" minutes")+" ("'],
   // pestaña de acciones tokenizadas (12/11/2026)
   ['<a class="tab tlink" href="/acciones/">', '<a class="tab tlink" href="/en/stocks/">']
 ];
@@ -159,6 +161,22 @@ export const TEXT = {
   "hasta hoy.": "so far.",
   "Cada lanzamiento queda guardado: quién lo creó, quién lo pagó y cómo acabó a las 24 horas.": "Every launch is recorded: who created it, who paid for it and how it ended up after 24 hours.",
   "¿Por qué?": "Why?",
+  "Sigue en la curva de Pump.fun": "Still on the Pump.fun curve",
+  "Todavía no ha graduado: se compra y se vende contra la curva de Pump.fun, no en un pool normal.": "It has not graduated yet: it is bought and sold against the Pump.fun curve, not in a normal pool.",
+  "Menos de 2 de 100": "Fewer than 2 in 100",
+  "tokens que vemos en la curva llegan a graduar": "curve tokens we see ever graduate",
+  "9 de cada 10": "9 in 10",
+  "de los que gradúan mueren en un día": "of those that graduate die within a day",
+  "MUY DEPRISA": "VERY FAST",
+  " a los ": " after ",
+  " por minuto). ": " a minute). ",
+  "Ya vale ": "Already worth ",
+  "De los que iban así, más de la mitad graduó. ": "More than half of those that moved like this graduated. ",
+  "Graduar no es ir bien:": "Graduating is not doing well:",
+  "la mayoría muere igual ese mismo día.": "most die that same day anyway.",
+  "Datos del registro de SolFlag, 1–12/11": "Data from the SolFlag registry, Nov 1–12",
+  "Datos y acierto": "Data and accuracy",
+  "Cómo funciona": "How it works",
   "Cómo se decide el nivel →": "How the level is decided →",
   "Primero comprueba.": "Check first.",
   "Después decide.": "Then decide.",
