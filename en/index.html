@@ -1523,6 +1523,11 @@ body.landing #adv{margin-top:10px}
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:40px}
 .sec-head h2{font:700 clamp(2.1rem,4.4vw,3.5rem)/1.04 var(--f-display);letter-spacing:-.02em;margin:0;color:var(--fg)}
 .sec-head p{color:var(--muted);max-width:440px;margin:0}
+/* enlaces a «Cómo funciona» desde el resultado (14/11) */
+.lwhy,.lt .lwhy{display:inline;margin-left:4px;font-size:.82rem;font-weight:700;font-style:normal;color:var(--kick);text-decoration:none;white-space:nowrap}
+.lwhy:hover{text-decoration:underline}
+.lhow{display:inline-block;margin:0 0 12px;font-size:.86rem;font-weight:700;color:var(--kick);text-decoration:none}
+.lhow:hover{text-decoration:underline}
 .syn{font-size:.8rem;color:var(--mut2);margin:14px 0 0}
 .syn a{color:var(--kick)}
 .term{display:grid;grid-template-columns:220px minmax(0,1fr);border:1px solid var(--line);border-radius:20px;overflow:hidden;background:rgba(14,10,36,.35)}
@@ -2033,7 +2038,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
     <section class="lblk lstats" id="lstats" hidden>
       <div class="sec-head"><h2>What we have seen<span class="thin">so far.</span></h2><p>Every launch is recorded: who created it, who paid for it and how it ended up after 24 hours.</p></div>
       <div class="sgrid" id="lsgrid"></div>
-      <p class="syn"><a href="/acierto/">See data and accuracy →</a></p>
+      <p class="syn"><a href="/en/accuracy/">See data and accuracy →</a> · <a href="/en/how-it-works/">How each flag works →</a></p>
     </section>
     <section class="lcta"><div class="cpanel">
       <canvas data-neb="panel" aria-hidden="true"></canvas>
@@ -2053,6 +2058,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
       <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Open source</a>
       <a href="https://solflag.com/blog/">Blog · Updates (Spanish)</a>
       <a href="/en/accuracy/">Data and accuracy</a>
+      <a href="/en/how-it-works/">How it works</a>
       <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
     </p>
     <p class="foot">Market data: DexScreener and GeckoTerminal (<a href="https://www.coingecko.com/" target="_blank" rel="noopener">Powered by CoinGecko</a>) · RugCheck analysis · Solana via Helius. Our data, under the <a href="/en/accuracy/#license">CC BY-NC 4.0 license</a>.</p>
@@ -2922,6 +2928,8 @@ var TYPES={
   ABIERTO:{label:"Open token",note:"No creator authorities, typical of memecoins and new projects. Concentration in people and liquidity matter most."}
 };
 var LKEYS={ctl:"Creator control",con:"Concentration",mkt:"Market and exit",dep:"Dependency"};
+// cada semáforo enlaza a su apartado de «Cómo funciona» (14/11)
+var LHOW="/en/how-it-works/", LANCH={ctl:"control",con:"concentracion",mkt:"mercado",dep:"dependencia"};
 var FLAGTXT={ok:"green flag",warn:"caution",bad:"red flag",na:"not checked"};
 var RANKS={ok:0,na:0,warn:1,bad:2};
 // "Medio" sin ninguna señal concreta: solo porque algún chequeo no se pudo hacer (p. ej. holders sin Helius).
@@ -3410,7 +3418,7 @@ function renderList(){
         "<div class='meta'>"+meta.join("")+"</div>"+
         (function(){
           var ORD={bad:0,warn:1,na:2,ok:3};
-          function ltHtml(l){ var t=l.tv!=null?l.tv:l.t; return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div style='min-width:0;flex:1'><b>"+LKEYS[l.k]+" <em class='lfl'>"+esc(FLAGTXT[l.s]||"")+"</em></b>"+(t?"<span>"+esc(t)+"</span>":"")+(l.x||"")+"</div></div>"; }
+          function ltHtml(l){ var t=l.tv!=null?l.tv:l.t; return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div style='min-width:0;flex:1'><b>"+LKEYS[l.k]+" <em class='lfl'>"+esc(FLAGTXT[l.s]||"")+"</em></b>"+(t?"<span>"+esc(t)+" <a class='lwhy' href='"+LHOW+"#"+(LANCH[l.k]||"nivel")+"' target='_blank' rel='noopener'>"+"Why?"+"</a></span>":"")+(l.x||"")+"</div></div>"; }
           var sorted=r.lights?r.lights.slice().sort(function(a,b){ return (ORD[a.s]==null?2:ORD[a.s])-(ORD[b.s]==null?2:ORD[b.s]); }):[];
           var oks=sorted.filter(function(l){ return l.s==="ok"; }), rest=sorted.filter(function(l){ return l.s!=="ok"; });
           // en el móvil, si hay algo que no está en verde, las verdes van plegadas en una línea
@@ -3420,7 +3428,7 @@ function renderList(){
           :"<ul class='why'>"+why+"</ul>";
           // Un token suelto: banderas a la izquierda y gráfica, lanzamiento e historial a la derecha
           if(state.token!==r) return lh;
-          return "<div class='tgrid'><div class='tcol'><p class='kick'>The 5 flags</p><h3 class='tgt'>Why it scores this way</h3>"+lh+"</div></div>";
+          return "<div class='tgrid'><div class='tcol'><p class='kick'>The 5 flags</p><h3 class='tgt'>Why it scores this way</h3>"+"<a class='lhow' href='"+LHOW+"#nivel' target='_blank' rel='noopener'>"+"How the level is decided →"+"</a>"+lh+"</div></div>";
         })()+
         "<div class='links'>"+links+"</div>"+
       "</div></article>";

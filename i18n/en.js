@@ -63,6 +63,10 @@ export const CODE = [
   // pie: enlace a la página de datos (6/11/2026)
   ['<a href="/acierto/">Datos y acierto</a>', '<a href="/en/accuracy/">Data and accuracy</a>'],
   ['<a href="/acierto/#licencia">', '<a href="/en/accuracy/#license">'],
+  // «Cómo funciona» (14/11/2026): pie, portada y enlaces de cada semáforo
+  ['<a href="/como-funciona/">Cómo funciona</a>', '<a href="/en/how-it-works/">How it works</a>'],
+  ['<p class="syn"><a href="/acierto/">Ver datos y acierto →</a> · <a href="/como-funciona/">Cómo funciona cada bandera →</a></p>', '<p class="syn"><a href="/en/accuracy/">See data and accuracy →</a> · <a href="/en/how-it-works/">How each flag works →</a></p>'],
+  ['var LHOW="/como-funciona/"', 'var LHOW="/en/how-it-works/"'],
   // pestaña de acciones tokenizadas (12/11/2026)
   ['<a class="tab tlink" href="/acciones/">', '<a class="tab tlink" href="/en/stocks/">']
 ];
@@ -154,7 +158,8 @@ export const TEXT = {
   "Lo que hemos visto": "What we have seen",
   "hasta hoy.": "so far.",
   "Cada lanzamiento queda guardado: quién lo creó, quién lo pagó y cómo acabó a las 24 horas.": "Every launch is recorded: who created it, who paid for it and how it ended up after 24 hours.",
-  "Ver datos y acierto →": "See data and accuracy →",
+  "¿Por qué?": "Why?",
+  "Cómo se decide el nivel →": "How the level is decided →",
   "Primero comprueba.": "Check first.",
   "Después decide.": "Then decide.",
   "Pega una dirección y en unos segundos sabrás quién lo lanzó, quién lo tiene y qué más ha hecho antes.": "Paste an address and in a few seconds you will know who launched it, who holds it and what else they did before.",

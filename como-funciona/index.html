@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cómo funciona · SolFlag</title>
+<meta name="description" content="Cada bandera de SolFlag explicada: qué mira, desde qué cifra se enciende y por qué, con los números de miles de lanzamientos de Solana.">
+<meta property="og:title" content="Cómo funciona · SolFlag">
+<meta property="og:description" content="Cada bandera de SolFlag explicada: qué mira, desde qué cifra se enciende y por qué, con los números de miles de lanzamientos de Solana.">
+<meta property="og:url" content="https://solflag.com/como-funciona/">
+<meta property="og:image" content="https://solflag.com/og.png?v=2">
+<link rel="canonical" href="https://solflag.com/como-funciona/">
+<link rel="alternate" hreflang="en" href="https://solflag.com/en/how-it-works/">
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+/* Mismo aspecto que solflag.com: lila oscuro, turquesa pastel y titulares con serifa */
+:root{--bg:#0e0926;--card:rgba(24,17,62,.96);--line:rgba(196,181,253,.3);--fg:#f1eeff;--muted:#c9c1ea;--soft:#ddd7f5;--kick:#8ec5cf;--accent:#7ab8c4;--alto:#ff6b6b;--bajo:#4ade80;--medio:#fbbf24;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--fg);font:17px/1.65 Manrope,'Segoe UI',system-ui,sans-serif;background:radial-gradient(1100px 720px at 88% -8%,rgba(139,92,246,.38),transparent 62%),radial-gradient(900px 640px at -12% 30%,rgba(192,38,211,.16),transparent 60%),linear-gradient(180deg,#140d33 0%,#0e0926 45%,#0a061c 100%) fixed;background-color:var(--bg);padding:0 16px 64px}
+a{color:var(--kick)}
+a:hover{color:#c3e2e7}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:780px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22)}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo svg,.logo .ico{width:42px;height:42px;flex:none}
+.wm{display:inline-block;font-family:Unbounded,'Arial Black',sans-serif;font-weight:700;line-height:1.15;letter-spacing:-.03em;background:linear-gradient(90deg,#7fd0dc,#9fb4f2 50%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));font-size:25px}
+.back{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:700;text-decoration:none}
+.back:hover{color:#140e31;filter:brightness(1.06)}
+.intro{padding:52px 0 18px}
+.kick{margin:0;color:var(--kick);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+h1{font:800 clamp(2.4rem,6vw,3.6rem)/1.05 Fraunces,Georgia,serif;margin:14px 0 0;color:#f7f4ff;text-wrap:balance}
+.intro p{color:var(--soft);font-size:1.08rem;margin:16px 0 0;max-width:600px}
+.toc{display:flex;flex-direction:column;gap:2px;margin:28px 0 0;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:20px}
+.toc a{display:flex;gap:14px;padding:8px 0;text-decoration:none;color:var(--fg)}
+.toc a:hover b{color:var(--kick)}
+.toc time{color:var(--muted);font-size:.88rem;flex:none;width:92px;padding-top:2px}
+article{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:32px;scroll-margin-top:16px}
+article time{color:var(--muted);font-size:.9rem}
+article h2{font:700 clamp(1.6rem,4vw,2.2rem)/1.15 Fraunces,Georgia,serif;margin:8px 0 14px;color:#f7f4ff;text-wrap:balance}
+article h3{font-size:1.1rem;margin:24px 0 6px}
+article p{margin:0 0 14px;color:var(--soft)}
+article ul{margin:0 0 14px;padding-left:22px;color:var(--soft)}
+article li{margin:6px 0}
+article b{color:#fff}
+article p.nota{border-left:3px solid var(--medio);background:rgba(251,191,36,.08);border-radius:0 12px 12px 0;padding:10px 14px;font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.tags span{border:1px solid #5e4bb0;border-radius:999px;padding:3px 12px;font-size:.8rem;color:#ece8fd}
+.fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.fig div{background:#1d1550;border:1px solid #3a2c7a;border-radius:16px;padding:14px 16px}
+.fig b{display:block;font:800 1.8rem/1.1 Fraunces,Georgia,serif}
+.fig span{color:var(--muted);font-size:.88rem}
+.share{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;padding-top:16px;border-top:1px solid rgba(196,181,253,.22);font-size:.92rem}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid rgba(196,181,253,.22);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;color:var(--muted);font-size:.92rem}
+footer .wm{font-size:17px}
+footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
+@media (max-width:620px){
+  body{font-size:16px}
+  .logo svg,.logo .ico{width:36px;height:36px}.wm{font-size:21px}
+  article{padding:22px 20px}
+  .toc time{width:78px}
+}
+</style>
+
+<style>
+.lang{margin:18px 0 0;font-size:.95rem}
+.upd{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+.fig div.k b{color:var(--kick)}
+article table{width:100%;border-collapse:collapse;margin:4px 0 14px;font-size:.93rem}
+article td,article th{text-align:left;vertical-align:top;padding:8px 8px;border-top:1px solid rgba(196,181,253,.22);color:var(--soft)}
+article th{color:var(--kick);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;border-top:0}
+article td.n,article th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+article tr.base td{background:rgba(122,184,196,.1);color:#fff;font-weight:600}
+article tr.few td{opacity:.6}
+article code{font-size:.8rem;color:var(--muted);word-break:break-all}
+.pill{display:inline-block;border-radius:999px;padding:1px 9px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.pill.HIGH{background:rgba(255,107,107,.18);color:var(--alto)}.pill.MEDIUM{background:rgba(251,191,36,.16);color:var(--medio)}
+.pill.LOW{background:rgba(74,222,128,.16);color:var(--bajo)}.pill.x{background:rgba(196,181,253,.16);color:var(--muted)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mono{font-family:ui-monospace,Consolas,monospace}
+.dl{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px;padding:0;list-style:none}
+.dl a{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid #5e4bb0;border-radius:12px;text-decoration:none;font-size:.9rem}
+.dl small{color:var(--muted);margin-left:6px}
+dl.fmt{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:0 0 14px;font-size:.93rem}
+dl.fmt dt{font-family:ui-monospace,Consolas,monospace;color:#fff}
+dl.fmt dd{margin:0;color:var(--soft)}
+#err{display:none}
+@media (max-width:520px){article table{font-size:.8rem} article td,article th{padding:7px 4px} article th,article th.n{white-space:normal;font-size:.62rem;letter-spacing:.04em} .hide-s{display:none} .pill{font-size:.68rem;padding:1px 6px} article{padding:20px 14px} dl.fmt{grid-template-columns:1fr} dl.fmt dd{margin-bottom:6px}}
+@media (max-width:360px){#alive code{display:none} article code{font-size:.66rem} article td,article th{padding:6px 3px}}
+</style>
+<link href="/paginas.css?v=20261111c" rel="stylesheet">
+<link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="/" title="SolFlag">
+    <img class="ico" src="/marca/solflag-icono.svg?v=1" alt="" width="44" height="44">
+    <span class="wm" translate="no">Solflag</span>
+  </a>
+  <nav class="pnav" aria-label="Secciones"><a href="/?v=escaner">Escáner</a><a href="/?v=lista">Mi lista</a><a href="/?v=confluencia">Confluencia</a><a href="/acciones/">Acciones</a><a class="pbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a></nav>
+  <a class="plang" href="/en/how-it-works/" hreflang="en" title="English version">EN</a>
+</header>
+
+<style>
+/* Cómo funciona (maqueta 14/11): cada bandera con lo que mira, desde qué cifra se enciende y por qué */
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0 6px}
+.flow div{border:1px solid var(--line2);border-radius:16px;padding:14px 14px 12px;background:rgba(5,4,13,.35)}
+.flow b{display:block;font:700 1.02rem/1.2 Fraunces,Georgia,serif;color:#f7f4ff}
+.flow span{display:block;margin-top:4px;font-size:.84rem;color:var(--muted);line-height:1.4}
+.flow i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:1px}
+.arrow{text-align:center;color:var(--kick);font-size:.82rem;font-weight:700;letter-spacing:.2em;margin:10px 0 0}
+.lv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 16px}
+.lv div{border-radius:16px;padding:14px 16px;border:1px solid}
+.lv .a{border-color:rgba(255,107,107,.5);background:rgba(255,107,107,.07)}.lv .m{border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.06)}.lv .b{border-color:rgba(74,222,128,.45);background:rgba(74,222,128,.06)}
+.lv b{display:block;font:700 1.15rem Fraunces,Georgia,serif}.lv .a b{color:var(--alto)}.lv .m b{color:var(--medio)}.lv .b b{color:var(--bajo)}
+.lv span{display:block;margin-top:4px;font-size:.9rem;color:var(--soft)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:1px}
+.dot.r{background:var(--alto)}.dot.y{background:var(--medio)}.dot.g{background:var(--bajo)}
+td.c{white-space:nowrap}
+td small{display:block;color:var(--mut2);font-size:.8rem;margin-top:3px;line-height:1.4}
+.why{color:var(--soft)}
+.why b{color:#fff;font-variant-numeric:tabular-nums}
+.chg{list-style:none;padding:0!important;margin:0}
+.chg li{display:grid;grid-template-columns:70px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--line);margin:0!important}
+.chg li:first-child{border-top:0}
+.chg time{color:var(--kick);font-weight:700;font-size:.9rem}
+.src{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0 4px}
+.src div{border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:.92rem;color:var(--soft)}
+.src b{display:block;color:#fff}
+@media (max-width:620px){.flow{grid-template-columns:1fr 1fr}.lv{grid-template-columns:1fr}}
+@media (max-width:520px){td.hide-s,th.hide-s{display:none}}
+</style>
+
+<section class="intro">
+  <p class="kick">Cómo funciona</p>
+  <h1>Cada bandera,<span class="thin">explicada.</span></h1>
+  <p>SolFlag mira cuatro cosas de cada token y te dice lo que encuentra, con números. Aquí está cada regla: qué mira, desde qué cifra se enciende y por qué la pusimos ahí. Las cifras salen de lo que hemos medido en miles de lanzamientos. El código es abierto y los datos, también.</p>
+  <div class="fig">
+    <div><b>4</b><span>semáforos por token</span></div>
+    <div><b>~900</b><span>tokens nuevos analizados al día</span></div>
+    <div><b>86 %</b><span>de los nuevos nunca llega a 10.000 $</span></div>
+    <div class="k"><b>0</b><span>veces que decimos «estafa»</span></div>
+  </div>
+  <nav class="toc" aria-label="En esta página">
+    <a href="#nivel"><time>Resumen</time><b>Del semáforo al nivel de riesgo</b></a>
+    <a href="#control"><time>1</time><b>Quién controla el token</b></a>
+    <a href="#concentracion"><time>2</time><b>Concentración de holders</b></a>
+    <a href="#mercado"><time>3</time><b>Mercado y salida</b></a>
+    <a href="#dependencia"><time>4</time><b>Dependencia de un emisor</b></a>
+    <a href="#detras"><time>Aparte</time><b>Quién está detrás</b></a>
+    <a href="#limites"><time>Límites</time><b>Lo que no puede saber</b></a>
+    <a href="#cambios"><time>Historial</time><b>Cambios en las reglas</b></a>
+  </nav>
+</section>
+
+<article id="nivel">
+  <h2>Del semáforo al nivel de riesgo</h2>
+  <p>Cada uno de los cuatro semáforos sale en verde, ámbar o rojo según la peor señal que encuentre dentro. El nivel del token se decide contando semáforos, no sumando puntos: así una sola cosa grave no se diluye entre muchas buenas.</p>
+  <div class="flow">
+    <div><b>Control</b><span>quién puede crear más, congelar o cobrar por moverlo</span></div>
+    <div><b>Concentración</b><span>cuánto tienen las mayores wallets de personas</span></div>
+    <div><b>Mercado</b><span>si hay liquidez real y si puedes salir</span></div>
+    <div><b>Dependencia</b><span>si depende de un emisor, un puente o un programa</span></div>
+  </div>
+  <p class="arrow">↓ SE CUENTAN ↓</p>
+  <div class="lv">
+    <div class="a"><b>Riesgo alto</b><span>dos rojos, o un rojo y un ámbar. También siempre que copia a un token famoso o a una marca real, o si su liquidez está inflada 100 veces.</span></div>
+    <div class="m"><b>Riesgo medio</b><span>un rojo, o dos ámbar. También si algo no se pudo comprobar o si su mercado tiene menos de 7 días.</span></div>
+    <div class="b"><b>Riesgo bajo</b><span>todo en verde, o un solo ámbar normal para su tipo de token. Nunca con algo sin comprobar.</span></div>
+  </div>
+  <p class="nota"><b>Por qué menos de 7 días nunca es «bajo».</b> Un mercado recién nacido no tiene historia. Lo medimos en 62 tokens reales: esta regla movió 9 tokens recién lanzados de bajo a medio y ninguno veterano.</p>
+</article>
+
+<article id="control">
+  <p class="kick">Semáforo 1</p>
+  <h2>Quién controla el token</h2>
+  <p>Lo primero es saber si alguien puede cambiar las reglas después de que compres: crear más tokens, congelar tu saldo o cobrarte al moverlo. Lo leemos directamente de la cadena.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Señal</th><th>Se enciende si…</th><th></th><th class="hide-s">Por qué</th></tr></thead>
+    <tbody>
+      <tr><td>Puede crear más tokens</td><td>la clave de emisión está activa y es de una persona<small>si es de un programa (un puente, un protocolo), va a Dependencia</small></td><td class="c"><span class="dot r"></span></td><td class="hide-s why">quien la tiene puede diluir tu parte a cero en un segundo</td></tr>
+      <tr><td>Puede congelar</td><td>la clave de congelar está activa y es de una persona</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">puede dejarte sin poder vender; los dólares digitales la llevan por ley, por eso es ámbar</td></tr>
+      <tr><td>Comisión al mover</td><td>el token cobra por cada transferencia</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">la comisión puede subir; con un emisor conocido y al 0 % no cuenta (PYUSD, USDG)</td></tr>
+      <tr><td>Gancho al mover · Nace congelado · No transferible</td><td>extensiones de Token-2022 que de verdad están puestas<small>un gancho sin programa ni dueño no hace nada y no se marca</small></td><td class="c"><span class="dot y"></span></td><td class="hide-s why">cambian lo que puedes hacer con tu saldo</td></tr>
+      <tr><td>Lanzamientos en serie</td><td>quien pagó su creación lanzó <b>2 o más</b> tokens en 24 h (rojo con <b>5 o más</b>)</td><td class="c"><span class="dot y"></span> <span class="dot r"></span></td><td class="hide-s why">en 100 tokens de Pump.fun, una wallet lanzó <b>7 copias</b> de «GMS» en 10 minutos</td></tr>
+      <tr><td>Historial del creador</td><td>de sus <b>3 o más</b> tokens anteriores, el <b>80 %</b> no despegó (rojo: <b>10 o más</b> y el <b>95 %</b>)</td><td class="c"><span class="dot y"></span> <span class="dot r"></span></td><td class="hide-s why">el <b>86 %</b> de los tokens nuevos nunca llega a 10.000 $, así que uno de cada diez que despega ya es mejor que el azar: por eso el rojo pide tanto</td></tr>
+      <tr><td>Copia de un token famoso o de una marca</td><td>usa el símbolo de USDC, SOL… con otra dirección, o el nombre exacto de una empresa real</td><td class="c"><span class="dot r"></span></td><td class="hide-s why">está hecho para parecer lo que no es: sube el nivel a alto aunque lo demás esté bien</td></tr>
+      <tr><td>Mismo nombre que otro más antiguo</td><td>hay un token anterior con el mismo nombre y símbolo y más mercado (rojo si tiene <b>10 veces</b> más liquidez)</td><td class="c"><span class="dot y"></span> <span class="dot r"></span></td><td class="hide-s why">el que busca «X» puede comprar la copia; un relanzamiento con más mercado que el original no se marca</td></tr>
+      <tr><td>Claves de un emisor cambiadas</td><td>un token oficial de un emisor verificado tiene una clave que no estaba en su lista</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">puede ser una rotación normal o alguien que la tomó: hasta comprobarlo en su fuente oficial, nunca verde</td></tr>
+    </tbody>
+  </table></div>
+</article>
+
+<article id="concentracion">
+  <p class="kick">Semáforo 2</p>
+  <h2>Concentración de holders</h2>
+  <p>Cuánto del total tienen las mayores wallets. Antes de contar, cada cuenta grande se sigue hasta su dueño: un pool, un programa o un exchange no es una persona que vaya a vender.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Señal</th><th>Se enciende si…</th><th></th><th class="hide-s">Por qué</th></tr></thead>
+    <tbody>
+      <tr><td>Muy concentrado</td><td>una sola wallet tiene más del <b>30 %</b> o las 10 mayores más del <b>70 %</b></td><td class="c"><span class="dot r"></span></td><td class="hide-s why">una venta de una sola persona hunde el precio</td></tr>
+      <tr><td>Concentrado</td><td>una sola wallet más del <b>15 %</b> o las 10 mayores más del <b>50 %</b></td><td class="c"><span class="dot y"></span></td><td class="hide-s why">lo mismo, con menos margen</td></tr>
+      <tr><td>Exchanges con nombre</td><td>se enseñan, pero no cuentan</td><td class="c"><span class="dot g"></span></td><td class="hide-s why">es el dinero de sus usuarios, no de una persona</td></tr>
+      <tr><td>Creadores de mercado con nombre</td><td>se enseñan y sí cuentan<small>Wintermute y DWF Labs, con dirección publicada por ellos o por Solscan</small></td><td class="c">—</td><td class="hide-s why">pueden vender mucho de golpe</td></tr>
+    </tbody>
+  </table></div>
+  <p>En dólares digitales, tokens de acciones y tokens puenteados, el rojo baja a ámbar. Con un emisor verificado, las grandes wallets son su tesorería, custodios y exchanges, y no cuentan: PYUSD tenía el <b>56 %</b> en una sola.</p>
+</article>
+
+<article id="mercado">
+  <p class="kick">Semáforo 3</p>
+  <h2>Mercado y salida</h2>
+  <p>No basta con que haya un precio: hace falta poder vender. Aquí se mira cuánto dinero real hay detrás, si alguien puede retirarlo y si el movimiento es de verdad.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Señal</th><th>Se enciende si…</th><th></th><th class="hide-s">Por qué</th></tr></thead>
+    <tbody>
+      <tr><td>Poca liquidez</td><td>menos de <b>10.000 $</b> (rojo) o de <b>50.000 $</b> (ámbar)</td><td class="c"><span class="dot r"></span> <span class="dot y"></span></td><td class="hide-s why">vender una cantidad normal mueve mucho el precio</td></tr>
+      <tr><td>Liquidez inflada</td><td>el lado real del pool (SOL, USDC o USDT) es menos del <b>5 %</b> de lo que se anuncia</td><td class="c"><span class="dot r"></span></td><td class="hide-s why">un «Shopify» anunciaba <b>12,9 M$</b> con <b>52 $</b> reales detrás; a <b>100 veces</b> o más, el nivel pasa a alto</td></tr>
+      <tr><td>Liquidez sin bloquear</td><td>menos del <b>20 %</b> bloqueado o quemado (ámbar por debajo del <b>60 %</b>), solo en mercados de menos de <b>90 días</b></td><td class="c"><span class="dot r"></span> <span class="dot y"></span></td><td class="hide-s why">el creador puede llevarse el dinero del pool; en tokens veteranos la ponen muchos y no es señal (JUP salía peor que una memecoin nueva)</td></tr>
+      <tr><td>Volumen inflado</td><td>el <b>80 %</b> o más del volumen es de wallets que compran y venden lo mismo (rojo si además son <b>25</b> o menos y las 3 mayores mueven el <b>75 %</b>)</td><td class="c"><span class="dot y"></span> <span class="dot r"></span></td><td class="hide-s why">en 14 tokens en tendencia salió entre el <b>0</b> y el <b>47 %</b>; en un pool de 6 minutos, el <b>96 %</b>. Mirar volumen/liquidez no sirve: memecoins sanas mueven de 20 a 360 veces su liquidez</td></tr>
+      <tr><td>Poco volumen</td><td>menos de <b>1.000 $</b> en 24 h</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">nadie lo está comprando ni vendiendo</td></tr>
+      <tr><td>Mercado nuevo</td><td>menos de <b>7 días</b></td><td class="c"><span class="dot y"></span></td><td class="hide-s why">sin historia no hay nada que comprobar</td></tr>
+      <tr><td>Tu posición pesa</td><td>lo que tiene la wallet analizada es el <b>10 %</b> o más de la liquidez</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">no podrías vender todo sin hundir el precio</td></tr>
+    </tbody>
+  </table></div>
+  <p class="nota"><b>Lo que no se marca.</b> En la curva de Pump.fun y en los pools de liquidez concentrada no existe liquidez que bloquear: RugCheck da 0 % y marcaba en rojo <b>49 de 75</b> tokens de la curva. Ahí esta regla no se aplica.</p>
+</article>
+
+<article id="dependencia">
+  <p class="kick">Semáforo 4</p>
+  <h2>Dependencia de un emisor</h2>
+  <p>Algunos tokens valen lo que vale la promesa de alguien: el dólar de Circle, la acción que custodia xStocks o el puente que guarda el original. No es malo, pero conviene saberlo.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Señal</th><th>Se enciende si…</th><th></th><th class="hide-s">Por qué</th></tr></thead>
+    <tbody>
+      <tr><td>Emisor de confianza</td><td>todas sus claves son las de un emisor de nuestra lista corta (Circle, Tether…)</td><td class="c"><span class="dot g"></span></td><td class="hide-s why">sus claves de congelar y emitir son como funciona el producto</td></tr>
+      <tr><td>Emisor conocido</td><td>sus claves son de un emisor verificado que no está en la lista corta (Ondo, xStocks…)</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">depende de que cumpla; las direcciones salen de su web oficial, nunca de agregadores</td></tr>
+      <tr><td>Controlado por un programa</td><td>la clave de emisión o de congelar es de un programa (puente, protocolo)</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">si el programa falla o lo atacan, el token también</td></tr>
+      <tr><td>Delegado permanente</td><td>alguien puede mover o quemar tokens de cualquier wallet</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">en acciones tokenizadas es normal; en una memecoin, no</td></tr>
+    </tbody>
+  </table></div>
+</article>
+
+<article id="detras">
+  <h2>Quién está detrás</h2>
+  <p>Aparte de los semáforos, SolFlag apunta quién pagó la creación de cada token, quién lo creó y quién le dio el primer SOL al creador. Con eso se ve lo que un solo token no enseña.</p>
+  <ul>
+    <li><b>Un grupo que ya ha estado en muchos lanzamientos.</b> Wallets que se mandan SOL entre ellas y han estado detrás o entre los primeros compradores de <b>5 o más</b> lanzamientos. Con 2 coincidencias puede ser casualidad, por eso no se enseña.</li>
+    <li><b>Compra al nacer.</b> Wallets que compran en los primeros bloques de <b>3 o más</b> lanzamientos. No es una señal del token: hay una de esas en el <b>84 %</b> de los lanzamientos y con ellas muere en 24 h el <b>98,6 %</b>, sin ellas el <b>99,3 %</b>. Lo que importa es si siguen teniendo tokens para vender, y eso se ve entre las mayores wallets.</li>
+    <li><b>Nombres que describen lo que hace</b>, no acusaciones: «Paga lanzamientos», «Reparte SOL», «Crea tokens en serie», «Ritmo de exchange». Siempre con el motivo en números.</li>
+  </ul>
+</article>
+
+<article id="limites">
+  <h2>Lo que no puede saber</h2>
+  <ul>
+    <li><b>La intención.</b> SolFlag ve hechos de la cadena, no lo que alguien piensa hacer. Un token en verde puede caer y uno en rojo puede subir.</li>
+    <li><b>Lo que no se pudo comprobar.</b> Si una fuente no responde, el semáforo sale «sin comprobar» y el token nunca queda en riesgo bajo. Si no se puede leer nada, sale «Sin datos», nunca «Probable spam».</li>
+    <li><b>Lo que pasa fuera de Solana.</b> Un token puenteado o de un exchange puede tener su mercado en otra parte: con poca liquidez aquí sale en ámbar, no en rojo.</li>
+  </ul>
+  <p>No es una recomendación de compra ni de venta. Cómo acierta, con los fallos incluidos, está en <a href="/acierto/">Datos y acierto</a>. Si ves un error, escríbenos a <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>.</p>
+</article>
+
+<article id="cambios">
+  <h2>Cambios en las reglas</h2>
+  <p>Cuando una regla da un resultado equivocado, se cambia y se apunta aquí con el motivo.</p>
+  <ul class="chg">
+    <li><time>14/11</time><span><b>Volumen inflado.</b> Se mira quién opera en las últimas ~300 operaciones, no la proporción entre volumen y liquidez, que daba falsos positivos.</span></li>
+    <li><time>14/11</time><span><b>«Sin datos» en vez de «Probable spam»</b> cuando la cadena no responde al leer un token sin mercado.</span></li>
+    <li><time>14/11</time><span><b>Compra al nacer:</b> etiqueta de wallet, no señal del token (con ellas o sin ellas muere casi lo mismo).</span></li>
+    <li><time>12/11</time><span><b>Emisores verificados con su lista de tokens.</b> Una clave nueva en un token oficial sale en ámbar hasta comprobarla.</span></li>
+    <li><time>12/11</time><span><b>Un token de un emisor conocido sin mercado</b> sale «Sin mercado», no «Probable spam» (OUSG y USDon de Ondo).</span></li>
+    <li><time>1/11</time><span><b>Pools de liquidez concentrada</b> fuera de la regla de liquidez sin bloquear ($STONK salía en rojo con 2,4 M$ en 27 pares).</span></li>
+    <li><time>1/11</time><span><b>USDC y USDT reales</b> ya no salen como copia de otro «USDC» más antiguo.</span></li>
+  </ul>
+</article>
+
+<article id="fuentes">
+  <h2>De dónde salen los datos</h2>
+  <div class="src">
+    <div><b>La cadena de Solana</b>claves, extensiones, holders y transacciones (Helius y RPC públicos)</div>
+    <div><b>DexScreener</b>pools, liquidez, volumen y edad del mercado</div>
+    <div><b>GeckoTerminal</b>quién opera en el pool y tokens de hace segundos</div>
+    <div><b>RugCheck</b>creador, liquidez bloqueada e historial</div>
+  </div>
+  <p>El motor es <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">código abierto</a> (MIT): cada regla de esta página está en él con sus números.</p>
+</article>
+
+<footer>
+  <span class="wm" translate="no">Solflag</span>
+  <a href="/">Escáner</a>
+  <a href="/acciones/">Acciones</a>
+  <a href="/blog/">Blog</a>
+  <a href="/acierto/">Datos y acierto</a>
+  <a href="/como-funciona/">Cómo funciona</a>
+  <a href="/privacidad/">Privacidad</a>
+  <a href="/terminos/">Términos</a>
+  <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
+  <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
+  <p>SolFlag es una herramienta orientativa, no consejo financiero.</p>
+</footer>
+</div>
+<script src="/fondo.js?v=20261111d" defer></script>
+</body>
+</html>

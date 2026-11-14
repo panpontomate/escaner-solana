@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works · SolFlag</title>
+<meta name="description" content="Every SolFlag flag explained: what it checks, the figure that turns it on and why, with numbers from thousands of Solana launches.">
+<meta property="og:title" content="How it works · SolFlag">
+<meta property="og:description" content="Every SolFlag flag explained: what it checks, the figure that turns it on and why, with numbers from thousands of Solana launches.">
+<meta property="og:url" content="https://solflag.com/en/how-it-works/">
+<meta property="og:image" content="https://solflag.com/og-en.png?v=2">
+<link rel="canonical" href="https://solflag.com/en/how-it-works/">
+<link rel="alternate" hreflang="es" href="https://solflag.com/como-funciona/">
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+/* Mismo aspecto que solflag.com: lila oscuro, turquesa pastel y titulares con serifa */
+:root{--bg:#0e0926;--card:rgba(24,17,62,.96);--line:rgba(196,181,253,.3);--fg:#f1eeff;--muted:#c9c1ea;--soft:#ddd7f5;--kick:#8ec5cf;--accent:#7ab8c4;--alto:#ff6b6b;--bajo:#4ade80;--medio:#fbbf24;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--fg);font:17px/1.65 Manrope,'Segoe UI',system-ui,sans-serif;background:radial-gradient(1100px 720px at 88% -8%,rgba(139,92,246,.38),transparent 62%),radial-gradient(900px 640px at -12% 30%,rgba(192,38,211,.16),transparent 60%),linear-gradient(180deg,#140d33 0%,#0e0926 45%,#0a061c 100%) fixed;background-color:var(--bg);padding:0 16px 64px}
+a{color:var(--kick)}
+a:hover{color:#c3e2e7}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:780px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22)}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo svg,.logo .ico{width:42px;height:42px;flex:none}
+.wm{display:inline-block;font-family:Unbounded,'Arial Black',sans-serif;font-weight:700;line-height:1.15;letter-spacing:-.03em;background:linear-gradient(90deg,#7fd0dc,#9fb4f2 50%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));font-size:25px}
+.back{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:700;text-decoration:none}
+.back:hover{color:#140e31;filter:brightness(1.06)}
+.intro{padding:52px 0 18px}
+.kick{margin:0;color:var(--kick);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+h1{font:800 clamp(2.4rem,6vw,3.6rem)/1.05 Fraunces,Georgia,serif;margin:14px 0 0;color:#f7f4ff;text-wrap:balance}
+.intro p{color:var(--soft);font-size:1.08rem;margin:16px 0 0;max-width:600px}
+.toc{display:flex;flex-direction:column;gap:2px;margin:28px 0 0;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:20px}
+.toc a{display:flex;gap:14px;padding:8px 0;text-decoration:none;color:var(--fg)}
+.toc a:hover b{color:var(--kick)}
+.toc time{color:var(--muted);font-size:.88rem;flex:none;width:92px;padding-top:2px}
+article{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:32px;scroll-margin-top:16px}
+article time{color:var(--muted);font-size:.9rem}
+article h2{font:700 clamp(1.6rem,4vw,2.2rem)/1.15 Fraunces,Georgia,serif;margin:8px 0 14px;color:#f7f4ff;text-wrap:balance}
+article h3{font-size:1.1rem;margin:24px 0 6px}
+article p{margin:0 0 14px;color:var(--soft)}
+article ul{margin:0 0 14px;padding-left:22px;color:var(--soft)}
+article li{margin:6px 0}
+article b{color:#fff}
+article p.nota{border-left:3px solid var(--medio);background:rgba(251,191,36,.08);border-radius:0 12px 12px 0;padding:10px 14px;font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.tags span{border:1px solid #5e4bb0;border-radius:999px;padding:3px 12px;font-size:.8rem;color:#ece8fd}
+.fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.fig div{background:#1d1550;border:1px solid #3a2c7a;border-radius:16px;padding:14px 16px}
+.fig b{display:block;font:800 1.8rem/1.1 Fraunces,Georgia,serif}
+.fig span{color:var(--muted);font-size:.88rem}
+.share{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;padding-top:16px;border-top:1px solid rgba(196,181,253,.22);font-size:.92rem}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid rgba(196,181,253,.22);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;color:var(--muted);font-size:.92rem}
+footer .wm{font-size:17px}
+footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
+@media (max-width:620px){
+  body{font-size:16px}
+  .logo svg,.logo .ico{width:36px;height:36px}.wm{font-size:21px}
+  article{padding:22px 20px}
+  .toc time{width:78px}
+}
+</style>
+
+<style>
+.lang{margin:18px 0 0;font-size:.95rem}
+.upd{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+.fig div.k b{color:var(--kick)}
+article table{width:100%;border-collapse:collapse;margin:4px 0 14px;font-size:.93rem}
+article td,article th{text-align:left;vertical-align:top;padding:8px 8px;border-top:1px solid rgba(196,181,253,.22);color:var(--soft)}
+article th{color:var(--kick);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;border-top:0}
+article td.n,article th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+article tr.base td{background:rgba(122,184,196,.1);color:#fff;font-weight:600}
+article tr.few td{opacity:.6}
+article code{font-size:.8rem;color:var(--muted);word-break:break-all}
+.pill{display:inline-block;border-radius:999px;padding:1px 9px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.pill.HIGH{background:rgba(255,107,107,.18);color:var(--alto)}.pill.MEDIUM{background:rgba(251,191,36,.16);color:var(--medio)}
+.pill.LOW{background:rgba(74,222,128,.16);color:var(--bajo)}.pill.x{background:rgba(196,181,253,.16);color:var(--muted)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mono{font-family:ui-monospace,Consolas,monospace}
+.dl{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px;padding:0;list-style:none}
+.dl a{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid #5e4bb0;border-radius:12px;text-decoration:none;font-size:.9rem}
+.dl small{color:var(--muted);margin-left:6px}
+dl.fmt{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:0 0 14px;font-size:.93rem}
+dl.fmt dt{font-family:ui-monospace,Consolas,monospace;color:#fff}
+dl.fmt dd{margin:0;color:var(--soft)}
+#err{display:none}
+@media (max-width:520px){article table{font-size:.8rem} article td,article th{padding:7px 4px} article th,article th.n{white-space:normal;font-size:.62rem;letter-spacing:.04em} .hide-s{display:none} .pill{font-size:.68rem;padding:1px 6px} article{padding:20px 14px} dl.fmt{grid-template-columns:1fr} dl.fmt dd{margin-bottom:6px}}
+@media (max-width:360px){#alive code{display:none} article code{font-size:.66rem} article td,article th{padding:6px 3px}}
+</style>
+<link href="/paginas.css?v=20261111c" rel="stylesheet">
+<link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="/en/" title="SolFlag">
+    <img class="ico" src="/marca/solflag-icono.svg?v=1" alt="" width="44" height="44">
+    <span class="wm" translate="no">Solflag</span>
+  </a>
+  <nav class="pnav" aria-label="Sections"><a href="/en/?v=escaner">Scanner</a><a href="/en/?v=lista">My list</a><a href="/en/?v=confluencia">Confluence</a><a href="/en/stocks/">Stocks</a><a class="pbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Telegram bot</a></nav>
+  <a class="plang" href="/como-funciona/" hreflang="es" title="Versión en español">ES</a>
+</header>
+
+<style>
+/* Cómo funciona (maqueta 14/11): cada bandera con lo que mira, desde qué cifra se enciende y por qué */
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0 6px}
+.flow div{border:1px solid var(--line2);border-radius:16px;padding:14px 14px 12px;background:rgba(5,4,13,.35)}
+.flow b{display:block;font:700 1.02rem/1.2 Fraunces,Georgia,serif;color:#f7f4ff}
+.flow span{display:block;margin-top:4px;font-size:.84rem;color:var(--muted);line-height:1.4}
+.flow i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:1px}
+.arrow{text-align:center;color:var(--kick);font-size:.82rem;font-weight:700;letter-spacing:.2em;margin:10px 0 0}
+.lv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 16px}
+.lv div{border-radius:16px;padding:14px 16px;border:1px solid}
+.lv .a{border-color:rgba(255,107,107,.5);background:rgba(255,107,107,.07)}.lv .m{border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.06)}.lv .b{border-color:rgba(74,222,128,.45);background:rgba(74,222,128,.06)}
+.lv b{display:block;font:700 1.15rem Fraunces,Georgia,serif}.lv .a b{color:var(--alto)}.lv .m b{color:var(--medio)}.lv .b b{color:var(--bajo)}
+.lv span{display:block;margin-top:4px;font-size:.9rem;color:var(--soft)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:1px}
+.dot.r{background:var(--alto)}.dot.y{background:var(--medio)}.dot.g{background:var(--bajo)}
+td.c{white-space:nowrap}
+td small{display:block;color:var(--mut2);font-size:.8rem;margin-top:3px;line-height:1.4}
+.why{color:var(--soft)}
+.why b{color:#fff;font-variant-numeric:tabular-nums}
+.chg{list-style:none;padding:0!important;margin:0}
+.chg li{display:grid;grid-template-columns:70px 1fr;gap:12px;padding:10px 0;border-top:1px solid var(--line);margin:0!important}
+.chg li:first-child{border-top:0}
+.chg time{color:var(--kick);font-weight:700;font-size:.9rem}
+.src{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:8px 0 4px}
+.src div{border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:.92rem;color:var(--soft)}
+.src b{display:block;color:#fff}
+@media (max-width:620px){.flow{grid-template-columns:1fr 1fr}.lv{grid-template-columns:1fr}}
+@media (max-width:520px){td.hide-s,th.hide-s{display:none}}
+</style>
+<section class="intro">
+  <p class="kick">How it works</p>
+  <h1>Every flag,<span class="thin">explained.</span></h1>
+  <p>SolFlag looks at four things in every token and tells you what it finds, with numbers. Here is every rule: what it checks, the figure that turns it on and why we put it there. The figures come from what we have measured across thousands of launches. The code is open and so is the data.</p>
+  <div class="fig">
+    <div><b>4</b><span>traffic lights per token</span></div>
+    <div><b>~900</b><span>new tokens analysed a day</span></div>
+    <div><b>86%</b><span>of new tokens never reach $10,000</span></div>
+    <div class="k"><b>0</b><span>times we say «scam»</span></div>
+  </div>
+  <nav class="toc" aria-label="On this page">
+    <a href="#nivel"><time>Summary</time><b>From traffic lights to the risk level</b></a>
+    <a href="#control"><time>1</time><b>Who controls the token</b></a>
+    <a href="#concentracion"><time>2</time><b>Holder concentration</b></a>
+    <a href="#mercado"><time>3</time><b>Market and exit</b></a>
+    <a href="#dependencia"><time>4</time><b>Dependency on an issuer</b></a>
+    <a href="#detras"><time>Also</time><b>Who is behind it</b></a>
+    <a href="#limites"><time>Limits</time><b>What it cannot know</b></a>
+    <a href="#cambios"><time>History</time><b>Changes to the rules</b></a>
+  </nav>
+</section>
+
+<article id="nivel">
+  <h2>From traffic lights to the risk level</h2>
+  <p>Each of the four traffic lights turns green, amber or red depending on the worst signal it finds inside. The token level is decided by counting lights, not by adding up points: that way one serious problem is not diluted by many good things.</p>
+  <div class="flow">
+    <div><b>Control</b><span>who can mint more, freeze or charge you to move it</span></div>
+    <div><b>Concentration</b><span>how much the largest wallets of people hold</span></div>
+    <div><b>Market</b><span>whether there is real liquidity and you can get out</span></div>
+    <div><b>Dependency</b><span>whether it depends on an issuer, a bridge or a program</span></div>
+  </div>
+  <p class="arrow">↓ THEY ARE COUNTED ↓</p>
+  <div class="lv">
+    <div class="a"><b>High risk</b><span>two reds, or one red and one amber. Also always when it copies a famous token or a real brand, or when its liquidity is inflated 100 times.</span></div>
+    <div class="m"><b>Medium risk</b><span>one red, or two ambers. Also when something could not be checked or its market is under 7 days old.</span></div>
+    <div class="b"><b>Low risk</b><span>all green, or a single amber that is normal for its kind of token. Never with something unchecked.</span></div>
+  </div>
+  <p class="nota"><b>Why under 7 days is never «low».</b> A brand-new market has no history. We measured it on 62 real tokens: this rule moved 9 brand-new tokens from low to medium and no established one.</p>
+</article>
+
+<article id="control">
+  <p class="kick">Traffic light 1</p>
+  <h2>Who controls the token</h2>
+  <p>The first thing is to know whether someone can change the rules after you buy: mint more tokens, freeze your balance or charge you to move it. We read it straight from the chain.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Signal</th><th>Turns on when…</th><th></th><th class="hide-s">Why</th></tr></thead>
+    <tbody>
+      <tr><td>More can be minted</td><td>the mint key is active and belongs to a person<small>if it belongs to a program (a bridge, a protocol), it goes to Dependency</small></td><td class="c"><span class="dot r"></span></td><td class="hide-s why">whoever holds it can dilute your share to zero in a second</td></tr>
+      <tr><td>Can be frozen</td><td>the freeze key is active and belongs to a person</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">it can stop you from selling; digital dollars carry it by law, which is why it is amber</td></tr>
+      <tr><td>Transfer fee</td><td>the token charges on every transfer</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">the fee can go up; with a known issuer and at 0% it does not count (PYUSD, USDG)</td></tr>
+      <tr><td>Transfer hook · Born frozen · Non-transferable</td><td>Token-2022 extensions that are really set<small>a hook with no program and no owner does nothing and is not flagged</small></td><td class="c"><span class="dot y"></span></td><td class="hide-s why">they change what you can do with your balance</td></tr>
+      <tr><td>Serial launches</td><td>whoever paid for its creation launched <b>2 or more</b> tokens in 24 h (red with <b>5 or more</b>)</td><td class="c"><span class="dot y"></span> <span class="dot r"></span></td><td class="hide-s why">in 100 Pump.fun tokens, one wallet launched <b>7 copies</b> of «GMS» in 10 minutes</td></tr>
+      <tr><td>Creator history</td><td>of their <b>3 or more</b> previous tokens, <b>80%</b> never took off (red: <b>10 or more</b> and <b>95%</b>)</td><td class="c"><span class="dot y"></span> <span class="dot r"></span></td><td class="hide-s why"><b>86%</b> of new tokens never reach $10,000, so one in ten taking off is already better than chance: that is why red asks for so much</td></tr>
+      <tr><td>Copy of a famous token or a brand</td><td>uses the symbol of USDC, SOL… with another address, or the exact name of a real company</td><td class="c"><span class="dot r"></span></td><td class="hide-s why">it is built to look like something it is not: the level goes to high even if the rest looks fine</td></tr>
+      <tr><td>Same name as an older token</td><td>there is an older token with the same name and symbol and a bigger market (red if it has <b>10 times</b> more liquidity)</td><td class="c"><span class="dot y"></span> <span class="dot r"></span></td><td class="hide-s why">someone searching «X» can buy the copy; a relaunch with a bigger market than the original is not flagged</td></tr>
+      <tr><td>Issuer keys changed</td><td>an official token of a verified issuer has a key that was not on its list</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">it can be a normal rotation or someone who took it: until it is checked at the official source, never green</td></tr>
+    </tbody>
+  </table></div>
+</article>
+
+<article id="concentracion">
+  <p class="kick">Traffic light 2</p>
+  <h2>Holder concentration</h2>
+  <p>How much of the supply the largest wallets hold. Before counting, every large account is traced to its owner: a pool, a program or an exchange is not a person about to sell.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Signal</th><th>Turns on when…</th><th></th><th class="hide-s">Why</th></tr></thead>
+    <tbody>
+      <tr><td>Highly concentrated</td><td>one wallet holds more than <b>30%</b> or the top 10 more than <b>70%</b></td><td class="c"><span class="dot r"></span></td><td class="hide-s why">one person selling sinks the price</td></tr>
+      <tr><td>Concentrated</td><td>one wallet more than <b>15%</b> or the top 10 more than <b>50%</b></td><td class="c"><span class="dot y"></span></td><td class="hide-s why">the same, with less margin</td></tr>
+      <tr><td>Named exchanges</td><td>shown, but not counted</td><td class="c"><span class="dot g"></span></td><td class="hide-s why">it is their users' money, not one person's</td></tr>
+      <tr><td>Named market makers</td><td>shown and counted<small>Wintermute and DWF Labs, with addresses published by them or by Solscan</small></td><td class="c">—</td><td class="hide-s why">they can sell a lot at once</td></tr>
+    </tbody>
+  </table></div>
+  <p>For digital dollars, stock tokens and bridged tokens, red drops to amber. With a verified issuer, the large wallets are its treasury, custodians and exchanges, and they do not count: PYUSD had <b>56%</b> in a single one.</p>
+</article>
+
+<article id="mercado">
+  <p class="kick">Traffic light 3</p>
+  <h2>Market and exit</h2>
+  <p>Having a price is not enough: you need to be able to sell. Here we look at how much real money is behind it, whether someone can pull it and whether the trading is real.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Signal</th><th>Turns on when…</th><th></th><th class="hide-s">Why</th></tr></thead>
+    <tbody>
+      <tr><td>Low liquidity</td><td>under <b>$10,000</b> (red) or <b>$50,000</b> (amber)</td><td class="c"><span class="dot r"></span> <span class="dot y"></span></td><td class="hide-s why">selling a normal amount moves the price a lot</td></tr>
+      <tr><td>Inflated liquidity</td><td>the real side of the pool (SOL, USDC or USDT) is under <b>5%</b> of what is reported</td><td class="c"><span class="dot r"></span></td><td class="hide-s why">a «Shopify» reported <b>$12.9M</b> with <b>$52</b> really behind it; at <b>100 times</b> or more, the level goes to high</td></tr>
+      <tr><td>Unlocked liquidity</td><td>under <b>20%</b> locked or burned (amber under <b>60%</b>), only for markets under <b>90 days</b></td><td class="c"><span class="dot r"></span> <span class="dot y"></span></td><td class="hide-s why">the creator can take the pool's money; in veteran tokens many provide it and it is not a signal (JUP scored worse than a new memecoin)</td></tr>
+      <tr><td>Inflated volume</td><td><b>80%</b> or more of the volume comes from wallets that buy and sell the same (red if they are also <b>25</b> or fewer and the top 3 move <b>75%</b>)</td><td class="c"><span class="dot y"></span> <span class="dot r"></span></td><td class="hide-s why">14 trending tokens came out between <b>0</b> and <b>47%</b>; a 6-minute-old pool, <b>96%</b>. Volume/liquidity does not work: healthy memecoins trade 20 to 360 times their liquidity</td></tr>
+      <tr><td>Low volume</td><td>under <b>$1,000</b> in 24 h</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">nobody is buying or selling it</td></tr>
+      <tr><td>New market</td><td>under <b>7 days</b></td><td class="c"><span class="dot y"></span></td><td class="hide-s why">with no history there is nothing to check</td></tr>
+      <tr><td>Your position is heavy</td><td>what the analysed wallet holds is <b>10%</b> or more of the liquidity</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">you could not sell it all without sinking the price</td></tr>
+    </tbody>
+  </table></div>
+  <p class="nota"><b>What is not flagged.</b> On the Pump.fun curve and in concentrated-liquidity pools there is no liquidity to lock: RugCheck reports 0% and flagged <b>49 of 75</b> curve tokens in red. This rule does not apply there.</p>
+</article>
+
+<article id="dependencia">
+  <p class="kick">Traffic light 4</p>
+  <h2>Dependency on an issuer</h2>
+  <p>Some tokens are worth what someone's promise is worth: Circle's dollar, the share xStocks holds in custody or the bridge that keeps the original. That is not bad, but it is worth knowing.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Signal</th><th>Turns on when…</th><th></th><th class="hide-s">Why</th></tr></thead>
+    <tbody>
+      <tr><td>Trusted issuer</td><td>all its keys belong to an issuer on our short list (Circle, Tether…)</td><td class="c"><span class="dot g"></span></td><td class="hide-s why">its freeze and mint keys are how the product works</td></tr>
+      <tr><td>Known issuer</td><td>its keys belong to a verified issuer that is not on the short list (Ondo, xStocks…)</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">it depends on the issuer keeping its word; addresses come from its official website, never from aggregators</td></tr>
+      <tr><td>Controlled by a program</td><td>the mint or freeze key belongs to a program (bridge, protocol)</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">if the program fails or is attacked, so is the token</td></tr>
+      <tr><td>Permanent delegate</td><td>someone can move or burn tokens from any wallet</td><td class="c"><span class="dot y"></span></td><td class="hide-s why">normal for tokenized stocks; not for a memecoin</td></tr>
+    </tbody>
+  </table></div>
+</article>
+
+<article id="detras">
+  <h2>Who is behind it</h2>
+  <p>Apart from the traffic lights, SolFlag records who paid for the creation of each token, who created it and who gave the creator their first SOL. That shows what a single token cannot.</p>
+  <ul>
+    <li><b>A group that has been in many launches.</b> Wallets that send SOL to each other and have been behind, or among the first buyers of, <b>5 or more</b> launches. With 2 matches it can be chance, so it is not shown.</li>
+    <li><b>Buys at launch.</b> Wallets that buy in the first blocks of <b>3 or more</b> launches. It is not a token signal: there is one in <b>84%</b> of launches, and with them <b>98.6%</b> die within 24 h, without them <b>99.3%</b>. What matters is whether they still hold tokens to sell, and that shows among the largest wallets.</li>
+    <li><b>Names that describe what it does</b>, not accusations: «Pays for launches», «Hands out SOL», «Creates tokens in series», «Exchange-like activity». Always with the reason in numbers.</li>
+  </ul>
+</article>
+
+<article id="limites">
+  <h2>What it cannot know</h2>
+  <ul>
+    <li><b>Intent.</b> SolFlag sees facts on the chain, not what someone plans to do. A green token can fall and a red one can rise.</li>
+    <li><b>What could not be checked.</b> If a source does not answer, the light shows «not checked» and the token is never low risk. If nothing can be read, it shows «No data», never «Probable spam».</li>
+    <li><b>What happens outside Solana.</b> A bridged or exchange token can have its market elsewhere: with little liquidity here it shows amber, not red.</li>
+  </ul>
+  <p>It is not a recommendation to buy or sell. How accurate it is, misses included, is in <a href="/en/accuracy/">Data and accuracy</a>. If you see a mistake, write to <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>.</p>
+</article>
+
+<article id="cambios">
+  <h2>Changes to the rules</h2>
+  <p>When a rule gives a wrong result, it is changed and noted here with the reason.</p>
+  <ul class="chg">
+    <li><time>11/14</time><span><b>Inflated volume.</b> We look at who trades in the last ~300 trades, not at volume over liquidity, which gave false positives.</span></li>
+    <li><time>11/14</time><span><b>«No data» instead of «Probable spam»</b> when the chain does not answer while reading a token with no market.</span></li>
+    <li><time>11/14</time><span><b>Buys at launch:</b> a wallet label, not a token signal (almost the same share dies with or without them).</span></li>
+    <li><time>11/12</time><span><b>Verified issuers with their token list.</b> A new key on an official token shows amber until it is checked.</span></li>
+    <li><time>11/12</time><span><b>A known issuer's token with no market</b> shows «No market», not «Probable spam» (Ondo's OUSG and USDon).</span></li>
+    <li><time>11/1</time><span><b>Concentrated-liquidity pools</b> left out of the unlocked liquidity rule ($STONK showed red with $2.4M in 27 pairs).</span></li>
+    <li><time>11/1</time><span><b>The real USDC and USDT</b> no longer show as a copy of an older «USDC».</span></li>
+  </ul>
+</article>
+
+<article id="fuentes">
+  <h2>Where the data comes from</h2>
+  <div class="src">
+    <div><b>The Solana chain</b>keys, extensions, holders and transactions (Helius and public RPCs)</div>
+    <div><b>DexScreener</b>pools, liquidity, volume and market age</div>
+    <div><b>GeckoTerminal</b>who trades in the pool and tokens seconds old</div>
+    <div><b>RugCheck</b>creator, locked liquidity and history</div>
+  </div>
+  <p>The engine is <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">open source</a> (MIT): every rule on this page is in it, with its numbers.</p>
+</article>
+
+<footer>
+  <span class="wm" translate="no">Solflag</span>
+  <a href="/en/">Scanner</a>
+  <a href="/en/stocks/">Stocks</a>
+  <a href="/en/accuracy/">Data and accuracy</a>
+  <a href="/en/how-it-works/">How it works</a>
+  <a href="/en/privacy/">Privacy</a>
+  <a href="/en/terms/">Terms</a>
+  <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Open source</a>
+  <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
+  <p>SolFlag is a guidance tool, not financial advice.</p>
+</footer>
+</div>
+<script src="/fondo.js?v=20261111d" defer></script>
+</body>
+</html>
