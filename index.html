@@ -48,6 +48,7 @@
   --fg:#131a23; --muted:#5a6676; --accent:#2c6bdc; --accent-fg:#ffffff;
   --alto:#bf3128; --alto-bg:#fdeae8;
   --medio:#a96a14; --medio-bg:#fbf0db;
+  --nar:#c2410c; --nar-bg:#ffedd5; --dia:#0369a1; --dia-bg:#e0f2fe;
   --bajo:#1b7f50; --bajo-bg:#e0f4e9;
   --nm:#66727f; --nm-bg:#e6eaf0;
   --f-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
@@ -61,6 +62,8 @@
     --fg:#e8edf3; --muted:#92a0b1; --accent:#6ea4ff; --accent-fg:#0a1220;
     --alto:#ff7b70; --alto-bg:#3a1c1b;
     --medio:#f0b25a; --medio-bg:#392a10;
+  --nar:#fb923c; --nar-bg:#3a2112; --dia:#7dd3fc; --dia-bg:#0f2a3a;
+    --nar:#fb923c; --nar-bg:#3a2112; --dia:#7dd3fc; --dia-bg:#0f2a3a;
     --bajo:#5ad39b; --bajo-bg:#12301f;
     --nm:#9aa7b6; --nm-bg:#212b36;
     color-scheme:dark;
@@ -71,6 +74,7 @@
   --fg:#e8edf3; --muted:#92a0b1; --accent:#6ea4ff; --accent-fg:#0a1220;
   --alto:#ff7b70; --alto-bg:#3a1c1b;
   --medio:#f0b25a; --medio-bg:#392a10;
+  --nar:#fb923c; --nar-bg:#3a2112; --dia:#7dd3fc; --dia-bg:#0f2a3a;
   --bajo:#5ad39b; --bajo-bg:#12301f;
   --nm:#9aa7b6; --nm-bg:#212b36;
   color-scheme:dark;
@@ -153,7 +157,7 @@ details.guide .mono{overflow-wrap:anywhere}
 .legend span{display:flex;align-items:center;gap:7px;color:var(--muted)}
 .legend b{color:var(--fg);font-variant-numeric:tabular-nums}
 .dot{width:10px;height:10px;border-radius:50%;flex:none}
-.c-spam{background:var(--alto);opacity:.4} .c-alto{background:var(--alto)} .c-medio{background:var(--medio)} .c-bajo{background:var(--bajo)} .c-nm{background:var(--nm)}
+.c-spam{background:var(--alto);opacity:.4} .c-alto{background:var(--alto)} .c-medio{background:var(--medio)}.c-nar{background:var(--nar)} .c-bajo{background:var(--bajo)}.c-dia{background:var(--dia)} .c-nm{background:var(--nm)}
 .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
 
 /* filtros */
@@ -168,16 +172,16 @@ details.guide .mono{overflow-wrap:anywhere}
 .av{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font:700 .95rem var(--f-display);overflow:hidden;flex:none}
 .av img{width:100%;height:100%;object-fit:cover}
 .lvl-alto .av{background:var(--alto-bg);color:var(--alto)}
-.lvl-medio .av{background:var(--medio-bg);color:var(--medio)}
-.lvl-bajo .av{background:var(--bajo-bg);color:var(--bajo)}
+.lvl-medio .av{background:var(--medio-bg);color:var(--medio)}.lvl-nar .av{background:var(--nar-bg);color:var(--nar)}
+.lvl-bajo .av{background:var(--bajo-bg);color:var(--bajo)}.lvl-dia .av{background:var(--dia-bg);color:var(--dia)}
 .lvl-nm .av{background:var(--nm-bg);color:var(--nm)}
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
 .head h3{margin:0;font:700 1.05rem/1.3 var(--f-display);min-width:0;overflow-wrap:anywhere}
 .head h3 span{font:400 .88rem var(--f-body);color:var(--muted);margin-left:6px}
 .pill{font-size:.76rem;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap}
 .lvl-alto .pill{background:var(--alto-bg);color:var(--alto)}
-.lvl-medio .pill{background:var(--medio-bg);color:var(--medio)}
-.lvl-bajo .pill{background:var(--bajo-bg);color:var(--bajo)}
+.lvl-medio .pill{background:var(--medio-bg);color:var(--medio)}.lvl-nar .pill{background:var(--nar-bg);color:var(--nar)}
+.lvl-bajo .pill{background:var(--bajo-bg);color:var(--bajo)}.lvl-dia .pill{background:var(--dia-bg);color:var(--dia)}
 .lvl-nm .pill{background:var(--nm-bg);color:var(--nm)}
 .meta{display:flex;gap:4px 14px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:.88rem;margin-top:4px}
 .meta .v{color:var(--fg);font-variant-numeric:tabular-nums}
@@ -185,11 +189,11 @@ details.guide .mono{overflow-wrap:anywhere}
 .copy:hover{color:var(--fg)}
 .meter{height:5px;border-radius:99px;background:var(--surface-2);margin-top:12px;overflow:hidden}
 .meter i{display:block;height:100%;border-radius:99px}
-.lvl-alto .meter i{background:var(--alto)} .lvl-medio .meter i{background:var(--medio)} .lvl-bajo .meter i{background:var(--bajo)}
+.lvl-alto .meter i{background:var(--alto)} .lvl-medio .meter i{background:var(--medio)}.lvl-nar .meter i{background:var(--nar)} .lvl-bajo .meter i{background:var(--bajo)}.lvl-dia .meter i{background:var(--dia)}
 .why{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
 .why li{display:flex;gap:9px}
 .why li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--nm);margin-top:.55em;flex:none}
-.lvl-alto .why li::before{background:var(--alto)} .lvl-medio .why li::before{background:var(--medio)}
+.lvl-alto .why li::before{background:var(--alto)} .lvl-medio .why li::before{background:var(--medio)}.lvl-nar .why li::before{background:var(--nar)}
 .why li.ok::before{background:var(--bajo)}
 .why li.warn{color:var(--muted)}
 .links{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:12px;font-size:.88rem}
@@ -291,6 +295,7 @@ html:root:root:root{
   --fg:#eef0ff; --muted:#9097dc; --accent:#7c6cff; --accent-fg:#ffffff;
   --alto:#ff7b7b; --alto-bg:#3a1b33;
   --medio:#ffc247; --medio-bg:#3b2f14;
+  --nar:#fb923c; --nar-bg:#3b2214; --dia:#7dd3fc; --dia-bg:#12284a;
   --bajo:#3ddc97; --bajo-bg:#10362d;
   --nm:#a3a9e0; --nm-bg:#23275a;
   color-scheme:dark;
@@ -473,7 +478,7 @@ details.pmenu>summary::-webkit-details-marker{display:none}
 .hist .hp0::before{content:"";position:absolute;top:6px;left:-50%;width:100%;height:2px;background:var(--line);z-index:0}
 .hist .hp0:first-child::before{display:none}
 .hist .hp0 i{width:14px;height:14px;border-radius:50%;background:var(--nm);position:relative;z-index:1}
-.hist .h-ALTO i{background:var(--alto)} .hist .h-MEDIO i{background:var(--medio)} .hist .h-BAJO i{background:var(--bajo)}
+.hist .h-ALTO i{background:var(--alto)}.hist .h-ROJO i{background:var(--alto)} .hist .h-MEDIO i{background:var(--medio)}.hist .h-NARANJA i{background:var(--nar)}.hist .h-AMARILLO i{background:var(--medio)} .hist .h-BAJO i{background:var(--bajo)}.hist .h-DIAMANTE i{background:var(--dia)}.hist .h-VERDE i{background:var(--bajo)}
 /* lista de tokens nuevos */
 .ntop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
 .tok .nwhy{color:var(--muted);font-size:.9rem;margin-top:8px}
@@ -484,6 +489,7 @@ html:root:root:root:root{
   --fg:#f1eeff; --muted:#c9c1ea; --accent:#7ab8c4; --accent-fg:#140e31;
   --alto:#ff6b6b; --alto-bg:#3d1f3a;
   --medio:#fbbf24; --medio-bg:#3a2c18;
+  --nar:#fb923c; --nar-bg:#3d2418; --dia:#7dd3fc; --dia-bg:#132a48;
   --bajo:#4ade80; --bajo-bg:#163a2c;
   --nm:#b4acdc; --nm-bg:#2a2350;
   --f-display:'Fraunces',Georgia,serif;
@@ -756,8 +762,8 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
 .take li{margin:3px 0}
 .tok.wt{display:block;padding:11px 12px;border-left:4px solid var(--line)}
 .tok.wt.lvl-alto{border-left-color:var(--alto)}
-.tok.wt.lvl-medio{border-left-color:var(--medio)}
-.tok.wt.lvl-bajo{border-left-color:var(--bajo)}
+.tok.wt.lvl-medio{border-left-color:var(--medio)}.tok.wt.lvl-nar{border-left-color:var(--nar)}
+.tok.wt.lvl-bajo{border-left-color:var(--bajo)}.tok.wt.lvl-dia{border-left-color:var(--dia)}
 .wt1{display:grid;grid-template-columns:38px minmax(0,1fr) auto;grid-template-areas:"av n v" "w w w" "a a a";gap:4px 10px;align-items:center}
 .wt1>.lav{grid-area:av}
 .wn{grid-area:n;min-width:0}
@@ -902,7 +908,7 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
 .cf-res .sub{color:var(--muted);font-size:.86rem;margin:14px 0 0}
 .cf-tlist{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:16px}
 .cf-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;background:rgba(24,17,62,.96);border:1px solid rgba(196,181,253,.24);border-left:4px solid var(--c,var(--line));border-radius:20px;padding:14px 16px}
-.cf-row.lvl-alto{--c:var(--alto)}.cf-row.lvl-medio{--c:var(--medio)}.cf-row.lvl-bajo{--c:var(--bajo)}
+.cf-row.lvl-alto{--c:var(--alto)}.cf-row.lvl-medio{--c:var(--medio)}.cf-row.lvl-nar{--c:var(--nar)}.cf-row.lvl-bajo{--c:var(--bajo)}.cf-row.lvl-dia{--c:var(--dia)}
 .cf-rank{font:800 1.1rem var(--f-display);color:#9a91c9;width:22px;text-align:center}
 .cf-mid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:center;min-width:0}
 .cf-tl{display:flex;align-items:center;gap:12px;min-width:0}
@@ -1058,7 +1064,7 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
 .ml-al .l1{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;min-width:0;font-size:.94rem;line-height:1.3}
 .ml-al .l1 b{font-family:var(--f-display);font-size:1rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ml-al .t small{color:#9a91c9;font-size:.78rem;line-height:1.3}
-.ml-p-alto{background:var(--alto-bg);color:var(--alto)}.ml-p-medio{background:var(--medio-bg);color:var(--medio)}.ml-p-bajo{background:var(--bajo-bg);color:var(--bajo)}
+.ml-p-alto{background:var(--alto-bg);color:var(--alto)}.ml-p-medio{background:var(--medio-bg);color:var(--medio)}.ml-p-nar{background:var(--nar-bg);color:var(--nar)}.ml-p-bajo{background:var(--bajo-bg);color:var(--bajo)}.ml-p-dia{background:var(--dia-bg);color:var(--dia)}
 .ml-p-nm,.ml-p-spam{background:var(--nm-bg);color:var(--nm)}
 .ml-filters{display:flex;gap:6px;flex-wrap:wrap}
 .ml-chip{border:0;background:var(--surface-2);border-radius:99px;padding:7px 12px;font-size:.84rem;font-weight:700;color:var(--muted);min-height:36px;cursor:pointer}
@@ -1066,7 +1072,7 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
 .ml-chip i{font-style:normal;opacity:.7;margin-left:4px}
 .ml-tlist{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-top:14px}
 .ml-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;background:rgba(14,9,38,.55);border:1px solid rgba(196,181,253,.2);border-left:4px solid var(--c,var(--line));border-radius:18px;padding:12px 14px}
-.ml-row.lvl-alto,.ml-row.lvl-spam{--c:var(--alto)}.ml-row.lvl-medio{--c:var(--medio)}.ml-row.lvl-bajo{--c:var(--bajo)}.ml-row.lvl-nm{--c:var(--nm)}
+.ml-row.lvl-alto,.ml-row.lvl-spam{--c:var(--alto)}.ml-row.lvl-medio{--c:var(--medio)}.ml-row.lvl-nar{--c:var(--nar)}.ml-row.lvl-bajo{--c:var(--bajo)}.ml-row.lvl-dia{--c:var(--dia)}.ml-row.lvl-nm{--c:var(--nm)}
 .ml-tl{display:flex;align-items:center;gap:12px;min-width:0}
 .ml-logo{position:relative;overflow:hidden;width:42px;height:42px;border-radius:14px;flex:none;display:grid;place-items:center;font:800 .88rem var(--f-body);color:#140e31}
 .ml-tn{min-width:0}
@@ -1357,7 +1363,7 @@ body:not(.landing) #goH{display:none}
 .rc b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rc small{display:block;color:var(--muted);font-size:.8rem}
 .rc .rcp{font-size:.76rem;font-weight:800;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.06);color:var(--c,var(--muted));white-space:nowrap}
-.rc-alto{--c:var(--alto)}.rc-medio{--c:var(--medio)}.rc-bajo{--c:var(--bajo)}
+.rc-alto{--c:var(--alto)}.rc-medio{--c:var(--medio)}.rc-nar{--c:var(--nar)}.rc-bajo{--c:var(--bajo)}.rc-dia{--c:var(--dia)}
 .rc-w .lav{background:#3a2c7a}
 #sdatos p{margin:0;color:var(--muted)}
 /* cinta: se mueve despacio, se para al pasar el ratón o tocarla; quieta y deslizable con «reducir movimiento» */
@@ -1390,7 +1396,7 @@ body:not(.landing) #goH{display:none}
 .tr .tx .up{color:var(--bajo)}.tr .tx .dn{color:var(--alto)}
 .tr .tp{display:block;margin-top:2px;font-weight:800;color:var(--c,var(--muted))}
 .tr .tp.wait{color:var(--muted);font-weight:600}
-.tr.lvl-alto{--c:var(--alto)}.tr.lvl-medio{--c:var(--medio)}.tr.lvl-bajo{--c:var(--bajo)}
+.tr.lvl-alto{--c:var(--alto)}.tr.lvl-medio{--c:var(--medio)}.tr.lvl-nar{--c:var(--nar)}.tr.lvl-bajo{--c:var(--bajo)}.tr.lvl-dia{--c:var(--dia)}
 .nr{grid-template-columns:auto minmax(0,1fr) auto}
 .nr.in{animation:nrIn .5s ease-out both}
 @keyframes nrIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
@@ -1528,6 +1534,10 @@ body.landing #adv{margin-top:10px}
 .lwhy:hover{text-decoration:underline}
 .lhow{display:inline-block;margin:0 0 12px;font-size:.86rem;font-weight:700;color:var(--kick);text-decoration:none}
 .lhow:hover{text-decoration:underline}
+/* insignia de los cinco niveles (14/11): gran proyecto o recién nacido */
+.tbadge{display:inline-block;margin:10px 0 0;padding:6px 12px;border-radius:999px;font-size:.78rem;font-weight:700;letter-spacing:.04em;border:1px solid var(--line)}
+.tb-dia{color:var(--dia);background:var(--dia-bg);border-color:var(--dia)}
+.tb-new{color:var(--medio);background:var(--medio-bg);border-color:var(--medio)}
 /* cuadro de la curva de Pump.fun (14/11): contexto bajo el nivel, no una señal */
 .curva{margin:18px 0 6px;border:1px solid var(--line);border-left:3px solid var(--kick,var(--accent));border-radius:16px;background:var(--surface);padding:16px 18px}
 .curva .kick{display:flex;align-items:center;gap:8px;margin:0}
@@ -1572,8 +1582,8 @@ body.landing #adv{margin-top:10px}
 .hr .sg{font-size:.88rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hseal{justify-self:start;margin-left:14px;font:700 .69rem var(--f-body);letter-spacing:.1em;padding:5px 11px!important;border-radius:999px;border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
 .hseal.s-alto{color:var(--alto);background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.4)}
-.hseal.s-medio{color:var(--medio);background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4)}
-.hseal.s-bajo{color:var(--bajo);background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.4)}
+.hseal.s-medio{color:var(--medio);background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.4)}.hseal.s-nar{color:var(--nar);background:rgba(251,146,60,.1);border-color:rgba(251,146,60,.4)}
+.hseal.s-bajo{color:var(--bajo);background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.4)}.hseal.s-dia{color:var(--dia);background:rgba(125,211,252,.1);border-color:rgba(125,211,252,.4)}
 .hseal.go{color:var(--kick);border-color:rgba(122,184,196,.5)}
 .lstats .sgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
 .stat{padding:4px 26px;border-left:1px solid var(--line2)}
@@ -1652,7 +1662,7 @@ body.landing #adv{margin-top:10px}
 #results.tview:not(.wview) .tsum2 .tidr .lav{width:88px;height:88px;font-size:1.6rem}
 #results.tview:not(.wview) .tsum2 .sub{font:300 clamp(1.25rem,1.9vw,1.6rem)/1.35 var(--f-display);color:var(--fg);max-width:820px;margin-top:24px}
 #results.tview:not(.wview) .tsum2 .sub .tvl{font-weight:700}
-.tvl.lv-alto{color:var(--alto)!important}.tvl.lv-medio{color:var(--medio)!important}.tvl.lv-bajo{color:var(--bajo)!important}
+.tvl.lv-alto{color:var(--alto)!important}.tvl.lv-medio{color:var(--medio)!important}.tvl.lv-nar{color:var(--nar)!important}.tvl.lv-bajo{color:var(--bajo)!important}.tvl.lv-dia{color:var(--dia)!important}
 #results.tview:not(.wview) .stamp{width:170px;height:170px;transform:rotate(-8deg);animation-name:stampIn2}
 @keyframes stampIn2{from{opacity:0;transform:rotate(-8deg) scale(1.5)}to{opacity:.95;transform:rotate(-8deg) scale(1)}}
 #results.tview:not(.wview) .stamp b{font:700 3.25rem/1 'Barlow Condensed',sans-serif;letter-spacing:.04em}
@@ -1779,7 +1789,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 .wtop .wkind{max-width:760px;background:#140a14}
 .wtop .wkind.id{background:#0a1418}.wtop .wkind:not(.red):not(.id){background:#17120a}
 .wverd{margin:22px 0 0!important;font:300 clamp(1.4rem,2.1vw,1.8rem)/1.3 var(--f-display)!important;max-width:860px;color:var(--fg)}
-.wverd.lv-alto{color:#ffb3b3}.wverd.lv-medio{color:#fde3a0}.wverd.lv-bajo{color:#bdf5d3}
+.wverd.lv-alto{color:#ffb3b3}.wverd.lv-medio{color:#fde3a0}.wverd.lv-nar{color:#fed7aa}.wverd.lv-bajo{color:#bdf5d3}.wverd.lv-dia{color:#bae6fd}
 #results.wview .take{max-width:860px;margin-top:16px}
 #results.wview .wacts{margin-top:22px;border-top:0;padding-top:0}
 #results.wview .wacts .btn{border-radius:999px}
@@ -2093,7 +2103,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="No se pudo cargar el motor del escáner desde cdn.jsdelivr.net. Revisa tu conexión a internet y recarga la página."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.5.6/src/index.js";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.6.0/src/index.js";
 window.__escOk=true;
 // Lista de emisores revisada (emisores.json): una rotación de claves aprobada no necesita otra versión del motor
 fetch("/emisores.json",{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j&&SRE.setIssuers) SRE.setIssuers(j.emisores); }).catch(function(){});
@@ -2121,7 +2131,14 @@ var EXT = {
   nonTransferable:[10,"No se puede transferir"],
   defaultAccountState:[10,"Las cuentas nuevas pueden crearse congeladas"]
 };
+// Los cinco niveles (motor 0.6.0, 14/11): lo que es el token. ALTO/MEDIO/BAJO siguen para lo ya guardado en el
+// navegador (Mi lista, historial) y para lo que llega de la API con el nivel antiguo
 var LEVELS = {
+  ROJO:{cls:"alto",bar:"c-alto",label:"Rojo",short:"Rojo"},
+  NARANJA:{cls:"nar",bar:"c-nar",label:"Naranja",short:"Naranja"},
+  AMARILLO:{cls:"medio",bar:"c-medio",label:"Amarillo",short:"Amarillo"},
+  VERDE:{cls:"bajo",bar:"c-bajo",label:"Verde",short:"Verde"},
+  DIAMANTE:{cls:"dia",bar:"c-dia",label:"Diamante",short:"Diamante"},
   ALTO:{cls:"alto",bar:"c-alto",label:"Riesgo alto",short:"Alto"},
   MEDIO:{cls:"medio",bar:"c-medio",label:"Riesgo medio",short:"Medio"},
   BAJO:{cls:"bajo",bar:"c-bajo",label:"Riesgo bajo",short:"Bajo"},
@@ -2129,7 +2146,14 @@ var LEVELS = {
   "SIN DATOS":{cls:"nm",bar:"c-nm",label:"Sin comprobar",short:"Sin datos"},
   "SIN MERCADO":{cls:"nm",bar:"c-nm",label:"Sin mercado",short:"Sin mercado"}
 };
-var ORDER = ["ALTO","MEDIO","BAJO","SPAM","SIN DATOS","SIN MERCADO"];
+var ORDER = ["ROJO","NARANJA","AMARILLO","VERDE","DIAMANTE","SPAM","SIN DATOS","SIN MERCADO"];
+var TIERS5=["ROJO","NARANJA","AMARILLO","VERDE","DIAMANTE"];
+// orden también para los niveles antiguos que siguen guardados (Mi lista, historial)
+var OLDPOS={ALTO:0.5,MEDIO:2.5,BAJO:3.5};
+function lvPos(l){ var i=ORDER.indexOf(l); return i>=0?i:(OLDPOS[l]!==undefined?OLDPOS[l]:ORDER.length); }
+// riesgo a vigilar: rojo, naranja o amarillo (y los antiguos alto y medio)
+function lvRisky(l){ return /^(ROJO|NARANJA|AMARILLO|ALTO|MEDIO)$/.test(l||""); }
+var LVCOL={ROJO:"var(--alto)",NARANJA:"var(--nar)",AMARILLO:"var(--medio)",VERDE:"var(--bajo)",DIAMANTE:"var(--dia)",ALTO:"var(--alto)",MEDIO:"var(--medio)",BAJO:"var(--bajo)"};
 
 var $ = function(s){ return document.querySelector(s); };
 var state = { mode:"W", scan:false, hin:null, shown:{W:false,H:false}, hold:null, cancel:false, rpc:PUBLIC_RPC, minUsd:1, results:[], filter:"TODOS", wallet:"", sol:0, hidden:0, total:0 };
@@ -2183,7 +2207,7 @@ function keepSnap(r,noSave,sameRun){
 function recordWallet(){
   var c=counts(), total=state.results.reduce(function(s,r){return s+r.valor;},0);
   var e=lista.w[state.wallet]||(lista.w[state.wallet]={fav:false,name:""});
-  e.ts=Date.now(); e.n=state.results.length; e.total=total; e.alto=c.ALTO; e.spam=c.SPAM; e.sol=state.sol;
+  e.ts=Date.now(); e.n=state.results.length; e.total=total; e.alto=c.ROJO; e.spam=c.SPAM; e.sol=state.sol;
   state.results.forEach(function(r){ if(lista.t[r.mint]) keepSnap(r,true); });
   var old=Object.keys(lista.w).filter(function(k){return !lista.w[k].fav&&!lista.w[k].name;})
     .sort(function(a,b){return (lista.w[b].ts||0)-(lista.w[a].ts||0);});
@@ -2192,11 +2216,11 @@ function recordWallet(){
 }
 function seenTag(addr){
   var e=lista.w[addr]; if(!e||!e.ts) return "";
-  return "<span class='tag seen' title='Ya la analizaste'>Analizada "+esc(hace(e.ts))+(e.alto?" · "+e.alto+" alto":"")+"</span>";
+  return "<span class='tag seen' title='Ya la analizaste'>Analizada "+esc(hace(e.ts))+(e.alto?" · "+e.alto+" en rojo":"")+"</span>";
 }
 function walletRow(addr,e){
   var meta=e.ts?["Analizada "+hace(e.ts),e.n+(e.n===1?" token":" tokens"),usd(e.total||0)+" en tokens",
-     (e.alto?e.alto+" con riesgo alto":"sin riesgo alto")+(e.spam?" · "+e.spam+" spam":"")]:["Todavía sin analizar"];
+     (e.alto?e.alto+" en rojo":"ninguno en rojo")+(e.spam?" · "+e.spam+" spam":"")]:["Todavía sin analizar"];
   return "<div class='lrow'><div class='main'><div class='hl1'>"+
       "<a href='#' class='nm' data-analyze='"+esc(addr)+"' title='Abrir el análisis de esta wallet'>"+esc(e.name||short(addr))+"</a>"+
       (e.name?"<span class='mono'>"+esc(short(addr))+"</span>":"")+"</div>"+
@@ -2212,13 +2236,13 @@ function walletRow(addr,e){
 }
 // ---------- Mi lista (diseño de maquetas/milista) ----------
 // Cuánto pesa cada nivel para saber si un cambio es a peor o a mejor
-var ML_RANK={ALTO:4,SPAM:4,MEDIO:3,"SIN DATOS":2,"SIN MERCADO":2,BAJO:1};
+var ML_RANK={ROJO:5,ALTO:5,SPAM:5,NARANJA:4,AMARILLO:3,MEDIO:3,"SIN DATOS":2,"SIN MERCADO":2,VERDE:1,BAJO:1,DIAMANTE:0};
 var ML_DAYS=7;   // un cambio de riesgo se avisa durante 7 días
 var ML_SHOW=8;   // tokens a la vista antes de «Ver los restantes»
 // Lo que ha cambiado en un token que sigues: su riesgo (al volver a analizarlo), su liquidez o su mercado
 function mlChanges(t){
   var out=[], now=llive.d[t.mint];
-  if(t.prev&&t.prev.lvl&&t.prev.lvl!==t.lvl&&Date.now()-(t.prev.ts||0)<ML_DAYS*864e5)
+  if(t.prev&&t.prev.lvl&&t.prev.lvl!==t.lvl&&!(OLDPOS[t.prev.lvl]!==undefined&&TIERS5.indexOf(t.lvl)>=0)&&Date.now()-(t.prev.ts||0)<ML_DAYS*864e5)
     out.push({k:"lvl",worse:(ML_RANK[t.lvl]||0)>(ML_RANK[t.prev.lvl]||0),from:t.prev.lvl});
   if(now===null) out.push({k:"gone"});
   else if(now&&!now.cv&&t.liq>=1000&&now.liq<t.liq*0.5) out.push({k:"liq",pct:Math.round((1-now.liq/t.liq)*100),from:t.liq,to:now.liq});
@@ -2282,7 +2306,7 @@ function mlWallet(e){
   return "<div class='ml-w'><div class='ml-wtop'>"+cfAva(a)+"<span class='t'><a href='#' data-analyze='"+esc(a)+"' title='Abrir el análisis de esta wallet'>"+esc(e.name||short(a))+"</a>"+
       "<span>"+(e.name?esc(short(a)):"sin nombre")+"</span></span>"+cfPnlBadge(e.pnl&&e.pnl.st?e.pnl:null)+"</div>"+
     (e.ts?"<div class='ml-wst'><div><b>"+usd(e.total||0)+"</b><span>en tokens</span></div><div><b>"+(e.n||0)+"</b><span>tokens</span></div>"+
-      "<div"+(e.alto?" class='r'":"")+"><b>"+(e.alto||0)+"</b><span>riesgo alto</span></div></div>":"<p class='hint' style='margin:0'>Todavía sin analizar</p>")+
+      "<div"+(e.alto?" class='r'":"")+"><b>"+(e.alto||0)+"</b><span>en rojo</span></div></div>":"<p class='hint' style='margin:0'>Todavía sin analizar</p>")+
     "<div class='ml-wact'><button class='btn small ghost ml-grow' type='button' data-analyze='"+esc(a)+"'>"+(e.ts?"Analizar · "+esc(hace(e.ts)):"Analizar")+"</button>"+
       "<button class='star' type='button' data-favw='"+esc(a)+"' aria-pressed='true' title='Dejar de seguir' aria-label='Dejar de seguir esta wallet'>★</button>"+
       "<details class='pmenu lmore'><summary class='btn small' aria-label='Más opciones'>⋯</summary><div class='pmenu-body'>"+
@@ -2298,16 +2322,18 @@ function renderLista(noLive){
   var favs=ws.filter(function(e){return e.fav;}).sort(byTs);
   var hist=ws.filter(function(e){return !e.fav&&(e.ts||e.name);}).sort(byTs);
   var toks=Object.keys(lista.t).map(function(k){ var t=lista.t[k]; t.mint=k; return t; })
-    .sort(function(a,b){ return ORDER.indexOf(a.lvl)-ORDER.indexOf(b.lvl)||(a.sym>b.sym?1:-1); });
+    .sort(function(a,b){ return lvPos(a.lvl)-lvPos(b.lvl)||(a.sym>b.sym?1:-1); });
   var chg=toks.filter(function(t){ return mlChanges(t).length; });
-  var cnt={ALTO:0,MEDIO:0,BAJO:0}; toks.forEach(function(t){ if(cnt[t.lvl]!==undefined) cnt[t.lvl]++; });
+  // los guardados con el nivel antiguo cuentan donde más se parecen hasta que se vuelvan a analizar
+  var cnt={ROJO:0,NARANJA:0,AMARILLO:0,VERDE:0,DIAMANTE:0}, OLD5={ALTO:"ROJO",MEDIO:"AMARILLO",BAJO:"VERDE"};
+  toks.forEach(function(t){ var k=OLD5[t.lvl]||t.lvl; if(cnt[k]!==undefined) cnt[k]++; });
   var lf=state.lf||"all";
   var h=storageWarningHtml()+"<header class='ml-head'><p class='kick'>Mi lista</p><h2 class='ml-h1'>Lo que sigues, <em>de un vistazo.</em></h2>"+
     "<p class='ml-sub'>Tus tokens y wallets, con lo que ha cambiado desde la última vez. Se guarda solo en este navegador.</p>";
   if(toks.length||favs.length) h+="<div class='ml-tiles'>"+
     "<button class='ml-tile' type='button' data-lf='all' aria-pressed='"+(lf==="all")+"'><b>"+toks.length+"</b><span>"+(toks.length===1?"token que sigues":"tokens que sigues")+"</span></button>"+
     "<button class='ml-tile' type='button' data-lgo='w'><b>"+favs.length+"</b><span>"+(favs.length===1?"wallet que sigues":"wallets que sigues")+"</span></button>"+
-    "<button class='ml-tile alto' type='button' data-lf='ALTO' aria-pressed='"+(lf==="ALTO")+"'><b>"+cnt.ALTO+"</b><span>en riesgo alto</span></button>"+
+    "<button class='ml-tile alto' type='button' data-lf='ROJO' aria-pressed='"+(lf==="ROJO")+"'><b>"+cnt.ROJO+"</b><span>en rojo</span></button>"+
     "<button class='ml-tile chg' type='button' data-lf='chg' aria-pressed='"+(lf==="chg")+"'><b>"+chg.length+"</b><span>con cambios</span></button></div>";
   h+="</header>";
   if(!toks.length&&!favs.length){
@@ -2326,10 +2352,10 @@ function renderLista(noLive){
   }
   // tokens
   if(toks.length){
-    var shown=toks.filter(function(t){ return lf==="all"||(lf==="chg"?mlChanges(t).length:t.lvl===lf); });
+    var shown=toks.filter(function(t){ return lf==="all"||(lf==="chg"?mlChanges(t).length:(OLD5[t.lvl]||t.lvl)===lf); });
     var vis=state.lallT?shown:shown.slice(0,ML_SHOW), re=state.lre;
     h+="<section class='card ml-card'><div class='ml-hrow'><h2>Tokens que sigo <small>"+toks.length+"</small></h2><div class='ml-filters'>"+
-      [["all","Todos",toks.length],["ALTO","Alto",cnt.ALTO],["MEDIO","Medio",cnt.MEDIO],["BAJO","Bajo",cnt.BAJO],["chg","Con cambios",chg.length]].map(function(f){
+      [["all","Todos",toks.length]].concat(TIERS5.filter(function(k){ return cnt[k]; }).map(function(k){ return [k,LEVELS[k].short,cnt[k]]; }),[["chg","Con cambios",chg.length]]).map(function(f){
         return "<button class='ml-chip' type='button' data-lf='"+f[0]+"' aria-pressed='"+(lf===f[0])+"'>"+f[1]+"<i>"+f[2]+"</i></button>";
       }).join("")+"</div></div>"+
       "<div class='ml-tlist'>"+(vis.length?vis.map(mlRow).join(""):"<p class='hint'>Ningún token con este filtro.</p>")+"</div>"+
@@ -2663,16 +2689,15 @@ function cfRow(r,i,res){
 function confResultHtml(res){
   var rows=res.rows.filter(function(r){ return conf.showAll||!(r.known||r.type==="STABLE"); });
   var hid=res.rows.length-rows.length;
-  var c={ALTO:0,MEDIO:0,BAJO:0}; rows.forEach(function(r){ if(c[r.lvl]!==undefined) c[r.lvl]++; });
+  var c={ROJO:0,NARANJA:0,AMARILLO:0,VERDE:0,DIAMANTE:0}, OLD5={ALTO:"ROJO",MEDIO:"AMARILLO",BAJO:"VERDE"};
+  rows.forEach(function(r){ var k=OLD5[r.lvl]||r.lvl; if(c[k]!==undefined) c[k]++; });
   var total=rows.reduce(function(s,r){ return s+r.total; },0);
   var win=res.pnl?Object.keys(res.pnl).filter(function(k){ return res.pnl[k].st==="win"; }).length:null;
   var h="<section class='card cf-res'><div class='eyebrow'>Resultado · "+hace(res.ts)+"</div><div class='cf-rhead'><div>"+
       "<div class='cf-n'>"+rows.length+"<small>"+(rows.length===1?"token en común":"tokens en común")+"</small></div>"+
       (rows.length?"<div class='cf-riskbar' aria-hidden='true'>"+
-          (c.ALTO?"<i style='flex:"+c.ALTO+";background:var(--alto)'></i>":"")+(c.MEDIO?"<i style='flex:"+c.MEDIO+";background:var(--medio)'></i>":"")+
-          (c.BAJO?"<i style='flex:"+c.BAJO+";background:var(--bajo)'></i>":"")+"</div>"+
-        "<div class='cf-legend'><span><i style='background:var(--alto)'></i><b>"+c.ALTO+"</b> riesgo alto</span>"+
-          "<span><i style='background:var(--medio)'></i><b>"+c.MEDIO+"</b> medio</span><span><i style='background:var(--bajo)'></i><b>"+c.BAJO+"</b> bajo</span></div>":"")+
+          TIERS5.filter(function(k){ return c[k]; }).map(function(k){ return "<i style='flex:"+c[k]+";background:"+LVCOL[k]+"'></i>"; }).join("")+"</div>"+
+        "<div class='cf-legend'>"+TIERS5.filter(function(k){ return c[k]; }).map(function(k){ return "<span><i style='background:"+LVCOL[k]+"'></i><b>"+c[k]+"</b> "+LEVELS[k].short.toLowerCase()+"</span>"; }).join("")+"</div>":"")+
     "</div><div class='cf-stats'><div class='cf-stat'><b>"+res.wallets+"</b><span>wallets comparadas</span></div>"+
       (win!==null?"<div class='cf-stat'><b>"+win+"</b><span>ganan dinero</span></div>":"<div class='cf-stat'><b>"+res.minN+"</b><span>mínimo para coincidir</span></div>")+
       "<div class='cf-stat'><b>"+usd(total)+"</b><span>en tokens comunes</span></div></div></div>"+
@@ -2748,7 +2773,7 @@ async function compare(){
     var out=[];
     rows.forEach(function(r){
       var base=(r.par&&r.par.baseToken)||{}, a=r.a;
-      if(KNOWN[r.mint]) out.push({mint:r.mint,sym:KNOWN[r.mint],name:"",lvl:"BAJO",sev:0,type:null,lights:null,known:true,n:r.n,total:r.total,liq:(r.par.liquidity&&r.par.liquidity.usd)||0,pair:r.par.pairAddress||"",img:null,hs:r.hs});
+      if(KNOWN[r.mint]) out.push({mint:r.mint,sym:KNOWN[r.mint],name:"",lvl:"VERDE",sev:0,type:null,lights:null,known:true,n:r.n,total:r.total,liq:(r.par.liquidity&&r.par.liquidity.usd)||0,pair:r.par.pairAddress||"",img:null,hs:r.hs});
       else if(a) out.push({mint:r.mint,sym:a.sym,name:a.name,lvl:a.lvl,sev:a.sev,type:a.type,lights:a.lights,known:false,n:r.n,total:r.total,liq:(r.par.liquidity&&r.par.liquidity.usd)||0,pair:r.par.pairAddress||"",img:a.img,hs:r.hs});
     });
     out.sort(function(x,y){ return y.n-x.n||y.total-x.total; });
@@ -2812,6 +2837,7 @@ function pct(n){ return Math.round(n)+"%"; }
    datos que usa el resto de la página y traducen lo que devuelve la librería, para que cualquier
    arreglo del motor llegue aquí sin tocar la interfaz. */
 var SRE_LV={HIGH:"ALTO",MEDIUM:"MEDIO",LOW:"BAJO",SPAM:"SPAM",NO_DATA:"SIN DATOS",NO_MARKET:"SIN MERCADO"};
+var SRE_TIER={DIAMOND:"DIAMANTE",GREEN:"VERDE",YELLOW:"AMARILLO",ORANGE:"NARANJA",RED:"ROJO"};
 var SRE_TY={STABLE:"STABLE",TOKENIZED:"TOKENIZADO",BRIDGED:"PUENTEADO",CREATOR:"CREADOR",OPEN:"ABIERTO"};
 var SRE_LK={control:"ctl",concentration:"con",market:"mkt",dependency:"dep"};
 var SRE_KIND={program:"programa",active:"activa"};
@@ -2859,7 +2885,8 @@ async function assess(mint,par,valor,unchecked,noConc,copies){
   var cl0=r.lights&&r.lights.filter(function(l){ return SRE_LK[l.k]==="ctl"; })[0];
   return {
     ctlAlt:cl0?ctlSinRC(cl0):null,
-    mint:r.mint, sym:r.sym, name:r.name, pts:r.pts, sev:r.sev, lvl:SRE_LV[r.lvl]||r.lvl,
+    mint:r.mint, sym:r.sym, name:r.name, pts:r.pts, sev:r.sev, lvl:(r.lvl!=="SPAM"&&SRE_TIER[r.tier])||SRE_LV[r.lvl]||r.lvl,
+    tierCap:!!r.tierCap, tierCapUntil:r.tierCapUntil||null, tierBig:r.tierBig||null,
     why:lights?lightsWhy(lights):r.reasons.map(function(x){ return SRE.describe(x,"es"); }),
     warn:[], lights:lights, type:SRE_TY[r.type]||null, valor:valor, par:r.pair, imp:r.impostor, img:r.img,
     cr:(r.creator&&r.creator.creator)||null,
@@ -3043,7 +3070,7 @@ async function analyze(){
     mints.forEach(function(m){
       var par=mk[m], precio=Number((par&&par.priceUsd)||0), valor=w.tokens[m]*precio;
       if(par&&par.liqRaw) valor=Math.min(valor,par.liquidity.usd);   // con la liquidez inflada, el precio también es de mentira
-      if(KNOWN[m]){ out.push({mint:m,sym:KNOWN[m],name:"",pts:0,lvl:"BAJO",why:["Token muy conocido"],warn:[],valor:valor,par:par,img:null}); return; }
+      if(KNOWN[m]){ out.push({mint:m,sym:KNOWN[m],name:"",pts:0,lvl:"VERDE",why:["Token muy conocido"],warn:[],valor:valor,par:par,img:null}); return; }
       if(precio>0&&valor<state.minUsd){ hidden++; return; }
       todo.push({mint:m,par:par,valor:valor,unchecked:!!failedMk[m]});
     });
@@ -3057,7 +3084,7 @@ async function analyze(){
     });
 
     out.sort(function(a,b){
-      return ORDER.indexOf(a.lvl)-ORDER.indexOf(b.lvl)||(b.sev||0)-(a.sev||0)||b.pts-a.pts||b.valor-a.valor;
+      return lvPos(a.lvl)-lvPos(b.lvl)||(b.sev||0)-(a.sev||0)||b.pts-a.pts||b.valor-a.valor;
     });
     state.results=out; state.hidden=hidden; state.total=mints.length;
     render(); track("scan-wallet");
@@ -3171,6 +3198,11 @@ async function checkToken(mint){
   renderToken();
 }
 var TOKEN_TIP={
+  ROJO:"Tiene una trampa o varias alertas graves: alguien podría quitarte el dinero. Mejor ni tocarlo.",
+  NARANJA:"Peligro: algo grave, aunque sin trampa (difícil de vender o en pocas manos).",
+  AMARILLO:"Una alerta leve o algo sin comprobar: vigílalo.",
+  VERDE:"Los chequeos no han encontrado ninguna alerta.",
+  DIAMANTE:"Gran proyecto de nuestra lista revisada a mano.",
   ALTO:"Tiene señales fuertes de alerta. Lee los semáforos antes de comprar.",
   MEDIO:"Sin alertas graves, pero con puntos a vigilar.",
   BAJO:"Los chequeos no han encontrado señales de alerta.",
@@ -3179,9 +3211,9 @@ var TOKEN_TIP={
   "SIN DATOS":"No se pudo consultar su mercado por un fallo de red. Vuelve a analizarlo."
 };
 function ringHtml(r){
-  var fr={ALTO:.85,MEDIO:.55,BAJO:.25}[r.lvl];
+  var fr={ROJO:.9,NARANJA:.7,AMARILLO:.5,VERDE:.25,DIAMANTE:.1,ALTO:.85,MEDIO:.55,BAJO:.25}[r.lvl];
   if(fr===undefined||!r.lights) return "";
-  var col={ALTO:"var(--alto)",MEDIO:"var(--medio)",BAJO:"var(--bajo)"}[r.lvl];
+  var col=LVCOL[r.lvl];
   var bad=strongAlerts(r),
       na=r.lights.filter(function(l){return l.s==="na";}).length,
       warn=r.lights.filter(function(l){return l.s==="warn";}).length;
@@ -3195,24 +3227,33 @@ function ringHtml(r){
     "<circle cx='65' cy='65' r='54' fill='none' stroke='var(--nm-bg)' stroke-width='14'/>"+
     "<circle cx='65' cy='65' r='54' fill='none' stroke='"+col+"' stroke-width='14' stroke-linecap='round' stroke-dasharray='"+(C*fr).toFixed(1)+" "+C.toFixed(1)+"' transform='rotate(-90 65 65)'/>"+
     "<text x='65' y='68' text-anchor='middle' font-size='"+fs+"' font-weight='800' fill='"+col+"'>"+esc(lbl)+"</text>"+
-    "<text x='65' y='86' text-anchor='middle' font-size='10' fill='var(--muted)'>riesgo</text></svg>"+
+    "<text x='65' y='86' text-anchor='middle' font-size='10' fill='var(--muted)'>"+(TIERS5.indexOf(r.lvl)>=0?"nivel":"riesgo")+"</text></svg>"+
     "<div class='ringtxt'>"+esc(parts.join(" · ")||"Sin alertas")+"</div></div>";
 }
 // El veredicto como un sello estampado: nivel en grande y debajo las alertas
 function stampHtml(r){
-  var col={ALTO:"var(--alto)",MEDIO:"var(--medio)",BAJO:"var(--bajo)"}[r.lvl]||"var(--muted)";
+  var col=LVCOL[r.lvl]||"var(--muted)";
   var lbl=(r.lvl==="SIN MERCADO"||r.lvl==="SIN DATOS"?LEVELS[r.lvl].label:LEVELS[r.lvl].short).toUpperCase();
   var bad=strongAlerts(r), warn=(r.lights||[]).filter(function(l){ return l.s==="warn"; }).length;
   var sub=dataOnly(r)?"falta de datos":bad?bad+(bad===1?" alerta fuerte":" alertas fuertes"):warn?warn+(warn===1?" aviso":" avisos"):r.lights?"sin alertas":"";
-  var top=/^(ALTO|MEDIO|BAJO)$/.test(r.lvl)?"riesgo":"";
+  var top=/^(ALTO|MEDIO|BAJO)$/.test(r.lvl)?"riesgo":TIERS5.indexOf(r.lvl)>=0?"nivel":"";
   return "<div class='stamp"+(lbl.length>6?" long":"")+"' style='--sc:"+col+"' role='img' aria-label='Veredicto de SolFlag: "+esc(LEVELS[r.lvl].label+(sub?", "+sub:""))+"'>"+
     "<svg class='st-ring' viewBox='0 0 140 140' aria-hidden='true'><circle cx='70' cy='70' r='66' stroke-width='4.5' stroke-dasharray='58 5 31 3 74 11 22 4 49 2 63 8 36 6 30 100' transform='rotate(-38 70 70)'/>"+
       "<circle cx='70' cy='70' r='58.5' stroke-width='1.6' stroke-dasharray='41 7 88 4 26 13 67 3 52 9 60 10' transform='rotate(25 70 70)'/></svg>"+
     "<span class='st-in'><span class='st-k'>SolFlag</span>"+(top?"<span class='st-t'>"+esc(top)+"</span>":"")+"<b>"+esc(lbl)+"</b>"+(sub?"<span class='st-s'>"+esc(sub)+"</span>":"")+"</span></div>";
 }
+// Insignia bajo el veredicto (cinco niveles, 14/11): un gran proyecto de la lista, o un recién nacido que no puede
+// pasar del amarillo hasta los 7 días (y desde cuándo podrá salir verde)
+function tierBadge(r){
+  if(r.tierBig) return "<p class='tbadge tb-dia'>"+"◆ Gran proyecto"+" · "+esc(r.tierBig)+"</p>";
+  if(r.tierCap) return "<p class='tbadge tb-new'>"+"● Recién nacido: con menos de 7 días, el amarillo es lo máximo que puede sacar"+
+    (r.tierCapUntil?". "+"Podrá salir verde a partir del "+esc(fdate(r.tierCapUntil))+" si sigue limpio":"")+"</p>";
+  return "";
+}
 function renderToken(noScroll){
   var r=state.token, L=LEVELS[r.lvl], fav=!!lista.t[r.mint];
   var tip=TOKEN_TIP[r.lvl]||"";
+  if(r.tierCap) tip="Sin alertas, pero con menos de 7 días todavía no ha demostrado nada.";
   if(r.launchLvl) tip+=" Sube a "+L.label.toLowerCase()+(r.faceLvl?" por quién está detrás del lanzamiento (mira «Control del creador»).":" por lo que pasó en el lanzamiento (mira «Compras en el lanzamiento»).");
   if(r.imp) tip="Es una copia de "+r.imp.sym+" con otra dirección: no es "+r.imp.sym+" y su precio no tiene nada que ver con el suyo. No lo compres pensando que es el original, y si lo tienes, no entres en webs que aparezcan a su nombre para «cambiarlo» o «reclamarlo».";
   else if(dataOnly(r)){
@@ -3233,7 +3274,7 @@ function renderToken(noScroll){
     "<div class='tidr'>"+tokAv(r.img,r.sym)+"<h2 class='tname'>"+esc(r.sym)+(r.name&&!sameName(r.name,r.sym)?"<small>"+esc(r.name)+"</small>":"")+"</h2>"+stampHtml(r)+"</div>"+
     "<div class='taddr'><button class='mono tmint2' type='button' data-copy='"+esc(r.mint)+"' title='Copiar dirección del token'>"+esc(r.mint)+"</button>"+
       "<button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copiar dirección del token'>copiar</button></div></div>"+
-    "<p class='sub'><b class='tvl lv-"+esc(L.cls)+"'>"+esc(dataOnly(r)?"Riesgo medio por falta de datos":L.label)+".</b> "+esc(tip)+"</p>"+
+    "<p class='sub'><b class='tvl lv-"+esc(L.cls)+"'>"+esc(dataOnly(r)?"Riesgo medio por falta de datos":L.label)+".</b> "+esc(tip)+"</p>"+tierBadge(r)+
     (chips.length?"<div class='tchips'>"+chips.map(function(c){ return "<span>"+esc(c[0])+" <b>"+esc(c[1])+"</b></span>"; }).join("")+"</div>":"")+
     "</div></div>"+
     "<div class='vsreal' id='vsreal' hidden></div>"+
@@ -3285,20 +3326,21 @@ function stockVs(mint){
 
 /* ---------- pintado ---------- */
 function counts(){
-  var c={ALTO:0,MEDIO:0,BAJO:0,SPAM:0,"SIN DATOS":0,"SIN MERCADO":0};
-  state.results.forEach(function(r){ c[r.lvl]++; });
+  var c={ROJO:0,NARANJA:0,AMARILLO:0,VERDE:0,DIAMANTE:0,SPAM:0,"SIN DATOS":0,"SIN MERCADO":0}, OLD5={ALTO:"ROJO",MEDIO:"AMARILLO",BAJO:"VERDE"};
+  state.results.forEach(function(r){ var k=OLD5[r.lvl]||r.lvl; if(c[k]!==undefined) c[k]++; });
   return c;
 }
 function verdict(c){
   // Sin tokens no hay nada analizado: "sin alertas" sonaría a visto bueno (típico al abrir el creador
   // de un token de Pump.fun, que suele haberlo vendido todo)
   if(!state.results.length) return state.hidden?"Solo tiene tokens de menos de 1 $":"Esta wallet no tiene tokens ahora mismo";
-  if(c.ALTO>0) return c.ALTO+(c.ALTO===1?" token con señales fuertes de alerta":" tokens con señales fuertes de alerta");
-  if(c.MEDIO>0) return "Sin alertas fuertes, pero "+c.MEDIO+(c.MEDIO===1?" token con riesgo medio":" tokens con riesgo medio");
+  if(c.ROJO>0) return c.ROJO+(c.ROJO===1?" token en rojo: trampa o alertas graves":" tokens en rojo: trampa o alertas graves");
+  if(c.NARANJA>0) return "Sin trampas, pero "+c.NARANJA+(c.NARANJA===1?" token en naranja (peligro)":" tokens en naranja (peligro)");
+  if(c.AMARILLO>0) return "Sin alertas graves, pero "+c.AMARILLO+(c.AMARILLO===1?" token en amarillo":" tokens en amarillo");
   return "No se han detectado alertas en los tokens analizados";
 }
 function valueSplit(){
-  var tot=0, v={ALTO:0,MEDIO:0,BAJO:0}, top=null;
+  var tot=0, v={ROJO:0,NARANJA:0,AMARILLO:0,VERDE:0,DIAMANTE:0}, top=null;
   state.results.forEach(function(r){
     tot+=r.valor; if(v[r.lvl]!==undefined) v[r.lvl]+=r.valor;
     if(!top||r.valor>top.valor) top=r;
@@ -3308,10 +3350,10 @@ function valueSplit(){
 function splitText(){
   var s=valueSplit();
   if(!s.tot) return "";
-  var parts=["BAJO","MEDIO","ALTO"].filter(function(k){ return s.v[k]>0; }).map(function(k){
+  var parts=["DIAMANTE","VERDE","AMARILLO","NARANJA","ROJO"].filter(function(k){ return s.v[k]>0; }).map(function(k){
     return LEVELS[k].short+" "+fmtPct(s.v[k]/s.tot*100);
   });
-  var t="Reparto del valor por riesgo: "+parts.join(" · ")+".";
+  var t="Reparto del valor por nivel: "+parts.join(" · ")+".";
   if(s.top&&s.top.valor/s.tot>0.5) t+=" Un solo token, "+s.top.sym+", es el "+fmtPct(s.top.valor/s.tot*100)+" del valor.";
   return t;
 }
@@ -3325,14 +3367,14 @@ function wtWhy(r){
 }
 // «Lo importante»: los tokens de riesgo alto o medio con su motivo y su dinero, el spam y cómo se reparte el valor
 function takeHtml(c,hid){
-  var risky=state.results.filter(function(r){ return r.lvl==="ALTO"||r.lvl==="MEDIO"; })
-    .sort(function(a,b){ return ORDER.indexOf(a.lvl)-ORDER.indexOf(b.lvl)||b.valor-a.valor; });
+  var risky=state.results.filter(function(r){ return lvRisky(r.lvl); })
+    .sort(function(a,b){ return lvPos(a.lvl)-lvPos(b.lvl)||b.valor-a.valor; });
   var li=risky.slice(0,3).map(function(r){ return "<b>"+esc(r.sym)+"</b> ("+usd(r.valor)+"): "+esc(wtWhy(r)); });
-  if(risky.length>3) li.push("Y "+(risky.length-3)+" más con riesgo alto o medio: míralos abajo.");
+  if(risky.length>3) li.push("Y "+(risky.length-3)+" más en rojo, naranja o amarillo: míralos abajo.");
   if(c.SPAM>0) li.push(c.SPAM+(c.SPAM===1?" token parece spam":" tokens parecen spam")+": no los vendas ni entres en webs que aparezcan a su nombre.");
   if(c["SIN DATOS"]>0) li.push(esc(c["SIN DATOS"]+(c["SIN DATOS"]===1?" token no se pudo comprobar por un fallo de red: vuelve a analizar la wallet para revisarlo.":" tokens no se pudieron comprobar por un fallo de red: vuelve a analizar la wallet para revisarlos.")));
   // el reparto del valor solo si hay más de un nivel; si no, basta con decir si un token es casi todo
-  var sp=splitText(), vs=valueSplit(), lv=["ALTO","MEDIO","BAJO"].filter(function(k){ return vs.v[k]>0; }).length;
+  var sp=splitText(), vs=valueSplit(), lv=TIERS5.filter(function(k){ return vs.v[k]>0; }).length;
   if(sp&&lv<2){ var k=sp.indexOf(". "); sp=k<0?"":sp.slice(k+2); }
   if(sp) li.push(esc(sp));
   if(hid) li.push(esc(hid.trim()));
@@ -3342,7 +3384,7 @@ function takeHtml(c,hid){
 // Fila corta de un token en la wallet: logo, nombre, valor y % de la wallet, riesgo, motivo, Analizar, Banderas y estrella
 function wtokRow(r,L){
   var tot=state.results.reduce(function(s,x){ return s+x.valor; },0)||1;
-  var risky=r.lvl==="ALTO"||r.lvl==="MEDIO", fav=!!lista.t[r.mint];
+  var risky=lvRisky(r.lvl), fav=!!lista.t[r.mint];
   var ORD={bad:0,warn:1,na:2,ok:3};
   var lh=r.lights?r.lights.slice().sort(function(a,b){ return (ORD[a.s]==null?2:ORD[a.s])-(ORD[b.s]==null?2:ORD[b.s]); }).map(function(l){
     return "<div class='lt lt-"+l.s+"'><i class='ld'></i><div><b>"+LKEYS[l.k]+" <em class='lfl'>"+esc(FLAGTXT[l.s]||"")+"</em></b><span>"+esc(l.t)+"</span></div></div>";
@@ -3361,7 +3403,7 @@ function summaryText(){
   var c=counts(), total=state.results.reduce(function(s,r){return s+r.valor;},0);
   return "Escáner de wallet "+short(state.wallet)+"\n"+
     state.results.length+" tokens analizados · "+usd(total)+" en tokens\n"+
-    "Alto: "+c.ALTO+" · Medio: "+c.MEDIO+" · Bajo: "+c.BAJO+" · Spam: "+c.SPAM+" · Sin mercado: "+c["SIN MERCADO"]+"\n"+splitText();
+    "Rojo: "+c.ROJO+" · Naranja: "+c.NARANJA+" · Amarillo: "+c.AMARILLO+" · Verde: "+c.VERDE+" · Diamante: "+c.DIAMANTE+" · Spam: "+c.SPAM+" · Sin mercado: "+c["SIN MERCADO"]+"\n"+splitText();
 }
 function render(again){
   var c=counts(), n=state.results.length;
@@ -3369,18 +3411,18 @@ function render(again){
   var segs=ORDER.filter(function(k){return c[k]>0;}).map(function(k){
     return "<i class='"+LEVELS[k].bar+"' style='flex:"+c[k]+"' title='"+LEVELS[k].short+": "+c[k]+"'></i>";
   }).join("");
-  var legend=ORDER.map(function(k){
+  var legend=ORDER.filter(function(k){ return c[k]>0||TIERS5.indexOf(k)<0; }).map(function(k){
     return "<span><i class='dot "+LEVELS[k].bar+"'></i>"+LEVELS[k].short+" <b>"+c[k]+"</b></span>";
   }).join("");
   var tip = !n ? "No hay tokens que revisar, así que esto no dice si la wallet es de fiar. Si es el creador de un token, lo que cuenta es lo que ha hecho: pulsa «Ver ganancias y pérdidas» para ver sus compras y ventas, o mira en Solscan a dónde ha movido el dinero." :
-            (c.ALTO>0 ? "Hay tokens con mercado y señales fuertes de alerta: revísalos abajo." : "Ningún token con mercado tiene señales fuertes de alerta.");
+            (c.ROJO+c.NARANJA>0 ? "Hay tokens con mercado y alertas graves: revísalos abajo." : "Ningún token con mercado tiene alertas graves.");
   if(c.SPAM>0) tip+=" Además hay "+c.SPAM+" tokens que parecen spam (sin mercado y con autoridades activas): no los vendas ni entres en webs que aparezcan a su nombre.";
   if(c["SIN DATOS"]>0) tip+=" "+c["SIN DATOS"]+(c["SIN DATOS"]===1?" token no se pudo comprobar por un fallo de red: vuelve a analizar la wallet para revisarlo.":" tokens no se pudieron comprobar por un fallo de red: vuelve a analizar la wallet para revisarlos.");
   var split=splitText();
   $("#results").classList.add("wmode"); walletDetail();
   var wa=state.wallet; loadBase().then(function(){ if(state.wallet===wa) paintWKind(wa); }).catch(function(){});
   var hid=state.hidden?(state.hidden===1?" Se ha ocultado 1 token de menos de 1 $.":" Se han ocultado "+state.hidden+" tokens de menos de 1 $."):"";
-  var wlv=c.ALTO>0?"alto":c.MEDIO>0||c.SPAM>0?"medio":n?"bajo":"nm";
+  var wlv=c.ROJO>0?"alto":c.NARANJA>0?"nar":c.AMARILLO>0||c.SPAM>0?"medio":n?"bajo":"nm";
   $("#summary").innerHTML=
     "<div class='wtop'><p class='kick'>Wallet</p>"+
       "<div class='widr'><span class='wav' id='wav' aria-hidden='true'>👛</span><h2 class='wname'>"+esc(short(state.wallet))+"</h2></div>"+
@@ -3426,7 +3468,7 @@ function ago(ts){
 function renderList(){
   var f=state.filter;
   var items=state.results.filter(function(r){ return f==="TODOS"||r.lvl===f; });
-  if(!state.token) items.sort(function(a,b){ return ORDER.indexOf(a.lvl)-ORDER.indexOf(b.lvl)||b.valor-a.valor; });
+  if(!state.token) items.sort(function(a,b){ return lvPos(a.lvl)-lvPos(b.lvl)||b.valor-a.valor; });
   var html=items.map(function(r){
     var L=LEVELS[r.lvl];
     if(state.token!==r&&!/^(SIN MERCADO|SPAM|SIN DATOS)$/.test(r.lvl)) return wtokRow(r,L);
@@ -4026,7 +4068,7 @@ function liveTick(){
 var cintaSig="";
 function paintCinta(){
   var it=[];
-  (trend.rows||[]).forEach(function(x){ if(x.r&&x.r.lvl==="BAJO") it.push({g:1,a:x.mint,sym:"$"+x.sym,img:x.img,k:"En verde ahora",t:"Pasó los chequeos · en tendencia"}); });
+  (trend.rows||[]).forEach(function(x){ if(x.r&&/^(VERDE|DIAMANTE|BAJO)$/.test(x.r.lvl)) it.push({g:1,a:x.mint,sym:"$"+x.sym,img:x.img,k:"En verde ahora",t:"Pasó los chequeos · en tendencia"}); });
   sdatos.green.forEach(function(x){ if(!it.some(function(y){ return y.a===x.m; })) it.push({g:1,a:x.m,sym:"$"+x.s,img:null,k:"En verde al nacer",t:"Sigue vivo"+(x.mc?" · cap. "+usd(x.mc):"")}); });
   recentAll().slice(0,8).forEach(function(x){ if(it.some(function(y){ return y.a===x.a; })) return;
     it.push(x.k==="w"?{a:x.a,sym:short(x.a),img:null,k:"Wallet que viste",t:hace(x.ts)}:{a:x.a,sym:"$"+(x.sym||short(x.a)),img:x.img,k:"Lo viste",t:hace(x.ts)+(x.lvl&&LEVELS[x.lvl]?" · "+LEVELS[x.lvl].label.toLowerCase():"")}); });
@@ -4535,6 +4577,11 @@ function bundleVerdict(b){
 // o un lanzador en serie en rojo, junto con otra alerta fuerte o un aviso, da riesgo alto. El amarillo no sube
 // nada: varias compras en el primer segundo también pueden ser bots rápidos
 function raiseByLaunch(r,v){
+  // con los cinco niveles, un bundle o un lanzador en serie en rojo es una trampa: rojo
+  if(TIERS5.indexOf(r.lvl)>=0){
+    if(r.launchLvl||!r.lights||v.s!=="bad"||r.lvl==="ROJO") return false;
+    r.launchLvl=r.lvl; r.lvl="ROJO"; return true;
+  }
   if(r.launchLvl||!r.lights||v.s!=="bad"||r.lvl==="ALTO"||!/^(MEDIO|BAJO)$/.test(r.lvl)) return false;
   var others=r.lights.some(function(l){ return l.s==="bad"||l.s==="warn"; });
   var lvl=others?"ALTO":"MEDIO";
@@ -4633,10 +4680,10 @@ async function loadNew(){
   }
 }
 function renderNewHead(){
-  var rows=news.rows||[], c={ALTO:0,MEDIO:0,BAJO:0}, done=0;
+  var rows=news.rows||[], c={ROJO:0,NARANJA:0,AMARILLO:0,VERDE:0,DIAMANTE:0,ALTO:0,MEDIO:0,BAJO:0}, done=0;
   rows.forEach(function(x){ if(x.st==="done"||x.st==="err") done++; if(x.r&&c[x.r.lvl]!==undefined) c[x.r.lvl]++; });
   var head=news.err?"No se pudo cargar la lista":!news.rows?"Buscando tokens…":!rows.length?"No hay tokens que mostrar":
-    done<rows.length?"Revisando tokens… "+done+"/"+rows.length:c.ALTO+" de "+rows.length+" tokens con riesgo alto";
+    done<rows.length?"Revisando tokens… "+done+"/"+rows.length:(c.ROJO+c.ALTO)+" de "+rows.length+" tokens en rojo";
   $("#nsummary").innerHTML="<div class='eyebrow'>Tokens nuevos de Solana</div>"+
     "<h2 class='verdict'>"+esc(head)+"</h2>"+
     "<p class='sub'>"+esc(state.nsrc==="new"?
@@ -4740,7 +4787,8 @@ function paintRadar(){
 // Si algún día la app tiene una URL pública, ponla aquí y saldrá en el pie de cada tarjeta
 var CARD_URL="";
 var CARD={bg:"#0f0a28",surface:"#18113e",line:"#44358f",fg:"#f1eeff",muted:"#c9c1ea",
-  lvl:{ALTO:["#ff6b6b","#3d1f3a"],MEDIO:["#fbbf24","#3a2c18"],BAJO:["#4ade80","#163a2c"]},
+  lvl:{ROJO:["#ff6b6b","#3d1f3a"],NARANJA:["#fb923c","#3d2418"],AMARILLO:["#fbbf24","#3a2c18"],VERDE:["#4ade80","#163a2c"],DIAMANTE:["#7dd3fc","#132a48"],
+    ALTO:["#ff6b6b","#3d1f3a"],MEDIO:["#fbbf24","#3a2c18"],BAJO:["#4ade80","#163a2c"]},
   dot:{ok:"#4ade80",warn:"#fbbf24",bad:"#ff6b6b",na:"#8b84b8"}};
 function cardLines(ctx,text,maxW,maxLines){
   var words=String(text).split(/\s+/), lines=[], cur="";
@@ -5097,9 +5145,10 @@ function walletStamp(c,n,face){
   if(face){ var bad=face.res>=3&&face.dead/face.res>=.9;
     return {col:bad?CARD.dot.bad:CARD.dot.warn,top:"CARA",lbl:"CONOCIDA",sub:face.res?face.dead+" de "+face.res+" murieron":face.n+(face.n===1?" lanzamiento":" lanzamientos")}; }
   if(!n) return {col:CARD.dot.na,top:"",lbl:"SIN TOKENS",sub:""};
-  if(c.ALTO) return {col:CARD.lvl.ALTO[0],top:"RIESGO",lbl:"ALTO",sub:c.ALTO+(c.ALTO===1?" token con alertas":" tokens con alertas")};
-  if(c.MEDIO) return {col:CARD.lvl.MEDIO[0],top:"RIESGO",lbl:"MEDIO",sub:c.MEDIO+(c.MEDIO===1?" token en medio":" tokens en medio")};
-  if(c.BAJO) return {col:CARD.lvl.BAJO[0],top:"RIESGO",lbl:"BAJO",sub:"sin alertas"};
+  if(c.ROJO) return {col:CARD.lvl.ROJO[0],top:"NIVEL",lbl:LEVELS.ROJO.short.toUpperCase(),sub:c.ROJO+(c.ROJO===1?" token en rojo":" tokens en rojo")};
+  if(c.NARANJA) return {col:CARD.lvl.NARANJA[0],top:"NIVEL",lbl:LEVELS.NARANJA.short.toUpperCase(),sub:c.NARANJA+(c.NARANJA===1?" token en naranja":" tokens en naranja")};
+  if(c.AMARILLO) return {col:CARD.lvl.AMARILLO[0],top:"NIVEL",lbl:LEVELS.AMARILLO.short.toUpperCase(),sub:c.AMARILLO+(c.AMARILLO===1?" token en amarillo":" tokens en amarillo")};
+  if(c.VERDE||c.DIAMANTE) return {col:CARD.lvl.VERDE[0],top:"NIVEL",lbl:LEVELS.VERDE.short.toUpperCase(),sub:"sin alertas"};
   // sin tokens con mercado de riesgo bajo: no se le da un visto bueno
   if(c.SPAM) return {col:CARD.dot.na,top:"TOKENS",lbl:"SPAM",sub:c.SPAM+(c.SPAM===1?" parece spam":" parecen spam")};
   return {col:CARD.dot.na,top:"",lbl:"SIN MERCADO",sub:""};
@@ -5141,7 +5190,7 @@ async function drawWalletXCard(){
   // abajo: sus tokens (hasta 5), primero los de riesgo y luego por valor
   var fy=610, fh=158;
   if(n){
-    var ts=state.results.slice().sort(function(p,q){ var rp=p.lvl==="ALTO"?0:p.lvl==="MEDIO"?1:2, rq=q.lvl==="ALTO"?0:q.lvl==="MEDIO"?1:2; return rp-rq||q.valor-p.valor; }).slice(0,5);
+    var ts=state.results.slice().sort(function(p,q){ return lvPos(p.lvl)-lvPos(q.lvl)||q.valor-p.valor; }).slice(0,5);
     var fw=Math.min((W-2*P-(ts.length-1)*14)/ts.length,(W-2*P-2*14)/3);   // con pocos tokens, recuadros de un tercio como mucho
     ts.forEach(function(r,i){ var fx=P+i*(fw+14), tc=(CARD.lvl[r.lvl]||[CARD.dot.na])[0];
       cardBox(x,fx,fy,fw,fh,18); x.save(); cardRound(x,fx,fy,fw,fh,18); x.clip(); x.fillStyle=tc; x.fillRect(fx,fy,fw,6); x.restore();
