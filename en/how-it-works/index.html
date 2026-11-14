@@ -117,6 +117,8 @@ dl.fmt dd{margin:0;color:var(--soft)}
 .lv .a{border-color:rgba(255,107,107,.5);background:rgba(255,107,107,.07)}.lv .m{border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.06)}.lv .b{border-color:rgba(74,222,128,.45);background:rgba(74,222,128,.06)}
 .lv b{display:block;font:700 1.15rem Fraunces,Georgia,serif}.lv .a b{color:var(--alto)}.lv .m b{color:var(--medio)}.lv .b b{color:var(--bajo)}
 .lv span{display:block;margin-top:4px;font-size:.9rem;color:var(--soft)}
+.lv5{grid-template-columns:repeat(5,minmax(0,1fr))}.lv .d{border-color:rgba(125,211,252,.5);background:rgba(125,211,252,.07)}.lv .o{border-color:rgba(251,146,60,.5);background:rgba(251,146,60,.07)}.lv .d b{color:#7dd3fc}.lv .o b{color:#fb923c}
+@media (max-width:1000px){.lv5{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:1px}
 .dot.r{background:var(--alto)}.dot.y{background:var(--medio)}.dot.g{background:var(--bajo)}
 td.c{white-space:nowrap}
@@ -156,21 +158,24 @@ td small{display:block;color:var(--mut2);font-size:.8rem;margin-top:3px;line-hei
 </section>
 
 <article id="nivel">
-  <h2>From traffic lights to the risk level</h2>
-  <p>Each of the four traffic lights turns green, amber or red depending on the worst signal it finds inside. The token level is decided by counting lights, not by adding up points: that way one serious problem is not diluted by many good things.</p>
+  <h2>From signals to the five tiers</h2>
+  <p>The four traffic lights still turn green, amber or red depending on the worst signal they find inside. The token's tier comes from looking at the warnings one by one and at <b>what kind</b> they are, not from adding up points: that way a single trap is not diluted by many good things. Since Nov 14 there are five tiers, based on what the token is.</p>
   <div class="flow">
     <div><b>Control</b><span>who can mint more, freeze or charge you to move it</span></div>
     <div><b>Concentration</b><span>how much the largest wallets of people hold</span></div>
     <div><b>Market</b><span>whether there is real liquidity and you can get out</span></div>
     <div><b>Dependency</b><span>whether it depends on an issuer, a bridge or a program</span></div>
   </div>
-  <p class="arrow">↓ THEY ARE COUNTED ↓</p>
-  <div class="lv">
-    <div class="a"><b>High risk</b><span>two reds, or one red and one amber. Also always when it copies a famous token or a real brand, or when its liquidity is inflated 100 times.</span></div>
-    <div class="m"><b>Medium risk</b><span>one red, or two ambers. Also when something could not be checked or its market is under 7 days old.</span></div>
-    <div class="b"><b>Low risk</b><span>all green, or a single amber that is normal for its kind of token. Never with something unchecked.</span></div>
+  <p class="arrow">↓ EACH WARNING IS LOOKED AT ONE BY ONE ↓</p>
+  <div class="lv lv5">
+    <div class="d"><b>Diamond</b><span>a big project on our hand-reviewed list (Jupiter, Jito, Pyth…) or a trusted issuer (Circle, Paxos…). Being on the list is enough; we review by hand who gets in.</span></div>
+    <div class="b"><b>Green</b><span>no warning at all and 7 days or more on the market. A memecoin can be green; never diamond.</span></div>
+    <div class="m"><b>Yellow</b><span>one mild warning or something unchecked. Also every token under 7 days old: it is the best a newborn can get.</span></div>
+    <div class="o"><b>Orange</b><span>danger without a trap: one serious warning that is not a trap (very low liquidity, a few wallets holding almost everything) or two or more mild ones.</span></div>
+    <div class="a"><b>Red</b><span>a trap (the creator can mint more or pull the liquidity, launches in series, fake liquidity or volume, a copy of another token) or two serious warnings.</span></div>
   </div>
-  <p class="nota"><b>Why under 7 days is never «low».</b> A brand-new market has no history. We measured it on 62 real tokens: this rule moved 9 brand-new tokens from low to medium and no established one.</p>
+  <p class="nota"><b>Why a newborn never goes above yellow.</b> After hours or a few days a token has proven nothing yet: in the registry, 99% of the ones we see die in their first week. It can be orange or red from the first minute; green, only from day 7.</p>
+  <p class="nota"><b>Red and orange almost always fail at launch</b> (99.4% and 99.6% dead within a day in the registry). The difference is not how long they last but the kind of danger: in red, someone can take your money or you are being deceived.</p>
 </article>
 
 <article id="control">
@@ -258,7 +263,7 @@ td small{display:block;color:var(--mut2);font-size:.8rem;margin-top:3px;line-hei
   <h2>What it cannot know</h2>
   <ul>
     <li><b>Intent.</b> SolFlag sees facts on the chain, not what someone plans to do. A green token can fall and a red one can rise.</li>
-    <li><b>What could not be checked.</b> If a source does not answer, the light shows «not checked» and the token is never low risk. If nothing can be read, it shows «No data», never «Probable spam».</li>
+    <li><b>What could not be checked.</b> If a source does not answer, the light shows «not checked» and the token does not go above yellow. If nothing can be read, it shows «No data», never «Probable spam».</li>
     <li><b>What happens outside Solana.</b> A bridged or exchange token can have its market elsewhere: with little liquidity here it shows amber, not red.</li>
   </ul>
   <p>It is not a recommendation to buy or sell. How accurate it is, misses included, is in <a href="/en/accuracy/">Data and accuracy</a>. If you see a mistake, write to <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>.</p>
@@ -268,6 +273,7 @@ td small{display:block;color:var(--mut2);font-size:.8rem;margin-top:3px;line-hei
   <h2>Changes to the rules</h2>
   <p>When a rule gives a wrong result, it is changed and noted here with the reason.</p>
   <ul class="chg">
+    <li><time>11/14</time><span><b>Five tiers instead of three:</b> diamond, green, yellow, orange and red. High and medium came out almost the same on new tokens (99.4% and 99.3% dead within a day); now red is a trap and orange is danger without a trap. A newborn token does not go above yellow until day 7.</span></li>
     <li><time>11/14</time><span><b>Inflated volume.</b> We look at who trades in the last ~300 trades, not at volume over liquidity, which gave false positives.</span></li>
     <li><time>11/14</time><span><b>«No data» instead of «Probable spam»</b> when the chain does not answer while reading a token with no market.</span></li>
     <li><time>11/14</time><span><b>Buys at launch:</b> a wallet label, not a token signal (almost the same share dies with or without them).</span></li>

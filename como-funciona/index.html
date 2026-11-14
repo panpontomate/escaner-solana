@@ -117,6 +117,8 @@ dl.fmt dd{margin:0;color:var(--soft)}
 .lv .a{border-color:rgba(255,107,107,.5);background:rgba(255,107,107,.07)}.lv .m{border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.06)}.lv .b{border-color:rgba(74,222,128,.45);background:rgba(74,222,128,.06)}
 .lv b{display:block;font:700 1.15rem Fraunces,Georgia,serif}.lv .a b{color:var(--alto)}.lv .m b{color:var(--medio)}.lv .b b{color:var(--bajo)}
 .lv span{display:block;margin-top:4px;font-size:.9rem;color:var(--soft)}
+.lv5{grid-template-columns:repeat(5,minmax(0,1fr))}.lv .d{border-color:rgba(125,211,252,.5);background:rgba(125,211,252,.07)}.lv .o{border-color:rgba(251,146,60,.5);background:rgba(251,146,60,.07)}.lv .d b{color:#7dd3fc}.lv .o b{color:#fb923c}
+@media (max-width:1000px){.lv5{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:1px}
 .dot.r{background:var(--alto)}.dot.y{background:var(--medio)}.dot.g{background:var(--bajo)}
 td.c{white-space:nowrap}
@@ -157,21 +159,24 @@ td small{display:block;color:var(--mut2);font-size:.8rem;margin-top:3px;line-hei
 </section>
 
 <article id="nivel">
-  <h2>Del semáforo al nivel de riesgo</h2>
-  <p>Cada uno de los cuatro semáforos sale en verde, ámbar o rojo según la peor señal que encuentre dentro. El nivel del token se decide contando semáforos, no sumando puntos: así una sola cosa grave no se diluye entre muchas buenas.</p>
+  <h2>De las señales a los cinco niveles</h2>
+  <p>Los cuatro semáforos siguen saliendo en verde, ámbar o rojo según la peor señal que encuentren dentro. El nivel del token sale de mirar las alertas una a una y de <b>qué tipo</b> son, no de sumar puntos: así una sola trampa no se diluye entre muchas cosas buenas. Desde el 14/11 son cinco niveles, según lo que es el token.</p>
   <div class="flow">
     <div><b>Control</b><span>quién puede crear más, congelar o cobrar por moverlo</span></div>
     <div><b>Concentración</b><span>cuánto tienen las mayores wallets de personas</span></div>
     <div><b>Mercado</b><span>si hay liquidez real y si puedes salir</span></div>
     <div><b>Dependencia</b><span>si depende de un emisor, un puente o un programa</span></div>
   </div>
-  <p class="arrow">↓ SE CUENTAN ↓</p>
-  <div class="lv">
-    <div class="a"><b>Riesgo alto</b><span>dos rojos, o un rojo y un ámbar. También siempre que copia a un token famoso o a una marca real, o si su liquidez está inflada 100 veces.</span></div>
-    <div class="m"><b>Riesgo medio</b><span>un rojo, o dos ámbar. También si algo no se pudo comprobar o si su mercado tiene menos de 7 días.</span></div>
-    <div class="b"><b>Riesgo bajo</b><span>todo en verde, o un solo ámbar normal para su tipo de token. Nunca con algo sin comprobar.</span></div>
+  <p class="arrow">↓ CADA ALERTA SE MIRA UNA A UNA ↓</p>
+  <div class="lv lv5">
+    <div class="d"><b>Diamante</b><span>gran proyecto de nuestra lista revisada a mano (Jupiter, Jito, Pyth…) o un emisor de confianza (Circle, Paxos…). Estar en la lista basta; quién entra lo revisamos a mano.</span></div>
+    <div class="b"><b>Verde</b><span>ninguna alerta y 7 días o más de mercado. Un meme puede ser verde; nunca diamante.</span></div>
+    <div class="m"><b>Amarillo</b><span>una alerta leve o algo sin comprobar. También todo token con menos de 7 días: es lo máximo que puede sacar un recién nacido.</span></div>
+    <div class="o"><b>Naranja</b><span>peligro sin trampa: una alerta grave que no es trampa (liquidez muy baja, pocas wallets con casi todo) o dos o más leves.</span></div>
+    <div class="a"><b>Rojo</b><span>una trampa (el creador puede crear más o sacar la liquidez, lanza en serie, liquidez o volumen falsos, copia de otro token) o dos alertas graves.</span></div>
   </div>
-  <p class="nota"><b>Por qué menos de 7 días nunca es «bajo».</b> Un mercado recién nacido no tiene historia. Lo medimos en 62 tokens reales: esta regla movió 9 tokens recién lanzados de bajo a medio y ninguno veterano.</p>
+  <p class="nota"><b>Por qué un recién nacido no pasa del amarillo.</b> Con horas o pocos días un token todavía no ha demostrado nada: en el registro, en su primera semana muere el 99 % de los que vemos. Puede salir naranja o rojo desde el primer minuto; verde, solo a partir del día 7.</p>
+  <p class="nota"><b>Rojo y naranja fracasan casi siempre al nacer</b> (99,4 % y 99,6 % muertos en un día en el registro). La diferencia no es cuánto duran, sino el tipo de peligro: en el rojo alguien te puede quitar el dinero o te están engañando.</p>
 </article>
 
 <article id="control">
@@ -259,7 +264,7 @@ td small{display:block;color:var(--mut2);font-size:.8rem;margin-top:3px;line-hei
   <h2>Lo que no puede saber</h2>
   <ul>
     <li><b>La intención.</b> SolFlag ve hechos de la cadena, no lo que alguien piensa hacer. Un token en verde puede caer y uno en rojo puede subir.</li>
-    <li><b>Lo que no se pudo comprobar.</b> Si una fuente no responde, el semáforo sale «sin comprobar» y el token nunca queda en riesgo bajo. Si no se puede leer nada, sale «Sin datos», nunca «Probable spam».</li>
+    <li><b>Lo que no se pudo comprobar.</b> Si una fuente no responde, el semáforo sale «sin comprobar» y el token no pasa del amarillo. Si no se puede leer nada, sale «Sin datos», nunca «Probable spam».</li>
     <li><b>Lo que pasa fuera de Solana.</b> Un token puenteado o de un exchange puede tener su mercado en otra parte: con poca liquidez aquí sale en ámbar, no en rojo.</li>
   </ul>
   <p>No es una recomendación de compra ni de venta. Cómo acierta, con los fallos incluidos, está en <a href="/acierto/">Datos y acierto</a>. Si ves un error, escríbenos a <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>.</p>
@@ -269,6 +274,7 @@ td small{display:block;color:var(--mut2);font-size:.8rem;margin-top:3px;line-hei
   <h2>Cambios en las reglas</h2>
   <p>Cuando una regla da un resultado equivocado, se cambia y se apunta aquí con el motivo.</p>
   <ul class="chg">
+    <li><time>14/11</time><span><b>Cinco niveles en vez de tres:</b> diamante, verde, amarillo, naranja y rojo. Alto y medio salían casi iguales en los tokens nuevos (99,4 % y 99,3 % muertos en un día); ahora el rojo es una trampa y el naranja, peligro sin trampa. Un recién nacido no pasa del amarillo hasta el día 7.</span></li>
     <li><time>14/11</time><span><b>Volumen inflado.</b> Se mira quién opera en las últimas ~300 operaciones, no la proporción entre volumen y liquidez, que daba falsos positivos.</span></li>
     <li><time>14/11</time><span><b>«Sin datos» en vez de «Probable spam»</b> cuando la cadena no responde al leer un token sin mercado.</span></li>
     <li><time>14/11</time><span><b>Compra al nacer:</b> etiqueta de wallet, no señal del token (con ellas o sin ellas muere casi lo mismo).</span></li>
