@@ -65,4 +65,7 @@ test("enlaces de CoinGecko: solo https; nivel del lanzamiento desde D1", async (
   const f = async (u) => u.includes("dexscreener") ? { ok: true, json: async () => [] } : { ok: false, status: 404 };
   assert.equal((await cotiza({ DB }, M, { cache: null, fetch: f })).nivel, "HIGH");
   assert.equal((await cotiza({}, M, { cache: null, fetch: f })).nivel, null);
+  // los cinco niveles, si ya están guardados
+  const DB5 = { prepare: () => ({ bind: () => ({ first: async () => ({ lvl: "HIGH", tr: "ORANGE" }) }) }) };
+  assert.equal((await cotiza({ DB: DB5 }, M, { cache: null, fetch: f })).nivel, "ORANGE");
 });

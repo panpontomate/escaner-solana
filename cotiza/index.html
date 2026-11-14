@@ -14,7 +14,7 @@
 /* «Dónde cotiza · todos» (maqueta aprobada el 13/11: maquetas\web\donde-cotiza-todos.html).
    Datos en vivo: https://api.solflag.com/api/cotiza/<mint> (tools/api/cotiza.js) y el coste en la cadena con Jupiter.
    ?t=<mint> el token · ?r=1 riesgo alto · ?r=0 lo abre el análisis y no es riesgo alto. Sin r (Google, un enlace
-   copiado a mano) no hay botones para ir a comprar; tampoco si al lanzarse lo apuntamos en riesgo alto (nivel de la API) */
+   copiado a mano) no hay botones para ir a comprar; tampoco si al lanzarse lo apuntamos en rojo, naranja o riesgo alto (nivel de la API) */
 :root{--bg:#05040d;--card:rgba(10,8,24,.96);--line:rgba(196,181,253,.16);--line2:rgba(196,181,253,.3);--tx:#f1eeff;--mut:#a99fd6;--mut2:#7d74a8;--tq:#8ec5cf;--hi:#ff6b6b;--md:#fbbf24;--lo:#4ade80;--vi:#8b5cf6}
 html{background:var(--bg);overflow-x:clip}body{margin:0;color:var(--tx);font:400 16px/1.5 Manrope,sans-serif;overflow-x:clip}
 a{color:var(--tq)}
@@ -213,7 +213,7 @@ function cabecera() {
   document.title = "Dónde cotiza " + (t.sym ? "$" + t.sym : "") + " · SolFlag";
   $("lt").innerHTML = t.img ? `<img src="${esc(t.img)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : esc((t.sym || "?").slice(0, 1));
   $("addr").innerHTML = "La dirección buena: " + esc(MINT.slice(0, -4)) + "<b>" + esc(MINT.slice(-4)) + "</b>";
-  const alto = RP === "1" || D.nivel === "HIGH";
+  const alto = RP === "1" || /^(HIGH|RED|ORANGE)$/.test(D.nivel || "");
   $("stop").hidden = !alto; $("nolinks").hidden = alto || !RISKY;
 }
 function resumen() {
@@ -291,7 +291,7 @@ else {
   $("scanit").href = $("back").href;
   fetch("https://api.solflag.com/api/cotiza/" + MINT).then((r) => r.ok ? r.json() : null).then((j) => {
     if (!j) throw 0;
-    D = j; if (D.nivel === "HIGH") RISKY = true; todo();
+    D = j; if (/^(HIGH|RED|ORANGE)$/.test(D.nivel || "")) RISKY = true; todo();
     idaVuelta(1000).then((p) => { ROUTE = p; resumen(); podio(); if (D) pinta(); });
   }).catch(() => { $("tn").textContent = "No se pudo cargar"; $("verdict").textContent = "Prueba a recargar en un momento."; });
 }

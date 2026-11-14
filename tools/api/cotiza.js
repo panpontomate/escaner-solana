@@ -96,10 +96,11 @@ async function coingecko(env, fetchFn, cache, mint) {
 }
 
 // Nivel con el que lo apuntamos al lanzarse (D1, tabla lanz), o null: la página «Ver todos» no enseña dónde comprar
-// un token que salió en riesgo alto, venga de donde venga el enlace
+// un token que salió en rojo o naranja (o en riesgo alto, el nivel antiguo), venga de donde venga el enlace.
+// tr = los cinco niveles (motor 0.6.0, 14/11); si no está, el de siempre
 async function nivelLanz(env, mint) {
   if (!env || !env.DB) return null;
-  try { const r = await env.DB.prepare("SELECT lvl FROM lanz WHERE m = ?1").bind(mint).first(); return (r && r.lvl) || null; }
+  try { const r = await env.DB.prepare("SELECT lvl, tr FROM lanz WHERE m = ?1").bind(mint).first(); return (r && (r.tr || r.lvl)) || null; }
   catch (e) { return null; }
 }
 
