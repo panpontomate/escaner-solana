@@ -37,7 +37,7 @@ const fail = (status, error) => new Response(JSON.stringify({ v: V, error: error
 const SUM = "COUNT(*) AS n, SUM(dead24 IS NOT NULL) AS resolved, SUM(dead24 = 1) AS dead24";
 const tally = (r) => ({ n: r.n || 0, resolved: r.resolved || 0, dead24: r.dead24 || 0 });
 const launch = (r) => {
-  const o = { m: r.m, t: r.t, plat: r.plat, dex: r.dex, lvl: r.lvl, dead24: r.dead24 == null ? null : !!r.dead24, mc24: r.mc24 };
+  const o = { m: r.m, t: r.t, plat: r.plat, dex: r.dex, lvl: r.lvl, tr: r.tr || undefined, dead24: r.dead24 == null ? null : !!r.dead24, mc24: r.mc24 };
   Object.keys(o).forEach((k) => { if (o[k] == null && k !== "dead24") delete o[k]; });
   return o;
 };
@@ -51,7 +51,7 @@ export async function wallet(db, a) {
   const rows = await all(db, "SELECT * FROM lanz WHERE py = ?1 OR cr = ?1 OR fu = ?1 ORDER BY t DESC LIMIT " + LIST, [a]);
   const launches = rows.map((r) => Object.assign(launch(r), { roles: ROLES.filter(([, c]) => r[c] === a).map(([k]) => k) }));
   const bsum = (await all(db, "SELECT COUNT(*) AS n, SUM(l.dead24 IS NOT NULL) AS resolved, SUM(l.dead24 = 1) AS dead24 FROM compras c LEFT JOIN lanz l ON l.m = c.m WHERE c.w = ?1", [a]))[0] || {};
-  const brows = await all(db, "SELECT c.m, c.d, l.t, l.plat, l.dex, l.lvl, l.dead24, l.mc24 FROM compras c LEFT JOIN lanz l ON l.m = c.m WHERE c.w = ?1 ORDER BY l.t DESC LIMIT " + LIST, [a]);
+  const brows = await all(db, "SELECT c.m, c.d, l.t, l.plat, l.dex, l.lvl, l.tr, l.dead24, l.mc24 FROM compras c LEFT JOIN lanz l ON l.m = c.m WHERE c.w = ?1 ORDER BY l.t DESC LIMIT " + LIST, [a]);
   const buys = Object.assign(tally(bsum), { list: brows.map((r) => Object.assign(launch(r), { blocks: r.d })) });
   const known = Object.values(roles).some((r) => r.n) || buys.n > 0;
   return { v: V, wallet: a, known: known, roles: roles, launches: launches, firstBuys: buys };
