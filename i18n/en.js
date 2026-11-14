@@ -1288,6 +1288,10 @@ export const TEXT = {
   "<p class='bnote'>Quien compra en los primeros bloques suele ser un bot que vende enseguida: en los tokens que llegaron al millón, el 93 % de estos compradores vendió, la mitad en poco más de un minuto (registro de SolFlag, 14/11).</p>": "<p class='bnote'>Whoever buys in the first blocks is usually a bot that sells right away: in tokens that reached $1M, 93% of these buyers sold, half of them within about a minute (SolFlag registry, 11/14).</p>",
   " compra al nacer en serie": " buys at launch time after time",
   " compran al nacer en serie": " buy at launch time after time",
+  "Forma parte de un grupo de ": "Part of a group of ",
+  " wallets que se mandan SOL entre ellas y que ha estado detrás o entre los primeros compradores de ": " wallets that send SOL to each other and have been behind or among the first buyers of ",
+  " de un grupo conectado": " from a connected group",
+  " de grupos conectados": " from connected groups",
   "Ha comprado al nacer en ": "Bought at launch in ",
   " lanzamientos · ": " launches · ",
   "Analizar esta wallet'>": "Analyze this wallet'>"

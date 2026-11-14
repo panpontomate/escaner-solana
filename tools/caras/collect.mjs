@@ -15,7 +15,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DAY, oldToken, INFRA_PER_HOUR, rcWatch, emptyState, addToken, addRolesLate, pumpCreator, platFromDex, resolveToken, onCurve, buildList, prune, needInfraCheck, perHour } from "./lib.mjs";
-import { emptyBase, observe, mergeAporte, pruneBase, publishBase } from "./base.mjs";
+import { emptyBase, observe, classify, mergeAporte, pruneBase, publishBase, equipos, EQ_MIN } from "./base.mjs";
 import { regEntry, regDue, regResolve, regRecheck, regRejudge, regPrune, regPublish, regFill, regMissing, dayOf, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
 import { emptyQueue, queueLaunch, queueBuyers, buyerCandidates, trimQueue, d1Config, flush, pedidosPendientes, marcarPedidos, pedidoLaunch, PEDIDOS_MAX, fromHelius, HELIUS_LIMIT, sinPagador } from "./plano.mjs";
@@ -150,6 +150,13 @@ if (fs.existsSync(APORTES)) {
   });
 }
 pruneBase(state.base, now);
+// Grupos de wallets conectadas (base.mjs, desde el estudio del 14/11). Un lanzamiento en el que paga, crea o financia
+// una wallet de un grupo pasa a contar para el grupo, y las otras wallets de detrás entran en él (sin exchanges).
+// Si el grupo ya tiene EQ_MIN lanzamientos, el token se analiza y se le buscan los primeros compradores aunque esta
+// ejecución ya haya llegado a REG_MAX (como mucho EQ_EXTRA de más)
+const EQ = equipos(state.base), EQ_EXTRA = 10;
+const eqDe = (a) => { const w = a && state.base.wallets[a]; return w && w.eq && classify(w) !== "exchange" ? w.eq : null; };
+const eqFuerte = (a) => { const e = eqDe(a); return e && EQ[e] && EQ[e].n >= EQ_MIN ? e : null; };
 state.reg = regPrune(state.reg || {}, now);
 state.regPub = state.regPub || {};
 // plano del dinero (plano.mjs): enlaces de cada lanzamiento pendientes de subir a Cloudflare D1
@@ -184,7 +191,8 @@ for (let p = 1; p <= 5 && fresh.length < MAX_NEW; p++) {
 }
 for (const f of fresh.slice(0, MAX_NEW)) {
   const t = { t: f.t, seen: now, dex: f.dex, liq: f.liq };
-  let nrc = false;
+  let nrc = false, prio = false;
+  const extra = () => log.registro >= REG_MAX && (log.grupoExtra || 0) < EQ_EXTRA;
   try {
     const rc = await rugcheck(f.mint, log);
     // sin respuesta: se apunta igual (nrc) y se vuelve a pedir en las siguientes ejecuciones
@@ -201,8 +209,9 @@ for (const f of fresh.slice(0, MAX_NEW)) {
     // creador y lanzador leídos de la cadena cuando RugCheck no los da (caído, o el token es de hace minutos)
     if (!t.creator) { const c = pumpCreator(me && me.tx, f.mint); if (c) { t.creator = c; log.creadorCadena = (log.creadorCadena || 0) + 1; } }
     if (!t.plat || t.plat === "unknown") t.plat = platFromDex(f.dex) || t.plat;
+    if (extra() && (eqFuerte(t.payer) || eqFuerte(t.creator))) prio = true;
     // compradores de los primeros bloques, solo en los que se analizan (cada uno es una petición más)
-    if (D1 && me && log.registro < REG_MAX) {
+    if (D1 && me && (log.registro < REG_MAX || prio)) {
       const buyers = [];
       for (const b of buyerCandidates(me.page)) {
         try { const s = await buyerSigners(me, b.sig); if (s && s[0]) buyers.push({ w: s[0], d: b.d, sig: b.sig }); } catch (e) { log.errores++; }
@@ -215,9 +224,16 @@ for (const f of fresh.slice(0, MAX_NEW)) {
       const cs = await firstSigners(t.creator);             // quien pagó la primera transacción del creador
       if (cs && cs[0] && cs[0] !== t.creator && cs[0] !== t.payer) t.funder = cs[0];
     }
+    if (!prio && extra() && eqFuerte(t.funder)) prio = true;
   } catch (e) { log.errores++; }
+  const detras = [t.payer, t.creator, t.funder].filter(Boolean), eqT = detras.map(eqDe).find(Boolean);
+  if (eqT) {
+    detras.forEach((a) => { if (classify(state.base.wallets[a]) !== "exchange") observe(state.base, { addr: a, eq: eqT, token: f.mint, at: f.t }, now); });
+    log.grupo = (log.grupo || 0) + 1;
+  }
   addToken(state, f.mint, t); state.seen[f.mint] = now; log.nuevos++;
-  if (log.registro < REG_MAX) {
+  if (prio) log.grupoExtra = (log.grupoExtra || 0) + 1;
+  if (log.registro < REG_MAX || prio) {
     let r = null;
     try {
       // cada token con su propio límite de tiempo: uno que se atasque no se come la ejecución

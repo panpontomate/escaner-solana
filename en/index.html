@@ -1326,6 +1326,7 @@ body.scanp #form .eyebrow{margin-bottom:8px}
 .buyers{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .buyers button{border:1px solid var(--line);background:var(--surface-2);color:var(--muted);border-radius:999px;padding:5px 10px;font:inherit;font-size:.8rem;cursor:pointer;min-height:32px}
 .buyers button:hover{color:var(--fg);border-color:var(--kick)}
+.whr small.eqn{display:block;color:var(--medio);font-weight:600}
 .buyers button.sn{color:var(--medio);border-color:var(--medio)}
 .bnote{margin:8px 0 0;font-size:.8rem;color:var(--muted)}
 .wsrc{margin:14px 0 0;font-size:.8rem;color:var(--muted)}
@@ -3542,14 +3543,17 @@ async function loadWho(mint){
   var b=box(); if(!b) return;
   b.innerHTML=whoHtml(who[mint]);
 }
+// grupos de wallets conectadas por envíos de SOL (base de wallets, 14/11): solo vienen los de 5 lanzamientos o más
+function eqOf(a){ var b=wbase.data, w=b&&b.wallets&&b.wallets[a]; return w&&w.eq&&b.equipos&&b.equipos[w.eq]||null; }
+function eqTxt(g){ return "Part of a group of "+g.w+" wallets that send SOL to each other and have been behind or among the first buyers of "+g.n+" launches"; }
 function whoRow(roles,x,cara){
-  var n=x.n||0, res=x.resolved||0, dead=x.dead24||0, fr=res?dead/res:0;
+  var n=x.n||0, g=eqOf(x.wallet), res=x.resolved||0, dead=x.dead24||0, fr=res?dead/res:0;
   var cls=res>=3&&fr>=0.9?" r":(res&&fr>=0.5?" y":"");
   var txt=!n?"First time we see it in a launch":
     n+(n===1?" launch":" launches")+" before this one · "+dead+(dead===1?" dead":" dead")+" after 24 h"+(n>res?" · "+(n-res)+" without a result yet":"");
   return "<div class='whr"+cls+"'>"+tokAv("",x.wallet)+
     "<div style='min-width:0'><span class='role'>"+esc(roles)+(cara?"<span class='wkf'>Known face</span>":"")+"</span>"+
-    "<b class='mono wk' tabindex='0' data-wk='"+esc(x.wallet)+"'"+(cara?" data-cara='1'":"")+">"+esc(short(x.wallet))+"</b><small>"+esc(txt)+"</small>"+(res?"<div class='wbar'><i style='width:"+Math.round(fr*100)+"%'></i></div>":"")+"</div>"+
+    "<b class='mono wk' tabindex='0' data-wk='"+esc(x.wallet)+"'"+(cara?" data-cara='1'":"")+">"+esc(short(x.wallet))+"</b><small>"+esc(txt)+"</small>"+(g?"<small class='eqn'>🔗 "+esc(eqTxt(g))+"</small>":"")+(res?"<div class='wbar'><i style='width:"+Math.round(fr*100)+"%'></i></div>":"")+"</div>"+
     "<button type='button' class='btn small ghost' data-analyze='"+esc(x.wallet)+"'>See this wallet</button></div>";
 }
 function whoHtml(j){
@@ -3568,9 +3572,9 @@ function whoHtml(j){
   var fb=j.firstBuyers||[];
   // snipers conocidos (base de wallets, 14/11): compran en el primer bloque de muchos lanzamientos
   var snN=function(w){ var x=wbase.data&&wbase.data.wallets&&wbase.data.wallets[w]; return x&&x.t==="sniper"?((x.roles&&x.roles.sniper)||x.n||3):0; };
-  var nsn=fb.filter(function(b){ return snN(b.wallet); }).length;
-  if(fb.length) h+="<h3 style='margin:16px 0 0;font-size:1rem'>Bought in the first blocks <small style='font-weight:600;color:var(--muted)'>"+fb.length+(nsn?" · "+nsn+(nsn===1?" buys at launch time after time":" buy at launch time after time"):"")+"</small></h3><div class='buyers'>"+
-    fb.slice(0,16).map(function(b){ var k=snN(b.wallet); return "<button type='button'"+(k?" class='sn'":"")+" data-analyze='"+esc(b.wallet)+"' title='"+(k?"Bought at launch in "+k+" launches · ":"")+"Analyze this wallet'>"+(k?"🎯 ":"")+esc(short(b.wallet))+" · "+(b.blocks?"block +"+b.blocks:"same block")+"</button>"; }).join("")+
+  var nsn=fb.filter(function(b){ return snN(b.wallet); }).length, neq=fb.filter(function(b){ return eqOf(b.wallet); }).length;
+  if(fb.length) h+="<h3 style='margin:16px 0 0;font-size:1rem'>Bought in the first blocks <small style='font-weight:600;color:var(--muted)'>"+fb.length+(nsn?" · "+nsn+(nsn===1?" buys at launch time after time":" buy at launch time after time"):"")+(neq?" · "+neq+(neq===1?" from a connected group":" from connected groups"):"")+"</small></h3><div class='buyers'>"+
+    fb.slice(0,16).map(function(b){ var k=snN(b.wallet), g=eqOf(b.wallet); return "<button type='button'"+(k||g?" class='sn'":"")+" data-analyze='"+esc(b.wallet)+"' title='"+(g?esc(eqTxt(g))+" · ":"")+(k?"Bought at launch in "+k+" launches · ":"")+"Analyze this wallet'>"+(g?"🔗 ":"")+(k?"🎯 ":"")+esc(short(b.wallet))+" · "+(b.blocks?"block +"+b.blocks:"same block")+"</button>"; }).join("")+
     (fb.length>16?"<span class='hint' style='align-self:center'>and "+(fb.length-16)+" more</span>":"")+"</div>"+
     "<p class='bnote'>Whoever buys in the first blocks is usually a bot that sells right away: in tokens that reached $1M, 93% of these buyers sold, half of them within about a minute (SolFlag registry, 11/14).</p>";
   return h;
