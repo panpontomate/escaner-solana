@@ -45,6 +45,8 @@ export function regEntry(mint, launch, r, now, face, ev) {
   if (r) {
     if (r.sym && r.sym.length <= 24) e.s = r.sym;
     e.l = r.lvl; e.v = r.sev; if (r.type) e.ty = r.type;
+    // los cinco niveles (motor 0.6.0, 14/11): diamante, verde, amarillo, naranja, rojo; tc = con el techo de 7 días
+    if (r.tier) { e.tr = r.tier; if (r.tierCap) e.tc = 1; }
     const f = [];
     (r.lights || []).forEach(function (l) {
       (l.items || []).forEach(function (i) {
@@ -170,7 +172,7 @@ export function regPublish(reg, pub, now) {
 // Resumen de un día: por nivel inicial y por señal, cuántos hay, cuántos tienen ya resultado y cuántos murieron;
 // alive = los que siguen vivos en su último resultado ({ m, s, l nivel, at h24|d7, mc })
 export function daySummary(tokens) {
-  const by = {}, sig = {}, alive = [], cur = { n: 0, h24: 0, gr24: 0, d7: 0, gr7: 0 };
+  const by = {}, sig = {}, filtro = {}, alive = [], cur = { n: 0, h24: 0, gr24: 0, d7: 0, gr7: 0 };
   const blank = function () { return { n: 0, h24: 0, dead24: 0, d7: 0, dead7: 0 }; };
   const count = function (s, e) {
     s.n++;
@@ -185,9 +187,14 @@ export function daySummary(tokens) {
       if (e.h24 && e.h24.dx !== undefined) { cur.h24++; if (e.h24.gr) cur.gr24++; }
       if (e.d7 && e.d7.dx !== undefined) { cur.d7++; if (e.d7.gr) cur.gr7++; }
     }
-    count(by[k] || (by[k] = blank()), e);
-    // cada señal (sin el color): cuántos tokens la tenían y cuántos murieron
-    (e.f || []).forEach(function (f) { const c = f.split(":")[0]; count(sig[c] || (sig[c] = blank()), e); });
+    // los elegidos por el filtro de entrada (sel prio o grupo, desde el 14/11) no cuentan en los porcentajes: están
+    // sesgados hacia lo que más promete. Cuentan los de antes (sin sel) y la muestra al azar (sel azar)
+    if (e.sel && e.sel !== "azar") { filtro[e.sel] = (filtro[e.sel] || 0) + 1; }
+    else {
+      count(by[k] || (by[k] = blank()), e);
+      // cada señal (sin el color): cuántos tokens la tenían y cuántos murieron
+      (e.f || []).forEach(function (f) { const c = f.split(":")[0]; count(sig[c] || (sig[c] = blank()), e); });
+    }
     // los que siguen vivos en su último resultado: los fallos de los marcados en rojo, a la vista
     const last = e.d7 ? "d7" : e.h24 ? "h24" : null;
     if (last && !e[last].dead) alive.push({ m: e.m, s: e.s, l: k, at: last, mc: e[last].mc });
@@ -196,6 +203,7 @@ export function daySummary(tokens) {
   LEVEL_ORDER.concat(["ERROR"]).forEach(function (k) { if (by[k]) levels[k] = by[k]; });
   const out = { n: Object.keys(tokens).length, levels: levels };
   if (cur.n) out.curve = cur;
+  if (Object.keys(filtro).length) out.filtro = filtro;   // cuántos se analizaron por prioridad (fuera de los %)
   out.sig = {};
   Object.keys(sig).sort().forEach(function (c) { out.sig[c] = sig[c]; });
   out.alive = alive;
