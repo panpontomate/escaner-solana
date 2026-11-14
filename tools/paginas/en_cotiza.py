@@ -17,6 +17,8 @@ T = [
   ('<h1 id="tn">Cargando…</h1>', '<h1 id="tn">Loading…</h1>'),
   ('<div class="stop" id="stop" hidden><b>Riesgo alto:</b> no enlazamos sitios para comprarlo. Te enseñamos dónde se negocia y, sobre todo, lo que cuesta salir.</div>',
    '<div class="stop" id="stop" hidden><b>High risk:</b> we do not link to places to buy it. We show where it trades and, above all, what it costs to get out.</div>'),
+  ('<b>Sin enlaces para comprar:</b> antes, analiza el token en el <a id="scanit" href="/">Escáner</a>. Desde su análisis verás aquí los enlaces directos.',
+   '<b>No links to buy:</b> first, analyze the token in the <a id="scanit" href="/en/">Scanner</a>. From its analysis you will see the direct links here.'),
   ('<h2>Los mejores<span>para entrar y salir.</span></h2><p>Los tres más baratos de cada lado. En la cadena compras desde tu wallet; en un exchange, desde tu cuenta allí.</p>',
    '<h2>The best<span>to get in and out.</span></h2><p>The three cheapest on each side. On-chain you buy from your wallet; on an exchange, from your account there.</p>'),
   ('<span class="k" style="font-size:12px">EN LA CADENA</span><span class="tg no">NO PIDE IDENTIDAD</span>', '<span class="k" style="font-size:12px">ON-CHAIN</span><span class="tg no">NO ID NEEDED</span>'),

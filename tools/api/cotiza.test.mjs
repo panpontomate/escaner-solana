@@ -53,3 +53,16 @@ test("ficha: nombre, símbolo y logo del par con más liquidez", async () => {
   assert.deepEqual(f, { sym: "JUP", name: "Jupiter", img: "https://x/logo.png" });
   assert.equal(ficha([], M), null);
 });
+
+test("enlaces de CoinGecko: solo https; nivel del lanzamiento desde D1", async () => {
+  const { seguro } = await import("./cotiza.js");
+  assert.equal(seguro("https://www.binance.com/en/trade/JUP_USDT"), "https://www.binance.com/en/trade/JUP_USDT");
+  assert.equal(seguro("javascript:alert(1)"), null);
+  assert.equal(seguro("http://x.com"), null);
+  const c = exchanges([tick("Binance", 0.07, 1e6, { trade_url: "javascript:alert(1)" })]);
+  assert.equal(c[0].url, null);
+  const DB = { prepare: () => ({ bind: () => ({ first: async () => ({ lvl: "HIGH" }) }) }) };
+  const f = async (u) => u.includes("dexscreener") ? { ok: true, json: async () => [] } : { ok: false, status: 404 };
+  assert.equal((await cotiza({ DB }, M, { cache: null, fetch: f })).nivel, "HIGH");
+  assert.equal((await cotiza({}, M, { cache: null, fetch: f })).nivel, null);
+});

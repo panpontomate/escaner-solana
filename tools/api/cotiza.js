@@ -12,6 +12,8 @@ export const MIN_VOL = 25000;     // exchanges con menos volumen al día no se e
 export const MIN_LIQ = 1000;      // pools con menos liquidez, tampoco
 export const DUDOSO = 1;          // diferencia de compra-venta de más del 1 %: precio poco fiable
 const CG_S = 21600, DEX_OK_S = 3600;
+// solo enlaces https: el de cada exchange llega tal cual de CoinGecko
+export const seguro = (u) => typeof u === "string" && /^https:\/\/[^\s"'<>]+$/.test(u) ? u : null;
 const memo = (k) => "https://cache.solflag.internal/cotiza/" + k;
 
 // Enlace directo al pool en su DEX (comprobados el 13/11); si no sabemos enlazarlo, la ruta de Jupiter
@@ -47,9 +49,9 @@ export function exchanges(tickers) {
     const n = x && x.market && x.market.name;
     if (!n || x.is_stale || x.is_anomaly || NO_SON_EXCHANGES.some((d) => n.indexOf(d) === 0)) continue;
     const vol = (x.converted_volume && x.converted_volume.usd) || 0, sp = Number(x.bid_ask_spread_percentage) || null;
-    const b = by[n] || (by[n] = { n: n, vol: 0, sp: null, par: "", url: x.trade_url || null });
+    const b = by[n] || (by[n] = { n: n, vol: 0, sp: null, par: "", url: seguro(x.trade_url) });
     b.vol += vol;
-    if (sp != null && (b.sp == null || sp < b.sp)) { b.sp = sp; b.par = x.base + " / " + x.target; if (x.trade_url) b.url = x.trade_url; }
+    if (sp != null && (b.sp == null || sp < b.sp)) { b.sp = sp; b.par = x.base + " / " + x.target; if (seguro(x.trade_url)) b.url = seguro(x.trade_url); }
   }
   return Object.values(by).filter((b) => b.vol >= MIN_VOL && b.sp != null).map((b) => {
     const e = EXCHANGES[b.n] || {}, fee = typeof e.fee === "number" ? e.fee : null;
@@ -93,13 +95,21 @@ async function coingecko(env, fetchFn, cache, mint) {
   return v;
 }
 
+// Nivel con el que lo apuntamos al lanzarse (D1, tabla lanz), o null: la página «Ver todos» no enseña dónde comprar
+// un token que salió en riesgo alto, venga de donde venga el enlace
+async function nivelLanz(env, mint) {
+  if (!env || !env.DB) return null;
+  try { const r = await env.DB.prepare("SELECT lvl FROM lanz WHERE m = ?1").bind(mint).first(); return (r && r.lvl) || null; }
+  catch (e) { return null; }
+}
+
 export async function cotiza(env, mint, opts) {
   opts = opts || {};
   const fetchFn = opts.fetch || fetch;
   const cache = opts.cache !== undefined ? opts.cache : (typeof caches !== "undefined" ? caches.default : null);
-  const [pares, cg] = await Promise.all([dexscreener(fetchFn, cache, mint), coingecko(env, fetchFn, cache, mint)]);
+  const [pares, cg, nivel] = await Promise.all([dexscreener(fetchFn, cache, mint), coingecko(env, fetchFn, cache, mint), nivelLanz(env, mint)]);
   return {
-    v: 1, mint: mint, t: Date.now(),
+    v: 1, mint: mint, t: Date.now(), nivel: nivel,
     ruta: rutaJupiter(mint),
     token: ficha(pares, mint),
     pools: pools(pares, mint),

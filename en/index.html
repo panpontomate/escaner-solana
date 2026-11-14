@@ -3559,7 +3559,7 @@ async function whalesInline(mint){
    Pools y exchanges: api.solflag.com/api/cotiza (exchanges con comisión, identidad y MiCA revisadas a mano).
    Coste en la cadena: Jupiter, comprar X $ con USDC y vender al momento lo recibido (lo que vuelve ya lleva las
    comisiones de los pools; falta la de la app). En riesgo alto no se enlaza dónde comprar. */
-var JUPQ="https://lite-api.jup.ag/swap/v1/quote", quoteMem={}, quoteData={};
+var JUPQ="https://lite-api.jup.ag/swap/v1/quote", quoteMem={}, quoteData={}, quoteAsk=0;
 function jupQuote(a,b,amount){
   return fetch(JUPQ+"?inputMint="+a+"&outputMint="+b+"&amount="+amount+"&slippageBps=300").then(function(x){ return x.ok?x.json():null; }).catch(function(){ return null; });
 }
@@ -3588,7 +3588,7 @@ function cqId(x){
   return t;
 }
 function quoteRiesgo(r){ return r.lvl==="ALTO"||r.lvl==="SPAM"; }
-function quoteAllLink(r){ return "/en/markets/?t="+encodeURIComponent(r.mint)+(quoteRiesgo(r)?"&r=1":""); }
+function quoteAllLink(r){ return "/en/markets/?t="+encodeURIComponent(r.mint)+"&r="+(quoteRiesgo(r)?1:0); }
 async function loadQuote(r){
   var mint=r.mint;
   var j=quoteData[mint]&&Date.now()-quoteData[mint].t<300000?quoteData[mint].j:
@@ -3647,7 +3647,8 @@ document.addEventListener("click",function(e){
   var b=e.target.closest&&e.target.closest("[data-cqamt]"); if(!b||!state.token) return;
   var r=state.token, amt=Number(b.getAttribute("data-cqamt"));
   $("#cqbig").innerHTML="<span class='hint'>Getting a Jupiter quote…</span>";
-  roundTrip(r.mint,amt).then(function(rt){ if(state.token===r) paintQuoteCost(r,rt,amt); });
+  var ask=++quoteAsk;   // solo cuenta la última cantidad pulsada: una respuesta lenta no pisa a la nueva
+  roundTrip(r.mint,amt).then(function(rt){ if(state.token===r&&ask===quoteAsk) paintQuoteCost(r,rt,amt); });
 });
 
 // Quién está detrás: la API pública de SolFlag (registro de lanzamientos en D1)
