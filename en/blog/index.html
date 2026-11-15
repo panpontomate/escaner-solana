@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog · SolFlag</title>
+<meta name="description" content="SolFlag updates, the risk scanner for Solana tokens and wallets: news, tests with real tokens and what we are learning.">
+<meta property="og:title" content="Blog · SolFlag">
+<meta property="og:description" content="SolFlag updates: news, tests with real tokens and what we are learning.">
+<meta property="og:url" content="https://solflag.com/en/blog/">
+<link rel="canonical" href="https://solflag.com/en/blog/">
+<link rel="alternate" hreflang="es" href="https://solflag.com/blog/">
+<meta property="og:image" content="https://solflag.com/og-en.png?v=2">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://solflag.com/og-en.png?v=2">
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+/* Mismo aspecto que solflag.com (versión inglesa de /blog/) */
+:root{--bg:#0e0926;--card:rgba(24,17,62,.96);--line:rgba(196,181,253,.3);--fg:#f1eeff;--muted:#c9c1ea;--soft:#ddd7f5;--kick:#8ec5cf;--accent:#7ab8c4;--alto:#ff6b6b;--bajo:#4ade80;--medio:#fbbf24;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--fg);font:17px/1.65 Manrope,'Segoe UI',system-ui,sans-serif;background:radial-gradient(1100px 720px at 88% -8%,rgba(139,92,246,.38),transparent 62%),radial-gradient(900px 640px at -12% 30%,rgba(192,38,211,.16),transparent 60%),linear-gradient(180deg,#140d33 0%,#0e0926 45%,#0a061c 100%) fixed;background-color:var(--bg);padding:0 16px 64px}
+a{color:var(--kick)}
+a:hover{color:#c3e2e7}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:780px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22)}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo svg,.logo .ico{width:42px;height:42px;flex:none}
+.wm{display:inline-block;font-family:Unbounded,'Arial Black',sans-serif;font-weight:700;line-height:1.15;letter-spacing:-.03em;background:linear-gradient(90deg,#7fd0dc,#9fb4f2 50%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));font-size:25px}
+.back{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:700;text-decoration:none}
+.back:hover{color:#140e31;filter:brightness(1.06)}
+.intro{padding:52px 0 18px}
+.kick{margin:0;color:var(--kick);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+h1{font:800 clamp(2.4rem,6vw,3.6rem)/1.05 Fraunces,Georgia,serif;margin:14px 0 0;color:#f7f4ff;text-wrap:balance}
+.intro p{color:var(--soft);font-size:1.08rem;margin:16px 0 0;max-width:600px}
+.toc{display:flex;flex-direction:column;gap:2px;margin:28px 0 0;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:20px}
+.toc a{display:flex;gap:14px;padding:8px 0;text-decoration:none;color:var(--fg)}
+.toc a:hover b{color:var(--kick)}
+.toc time{color:var(--muted);font-size:.88rem;flex:none;width:92px;padding-top:2px}
+article{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:32px;scroll-margin-top:16px}
+article time{color:var(--muted);font-size:.9rem}
+article h2{font:700 clamp(1.6rem,4vw,2.2rem)/1.15 Fraunces,Georgia,serif;margin:8px 0 14px;color:#f7f4ff;text-wrap:balance}
+article h3{font-size:1.1rem;margin:24px 0 6px}
+article p{margin:0 0 14px;color:var(--soft)}
+article ul{margin:0 0 14px;padding-left:22px;color:var(--soft)}
+article li{margin:6px 0}
+article b{color:#fff}
+article p.nota{border-left:3px solid var(--medio);background:rgba(251,191,36,.08);border-radius:0 12px 12px 0;padding:10px 14px;font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.tags span{border:1px solid #5e4bb0;border-radius:999px;padding:3px 12px;font-size:.8rem;color:#ece8fd}
+.fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.fig div{background:#1d1550;border:1px solid #3a2c7a;border-radius:16px;padding:14px 16px}
+.fig b{display:block;font:800 1.8rem/1.1 Fraunces,Georgia,serif}
+.fig span{color:var(--muted);font-size:.88rem}
+.share{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;padding-top:16px;border-top:1px solid rgba(196,181,253,.22);font-size:.92rem}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid rgba(196,181,253,.22);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;color:var(--muted);font-size:.92rem}
+footer .wm{font-size:17px}
+footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
+@media (max-width:620px){
+  body{font-size:16px}
+  .logo svg,.logo .ico{width:36px;height:36px}.wm{font-size:21px}
+  article{padding:22px 20px}
+  .toc time{width:78px}
+}
+</style>
+<link href="/paginas.css?v=20261111c" rel="stylesheet">
+<link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="/en/" title="SolFlag, go to the scanner">
+    <img class="ico" src="/marca/solflag-icono.svg?v=1" alt="" width="44" height="44">
+    <span class="wm" translate="no">Solflag</span>
+  </a>
+  <nav class="pnav" aria-label="Sections"><a href="/en/?v=escaner">Scanner</a><a href="/en/?v=lista">My list</a><a href="/en/?v=confluencia">Confluence</a><a href="/en/stocks/">Stocks</a><a class="pbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Telegram bot</a></nav>
+  <a class="plang" href="/blog/" hreflang="es" title="Versión en español">ES</a>
+</header>
+
+<section class="intro">
+  <p class="kick">Blog · Updates</p>
+  <h1>What we are<span class="thin">building.</span></h1>
+  <p>SolFlag news, tests with real tokens and what we learn along the way. Told as it is, including what goes wrong.</p>
+  <nav class="toc" aria-label="Posts">
+    <a href="#grafica-grande"><time datetime="2026-11-15">15 Nov 2026</time><b>The chart, full screen: draw on it and see when the creator sold</b></a>
+    <a href="#llegaron-lejos"><time datetime="2026-11-14">14 Nov 2026</time><b>The ones that went far were not luck; and five levels instead of three</b></a>
+    <a href="#claves-emisores"><time datetime="2026-11-12">12 Nov 2026</time><b>When an issuer changes its keys</b></a>
+    <a href="#fichas-y-portada"><time datetime="2026-11-11">11 Nov 2026</time><b>A page for every token, a new home page and the bot in groups</b></a>
+    <a href="#quien-esta-detras"><time datetime="2026-11-10">10 Nov 2026</time><b>Who is behind, in the data; and every scan counts</b></a>
+    <a href="#mapa-y-tarjetas"><time datetime="2026-11-07">7 Nov 2026</time><b>A smoother map you can share; and new cards for tokens and wallets</b></a>
+    <a href="#datos-y-acierto"><time datetime="2026-11-06">6 Nov 2026</time><b>Data and accuracy: all the numbers, the misses too</b></a>
+    <a href="#volver-atras"><time datetime="2026-11-05">5 Nov 2026</time><b>Going back without losing the scan, and a new background</b></a>
+    <a href="#onchain-map-beta"><time datetime="2026-11-04">4 Nov 2026</time><b>On-chain Map in beta, and known faces in Creator control</b></a>
+    <a href="#estables-lista-confluencia"><time datetime="2026-11-02">2 Nov 2026</time><b>USDC in green, and a new My list and Confluence</b></a>
+    <a href="#movil-mi-lista"><time datetime="2026-10-31">31 Oct 2026</time><b>SolFlag on your phone: clearer and faster</b></a>
+    <a href="#primeros-numeros"><time datetime="2026-10-31">31 Oct 2026</time><b>First numbers: almost everything launched dies within a day</b></a>
+    <a href="#caras-marcas-bot"><time datetime="2026-10-29">29 Oct 2026</time><b>Known faces, fake brands and a new bot</b></a>
+    <a href="#nace-solflag"><time datetime="2026-10-26">26 Oct 2026</time><b>SolFlag is born: new name, domain and design</b></a>
+    <a href="#falsa-alarma-rugcheck"><time datetime="2026-10-26">26 Oct 2026</time><b>A RugCheck false alarm, filtered out</b></a>
+    <a href="#prueba-pumpfun"><time datetime="2026-10-25">25 Oct 2026</time><b>We tested the scanner with 100 Pump.fun tokens</b></a>
+    <a href="#motor-open-source"><time datetime="2026-10-25">25 Oct 2026</time><b>The SolFlag engine, open source</b></a>
+  </nav>
+</section>
+
+<!-- English copy of /blog/ (the Spanish one is the source): add each new post here too, translated, with the same id -->
+
+<article id="grafica-grande">
+  <time datetime="2026-11-15">15 November 2026</time>
+  <h2>The chart, full screen: draw on it and see when the creator sold</h2>
+  <div class="tags"><span>Chart</span><span>Who is behind</span><span>New</span></div>
+  <p>Today we reworked the chart of every token from top to bottom. It now loads better, opens full screen so you can draw on it, and above all it shows you something no ordinary chart tells you: <b>in which candle the creator and the first buyers sold</b>.</p>
+  <h3>When the creator sold, right on the chart</h3>
+  <p>Marks appear on top of the candles:</p>
+  <ul>
+    <li><b>Creator</b> (red arrow): when the wallet that created the token sells or dumps its tokens.</li>
+    <li><b>Launch buyers</b> (orange): when those who bought in the first block sell. “×3” means three in the same candle.</li>
+    <li><b>Whales</b> (blue): big buys and sells, worth more than 2% of the liquidity, or by the 10 biggest holders if you opened “Whales”.</li>
+    <li><b>You</b>: when you scanned it.</li>
+  </ul>
+  <p>Hover over a candle with marks to see who it was, how much and what share of their bag. Below the chart, <b>“What happened”</b> sums it up: how much the creator has sold, how many launch buyers are already gone, and the list in order, each with its Solscan link. Each kind of mark can be hidden.</p>
+  <p>It comes from the token’s latest trades and, if they don’t reach its birth, from the full history of the creator and of the biggest early buyers. We are careful with words: we say “sells” only if they got SOL back; if not, “dumps their tokens”, because they may have moved them to another wallet. And if it happened before graduating, we say so. As always, these are on-chain facts, not accusations.</p>
+  <h3>Full screen, with drawing tools</h3>
+  <p>The new chart icon opens it full screen (on a phone, the whole screen) with all its history loaded, zoom, log scale, candles or line, and volume. On the left you have TradingView-style drawing tools: trend and horizontal lines, rectangles, triangles, brush, text, ruler (how much it went up or down and in how long), Fibonacci and Gann box, with adjustable levels. Tap a drawing to change its colour, thickness or levels.</p>
+  <p>Your drawings are saved in your browser, for each token: open it again and they are still there.</p>
+  <h3>A chart that loads better</h3>
+  <ul>
+    <li><b>Faster:</b> we fetch the candles once and build the 1, 5 and 15-minute ones from them. Switching interval is now instant, and a brand-new token opens straight at 1 minute.</li>
+    <li><b>No more blank chart:</b> for tokens that crashed, the chart never got drawn. Fixed. And if our data source is overloaded, it says so and tries again by itself.</li>
+    <li><b>The home page too:</b> the trending and just-launched lists no longer stay empty when something fails; they retry within seconds.</li>
+  </ul>
+  <p>If you see anything odd, write to us at <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a> or on X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20The%20chart%2C%20full%20screen%3A%20draw%20on%20it%20and%20see%20when%20the%20creator%20sold&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23grafica-grande" target="_blank" rel="noopener">Share on X</a><a href="#grafica-grande">Link to this post</a></div>
+</article>
+
+<article id="llegaron-lejos">
+  <time datetime="2026-11-14">14 November 2026</time>
+  <h2>The ones that went far were not luck; and five levels instead of three</h2>
+  <div class="tags"><span>Data</span><span>Who is behind</span><span>Levels</span></div>
+  <p>We had a question pending: of the tokens we see being born, which ones go far and who is behind them? With two weeks of records (13,344 tokens scanned at birth, from 29/10 to 12/11) it can now be answered. And the answer made us change how SolFlag scores.</p>
+  <h3>Only 52 went far</h3>
+  <p>At first we got about 200 tokens that passed $250,000 market cap in their first week. It wasn’t true: many “highs” were a single buy in an almost empty pool, which spikes the price for a minute. Counting only hours with real volume, they come down to <b>52</b>, and <b>20</b> passed $1M.</p>
+  <ul>
+    <li><b>What sets them apart most is the liquidity they had at birth.</b> With less than $10,000, 3 of 12,384 made it; with $50,000 or more, 15%.</li>
+    <li><b>Going far is not lasting.</b> 37 of the 52 hit their high in the first hour and 32 were dead at 24 h.</li>
+    <li><b>Behind serial launchers, nothing.</b> Of the 1,449 launches paid by wallets with more than 20, none went far.</li>
+  </ul>
+  <h3>And many were moved by the same group</h3>
+  <p>We followed the first buyers of those 52 and where they sent their SOL afterwards. In <b>10</b> of them, some buyers sent SOL to the wallet that created or paid for the token: 1,205 SOL in total. And <b>12</b> come in pairs: they were bought early by the same groups of wallets, which send SOL to each other. One example: two Gemini buyers send SOL to a wallet that, six minutes later, funds the creator of Rockstar.</p>
+  <p>This is what surprised us most: many of the ones that go far are not luck. That is why we look at who is behind and not only at the chart. The figures, the six pairs and their token pages are in <a href="/en/accuracy/#detras">Data and accuracy</a>. These are on-chain facts, not accusations: sending SOL to the creator does not prove by itself who keeps the money.</p>
+  <h3>Five levels instead of three</h3>
+  <p>Looking at the records we saw something else: in new tokens, “high risk” and “medium risk” ended up the same (99.4% and 99.3% dead within a day). So the traffic light now says <b>what</b> each token is:</p>
+  <ul>
+    <li><b>Diamond:</b> a big project from our hand-reviewed list (Jupiter, Jito, Pyth…) or a trusted issuer (Circle, Paxos…).</li>
+    <li><b>Green:</b> no alerts and 7 days old or more. A meme can be green; never diamond.</li>
+    <li><b>Yellow:</b> one mild alert. It is also the most a token under 7 days old can get: with hours of life it hasn’t proven anything yet. We tell you from which day it could turn green.</li>
+    <li><b>Orange:</b> danger without a trap, like very low liquidity.</li>
+    <li><b>Red:</b> a trap: the creator can mint more or pull the liquidity, launches in series, the liquidity or volume is fake, or it copies another token.</li>
+  </ul>
+  <p>Red and orange almost always fail at birth; the difference is the kind of danger. It’s on the website, in the Telegram bot and on the token pages, and explained in <a href="/en/how-it-works/#nivel">How it works</a>.</p>
+  <h3>Also these days</h3>
+  <ul>
+    <li><b><a href="/en/how-it-works/">How it works</a>:</b> a page with what each flag checks, from which figure it turns on and why. Every traffic light in a scan has its “Why?”.</li>
+    <li><b>The Pump.fun curve:</b> if a token is still on it, a box tells you what really happens there: fewer than 2 in 100 graduate, and 9 in 10 of those that graduate die within a day.</li>
+    <li><b>More useful records:</b> the collector no longer scans tokens in order of arrival with seconds of life, but after half an hour and giving priority to those with liquidity. A quarter is still picked at random, so the percentages in <a href="/en/accuracy/">Data and accuracy</a> are not biased.</li>
+  </ul>
+  <p>If you see anything odd, write to us at <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a> or on X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20The%20ones%20that%20went%20far%20were%20not%20luck&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23llegaron-lejos" target="_blank" rel="noopener">Share on X</a><a href="#llegaron-lejos">Link to this post</a></div>
+</article>
+<article id="claves-emisores">
+  <time datetime="2026-11-12">12 November 2026</time>
+  <h2>When an issuer changes its keys</h2>
+  <div class="tags"><span>Issuers</span><span>Security</span></div>
+  <p>SolFlag trusts a short list of issuers: Circle, Paxos, Tether and xStocks. When you scan USDC it doesn’t treat it as a memecoin whose creator can freeze your tokens: it checks that the keys controlling the token are the ones Circle uses.</p>
+  <p>A few days ago someone asked us what happens if an issuer changes its keys. We answered quickly: “the chain rules”. But a new key on the chain proves the key changed, not who changed it. A legitimate change and a stolen key look the same from outside. And there was something worse: if Circle rotated a key, SolFlag stopped recognising USDC and flagged it as just another token.</p>
+  <h3>What changes</h3>
+  <ul>
+    <li><b>If an official token from one of these issuers shows up with a key we don’t know, it comes out amber:</b> “new key, pending review”. Neither green nor “fake”.</li>
+    <li><b>Every morning we read on the chain the keys of USDC, EURC, USDT, PYUSD and USDG.</b> If one changes, we get an alert with the key, the transaction and who signed it.</li>
+    <li><b>A person checks it on the issuer’s own website</b> before the token goes back to green. The reviewed list is public: <a href="/emisores.json">emisores.json</a>.</li>
+  </ul>
+  <p>It’s slower than fully automating it. But “we don’t know yet” is an answer we prefer to give over an unchecked green.</p>
+  <h3>And a mistake of ours with Ondo</h3>
+  <p>While reviewing tokenized assets we saw that two official Ondo tokens, OUSG and USDon, came out as “probably spam”. They are products for approved investors only, with no public market, and the scanner mistook them for junk. Now Ondo is a verified issuer, with the addresses it publishes on <a href="https://docs.ondo.finance/addresses" target="_blank" rel="noopener">its own website</a>: its tokens come out as what they are, and their keys are also watched every morning.</p>
+  <p>If you see anything odd, write to us at <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a> or on X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20When%20an%20issuer%20changes%20its%20keys&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23claves-emisores" target="_blank" rel="noopener">Share on X</a><a href="#claves-emisores">Link to this post</a></div>
+</article>
+<article id="fichas-y-portada">
+  <time datetime="2026-11-11">11 November 2026</time>
+  <h2>A page for every token, a new home page and the bot in groups</h2>
+  <div class="tags"><span>Token pages</span><span>Design</span><span>Bot</span></div>
+  <p>Our longest day so far. The most important part: SolFlag stops being just a traffic light and starts keeping the history of every token.</p>
+  <h3>A public page for every token</h3>
+  <ul>
+    <li><b>At <a href="https://token.solflag.com">token.solflag.com</a> every token has its page:</b> who paid for the launch, who created it and who funded it, with how their other launches ended; the first buyers; what we said when we saw it born and what happened next; and where it trades today. There are already more than 23,000, in Spanish and English.</li>
+    <li><b>Sharing a token links to its page,</b> with its own preview on X and Telegram.</li>
+    <li><b>A stumble:</b> when we told Google, it read almost all the pages in a few hours and the database ran out of reads for the day. The token pages, the API and the home page figures were blank until midnight. It’s fixed now: a paid plan ($5 a month), fewer reads per page and 6 hours of cache.</li>
+  </ul>
+  <h3>New home page and style</h3>
+  <ul>
+    <li><b>What moves first:</b> hot tokens, the wallets launching the most today and on which platforms tokens are launched, with data from the last 24 hours. Then, the scanner.</li>
+    <li><b>New logo:</b> the same three cubes, with the top one dissolving into dots.</li>
+    <li><b>A background that doesn’t say what it isn’t:</b> the corner glow was green, and here green means “low risk”. Now it’s a teal aurora.</li>
+    <li><b>A wallet scan looks like a token scan:</b> big header, four figures and two columns.</li>
+  </ul>
+  <h3>Names that describe, not accuse</h3>
+  <p>Wallets are classified as “Identified” (an exchange or market maker with a verified name) or “By its behaviour”, with names like “Pays for launches”, “Hands out SOL” or “Buys at birth”, always with the reason in numbers. Words like “farm” or “sniper” sounded like accusations.</p>
+  <h3>The bot, in groups too</h3>
+  <p><a href="https://t.me/SolFlagBot" target="_blank" rel="noopener">@SolFlagBot</a> can be added to a Telegram group. It only speaks when someone pastes a token contract: it replies with the risk and the token page. It doesn’t store the group’s messages.</p>
+  <p>If you see anything odd, write to us at <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a> or on X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20A%20page%20for%20every%20token%2C%20a%20new%20home%20page%20and%20the%20bot%20in%20groups&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23fichas-y-portada" target="_blank" rel="noopener">Share on X</a><a href="#fichas-y-portada">Link to this post</a></div>
+</article>
+<article id="quien-esta-detras">
+  <time datetime="2026-11-10">10 November 2026</time>
+  <h2>Who is behind, in the data; and every scan counts</h2>
+  <div class="tags"><span>Records</span><span>Open data</span></div>
+  <p>Two days of less visible work, but among the ones that matter most.</p>
+  <ul>
+    <li><b>New section in <a href="/en/accuracy/">Data and accuracy</a>: “Who is behind the launches”.</b> The wallets that pay for, create or fund the most tokens, and how those tokens ended.</li>
+    <li><b>Every token you scan on the website goes into the who-is-behind database.</b> The website only reports the token and our collector scans it on its own, so nobody can feed in fake data. Tokens only: never wallets, because they may be yours, and without storing your IP.</li>
+    <li><b>We fixed two bugs that skewed the numbers:</b> a very active bot counted as an exchange (now whoever launches more than 3 of their own tokens can’t be one), and an old token opening a new pool counted as a new launch. We removed 52 of those from the records.</li>
+  </ul>
+  <p>If you see anything odd, write to us at <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a> or on X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Who%20is%20behind%2C%20in%20the%20data%3B%20and%20every%20scan%20counts&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23quien-esta-detras" target="_blank" rel="noopener">Share on X</a><a href="#quien-esta-detras">Link to this post</a></div>
+</article>
+<article id="mapa-y-tarjetas">
+  <time datetime="2026-11-07">7 November 2026</time>
+  <h2>A smoother map you can share; and new cards for tokens and wallets</h2>
+  <div class="tags"><span>On-chain Map</span><span>Sharing</span></div>
+  <p>Today was about polishing what people see most. Almost everything is about the On-chain Map and the images you share.</p>
+  <h3>The On-chain Map</h3>
+  <ul>
+    <li><b>Huge transfer networks no longer choke the map.</b> With $STONK, which has a network of 148 wallets and 569 links, the map turned into endless flicker: every link had its own pulse. Now the whole network is drawn with about 20 pulses, the structure clearly marked and the extra links fainter (they all light up when you tap the network).</li>
+    <li><b>Smoother.</b> Lines and pulses are painted differently, and the same $STONK map goes from about 20-30 to about 60 frames per second.</li>
+    <li><b>You can share it.</b> A “Share” button inside the map: an image for X, a download and a direct link to the token’s map.</li>
+    <li><b>The home page’s Map of the moment is now the real map,</b> still, and it comes alive when you hover over it.</li>
+  </ul>
+  <h3>Images to share</h3>
+  <ul>
+    <li><b>Tokens:</b> the card for X and the one to download now carry the scan header, with the logo, the name and the verdict seal. If a token barely has any trades, it says so clearly instead of showing an empty chart.</li>
+    <li><b>Wallets, for the first time:</b> a wallet scan can be shared too. Since a wallet has no logo, we give it a label based on what it is or does (exchange, serial payer or creator, whale…), and its card shows “Who it is” with the numbers from the records. These are data, not accusations.</li>
+  </ul>
+  <p>And the blog and the data pages now have the same background as the rest of SolFlag.</p>
+  <p>If you see anything odd in an image or a map, write to us at <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a> or on X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20A%20smoother%20map%20you%20can%20share%3B%20and%20new%20cards%20for%20tokens%20and%20wallets&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23mapa-y-tarjetas" target="_blank" rel="noopener">Share on X</a><a href="#mapa-y-tarjetas">Link to this post</a></div>
+</article>
+<article id="datos-y-acierto">
+  <time datetime="2026-11-06">6 November 2026</time>
+  <h2>Data and accuracy: all the numbers, the misses too</h2>
+  <div class="tags"><span>Records</span><span>Open data</span></div>
+  <p>Since 29 October, SolFlag scans every new token when it sees it and writes down how it ended at 24 hours and at 7 days. There are already more than 6,000. From today they are all on a new page, <a href="/en/accuracy/">Data and accuracy</a>, with the data to download and its format explained.</p>
+  <h3>What they say, without spin</h3>
+  <ul>
+    <li><b>Almost everything new dies:</b> 99.2% within a day. That’s why the reds dying proves little: reds and yellows die almost equally.</li>
+    <li><b>What separates the survivors is how big they were when we saw them:</b> below $5,000, 0.1% survive; above $100,000, one in five. The traffic light doesn’t take this into account yet, and it will.</li>
+    <li><b>Who is behind matters too:</b> of the 355 tokens paid for by wallets with more than 20 launches, none is still alive.</li>
+    <li><b>The two we marked green are still alive.</b> They are too few to draw conclusions, but it’s the test we care about most, and it’s in plain sight on the page.</li>
+  </ul>
+  <p>The tokens that are still alive are listed one by one: if we marked them red, those are our misses.</p>
+  <p class="nota">Correction of 6 November: a token off the Pump.fun curve whose liquidity is less than 0.2% of what it claims to be worth now counts as dead, because it can’t be sold. 2 tokens change in the days already published (DAKU, 1/11, and TSED, 3/11).</p>
+  <p>If you see a wrong figure, write to us at <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a> or on X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Data%20and%20accuracy%3A%20all%20the%20numbers%2C%20the%20misses%20too&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23datos-y-acierto" target="_blank" rel="noopener">Share on X</a><a href="#datos-y-acierto">Link to this post</a></div>
+</article>
+<article id="volver-atras">
+  <time datetime="2026-11-05">5 November 2026</time>
+  <h2>Going back without losing the scan, and a new background</h2>
+  <div class="tags"><span>Website</span></div>
+  <p>Yesterday the On-chain Map came out. Today, smaller things that make the website more comfortable.</p>
+  <h3>The “back” button works now</h3>
+  <ul>
+    <li>Before, if you went from a token to its whales and from there to a wallet, the browser’s “back” button took you out of SolFlag. Now it returns to the previous view <b>instantly, without repeating the scan</b>.</li>
+    <li>Every view has its own link: a token, a wallet (<b>solflag.com/?wallet=</b>), whales, a map or a tab like My list. You can save it or share it.</li>
+    <li>In the On-chain Map, tapping a bubble opens that wallet’s scan. With “back” you return to the map as it was. If you prefer Solscan, Ctrl+click.</li>
+  </ul>
+  <h3>New background and a cleaner footer</h3>
+  <p>The background now uses the Confluence colours: lilac, teal and pink bubbles that meet in the centre. If your phone has “reduce motion” on, they stay still. And our email is now visible in the footer, <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>.</p>
+  <h3>Records: the corrected numbers hold</h3>
+  <p>With the new rule (less than $1,000 of liquidity counts as dead), the tokens SolFlag marked as high risk still almost all die within 24 hours: 99.0%, 99.3% and 99.4% from 1 to 3 November. The first tokens in the records are now 7 days old; with those results comes a page with our numbers.</p>
+  <p>Any bug or idea, on X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20go%20back%20without%20losing%20the%20scan%2C%20and%20a%20new%20background&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23volver-atras" target="_blank" rel="noopener">Share on X</a><a href="#volver-atras">Link to this post</a></div>
+</article>
+
+<article id="onchain-map-beta">
+  <time datetime="2026-11-04">4 November 2026</time>
+  <h2>On-chain Map in beta, and known faces in Creator control</h2>
+  <div class="tags"><span>Website</span><span>Engine</span></div>
+  <p>Today we launch a new section in SolFlag: the <b>On-chain Map</b>. It comes out in beta, so if you see anything odd, tell us.</p>
+  <h3>What the On-chain Map is</h3>
+  <ul>
+    <li>Everything around a token, full screen: its biggest holders, what each one is (person, exchange, bot or pool), <b>who gave each of them their first SOL</b> and the groups that share that origin.</li>
+    <li>Also the <b>transfer networks</b> (who passed tokens to whom). That’s what you can’t see in a holder list: wallets that hand out tokens to dozens or hundreds of others without being among the biggest.</li>
+    <li>If a group holds too much, or many wallets come from the same place, the map warns you. A young token and a mature one are looked at with different rules.</li>
+    <li>You open it from the <b>On-chain Map</b> tab, from the “✦ On-chain Map” button in a scan or in Whales, or with the link <b>solflag.com/?map=</b> followed by the token.</li>
+  </ul>
+  <h3>Known faces, in Creator control</h3>
+  <p>When the wallet launching a token has already launched others that didn’t take off, you’ll now see it in the <b>Creator control</b> light, with the wallet and those tokens. It replaces what RugCheck says about the creator’s history, and the colour is recalculated with it.</p>
+  <h3>Clearer copy warnings</h3>
+  <p>If a token copies another one’s name, SolFlag says it like this: “it is not X and its price has nothing to do with X’s”. Without implying who is behind it.</p>
+  <p>Any bug or idea, on X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%20launches%20the%20On-chain%20Map%20(beta)%3A%20who%20holds%20a%20token%20and%20where%20their%20money%20comes%20from&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23onchain-map-beta" target="_blank" rel="noopener">Share on X</a><a href="#onchain-map-beta">Link to this post</a></div>
+</article>
+
+<article id="estables-lista-confluencia">
+  <time datetime="2026-11-02">2 November 2026</time>
+  <h2>USDC in green, and a new My list and Confluence</h2>
+  <div class="tags"><span>Engine</span><span>Website</span></div>
+  <p>If you scanned USDC or USDT on SolFlag, they came out red as if they were copies of themselves. It was our mistake and it’s fixed, along with other things we changed this weekend.</p>
+  <h3>Trusted issuers, in green</h3>
+  <ul>
+    <li><b>USDC, USDT, PYUSD, USDG, EURC and the xStocks shares</b> now come out as low risk. SolFlag checks that the token address and its keys belong to the official issuer (Circle, Tether, Paxos, xStocks), not just that the name matches.</li>
+    <li>A token that <b>copies the name</b> of one of them still comes out as a copy.</li>
+    <li>Note: these issuers can freeze funds. That’s normal for a stablecoin, and SolFlag still shows it to you.</li>
+  </ul>
+  <h3>Fewer false alarms</h3>
+  <ul>
+    <li><b>Concentrated liquidity pools</b> (Meteora DLMM, Raydium CLMM, Orca Whirlpool): we no longer warn about “unlocked liquidity”, because in these pools there is nothing to lock. Some tokens went from medium to low risk because of this.</li>
+    <li><b>The price chart</b> of USDC showed the price of SOL (about $95). Now every chart uses the token’s own candles.</li>
+  </ul>
+  <h3>My list, rebuilt</h3>
+  <p>At the top you get a summary (how many tokens and wallets you follow, how many are high risk) and a <b>“Since last time”</b> section that tells you if a token changed risk level or lost liquidity. Tokens show their logo, you can filter them by level and re-scan them all with one button.</p>
+  <h3>Confluence, easier</h3>
+  <p>Confluence finds the tokens that several wallets have in common. Now the wallets show up as chips with their colour and their result, you choose with a slider how many have to match (“at least 3 of 8”) and the result comes out sorted, with each token’s risk in sight. On a phone, the compare button always stays at the bottom.</p>
+  <p>And we keep recording data: the records now store whether each Pump.fun token graduates. With a couple of weeks of data we’ll tell you which signals anticipate it. Anything, on X: <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20USDC%20and%20USDT%20now%20come%20out%20green%2C%20and%20My%20list%20and%20Confluence%20are%20new&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23estables-lista-confluencia" target="_blank" rel="noopener">Share on X</a><a href="#estables-lista-confluencia">Link to this post</a></div>
+</article>
+
+<article id="movil-mi-lista">
+  <time datetime="2026-10-31">31 October 2026</time>
+  <h2>SolFlag on your phone: clearer and faster</h2>
+  <div class="tags"><span>Website</span><span>Mobile</span></div>
+  <p>Most of you come in from a phone, so we went through SolFlag screen by screen on a phone. What we changed:</p>
+  <ul>
+    <li><b>The scanner, right away.</b> Before, you had to scroll down to find where to paste the address. Now it’s on the first screen.</li>
+    <li><b>Red first.</b> The flags come in order: red, yellow and green. On a phone the green ones fold into one line (“3 green flags”) that opens when tapped.</li>
+    <li><b>How it launched, before the chart.</b> If a token goes up to high risk because of its launch (bundled buys, a serial launcher), you see it right after the flags.</li>
+    <li><b>No repeats.</b> Gone is the second card with the same price and liquidity, and the links that were already in “Share” and “Alerts”.</li>
+    <li><b>The token’s logo</b> next to the verdict, and the name only if it says something different from the ticker.</li>
+  </ul>
+  <h3>My list, truly useful now</h3>
+  <p>The tokens you follow now show their <b>current price</b> and how much it changed since you checked them. If more than half of a token’s liquidity was pulled, or it no longer has a market, it tells you in red. You can also re-scan it with one tap, and the rest (copy, Solscan, DexScreener) is in a “⋯” menu.</p>
+  <p>All this shows on a computer too. If something doesn’t fit, write to us on X at <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">@solflagTeam</a>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%20on%20your%20phone%3A%20the%20scanner%20right%20away%20and%20red%20flags%20first&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23movil-mi-lista" target="_blank" rel="noopener">Share on X</a><a href="#movil-mi-lista">Link to this post</a></div>
+</article>
+
+<article id="primeros-numeros">
+  <time datetime="2026-10-31">31 October 2026</time>
+  <h2>First numbers: almost everything launched dies within a day</h2>
+  <div class="tags"><span>Data</span><span>Engine</span></div>
+  <p>Since 29 October, every half hour SolFlag scans dozens of tokens just launched on Solana, just as the website would, and writes down what happened to them at 24 hours and at 7 days. Every day it’s published openly at <a href="https://solflag.com/datos/registro/indice.json">solflag.com/datos/registro</a>.</p>
+  <p>First full day, <b>320 tokens</b>:</p>
+  <ul>
+    <li>Of those SolFlag marked as <b>high risk</b> (246), <b>99.6%</b> were dead at 24 hours (under $10,000 market cap or with no liquidity).</li>
+    <li>Of the <b>medium risk</b> ones (71), 97%.</li>
+    <li>None came out as low risk.</li>
+  </ul>
+  <p class="nota"><b>Correction of 2 November:</b> at first we wrote 97% and 96%. Some tokens with no liquidity counted as alive because DexScreener gave them a huge market cap (one, 434 million dollars with $0 of liquidity). Now, off the Pump.fun curve, a token with less than $1,000 of liquidity counts as dead, and we redid the numbers with that rule.</p>
+  <p>We say it as it is: <b>almost everything launched dies</b>, so in one-day-old tokens red can’t yet be told apart from yellow, and with no green tokens we can’t measure the opposite. We need the 7-day results and several weeks of data. We’ll keep publishing them.</p>
+  <h3>What we already fixed thanks to this data</h3>
+  <ul>
+    <li><b>Pulling the liquidity is dying.</b> A token whose liquidity was pulled could still show a high market cap and look alive. Now it counts as dead.</li>
+    <li><b>A finer copy warning.</b> “There is another token with the same name” came up in almost two out of three new tokens: farms relaunch the same name many times a day and the “original” was another dead copy. Now it only warns if the copied token has a real market. In just-launched tokens it went from 68% to 5%, and the ones left are real copies.</li>
+  </ul>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%27s%20first%20numbers%3A%20of%20320%20new%20tokens%2C%2099.6%25%20of%20those%20marked%20red%20died%20within%2024%20h&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23primeros-numeros" target="_blank" rel="noopener">Share on X</a><a href="#primeros-numeros">Link to this post</a></div>
+</article>
+
+<article id="caras-marcas-bot">
+  <time datetime="2026-10-29">29 October 2026</time>
+  <h2>Known faces, fake brands and a new bot</h2>
+  <div class="tags"><span>Engine</span><span>Website</span><span>Bot</span></div>
+  <p>A few days with lots of news. The most important:</p>
+  <ul>
+    <li><b>Creator history.</b> If a token’s creator launched others before, SolFlag checks how many stayed under $10,000. Many launches and almost none took off: flag.</li>
+    <li><b>Known faces.</b> Farms change the creator wallet for every token, but they usually pay from the same one. SolFlag remembers which wallets pay for or fund launches that die and warns you when they launch again, even with a new creator.</li>
+    <li><b>Fake brands and copies.</b> A token named exactly like a real company (Spotify, Shopify…) comes out high risk, just like one claiming a hundred times more liquidity than there is.</li>
+    <li><b>Tokenized stocks and official tokens.</b> Tokenized Tesla, NVIDIA or the S&amp;P 500, exchanges’ staked SOL (bnSOL…) or club fan tokens came out red because their issuer can mint more. Now SolFlag recognises the issuer and leaves them at medium risk: “controlled by its issuer”.</li>
+    <li><b>Whales, young and mature.</b> In tokens under 14 days old, very active wallets are also checked, because on day one almost everything is bots. And in “Launch buys” you see whether the creator has already dumped what they bought at launch.</li>
+    <li><b>New bot: <a href="https://t.me/SolFlagBot" target="_blank" rel="noopener">@SolFlagBot</a>.</b> The alerts bot now carries the SolFlag name. If you used the old one, it takes you to the new one and your watches stay the same.</li>
+  </ul>
+  <div class="share"><a href="#caras-marcas-bot">Link to this post</a></div>
+</article>
+
+<article id="nace-solflag">
+  <time datetime="2026-10-26">26 October 2026</time>
+  <h2>SolFlag is born: new name, domain and design</h2>
+  <div class="tags"><span>Website</span><span>Brand</span></div>
+  <p>The scanner now has its own name and its own home: <b>SolFlag</b>, at <a href="https://solflag.com">solflag.com</a>. In crypto people talk about <i>red flags</i> and <i>green flags</i>, and that’s exactly what it does: put flags on every token, with the reason for each one.</p>
+  <h3>What changes</h3>
+  <ul>
+    <li><b>A new home page</b>, with the scanner at hand and the 5 flags explained: creator, concentration, liquidity, dependency and launch.</li>
+    <li><b>Real-time red flag radar:</b> when you come in, SolFlag checks the last 10 tokens launched on Solana and shows the most dangerous ones with their reason.</li>
+    <li><b>A clearer result:</b> the verdict with its figures at the top and, below, each flag marked as <i>green flag</i>, <i>caution</i> or <i>red flag</i>, next to the chart.</li>
+    <li><b>Whales in two columns:</b> the biggest holders on one side and, on the other, the wallets funded by the same wallet, the creator and the accounts that don’t count (bots, exchanges, pools).</li>
+    <li><b>Made for phones:</b> section bar at the bottom, like an app.</li>
+    <li><b>Redesigned images to share</b>, for X and to download.</li>
+    <li>The <b>Telegram bot</b> is now called SolFlag too and links every scan to the website.</li>
+  </ul>
+  <p>What matters stays the same: free, no sign-up, no wallet connection, and in Spanish and English.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%20is%20born%3A%20red%20flags%20of%20any%20Solana%20token%2C%20explained&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23nace-solflag" target="_blank" rel="noopener">Share on X</a><a href="#nace-solflag">Link to this post</a></div>
+</article>
+
+<article id="falsa-alarma-rugcheck">
+  <time datetime="2026-10-26">26 October 2026</time>
+  <h2>A RugCheck false alarm, filtered out</h2>
+  <div class="tags"><span>Engine</span><span>Bot</span></div>
+  <p>The bot kept warning that a token went from medium to high risk because "only 0% of the liquidity is locked", and 15 minutes later that it was back to medium. When we checked, the problem wasn’t the token: <b>RugCheck answered 0% in 5 out of 40 queries</b> for a pool that was 99% locked.</p>
+  <p>Since version 0.3.2 of the engine, when RugCheck says less than 60% is locked, SolFlag asks up to two more times and keeps the highest value. A pool that really isn’t locked comes out low all three times, so that alert still works; only the false one is gone.</p>
+  <p>It’s a good example of why we don’t blindly trust any third-party data: what can’t be checked isn’t taken as good, and what looks odd gets checked again.</p>
+  <div class="share"><a href="#falsa-alarma-rugcheck">Link to this post</a></div>
+</article>
+
+<article id="prueba-pumpfun">
+  <time datetime="2026-10-25">25 October 2026</time>
+  <h2>We tested the scanner with 100 Pump.fun tokens</h2>
+  <div class="tags"><span>Tests</span><span>Pump.fun</span></div>
+  <p>We ran through SolFlag 50 tokens 10 minutes old, 25 still on the Pump.fun curve and 25 already graduated to PumpSwap. None gave an error, and each scan took between 0.3 and 5 seconds.</p>
+  <div class="fig">
+    <div><b>100</b><span>tokens checked</span></div>
+    <div><b>0</b><span>errors</span></div>
+    <div><b>4</b><span>problems found and fixed</span></div>
+  </div>
+  <h3>What worked</h3>
+  <ul>
+    <li>The 5 tokens pretending to be "SOL" came out high risk.</li>
+    <li>The launch detector marked red a token in which <b>7 wallets took 29.7% at birth</b>, and another with 33.5%.</li>
+  </ul>
+  <h3>What we fixed</h3>
+  <ul>
+    <li><b>False alarm about removable liquidity</b> on curve tokens: there nobody can pull the liquidity, the Pump.fun program holds it. The warning no longer shows on the curve and comes back when the token graduates.</li>
+    <li><b>Serial launchers:</b> 50 new tokens had only 34 creators, and one wallet launched 7 tokens with the same name in 10 minutes. Now SolFlag warns about it. Some farms pay from one wallet and put a different creator each time; the website also counts what the payer launched.</li>
+    <li><b>Very active tokens:</b> with thousands of trades we didn’t reach the moment of launch. With your own Helius URL, up to 25,000 are now read.</li>
+    <li><b>"BTC" and "ETH" impostors:</b> added to the list of famous names we watch.</li>
+  </ul>
+  <h3>What didn’t work out</h3>
+  <p>We wanted to see whether the flagged tokens fell more after an hour, but 52 minutes later almost all were the same: nobody had bought them. They didn’t sink because of a scam, they were born dead, so there was nothing to measure. The next test will use tokens that do have buyers, checked at 24 hours.</p>
+  <div class="share"><a href="#prueba-pumpfun">Link to this post</a></div>
+</article>
+
+<article id="motor-open-source">
+  <time datetime="2026-10-25">25 October 2026</time>
+  <h2>The SolFlag engine, open source</h2>
+  <div class="tags"><span>Open source</span></div>
+  <p>Everything that decides the risk in SolFlag is in a public library, <b>solana-risk-engine</b>, MIT licensed: on <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">GitHub</a> and on <a href="https://www.npmjs.com/package/solana-risk-engine" target="_blank" rel="noopener">npm</a>. Anyone can review how each flag is calculated, or use it in their own project.</p>
+  <ul>
+    <li><b>90 automated tests</b> covering almost all the code, with a simulated blockchain.</li>
+    <li>Rules calibrated with <b>62 real tokens</b>. That review uncovered a serious bug: well-known tokens like ORCA came out high risk because their supply is controlled by a program, not a person. It’s fixed now.</li>
+    <li>No dependencies: it works the same in the browser as on a server, like in the Telegram bot.</li>
+  </ul>
+  <div class="share"><a href="#motor-open-source">Link to this post</a></div>
+</article>
+
+<footer>
+  <span class="wm" translate="no">Solflag</span>
+  <a href="/en/">Scanner</a>
+  <a href="/en/stocks/">Stocks</a>
+  <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">X @solflagTeam</a>
+  <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Open source</a>
+  <a href="/en/accuracy/">Data and accuracy</a>
+  <a href="/en/how-it-works/">How it works</a>
+  <a href="/en/privacy/">Privacy</a>
+  <a href="/en/terms/">Terms</a>
+  <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
+  <p>SolFlag is a guidance tool, not financial advice. Created by <a href="https://x.com/elgatotradebtc" target="_blank" rel="noopener">El Gato Trade</a>.</p>
+</footer>
+</div>
+<script src="/fondo.js?v=20261111d" defer></script>
+</body>
+</html>

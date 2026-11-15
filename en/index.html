@@ -1298,6 +1298,7 @@ body.scanp #form .eyebrow{margin-bottom:8px}
 #results.tview #list{margin-top:0!important}
 #results.tview #summary{order:1}
 #results.tview #tdetail{display:contents}
+.tc2{display:contents}
 .tnav{order:2;position:sticky;top:8px;z-index:20;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px;border-radius:14px;background:rgba(24,17,62,.94);border:1px solid var(--line);backdrop-filter:blur(8px)}
 .tnav::-webkit-scrollbar{display:none}
 .tnav button{flex:none;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:.88rem;padding:8px 12px;border-radius:10px;cursor:pointer;min-height:38px;white-space:nowrap}
@@ -1306,6 +1307,7 @@ body.scanp #form .eyebrow{margin-bottom:8px}
 .tnav .tnv{display:inline-block}
 #t-chart{order:3}
 #results.tview #list{order:4}
+#t-quote{order:5}
 #t-who{order:5}
 #t-hold{order:6}
 .tdc{scroll-margin-top:72px}
@@ -1723,10 +1725,10 @@ body:not(.landing):not(.scanp) #form .row .btn{min-height:40px;border-radius:999
 @media (min-width:1100px){
   #results.tview:not(.wview){grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-auto-flow:row dense;column-gap:28px;row-gap:16px;max-width:1320px}
   #results.tview:not(.wview) #tside,#results.tview:not(.wview) #tdetail{display:contents}
-  #results.tview:not(.wview) #summary,#results.tview:not(.wview) .rseam,#results.tview:not(.wview) #t-who,#results.tview:not(.wview) #t-hold{grid-column:1/-1}
-  #results.tview:not(.wview) #list{grid-column:1;grid-row:span 2;order:3}
-  #results.tview:not(.wview) .tnav{grid-column:2;order:3;position:static}
-  #results.tview:not(.wview) #t-chart{grid-column:2;order:4}
+  #results.tview:not(.wview) #summary,#results.tview:not(.wview) .rseam,#results.tview:not(.wview) #t-who,#results.tview:not(.wview) #t-hold,#results.tview:not(.wview) #t-quote{grid-column:1/-1}
+  #results.tview:not(.wview) #list{grid-column:1;order:3}
+  #results.tview:not(.wview) .tc2{display:flex;flex-direction:column;gap:16px;grid-column:2;order:3;align-self:start;min-width:0}
+  #results.tview:not(.wview) .tnav{position:static}
   #results.tview:not(.wview) .tnav .tnv{display:none}
 }
 @media (max-width:960px){
@@ -1873,6 +1875,171 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 @media (max-width:560px){ .wnums span{padding:14px 8px 12px} .wnums span:nth-child(3){padding-left:8px} .wnums b{font-size:1.45rem} }
 </style>
 <link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
+<style>
+/* ---- gráfica en pantalla completa y dibujos (15/11, maqueta maquetas/grafica/grafica-pantalla-completa.html) ---- */
+.pc-x{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(196,181,253,.3);border-radius:10px;background:rgba(255,255,255,.03);cursor:pointer;color:var(--fg);transition:background .15s,border-color .15s,transform .15s;flex:none}
+.pc-x:hover{background:rgba(139,92,246,.18);border-color:#c4b5fd;transform:scale(1.06)}
+.pc-x svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pc-head .segs+.pc-x{margin-left:6px}
+.gx{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:rgba(5,4,13,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity .2s}
+.gx.on{opacity:1}
+.gx[hidden]{display:none}
+.gx-d{position:relative;width:min(1320px,94vw);height:min(880px,90vh);display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;background:linear-gradient(180deg,#0e0a26,#0a0720);border:1px solid rgba(196,181,253,.3);border-radius:22px;box-shadow:0 30px 90px rgba(0,0,0,.6);transform:scale(.96);transition:transform .22s cubic-bezier(.2,.8,.2,1);overflow:hidden;color:#f1eeff}
+.gx.on .gx-d{transform:none}
+.gx-h{display:flex;align-items:center;gap:14px;padding:16px 18px 12px 22px;border-bottom:1px solid rgba(196,181,253,.18)}
+.gx-h .lav{width:40px;height:40px}
+.gx-n{min-width:0}
+.gx-n b{display:block;font:700 1.35rem/1.1 var(--f-display);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gx-n small{color:#a59cc9;font-size:.8rem}
+.gx-p{margin-left:6px;display:flex;flex-direction:column}
+.gx-p b{font:300 1.6rem/1.05 var(--f-display);font-variant-numeric:tabular-nums}
+.gx-p span{font-size:.84rem;font-weight:700}
+.gx-p .up{color:var(--bajo)} .gx-p .down{color:var(--alto)}
+.gx-x{margin-left:auto;width:42px;height:42px;border-radius:12px;border:1px solid rgba(196,181,253,.3);background:transparent;cursor:pointer;display:grid;place-items:center;flex:none;color:#f1eeff}
+.gx-x:hover{background:rgba(255,107,107,.14);border-color:#ff6b6b}
+.gx-x svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.gx-t{display:flex;align-items:center;gap:10px;padding:10px 18px 10px 22px;border-bottom:1px solid rgba(196,181,253,.18);overflow-x:auto;scrollbar-width:none}
+.gx-t::-webkit-scrollbar{display:none}
+.gx-g{display:inline-flex;gap:4px;padding:3px;background:rgba(255,255,255,.04);border-radius:12px;flex:none}
+.gx-b{border:0;background:transparent;color:#a59cc9;border-radius:9px;padding:6px 11px;font:600 .84rem var(--f-body);cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.gx-b:hover{color:#f1eeff}
+.gx-b[aria-pressed=true]{background:rgba(139,92,246,.22);color:#f1eeff}
+#gxSegs .gx-b[aria-pressed=true]{background:#7ab8c4;color:#0b0820}
+.gx-b svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gx-sep{width:1px;height:24px;background:rgba(196,181,253,.18);flex:none}
+.gx-c{position:relative;min-height:0;padding:6px 10px 0 8px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px}
+.gx-plot{position:relative;min-width:0;min-height:0}
+.gx-plot .lwc{height:100%;margin:0}
+.gx-plot .lwc-lg{font-size:.84rem;top:8px;left:10px}
+.gx-msg{display:grid;place-items:center;height:100%;color:#a59cc9;text-align:center;padding:20px}
+.gx-f{display:flex;align-items:center;gap:16px;padding:8px 22px 12px;font-size:.74rem;color:#a59cc9}
+.gx-f .kb{margin-right:auto}
+.gx-f kbd{font:600 .7rem var(--f-body);border:1px solid rgba(196,181,253,.3);border-radius:5px;padding:1px 5px;color:#f1eeff}
+.gx-f a{color:#a59cc9}
+.gx-rot{display:none}
+.gx-tools{display:flex;flex-direction:column;gap:4px;padding:6px 4px;align-self:start;border:1px solid rgba(196,181,253,.18);border-radius:14px;background:rgba(255,255,255,.03)}
+.gx-dt{position:relative;width:38px;height:38px;display:grid;place-items:center;border:0;border-radius:10px;background:transparent;color:#a59cc9;cursor:pointer}
+.gx-dt:hover{color:#f1eeff;background:rgba(255,255,255,.05)}
+.gx-dt[aria-pressed=true]{background:rgba(139,92,246,.24);color:#f1eeff;box-shadow:inset 0 0 0 1px rgba(196,181,253,.45)}
+.gx-dt svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.gx-dt.del:hover{color:#ff6b6b;background:rgba(255,107,107,.1)}
+.gx-tools hr{width:24px;border:0;border-top:1px solid rgba(196,181,253,.18);margin:4px auto}
+.gx-dt::after{content:attr(aria-label);position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);white-space:nowrap;padding:5px 9px;border-radius:8px;background:#1d1640;border:1px solid rgba(196,181,253,.3);color:#f1eeff;font:600 .76rem var(--f-body);opacity:0;pointer-events:none;transition:opacity .12s;z-index:5}
+@media (hover:hover){ .gx-dt:hover::after{opacity:1} }
+#gxOv{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;touch-action:none}
+#gxOv.drawing{pointer-events:auto;cursor:crosshair}
+.gx-hint{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);z-index:6;padding:7px 14px;border-radius:999px;background:rgba(29,22,64,.95);border:1px solid rgba(196,181,253,.3);font-size:.8rem;color:#f1eeff;pointer-events:none;white-space:nowrap}
+.gx-hint[hidden]{display:none}
+.gx-bar{position:absolute;z-index:7;display:flex;gap:2px;padding:3px;border-radius:12px;background:#1d1640;border:1px solid rgba(196,181,253,.3);box-shadow:0 10px 30px rgba(0,0,0,.5);transform:translate(-50%,-100%)}
+.gx-bar[hidden],.gx-bar [hidden]{display:none}
+.gx-bar button{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:#f1eeff;border-radius:9px;padding:6px 10px;font:600 .8rem var(--f-body);cursor:pointer;white-space:nowrap}
+.gx-bar button:hover,.gx-bar button[aria-expanded=true]{background:rgba(139,92,246,.24)}
+.gx-bar button.del:hover{background:rgba(255,107,107,.16);color:#ff6b6b}
+.gx-bar svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gx-txt{position:absolute;z-index:9;min-width:160px;max-width:340px;resize:none;overflow:hidden;background:rgba(20,15,51,.96);border:1.5px solid #8ec5cf;border-radius:8px;color:#f1eeff;font:600 14px/18px var(--f-body);padding:6px 8px;outline:none;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.gx-txt[hidden]{display:none}
+.gx-pn{position:absolute;top:10px;left:10px;z-index:8;width:270px;max-height:calc(100% - 20px);overflow:auto;background:#140f33;border:1px solid rgba(196,181,253,.3);border-radius:14px;padding:12px 12px 10px;box-shadow:0 18px 50px rgba(0,0,0,.55);color:#f1eeff}
+.gx-pn[hidden]{display:none}
+.gx-pn h4{margin:0 0 2px;font:700 1rem var(--f-display)}
+.gx-pn .who{margin:0 0 10px;font-size:.74rem;color:#a59cc9}
+.gx-pn .lab{margin:12px 0 6px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#a59cc9}
+.gx-sw{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}
+.gx-sw button{aspect-ratio:1;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+.gx-sw button[aria-pressed=true]{border-color:#fff;box-shadow:0 0 0 2px #8b5cf6}
+.gx-sg{display:flex;gap:4px;padding:3px;background:rgba(255,255,255,.04);border-radius:10px}
+.gx-sg button{flex:1;border:0;background:transparent;color:#a59cc9;border-radius:8px;padding:6px 4px;cursor:pointer;font:600 .78rem var(--f-body);display:grid;place-items:center}
+.gx-sg button[aria-pressed=true]{background:rgba(139,92,246,.26);color:#f1eeff}
+.gx-sg svg{width:34px;height:10px}
+.gx-lv{display:grid;grid-template-columns:20px minmax(0,1fr) 14px 26px;align-items:center;gap:8px;padding:3px 0}
+.gx-lv input[type=checkbox]{width:16px;height:16px;accent-color:#8b5cf6;margin:0}
+.gx-lv input[type=text]{width:100%;min-width:0;background:rgba(255,255,255,.05);border:1px solid rgba(196,181,253,.18);border-radius:8px;color:#f1eeff;padding:5px 8px;font:600 .86rem var(--f-body);font-variant-numeric:tabular-nums}
+.gx-lv input[type=text]:focus{outline:2px solid #8b5cf6;outline-offset:0;border-color:transparent}
+.gx-lv .dot{width:14px;height:14px;border-radius:50%;padding:0;border:0;cursor:pointer}
+.gx-lv .x{border:0;background:none;color:#a59cc9;cursor:pointer;font-size:.9rem;border-radius:6px;height:26px}
+.gx-lv .x:hover{color:#ff6b6b;background:rgba(255,107,107,.1)}
+.gx-lv.off input[type=text],.gx-lv.off .dot{opacity:.4}
+.gx-ck{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-size:.82rem;color:#a59cc9;cursor:pointer}
+.gx-ck input{accent-color:#8b5cf6;margin:0}
+.gx-bb{display:flex;gap:8px;margin-top:12px}
+.gx-bb button{flex:1;border:1px solid rgba(196,181,253,.3);background:transparent;border-radius:999px;padding:7px 10px;cursor:pointer;font:600 .8rem var(--f-body);color:#f1eeff}
+.gx-bb button.ok{background:#7ab8c4;border-color:#7ab8c4;color:#0b0820}
+@media (max-width:700px){
+  .gx-d{width:100vw;height:100dvh;border-radius:0;border:0;grid-template-rows:auto auto auto minmax(0,1fr) auto}
+  .gx-h{padding:12px 12px 10px 16px;gap:4px 10px;flex-wrap:wrap}
+  .gx-h .lav{width:34px;height:34px}
+  .gx-n b{font-size:1.1rem}
+  .gx-n small{font-size:.74rem}
+  .gx-p{order:4;flex-basis:100%;margin:2px 0 0;flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .gx-p b{font-size:1.3rem}
+  .gx-x{width:40px;height:40px}
+  .gx-t{padding:8px 12px;flex-wrap:wrap;gap:8px}
+  .gx-t .gx-sep{display:none}
+  .gx-c{padding:4px 4px 0 6px}
+  .gx-f{padding:6px 12px calc(10px + env(safe-area-inset-bottom))}
+  .gx-f .kb{display:none}
+  .gx-rot{display:flex;align-items:center;gap:10px;margin:8px 12px 0;padding:9px 12px;border:1px solid rgba(122,184,196,.45);border-radius:12px;background:rgba(122,184,196,.1);font-size:.82rem;color:#8ec5cf}
+  .gx-rot svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .gx-rot button{margin-left:auto;border:0;background:none;color:#a59cc9;cursor:pointer;font-size:1rem}
+  .gx-d.norot{grid-template-rows:auto auto minmax(0,1fr) auto}
+  .gx-pn{right:8px;left:8px!important;width:auto;top:8px!important}
+}
+@media (max-height:500px){
+  .gx-d{width:100vw;height:100dvh;border-radius:0;border:0;grid-template-rows:auto minmax(0,1fr)!important}
+  .gx-rot,.gx-f,.gx-n small,.gx-p span{display:none!important}
+  .gx-h{padding:4px 8px 4px 14px;gap:10px;border-bottom:0;position:absolute;top:0;right:0;z-index:2;background:none}
+  .gx-h .lav,.gx-n,.gx-p{display:none}
+  .gx-x{width:34px;height:34px}
+  .gx-t{padding:4px 54px 4px 10px;gap:6px;flex-wrap:nowrap}
+  .gx-t .gx-sep{display:none}
+  .gx-b{padding:5px 9px;font-size:.8rem}
+  .gx-c{padding:0 4px 0 6px}
+  .gx-tools{max-height:100%;overflow-y:auto;gap:1px;padding:3px;scrollbar-width:none}
+  .gx-dt{width:32px;height:30px}
+  .gx-dt svg{width:18px;height:18px}
+  .gx-tools hr{margin:2px auto}
+}
+@media (prefers-reduced-motion:reduce){ .gx,.gx-d,.pc-x{transition:none} }
+/* marcas en la gráfica (creador, lanzamiento, ballenas, tú) y «Lo que pasó» */
+.mkrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 0}
+.mkrow:empty{display:none}
+.mkc{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(196,181,253,.3);background:rgba(255,255,255,.03);border-radius:999px;padding:5px 11px 5px 9px;font:600 .8rem var(--f-body);cursor:pointer;color:var(--fg)}
+.mkc i{width:10px;height:10px;border-radius:50%}
+.mkc b{font-weight:700;color:var(--muted)}
+.mkc[aria-pressed=false]{opacity:.45}
+.mkc[aria-pressed=false] i{background:transparent!important;box-shadow:inset 0 0 0 1.5px var(--muted)}
+.mkq{margin-left:auto;border:0;background:none;color:var(--muted);font:600 .78rem var(--f-body);padding:5px 2px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.mkw{font-size:.8rem;color:var(--muted)}
+.mkh{flex-basis:100%;list-style:none;margin:4px 0 2px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02);font-size:.82rem;color:var(--muted)}
+.mkh[hidden]{display:none}
+.mkh li{display:flex;gap:8px;align-items:baseline;padding:2px 0}
+.mkh i{width:9px;height:9px;border-radius:50%;flex:none}
+.mkh b{color:var(--fg)}
+.gx-t .mkrow{margin:0;flex-wrap:nowrap}
+.gx-t .mkc{padding:4px 9px 4px 8px;font-size:.78rem;white-space:nowrap}
+.mktip{position:absolute;z-index:6;width:260px;pointer-events:none;background:#140f33;border:1px solid rgba(196,181,253,.3);border-radius:12px;padding:8px 12px;box-shadow:0 14px 40px rgba(0,0,0,.55);font-size:.8rem;color:#f1eeff}
+.mktip[hidden]{display:none}
+.mke{display:grid;grid-template-columns:10px 1fr;gap:3px 8px;padding:5px 0;border-top:1px solid rgba(196,181,253,.18)}
+.mke:first-child{border-top:0}
+.mke i{width:10px;height:10px;border-radius:50%;margin-top:4px}
+.mke small{grid-column:2;color:#a59cc9;font:500 .72rem var(--f-mono)}
+.mkstory{margin-top:18px}
+.mkstory:empty{display:none}
+.mkt{margin:0 0 4px;font:700 1.25rem var(--f-display)}
+.mks{margin:6px 0 10px;color:var(--muted);font-size:.84rem}
+.mksum{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:10px}
+.mksum div{padding:14px 16px 12px 0}
+.mksum div+div{border-left:1px solid var(--line);padding-left:16px}
+.mksum b{display:block;font:300 1.7rem/1.05 var(--f-display)}
+.mksum span{display:block;margin-top:4px;font-size:.84rem;color:var(--muted)}
+.mktl{list-style:none;margin:0;padding:0}
+.mktl li{display:grid;grid-template-columns:52px 12px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-size:.88rem;cursor:pointer}
+.mktl li:hover{background:rgba(255,255,255,.02)}
+.mktl time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.82rem}
+.mktl i{width:10px;height:10px;border-radius:50%;align-self:center}
+.mktl small{color:var(--muted);font:500 .74rem var(--f-mono)}
+.mktl a{color:var(--kick,#7ab8c4);font-size:.8rem;text-decoration:none;white-space:nowrap}
+@media (max-width:560px){ .mksum div+div{border-left:0;padding-left:0;border-top:1px solid var(--line)} .mktl li{grid-template-columns:44px 10px minmax(0,1fr)} .mktl a{grid-column:3} .mkq{margin-left:0} }
+</style>
 </head>
 <body>
 <svg class="bgfx" hidden aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
@@ -2109,7 +2276,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
       <span class="wm" translate="no">Solflag</span>
       <a href="https://x.com/solflagTeam" target="_blank" rel="noopener">X @solflagTeam</a>
       <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Open source</a>
-      <a href="https://solflag.com/blog/">Blog · Updates (Spanish)</a>
+      <a href="https://solflag.com/en/blog/">Blog · Updates</a>
       <a href="/en/accuracy/">Data and accuracy</a>
       <a href="/en/how-it-works/">How it works</a>
       <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
@@ -2123,6 +2290,66 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
   <iframe id="omFrame" title="On-chain Map"></iframe>
   <div class="om-load" id="omLoad" hidden></div>
   <button class="btn ghost small om-x" type="button" id="omClose" aria-label="Close the map">✕ Close</button>
+</div>
+<!-- gráfica en pantalla completa (la rellena el código: gxOpen) -->
+<div class="gx" id="gx" hidden role="dialog" aria-modal="true" aria-label="Full-screen chart">
+  <div class="gx-d" id="gxD">
+    <div class="gx-h">
+      <span id="gxAv"></span>
+      <div class="gx-n"><b id="gxName"></b><small id="gxSub"></small></div>
+      <div class="gx-p"><b id="gxPrice"></b><span id="gxChg"></span></div>
+      <button type="button" class="gx-x" id="gxClose" title="Close (Esc)" aria-label="Close full screen"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="gx-rot" id="gxRot"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M3 13a9 9 0 0 0 6 7M21 11a9 9 0 0 0-6-7"/></svg>Turn your phone to see it better<button type="button" id="gxRotX" aria-label="Dismiss">✕</button></div>
+    <div class="gx-t">
+      <span class="gx-g" id="gxSegs"></span>
+      <span class="gx-sep"></span>
+      <span class="gx-g">
+        <button type="button" class="gx-b" id="gxZin" title="Zoom in" aria-label="Zoom in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg></button>
+        <button type="button" class="gx-b" id="gxZout" title="Zoom out" aria-label="Zoom out"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6"/></svg></button>
+        <button type="button" class="gx-b" id="gxFit" title="See all of it again"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Fit</button>
+      </span>
+      <span class="gx-sep"></span>
+      <span class="gx-g">
+        <button type="button" class="gx-b" id="gxCandle" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M7 3v4M7 17v4M17 6v3M17 15v3"/><rect x="5" y="7" width="4" height="10" rx="1"/><rect x="15" y="9" width="4" height="6" rx="1"/></svg>Candles</button>
+        <button type="button" class="gx-b" id="gxLine" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 4 8-9"/></svg>Line</button>
+      </span>
+      <span class="gx-g">
+        <button type="button" class="gx-b" id="gxLog" aria-pressed="false" title="Log scale: a ×2 looks the same at the bottom as at the top">Log</button>
+        <button type="button" class="gx-b" id="gxVol" aria-pressed="true">Volume</button>
+      </span>
+      <span class="gx-sep"></span>
+      <span class="mkrow mkrow-b" id="gxMk"></span>
+    </div>
+    <div class="gx-c">
+      <div class="gx-tools" id="gxTools" role="toolbar" aria-orientation="vertical" aria-label="Drawing tools">
+        <button type="button" class="gx-dt" data-tool="cursor" aria-pressed="true" aria-label="Cursor: move and pick drawings"><svg viewBox="0 0 24 24"><path d="M5 3l14 7-6 2-2 6z"/></svg></button>
+        <hr>
+        <button type="button" class="gx-dt" data-tool="trend" aria-pressed="false" aria-label="Trend line"><svg viewBox="0 0 24 24"><path d="M4 19L20 5"/><circle cx="4" cy="19" r="1.8"/><circle cx="20" cy="5" r="1.8"/></svg></button>
+        <button type="button" class="gx-dt" data-tool="hline" aria-pressed="false" aria-label="Horizontal line (a price)"><svg viewBox="0 0 24 24"><path d="M3 12h18"/><circle cx="12" cy="12" r="1.8"/></svg></button>
+        <button type="button" class="gx-dt" data-tool="rect" aria-pressed="false" aria-label="Rectangle (a zone)"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1"/></svg></button>
+        <button type="button" class="gx-dt" data-tool="tri" aria-pressed="false" aria-label="Triangle (three points)"><svg viewBox="0 0 24 24"><path d="M4 19L10 5l10 10z"/><circle cx="4" cy="19" r="1.6"/><circle cx="10" cy="5" r="1.6"/><circle cx="20" cy="15" r="1.6"/></svg></button>
+        <button type="button" class="gx-dt" data-tool="brush" aria-pressed="false" aria-label="Brush (freehand)"><svg viewBox="0 0 24 24"><path d="M18.4 2.6a2 2 0 0 1 2.9 2.9L12 14.8 9.2 12z"/><path d="M9.2 12c-2.4 0-4 1.6-4.2 4-.1 1.6-1 2.8-2.5 3.4 1.6 1.1 3.8 1.6 5.6 1.1 2.6-.7 3.9-2.7 3.9-5.7"/></svg></button>
+        <button type="button" class="gx-dt" data-tool="text" aria-pressed="false" aria-label="Text"><svg viewBox="0 0 24 24"><path d="M5 5h14M12 5v14M9 19h6"/></svg></button>
+        <button type="button" class="gx-dt" data-tool="fib" aria-pressed="false" aria-label="Fibonacci (retracement)"><svg viewBox="0 0 24 24"><path d="M3 5h18M3 9.5h18M3 13h18M3 16.5h18M3 20h18" stroke-width="1.4"/><path d="M5 20L19 5" stroke-dasharray="2 2"/></svg></button>
+        <button type="button" class="gx-dt" data-tool="gann" aria-pressed="false" aria-label="Gann box"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 12h18M12 4v16M3 20L21 4" stroke-width="1.4"/><path d="M3 20l18-8M3 20l9-16" stroke-width="1" opacity=".7"/></svg></button>
+        <button type="button" class="gx-dt" data-tool="ruler" aria-pressed="false" aria-label="Ruler: how much % and how long"><svg viewBox="0 0 24 24"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg></button>
+        <hr>
+        <button type="button" class="gx-dt del" id="gxAll" aria-label="Delete all drawings"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11l4 5M14 11l-4 5"/></svg></button>
+      </div>
+      <div class="gx-plot" id="gxPlot"><div class="lwc" id="gxBig"><div class="lwc-lg" id="gxLg"></div></div><canvas id="gxOv"></canvas><div class="gx-hint" id="gxHint" hidden></div><div class="mktip" id="gxTip" hidden></div>
+        <div class="gx-bar" id="gxBar" hidden role="toolbar" aria-label="Drawing options">
+          <button type="button" id="gxSet" aria-expanded="false" title="Settings: colour and more"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</button>
+          <button type="button" id="gxEdit" title="Change the text"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/></svg>Edit</button>
+          <button type="button" id="gxDel" class="del" title="Delete this drawing (Del)" aria-label="Delete this drawing"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+        </div>
+        <div class="gx-pn" id="gxPn" hidden role="dialog" aria-label="Drawing settings"></div>
+        <textarea class="gx-txt" id="gxTxt" hidden rows="1" placeholder="Type here…" aria-label="Drawing text"></textarea>
+      </div>
+    </div>
+    <div class="gx-f"><span class="kb"><kbd>Wheel</kbd> zoom · <kbd>Drag</kbd> move · <kbd>Esc</kbd> close</span>
+      <a href="https://www.tradingview.com/" target="_blank" rel="noopener">Chart: TradingView Lightweight Charts</a><a href="https://www.coingecko.com/" target="_blank" rel="noopener">Data: Powered by CoinGecko</a></div>
+  </div>
 </div>
 <script>
 // Si el motor (librería solana-risk-engine) no carga desde el CDN, se avisa en vez de dejar la página muerta
@@ -2871,9 +3098,33 @@ var SRE_KIND={program:"programa",active:"activa"};
 // Un cliente por análisis: guarda la cola de Vibe Station y los métodos que PublicNode rechaza.
 // «Cancelar» aborta su señal; un análisis nuevo pone state.cancel=false y estrena otra
 var eng={c:null,rpc:null,ac:null};
+// Cola para GeckoTerminal (15/11): corta por ráfagas (429), y al entrar se pedían a la vez las listas y las
+// operaciones de los 10 tokens en tendencia. Ahora sale una petición cada GT_GAP ms; lo que se ve (listas, gráfica)
+// pasa delante de las operaciones de los análisis, y tras un 429 se espera unos segundos en vez de insistir
+var GT_GAP=1300, gtq={last:0,pause:0,q:[],timer:null};
+function gtFetch(url,init){
+  if(typeof url!=="string"||url.indexOf("api.geckoterminal.com")<0) return fetch(url,init);
+  var sig=init&&init.signal, hi=!/\/trades(\?|$)/.test(url);
+  return new Promise(function(res,rej){
+    function abortErr(){ return new DOMException("Aborted","AbortError"); }
+    if(sig&&sig.aborted) return rej(abortErr());
+    var it={hi:hi,go:function(){
+      fetch(url,init).then(function(r){ if(r.status===429) gtq.pause=Date.now()+8000; res(r); },
+        function(e){ if(!(sig&&sig.aborted)) gtq.pause=Date.now()+8000; rej(e); });   // un 429 sin CORS llega como fallo de red
+    }};
+    if(sig) sig.addEventListener("abort",function(){ var i=gtq.q.indexOf(it); if(i>=0){ gtq.q.splice(i,1); rej(abortErr()); } });
+    if(hi){ var k=0; while(k<gtq.q.length&&gtq.q[k].hi) k++; gtq.q.splice(k,0,it); } else gtq.q.push(it);
+    gtPump();
+  });
+}
+function gtPump(){
+  if(gtq.timer||!gtq.q.length) return;
+  var wait=Math.max(0,gtq.last+GT_GAP-Date.now(),gtq.pause-Date.now());
+  gtq.timer=setTimeout(function(){ gtq.timer=null; var it=gtq.q.shift(); if(it){ gtq.last=Date.now(); it.go(); } gtPump(); },wait);
+}
 function client(){
   if(!eng.ac||(eng.ac.signal.aborted&&!state.cancel)){ eng.ac=new AbortController(); eng.c=null; }
-  if(!eng.c||eng.rpc!==state.rpc){ eng.c=SRE.createClient({rpcUrl:state.rpc,signal:eng.ac.signal}); eng.rpc=state.rpc; }
+  if(!eng.c||eng.rpc!==state.rpc){ eng.c=SRE.createClient({rpcUrl:state.rpc,signal:eng.ac.signal,fetch:gtFetch}); eng.rpc=state.rpc; }
   return eng.c;
 }
 function cancelEngine(){ if(eng.ac) eng.ac.abort(); }
@@ -2938,8 +3189,6 @@ function curvaHtml(r){
   var m=Math.max(1,Math.round(c.min));
   return "<div class='curva'><p class='kick'><i></i>"+"Still on the Pump.fun curve"+"</p>"+
     "<p>"+"It has not graduated yet: it is bought and sold against the Pump.fun curve, not in a normal pool."+"</p>"+
-    "<div class='cfacts'><div><b>"+"Fewer than 2 in 100"+"</b><span>"+"curve tokens we see ever graduate"+"</span></div>"+
-    "<div><b>"+"9 in 10"+"</b><span>"+"of those that graduate die within a day"+"</span></div></div>"+
     (c.fast?"<div class='cfast'><span class='tg'>"+"VERY FAST"+"</span><p>"+"Already worth "+usd(c.mc)+" after "+m+(m===1?" minute":" minutes")+" ("+usd(c.ritmo)+" a minute). "+"More than half of those that moved like this graduated. "+"<b>"+"Graduating is not doing well:"+"</b> "+"most die that same day anyway."+"</p></div>":"")+
     "<p class='csrc'>"+"Data from the SolFlag registry, Nov 1–12"+" · <a href='"+LACIERTO+"' target='_blank' rel='noopener'>"+"Data and accuracy"+"</a> · <a href='"+LHOW+"#mercado' target='_blank' rel='noopener'>"+"How it works"+"</a></p></div>";
 }
@@ -3189,9 +3438,26 @@ function xBtn(r){
 }
 // En la curva de Pump.fun DexScreener no da liquidez y el token salía con «liquidez 0 $»; GeckoTerminal sí
 // sabe lo que hay en la curva (el mismo pool), que es contra lo que se vende
+// 15/11: primero se lee la propia cuenta de la curva en Solana (sin gastar GeckoTerminal, que hace falta para la
+// gráfica). Mismo cálculo que GeckoTerminal: el SOL de la curva más los tokens que le quedan, al precio de ahora
+var PUMP_PROG="6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
+async function curveLiquidity(par){
+  if(!/^pump-?fun$/i.test(par.dexId||"")) return 0;
+  var pu=Number(par.priceUsd), pn=Number(par.priceNative); if(!(pu>0&&pn>0)) return 0;
+  try{
+    var a=await rpc("getAccountInfo",[par.pairAddress,{encoding:"base64"}]), v=a&&a.value;
+    if(!v||v.owner!==PUMP_PROG) return 0;
+    var b=Uint8Array.from(atob(v.data[0]),function(ch){ return ch.charCodeAt(0); }); if(b.length<49) return 0;
+    var dv=new DataView(b.buffer);
+    function u64(o){ return dv.getUint32(o,true)+dv.getUint32(o+4,true)*4294967296; }
+    // cuenta de la curva: 8 de cabecera, reservas virtuales de token y SOL, reservas reales de token (24) y SOL (32)
+    return u64(32)/1e9*(pu/pn)+u64(24)/1e6*pu;
+  }catch(e){ if(e&&e.message==="cancelado") throw e; return 0; }
+}
 async function fillLiquidity(par,known){
   if(!par||(par.liquidity&&par.liquidity.usd)||!par.pairAddress) return;
   var v=known||0;
+  if(!v) v=await curveLiquidity(par);
   if(!v){ try{ var j=await jfetch(GT+"pools/"+par.pairAddress); v=Number(j&&j.data&&j.data.attributes&&j.data.attributes.reserve_in_usd)||0; }catch(e){} }
   if(v>0) par.liquidity=Object.assign({},par.liquidity,{usd:v});
 }
@@ -3587,7 +3853,8 @@ function tokenDetail(r){
   $("#results").classList.add("tview"); $("#results").classList.remove("wview"); $(".wrap").classList.add("tv-wide"); d.hidden=false;
   listHome(); $("#wnum").hidden=true;
   var young=r.par&&r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<7*86400000;
-  d.innerHTML="<nav class='tnav' aria-label='Token sections'>"+
+  // atajos y gráfica en una sola caja: en pantalla ancha van juntos a la derecha aunque las banderas sean más altas (15/11)
+  d.innerHTML="<div class='tc2'><nav class='tnav' aria-label='Token sections'>"+
       "<button type='button' class='tnv' data-tgo='summary'>Verdict</button>"+
       "<button type='button' data-tgo='t-chart'>Chart</button>"+
       "<button type='button' data-tgo='t-quote'>Where it trades</button>"+
@@ -3595,7 +3862,7 @@ function tokenDetail(r){
       "<button type='button' data-tgo='t-who'>Who is behind</button>"+
       (r.emisor?"":"<button type='button' data-tgo='t-hold'>Whales</button>")+"</nav>"+
     "<section class='card tdc' id='t-chart'><h2>Chart <small>price in $</small></h2>"+
-      (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("No market: there is no price to draw.")+"</div>")+histHtml(r)+"</section>"+
+      (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("No market: there is no price to draw.")+"</div>")+histHtml(r)+"<div class='mkstory' id='mkstory'></div></section></div>"+
     "<section class='card tdc' id='t-quote'><h2>Where it trades <small>and what it costs to get in and out</small></h2>"+
       "<div id='quotebox'><p class='hint'>Looking for where it trades…</p></div></section>"+
     "<section class='card tdc' id='t-who'><h2>Who is behind<span class='tnew'>new</span> <small>what they did before</small></h2>"+
@@ -3618,7 +3885,9 @@ var logos={};
 async function tokenLogo(r){
   if(logos[r.mint]===undefined){
     logos[r.mint]=null;
-    try{ var j=await jfetch(GT+"tokens/"+r.mint), u=j&&j.data&&j.data.attributes&&j.data.attributes.image_url; if(u&&!/missing/.test(u)) logos[r.mint]=u; }catch(e){}
+    // primero nuestra API (Helius, en caché una semana): GeckoTerminal se guarda para la gráfica (15/11)
+    try{ var q=await fetch(API+"logo/"+r.mint+"?w=192"); if(q.ok){ var qj=await q.json(); if(qj&&qj.img) logos[r.mint]=qj.img; else if(qj&&qj.img===null) logos[r.mint]=""; } }catch(e){}
+    if(logos[r.mint]===null) try{ var j=await jfetch(GT+"tokens/"+r.mint), u=j&&j.data&&j.data.attributes&&j.data.attributes.image_url; if(u&&!/missing/.test(u)) logos[r.mint]=u; }catch(e){}
   }
   var u=logos[r.mint]; if(!u||state.token!==r) return;
   r.img=u;
@@ -3998,11 +4267,11 @@ async function loadTrend(){
       x.st="done";
       if(run===trend.run){ paintTrend(); paintCinta(); }
     });
-  }catch(e){ if(run===trend.run){ trend.err=true; paintTrend(); } }
+  }catch(e){ if(run===trend.run){ trend.err=true; trend.ts=Date.now()-280000; paintTrend(); } }   // otro intento en ~20 s
 }
 function paintTrend(){
   var box=$("#strows"); if(!box) return;
-  if(trend.err){ box.innerHTML="<p class='hint'>Trending could not be loaded right now. It will retry in a few minutes.</p>"; return; }
+  if(trend.err){ box.innerHTML="<p class='hint'>GeckoTerminal is overloaded: we will try again in a few seconds.</p>"; return; }
   if(!trend.rows){ box.innerHTML="<p class='hint'>Loading trending tokens…</p>"; return; }
   if(!trend.rows.length){ box.innerHTML="<p class='hint'>GeckoTerminal has no trending tokens right now.</p>"; return; }
   box.innerHTML=trend.rows.map(function(x,i){
@@ -4036,13 +4305,13 @@ async function loadFresh(){
     if(run!==fresh.run) return;
     rows.forEach(function(x){ fresh.seen[x.mint]=1; });
     fresh.rows=rows; fresh.err=false;
-  }catch(e){ if(run===fresh.run&&!fresh.rows) fresh.err=true; }
+  }catch(e){ if(run===fresh.run&&!fresh.rows){ fresh.err=true; fresh.ts=Date.now()-20000; } }   // otro intento en ~10 s
   paintFresh();
 }
 function paintFresh(keepAnim){
   var box=$("#snrows"); if(!box) return;
-  if(fresh.err){ box.innerHTML="<p class='hint'>The latest launches could not be loaded right now.</p>"; return; }
-  if(!fresh.rows) return;
+  if(fresh.err){ box.innerHTML="<p class='hint'>GeckoTerminal is overloaded: we will try again in a few seconds.</p>"; return; }
+  if(!fresh.rows){ box.innerHTML="<p class='hint'>Looking for the latest launches…</p>"; return; }
   box.innerHTML=fresh.rows.map(function(x){
     return "<div class='tr nr"+(x.isNew&&!keepAnim?" in":"")+"' role='button' tabindex='0' data-analyze='"+esc(x.mint)+"'>"+tokAv(x.img,x.sym)+
       "<span style='min-width:0'><b>$"+esc(x.sym)+"</b><small>"+esc([DEXN[x.dex]||x.dex,x.liq?"Liquidity "+usd(x.liq):""].filter(Boolean).join(" · "))+"</small>"+fichaA(x.mint)+"</span>"+
@@ -4071,7 +4340,7 @@ function paintHot(){
   var src=$("#hotsrc");
   if(hot.tab==="t"){
     src.innerHTML="Source: GeckoTerminal trending (by real activity, no paid spots). A trending token only means it moves a lot: it is not a buy recommendation. <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a>.";
-    if(trend.err){ box.innerHTML="<p class='hint'>Trending could not be loaded right now. It will retry in a few minutes.</p>"; return; }
+    if(trend.err){ box.innerHTML="<p class='hint'>GeckoTerminal is overloaded: we will try again in a few seconds.</p>"; return; }
     if(!trend.rows){ box.innerHTML="<p class='hint'>Loading trending tokens…</p>"; return; }
     if(!tr.length){ box.innerHTML="<p class='hint'>GeckoTerminal has no trending tokens right now.</p>"; return; }
     box.innerHTML="<div class='hr hh' aria-hidden='true'><span>#</span><span>TOKEN</span><span class='c3'>PRICE 1 H</span><span class='c4'>VOLUME 24 H</span><span class='c5'>SIGNAL</span><span>RISK</span></div>"+
@@ -4084,7 +4353,7 @@ function paintHot(){
       }).join("");
   } else {
     src.innerHTML="The 5 latest on Solana (Pump.fun and others). Of what is born, <b>99%</b> is dead within 24 h (SolFlag registry). <a href='#' data-trynew>See all in New tokens →</a> · <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a>";
-    if(fresh.err){ box.innerHTML="<p class='hint'>The latest launches could not be loaded right now.</p>"; return; }
+    if(fresh.err){ box.innerHTML="<p class='hint'>GeckoTerminal is overloaded: we will try again in a few seconds.</p>"; return; }
     if(!fresh.rows){ box.innerHTML="<p class='hint'>Looking for the latest launches…</p>"; return; }
     box.innerHTML="<div class='hr hh' aria-hidden='true'><span>#</span><span>TOKEN</span><span class='c3'>AGE</span><span class='c4'>LIQUIDITY</span><span class='c5'>DEX</span><span>RISK</span></div>"+
       fr.map(function(x,i){
@@ -4139,7 +4408,10 @@ function paintHotW(){
   $("#hotdsrc").textContent=d.length?"SolFlag registry: "+(L.n||0).toLocaleString("en-US")+" launches in the last 24 h, "+(L.analyzed||0).toLocaleString("en-US")+" analyzed. Updated every 5 min.":"";
 }
 function paintHome(){
-  if(!trend.rows||Date.now()-trend.ts>300000) setTimeout(loadTrend,300); else paintTrend();
+  // con un enlace directo (?token=, ?wallet=…) el análisis ya ha empezado: la portada no llega a verse y no se
+  // gasta GeckoTerminal en sus listas, que hace falta para la gráfica (15/11)
+  if(!document.body.classList.contains("landing")) return;
+  if(!trend.rows||Date.now()-trend.ts>300000) setTimeout(function(){ if(liveOn()) loadTrend(); },300); else paintTrend();
   if(Date.now()-fresh.ts>=30000) loadFresh(); else paintFresh(true);
   if(!fresh.timer) fresh.timer=setInterval(liveTick,10000);
   loadDatos(); loadHotW();
@@ -4212,7 +4484,7 @@ function paintCinta(){
   $("#sctrack").style.setProperty("--cd",Math.max(30,it.length*6)+"s");
 }
 function paintScanPage(){
-  if(!trend.rows||Date.now()-trend.ts>300000) setTimeout(loadTrend,300); else paintTrend();
+  if(!trend.rows||Date.now()-trend.ts>300000) setTimeout(function(){ if(liveOn()) loadTrend(); },300); else paintTrend();
   if(Date.now()-fresh.ts>=30000) loadFresh(); else paintFresh(true);
   if(!fresh.timer) fresh.timer=setInterval(liveTick,10000);
   paintCinta(); loadMoment();
@@ -4284,41 +4556,78 @@ var CHART_TF={m1:["minute",1,120,"1 min"],m5:["minute",5,120,"5 min"],m15:["minu
 var charts={};   // "pool|periodo" -> [[ms, cierre]...], "loading" o "err"
 state.ctf="m5";
 // en vez de una gráfica vacía, un aviso del mismo tamaño
-function chartNA(why){
-  return "<div class='pc-na'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M3 3v18h18'/><path d='m7 15 4-4 3 3 5-6'/></svg><b>Chart not available right now</b><span>"+esc(why)+"</span></div>";
+function chartNA(why,retry){
+  return "<div class='pc-na'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M3 3v18h18'/><path d='m7 15 4-4 3 3 5-6'/></svg><b>Chart not available right now</b><span>"+esc(why)+"</span>"+
+    (retry?"<button type='button' class='btn small' data-cretry>"+"Try again"+"</button>":"")+"</div>";
 }
+// GeckoTerminal corta por ráfagas (429 sin CORS: el navegador lo ve como fallo de red). Un fallo no se guarda para
+// siempre: se reintenta solo a los 15, 30 y 45 s y queda el botón «Reintentar» (15/11)
+var chartErr={};
+// 1, 5 y 15 min salen de UNA sola petición de 1.000 velas de 1 min; 1 h y 1 d van aparte
+function ohlcvUrl(r,k){ var tf=CHART_TF[k], mn=tf[0]==="minute";
+  return GT+"pools/"+r.par.pairAddress+"/ohlcv/"+tf[0]+"?aggregate="+(mn?1:tf[1])+"&limit="+(mn?1000:tf[2])+"&currency=usd&token="+encodeURIComponent(r.mint); }
+function ohlcvParse(j){ var l=(j&&j.data&&j.data.attributes&&j.data.attributes.ohlcv_list)||[];
+  return l.map(function(v){ return [v[0]*1000,Number(v[4]),Number(v[1]),Number(v[2]),Number(v[3]),Number(v[5])||0]; }).filter(function(p){ return p[1]>0&&p[2]>0&&p[3]>0&&p[4]>0; }).sort(function(a,b){ return a[0]-b[0]; }); }
+// lo que se guarda de un token: las velas de 1 min (para 1, 5 y 15 min) o las de 1 h / 1 d
+function chartKey(r){ return r.par.pairAddress+"|"+(CHART_TF[state.ctf][0]==="minute"?"min":state.ctf); }
+// junta velas de 1 min [ms, cierre, apertura, máx, mín, volumen] en velas de n minutos
+function candlesJoin(c,n){
+  if(n<=1) return c;
+  var out=[], w=n*60000, cur=null;
+  c.forEach(function(p){
+    var t=Math.floor(p[0]/w)*w;
+    if(!cur||cur[0]!==t){ cur=[t,p[1],p[2],p[3],p[4],p[5]]; out.push(cur); }
+    else{ cur[1]=p[1]; cur[3]=Math.max(cur[3],p[3]); cur[4]=Math.min(cur[4],p[4]); cur[5]+=p[5]; }
+  });
+  return out;
+}
+function ctfButtons(){ Array.prototype.forEach.call(document.querySelectorAll("[data-ctf]"),function(b){ b.setAttribute("aria-pressed",String(b.getAttribute("data-ctf")===state.ctf)); }); }
 function chartHtml(r){
   if(!r.par||!r.par.pairAddress) return "";
   return "<div class='pchart'><div class='pc-head'><b>Price</b><span class='pc-chg' id='pcchg'></span><span class='segs'>"+
     Object.keys(CHART_TF).map(function(k){ return "<button type='button' class='seg' data-ctf='"+k+"' aria-pressed='"+(state.ctf===k)+"'>"+esc(CHART_TF[k][3])+"</button>"; }).join("")+
-    "</span></div><div class='pc-body' id='pcbody'><p class='hint'>Loading chart…</p></div></div>";
+    "</span><button type='button' class='pc-x' data-gx title='Full screen' aria-label='See the chart in full screen'><svg viewBox='0 0 24 24'><path d='M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7'/></svg></button></div><div class='mkrow'></div><div class='pc-body' id='pcbody'><p class='hint'>Loading chart…</p></div></div>";
 }
 async function paintChart(){
   var r=state.token, box=$("#pcbody");
   if(!r||!r.par||!r.par.pairAddress||!box) return;
-  var key=r.par.pairAddress+"|"+state.ctf, c=charts[key];
+  // el paso a 1 min de un token joven no se arrastra al siguiente token
+  if(state.cmint!==r.mint){ state.cmint=r.mint; if(state.ctfAuto){ state.ctf="m5"; state.ctfAuto=false; ctfButtons(); } }
+  var tf=CHART_TF[state.ctf], key=chartKey(r), c=charts[key];
   if(c===undefined){
     charts[key]="loading";
-    var tf=CHART_TF[state.ctf];
     try{
       // token=: el precio de ESTE token. Sin él GeckoTerminal da el de su token base del pool, que puede ser el otro
       // (USDC/SOL en DexScreener es SOL/USDC en GeckoTerminal: la gráfica de USDC salía a ~95 $)
-      var j=await jfetch(GT+"pools/"+r.par.pairAddress+"/ohlcv/"+tf[0]+"?aggregate="+tf[1]+"&limit="+tf[2]+"&currency=usd&token="+encodeURIComponent(r.mint));
-      var l=(j&&j.data&&j.data.attributes&&j.data.attributes.ohlcv_list)||[];
-      charts[key]=l.map(function(v){ return [v[0]*1000,Number(v[4]),Number(v[1]),Number(v[2]),Number(v[3]),Number(v[5])||0]; }).filter(function(p){ return p[1]>0&&p[2]>0&&p[3]>0&&p[4]>0; }).sort(function(a,b){ return a[0]-b[0]; });
+      // 1, 5 y 15 min salen de UNA sola petición de 1.000 velas de 1 min (unas 16 h); 1 h y 1 d van aparte (15/11)
+      charts[key]=ohlcvParse(await jfetch(ohlcvUrl(r,state.ctf)));
     }catch(e){ charts[key]="err"; }
     return paintChart();   // puede que entretanto se haya cambiado de token o de periodo
   }
   if(c==="loading") return;
+  if(c!=="err"&&tf[0]==="minute") c=candlesJoin(c,tf[1]).slice(-tf[2]);
   state.cpts=null;
-  if(c==="err"||c.length<2){
-    box.innerHTML=chartNA(c==="err"?"GeckoTerminal is not answering or does not have this market yet.":"There are not enough trades yet to draw the candles.");
+  // token joven: a 5 min solo hay 1–3 velas; si no lo ha elegido la persona, pasa solo a 1 min
+  if(c!=="err"&&c.length<12&&state.ctf==="m5"&&state.ctfUser!==r.mint&&r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<3*3600000){
+    state.ctf="m1"; state.ctfAuto=true; ctfButtons(); return paintChart();
+  }
+  if(c==="err"){
+    var n0=chartErr[key]||0;
+    if(n0<3){
+      chartErr[key]=n0+1;
+      setTimeout(function(){ if(charts[key]==="err"){ delete charts[key]; paintChart(); } },15000*(n0+1));
+    }
+    box.innerHTML=chartNA(n0<3?"GeckoTerminal is overloaded right now. We will try again on our own in a few seconds.":"GeckoTerminal is not answering or does not have this market yet.",true);
     $("#pcchg").textContent=""; return;
   }
-  var key0=key;
+  if(c.length<2){
+    box.innerHTML=chartNA("There are not enough trades yet to draw the candles.");
+    $("#pcchg").textContent=""; return;
+  }
+  var ctf0=state.ctf;
   try{
     await loadLWC();
-    if(state.token!==r||!document.body.contains(box)||r.par.pairAddress+"|"+state.ctf!==key0) return;
+    if(state.token!==r||!document.body.contains(box)||state.ctf!==ctf0) return;
     lwcDraw(box,c,r); return;
   }catch(e){}   // sin la librería, velas dibujadas aquí mismo
   if(state.lwc){ try{ state.lwc.remove(); }catch(e){} state.lwc=null; }
@@ -4362,9 +4671,12 @@ function loadLWC(){
   return lwcP;
 }
 function lwcNum(v){
-  if(!v) return "0";
-  var d=v>=1?Math.max(2,4-Math.floor(Math.log10(v))):Math.min(12,2-Math.floor(Math.log10(v))+2);
-  return v.toLocaleString("en-US",{minimumFractionDigits:Math.min(d,v>=1000?0:d),maximumFractionDigits:Math.min(d,v>=1000?0:d)});
+  // la escala puede bajar de 0 cuando el precio se hunde (15/11): con un negativo, log10 daba NaN y la gráfica no salía
+  if(v<0) return "";   // un precio no es negativo: esas marcas de la escala no se enseñan
+  var a=Math.abs(v); if(!a||!isFinite(a)) return "0";
+  var d=a>=1?Math.max(2,4-Math.floor(Math.log10(a))):Math.min(12,2-Math.floor(Math.log10(a))+2);
+  d=Math.min(d,a>=1000?0:d);
+  return v.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
 }
 function lwcVol(v){ return v>=1e6?(v/1e6).toLocaleString("en-US",{maximumFractionDigits:2})+" M":v>=1e3?(v/1e3).toLocaleString("en-US",{maximumFractionDigits:1})+" K":Math.round(v).toString(); }
 function lwcDraw(box,c,r){
@@ -4372,7 +4684,7 @@ function lwcDraw(box,c,r){
   var LC=window.LightweightCharts, tz=new Date().getTimezoneOffset()*60;   // la librería pinta en UTC: se pasa a la hora local
   var minP=Infinity; c.forEach(function(p){ if(p[4]<minP) minP=p[4]; });
   var prec=minP>=1?4:Math.min(12,Math.max(2,2-Math.floor(Math.log10(minP))+2));
-  box.innerHTML="<div class='lwc' id='lwcbox'><div class='lwc-lg' id='lwclg'></div></div>"+
+  box.innerHTML="<div class='lwc' id='lwcbox'><div class='lwc-lg' id='lwclg'></div><div class='mktip' id='lwctip' hidden></div></div>"+
     "<p class='lwc-attr'><span id='lwcmk'></span><a href='https://www.tradingview.com/' target='_blank' rel='noopener'>Chart: TradingView Lightweight Charts</a> · <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Data: Powered by CoinGecko</a></p>";
   var el=$("#lwcbox"), mob=window.matchMedia&&matchMedia("(max-width:520px)").matches;
   var ch=LC.createChart(el,{autoSize:true,height:mob?260:330,
@@ -4393,11 +4705,10 @@ function lwcDraw(box,c,r){
     data.push({time:t,open:p[2],high:p[3],low:p[4],close:p[1]});
     vol.push({time:t,value:p[5]||0,color:p[1]>=p[2]?"rgba(74,222,128,.35)":"rgba(255,107,107,.35)"}); });
   cs.setData(data); vs.setData(vol);
-  // dónde lo analizaste tú: flecha sobre la vela de ese momento (GeckoTerminal va unos minutos por detrás)
-  var step=data.length>1?data[1].time-data[0].time:60, mk=[];
-  (r.hist||[]).forEach(function(e){ var t=Math.floor(e.ts/1000)-tz; if(t<data[0].time||t>data[data.length-1].time+Math.max(3*step,600)) return;
-    var k=data.length-1; while(k>0&&data[k].time>t) k--; if(!mk.some(function(m){ return m.time===data[k].time; })) mk.push({time:data[k].time,position:"aboveBar",color:"#c4b5fd",shape:"arrowDown",text:"You"}); });
-  if(mk.length){ cs.setMarkers(mk); $("#lwcmk").innerHTML="<i></i>You analyzed it here"; }
+  // marcas: tú (donde lo analizaste), el creador, el lanzamiento y las ballenas (mkSet; llegan aparte con mkLoad)
+  var step=data.length>1?data[1].time-data[0].time:60;
+  state.lwcS={series:cs,times:data.map(function(d){ return d.time; }),step:step,tz:tz};
+  mkSet(cs,state.lwcS.times,r,step,tz);
   ch.timeScale().fitContent();
   // leyenda arriba a la izquierda, como en TradingView: la vela bajo la cruz o la última
   var lg=$("#lwclg"), byT={}; data.forEach(function(d,i){ byT[d.time]=i; });
@@ -4407,8 +4718,10 @@ function lwcDraw(box,c,r){
     lg.innerHTML="<span>O <b style='color:"+col+"'>"+lwcNum(d.open)+"</b></span><span>H <b style='color:"+col+"'>"+lwcNum(d.high)+"</b></span><span>L <b style='color:"+col+"'>"+lwcNum(d.low)+"</b></span><span>C <b style='color:"+col+"'>"+lwcNum(d.close)+"</b></span><span><b style='color:"+col+"'>"+(chg>=0?"+":"")+fmtPct(chg)+"</b></span><span>Vol <b>"+lwcVol(v.value)+" $</b></span>";
   }
   legend(data.length-1);
-  ch.subscribeCrosshairMove(function(pr){ var i=pr&&pr.time!=null?byT[pr.time]:undefined; legend(i===undefined?data.length-1:i); });
+  ch.subscribeCrosshairMove(function(pr){ var i=pr&&pr.time!=null?byT[pr.time]:undefined; legend(i===undefined?data.length-1:i); mkTip($("#lwctip"),cs,pr,el); });
   state.lwc=ch;
+  document.querySelectorAll(".mkrow").forEach(function(x){ if(!x.innerHTML) x.innerHTML=mkChipsHtml(r.mint)+mkHelpHtml(); });
+  mkLoad(r);
   var hi=0; c.forEach(function(p){ if(p[3]>hi) hi=p[3]; });
   var n=c.length, chg=(c[n-1][1]/c[0][2]-1)*100, fromHi=(c[n-1][1]/hi-1)*100, pe=$("#pcchg");
   if(pe){ pe.textContent=(chg>=0?"+":"")+fmtPct(chg)+" · "+priceUsd(c[n-1][1])+(fromHi<=-1?" · "+fmtPct(fromHi)+" from the high":""); pe.className="pc-chg "+(chg>=0?"up":"down"); }
@@ -4480,7 +4793,9 @@ async function launchBuys(mint){
     try{ var now=await holdNow(mint,ws.map(function(x){ return x.w; })); after=ws.map(function(x){ return {w:x.w,creator:x.creator,raw:x.raw,now:now[x.w]||0}; }); }
     catch(e){ if(e.message==="cancelado") throw e; }
   }
-  return {ws:ws,capped:capped,creator:creator,serial:serial,after:after,supply:sup};
+  // born: cuándo nació el token (su primera firma); el pool de DexScreener puede ser el de después de graduar
+  var born=Math.min.apply(null,ok.map(function(s){ return s.blockTime||Infinity; }));
+  return {ws:ws,capped:capped,creator:creator,serial:serial,after:after,supply:sup,born:isFinite(born)?born*1000:0};
 }
 // Otros tokens que lanzó en 24 h la wallet que pagó este (el propio token también sale en la cuenta)
 function serialOthers(b,mint){
@@ -6118,11 +6433,644 @@ $("#omClose").addEventListener("click",closeMap);
 document.addEventListener("keydown",function(ev){ if(ev.key==="Escape"&&!$("#omap").hidden) closeMap(); });
 $("#mform").addEventListener("submit",function(e){ e.preventDefault(); var v=$("#mmint").value.trim(); if(!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(v)){ showError("That does not look like a Solana token address."); return; } openMap(v); });
 
+/* ---------- gráfica en pantalla completa y dibujos (15/11, maqueta maquetas/grafica/grafica-pantalla-completa.html) ----------
+   Se abre con el icono de la gráfica. Usa las mismas velas que la pequeña (toda la historia cargada: hasta 1.000 de 1 min).
+   Dibujos: cada punto se guarda como {t: hora, p: precio}, así siguen en su sitio al cambiar de intervalo, de escala o de
+   zoom. Se guardan en este navegador, por token (sf.draw.<mint>); cada tipo recuerda su último color y sus niveles */
+var GX={k:"m5",line:false,log:false,vol:true,ch:null,r:null,run:0};
+function gxEl(id){ return document.getElementById(id); }
+function gxPct(x){ return (x>=0?"+":"")+fmtPct(x); }
+// velas de un periodo para la grande: con las de 1 min juntadas, o las de 1 h / 1 d; se piden si aún no están
+async function chartData(r,k){
+  var tf=CHART_TF[k], key=r.par.pairAddress+"|"+(tf[0]==="minute"?"min":k);
+  for(var i=0;i<200&&charts[key]==="loading";i++) await new Promise(function(res){ setTimeout(res,300); });
+  if(charts[key]==="err") delete charts[key];
+  if(charts[key]===undefined){
+    charts[key]="loading";
+    try{ charts[key]=ohlcvParse(await jfetch(ohlcvUrl(r,k))); }catch(e){ charts[key]="err"; }
+  }
+  var c=charts[key]; if(!Array.isArray(c)) return null;
+  return tf[0]==="minute"?candlesJoin(c,tf[1]):c;
+}
+function gxSegs(){
+  gxEl("gxSegs").innerHTML=Object.keys(CHART_TF).map(function(k){ return "<button type='button' class='gx-b' data-gxk='"+k+"' aria-pressed='"+(k===GX.k)+"'>"+esc(CHART_TF[k][3])+"</button>"; }).join("");
+}
+function gxOpen(){
+  var r=state.token; if(!r||!r.par||!r.par.pairAddress) return;
+  GX.r=r; GX.k=state.ctf; GX.last=document.activeElement;
+  dLoad(r.mint);
+  gxEl("gxAv").innerHTML=tokAv(r.img,r.sym);
+  var sym="$"+String(r.sym||"").replace(/^\$/,"");   // algunos símbolos ya traen su $ (WIF)
+  gxEl("gxName").textContent=sym;
+  var dx=r.par.dexId||"";
+  gxEl("gxSub").textContent=[DEXN[dx]||dx,r.par.pairCreatedAt?"created "+haceMin(r.par.pairCreatedAt):""].filter(Boolean).join(" · ");
+  gxEl("gx").setAttribute("aria-label",""+sym+" chart in full screen");
+  gxEl("gx").hidden=false; document.body.style.overflow=document.documentElement.style.overflow="hidden";
+  gxSegs();
+  requestAnimationFrame(function(){ gxEl("gx").classList.add("on"); gxPaint(); gxEl("gxClose").focus(); if(!D.raf) D.raf=requestAnimationFrame(dFrame); });
+}
+function gxClose(){
+  if(gxEl("gx").hidden) return;
+  txtClose(true); setTool("cursor"); pnOpen(false); D.sel=-1;
+  cancelAnimationFrame(D.raf); D.raf=0;
+  gxEl("gx").classList.remove("on"); document.body.style.overflow=document.documentElement.style.overflow="";
+  setTimeout(function(){
+    gxEl("gx").hidden=true; if(GX.ch){ try{ GX.ch.remove(); }catch(e){} GX.ch=null; }
+    // la pequeña se queda con el intervalo elegido en grande
+    if(state.token===GX.r&&state.ctf!==GX.k){ state.ctf=GX.k; state.ctfAuto=false; state.ctfUser=GX.r.mint; ctfButtons(); var pb=$("#pcbody"); if(pb) pb.innerHTML="<p class='hint'>Loading chart…</p>"; paintChart(); }
+    if(GX.last&&GX.last.focus) GX.last.focus();
+  },200);
+}
+async function gxPaint(keep){
+  var r=GX.r, run=++GX.run, box=gxEl("gxBig");
+  var range=keep&&GX.ch?GX.ch.timeScale().getVisibleLogicalRange():null;
+  if(GX.ch){ try{ GX.ch.remove(); }catch(e){} GX.ch=null; }
+  if(!keep) box.innerHTML="<div class='lwc-lg' id='gxLg'></div><p class='gx-msg'>Loading chart…</p>";
+  var c=await chartData(r,GX.k);
+  if(run!==GX.run||gxEl("gx").hidden) return;
+  if(!c||c.length<2){
+    box.innerHTML="<div class='lwc-lg' id='gxLg'></div><p class='gx-msg'>"+(c?"There are not enough trades yet to draw the candles.":"GeckoTerminal is overloaded right now. Try again in a few seconds.")+"</p>";
+    gxEl("gxPrice").textContent=""; gxEl("gxChg").textContent=""; return;
+  }
+  try{ await loadLWC(); }catch(e){ box.innerHTML="<p class='gx-msg'>"+"The chart library could not load."+"</p>"; return; }
+  if(run!==GX.run) return;
+  box.innerHTML="<div class='lwc-lg' id='gxLg'></div>";
+  // se abre enseñando lo mismo que la pequeña (en el móvil en vertical, menos velas para que se vean)
+  var n=c.length, show=CHART_TF[GX.k][2]; if(matchMedia("(max-width:700px)").matches) show=Math.min(show,60);
+  // si se viene de «Lo que pasó», centrada en ese momento
+  if(!range&&GX.focus){ var ft=GX.focus, fk=c.length-1; while(fk>0&&c[fk][0]>ft) fk--; range=ft<c[0][0]?{from:-3,to:80}:{from:fk-40,to:fk+40}; GX.focus=0; }   // antes de las velas (otro pool): al principio
+  GX.ch=gxDraw(box,c,r,range||{from:Math.max(0,n-show)-.5,to:n+3});
+  mkPaint();
+  var cs=c.slice(-CHART_TF[GX.k][2]), hi=0; cs.forEach(function(p){ if(p[3]>hi) hi=p[3]; });
+  var last=cs[cs.length-1][1], chg=(last/cs[0][2]-1)*100, fh=(last/hi-1)*100;
+  gxEl("gxPrice").textContent=priceUsd(last);
+  var ce=gxEl("gxChg"); ce.textContent=gxPct(chg)+(fh<=-1?" · "+fmtPct(fh)+" from the high":""); ce.className=chg>=0?"up":"down";
+  gxEl("gxCandle").setAttribute("aria-pressed",String(!GX.line)); gxEl("gxLine").setAttribute("aria-pressed",String(GX.line));
+  gxEl("gxLog").setAttribute("aria-pressed",String(GX.log)); gxEl("gxVol").setAttribute("aria-pressed",String(GX.vol));
+}
+function gxDraw(el,c,r,range){
+  var LC=window.LightweightCharts, tz=new Date().getTimezoneOffset()*60, up="#4ade80", dn="#ff6b6b";
+  var minP=Infinity; c.forEach(function(p){ if(p[4]<minP) minP=p[4]; });
+  var prec=minP>=1?4:Math.min(12,Math.max(2,2-Math.floor(Math.log10(minP))+2));
+  var ch=LC.createChart(el,{autoSize:true,
+    layout:{background:{type:"solid",color:"transparent"},textColor:"#c9c1ea",fontFamily:"Manrope, system-ui, sans-serif",fontSize:12},
+    grid:{vertLines:{color:"rgba(196,181,253,.07)"},horzLines:{color:"rgba(196,181,253,.07)"}},
+    crosshair:{mode:LC.CrosshairMode.Normal,vertLine:{color:"rgba(196,181,253,.45)",labelBackgroundColor:"#3a2c7a"},horzLine:{color:"rgba(196,181,253,.45)",labelBackgroundColor:"#3a2c7a"}},
+    rightPriceScale:{borderColor:"rgba(196,181,253,.18)",scaleMargins:{top:.08,bottom:GX.vol?.24:.04},mode:GX.log?LC.PriceScaleMode.Logarithmic:LC.PriceScaleMode.Normal},
+    timeScale:{borderColor:"rgba(196,181,253,.18)",timeVisible:true,secondsVisible:false,rightOffset:4},
+    localization:{locale:"en-US",priceFormatter:lwcNum},handleScroll:{vertTouchDrag:false}});
+  var seen={}, data=[], vols=[];
+  c.forEach(function(p){ var t=Math.floor(p[0]/1000)-tz; if(seen[t]) return; seen[t]=1;
+    data.push({time:t,open:p[2],high:p[3],low:p[4],close:p[1]});
+    vols.push({time:t,value:p[5]||0,color:p[1]>=p[2]?"rgba(74,222,128,.35)":"rgba(255,107,107,.35)"}); });
+  var pf={type:"price",precision:prec,minMove:Math.pow(10,-prec)};
+  var main=GX.line?ch.addAreaSeries({lineColor:"#c4b5fd",topColor:"rgba(139,92,246,.32)",bottomColor:"rgba(139,92,246,0)",lineWidth:2,priceFormat:pf})
+    :ch.addCandlestickSeries({upColor:up,downColor:dn,borderUpColor:up,borderDownColor:dn,wickUpColor:up,wickDownColor:dn,priceFormat:pf});
+  main.setData(GX.line?data.map(function(d){ return {time:d.time,value:d.close}; }):data);
+  if(GX.vol){ var vs=ch.addHistogramSeries({priceScaleId:"",priceFormat:{type:"volume"},lastValueVisible:false,priceLineVisible:false}); vs.priceScale().applyOptions({scaleMargins:{top:.8,bottom:0}}); vs.setData(vols); }
+  // marcas (como en la pequeña): tú, el creador, el lanzamiento y las ballenas
+  var step=data.length>1?data[1].time-data[0].time:60;
+  if(!GX.line) mkSet(main,data.map(function(d){ return d.time; }),r,step,tz);
+  var lg=gxEl("gxLg"), byT={}; data.forEach(function(d,i){ byT[d.time]=i; });
+  function legend(i){ var d=data[i]; if(!d||!lg) return; var col=d.close>=d.open?up:dn, x=(d.close/d.open-1)*100;
+    lg.innerHTML="<span>O <b style='color:"+col+"'>"+lwcNum(d.open)+"</b></span><span>H <b style='color:"+col+"'>"+lwcNum(d.high)+"</b></span><span>L <b style='color:"+col+"'>"+lwcNum(d.low)+"</b></span><span>C <b style='color:"+col+"'>"+lwcNum(d.close)+"</b></span><span><b style='color:"+col+"'>"+gxPct(x)+"</b></span><span>Vol <b>"+lwcVol(vols[i].value)+" $</b></span>"; }
+  legend(data.length-1);
+  ch.subscribeCrosshairMove(function(pr){ var i=pr&&pr.time!=null?byT[pr.time]:undefined; legend(i===undefined?data.length-1:i); mkTip(gxEl("gxTip"),main,pr,el); });
+  if(range) ch.timeScale().setVisibleLogicalRange(range); else ch.timeScale().fitContent();
+  ch._main=main; ch._T=data.map(function(d){ return d.time; }); ch._step=(CHART_TF[GX.k][0]==="minute"?CHART_TF[GX.k][1]*60:CHART_TF[GX.k][0]==="hour"?3600:86400);
+  return ch;
+}
+function gxZoom(f){ if(!GX.ch) return; var ts=GX.ch.timeScale(), rg=ts.getVisibleLogicalRange(); if(!rg) return; var mid=(rg.from+rg.to)/2, half=Math.max(5,(rg.to-rg.from)/2*f); ts.setVisibleLogicalRange({from:mid-half,to:mid+half}); }
+
+/* ---- dibujos ---- */
+var D={tool:"cursor",list:[],sel:-1,tmp:null,drag:null,raf:0,key:""};
+function dLoad(m){ D.key="sf.draw."+m; D.sel=-1; D.tmp=null; try{ D.list=JSON.parse(localStorage.getItem(D.key)||"[]")||[]; }catch(e){ D.list=[]; } }
+function dSave(){ try{ localStorage.setItem(D.key,JSON.stringify(D.list.map(function(d){ var o={}; Object.keys(d).forEach(function(x){ if(x[0]!=="_") o[x]=d[x]; }); return o; }))); }catch(e){} }
+// Fibonacci: los niveles de siempre encendidos y las extensiones apagadas. Gann: 0 · 0,25 · 0,5 · 0,75 · 1 (0,382 y 0,618 apagados)
+var FIBD=[0,.236,.382,.5,.618,.786,1,1.618,2.618,3.618,4.236], FIBON=[1,1,1,1,1,1,1,0,0,0,0];
+var GANND=[0,.25,.382,.5,.618,.75,1], GANNON=[1,1,0,1,0,1,1];
+var FIBC=["#ff6b6b","#fbbf24","#4ade80","#7ab8c4","#8ec5cf","#a78bfa","#c4b5fd","#f472b6","#fb923c","#60a5fa","#34d399","#facc15","#e879f9"];
+function fibFactory(k){
+  if(k==="gann") return {lv:GANND.map(function(v,i){ return {v:v,on:GANNON[i],c:FIBC[i]}; }),ext:true};   // en Gann, «ext» = mostrar los ángulos
+  return {lv:FIBD.map(function(v,i){ return {v:v,on:FIBON[i],c:FIBC[i]}; }),ext:false};
+}
+function fibDef(k){ k=k||"fib"; try{ var x=JSON.parse(localStorage.getItem("sf."+k+".def")); if(x&&x.lv&&x.lv.length) return x; }catch(e){} return fibFactory(k); }
+function fibSaveDef(x,k){ try{ localStorage.setItem("sf."+(k||"fib")+".def",JSON.stringify({lv:x.lv,ext:!!x.ext})); }catch(e){} }
+var NEED={trend:2,hline:1,rect:2,tri:3,fib:2,gann:2,ruler:2,text:1};
+var HINT={trend:"Press and drag, or tap two points",hline:"Tap the price you want to mark",rect:"Press and drag to mark the zone",
+  tri:"Tap three points (or drag the first side and tap the third)",brush:"Hold down and draw whatever you like",
+  text:"Tap where you want the text",fib:"Drag from the low to the high (or the other way)",gann:"Drag from one corner to the other",
+  ruler:"Drag from one point to another to measure"};
+// color, grosor, discontinua y tamaño de letra; cada tipo recuerda lo último que se eligió
+var PAL=["#c4b5fd","#8b5cf6","#7ab8c4","#4ade80","#fbbf24","#fb923c","#ff6b6b","#f472b6","#60a5fa","#f1eeff"];
+var STY0={trend:{c:"#c4b5fd",w:2,dash:0},hline:{c:"#c4b5fd",w:2,dash:0},rect:{c:"#c4b5fd",w:2,dash:0},tri:{c:"#c4b5fd",w:2,dash:0},
+  brush:{c:"#c4b5fd",w:3},text:{c:"#f1eeff",fs:14},fib:{c:"#c4b5fd"},gann:{c:"#c4b5fd"},ruler:{}};
+var KNAME={trend:"Trend line",hline:"Horizontal line",rect:"Rectangle",tri:"Triangle",brush:"Brush",text:"Text",fib:"Fibonacci",gann:"Gann box"};
+function styDef(k){ var o=Object.assign({},STY0[k]||{}); try{ Object.assign(o,JSON.parse(localStorage.getItem("sf.sty."+k))||{}); }catch(e){} return o; }
+function stySave(d){ var o={}; ["c","w","dash","fs"].forEach(function(x){ if(d[x]!==undefined) o[x]=d[x]; }); try{ localStorage.setItem("sf.sty."+d.k,JSON.stringify(o)); }catch(e){} }
+function ink(c){ var n=parseInt(String(c).slice(1),16), rr=n>>16, gg=n>>8&255, bb=n&255; return (rr*299+gg*587+bb*114)/1000>150?"#0b0820":"#ffffff"; }   // letra legible sobre ese color
+function styApply(d){ var o=styDef(d.k); Object.keys(o).forEach(function(x){ if(d[x]===undefined) d[x]=o[x]; }); return d; }
+function fmtLv(v){ return Number(v).toLocaleString("en-US",{maximumFractionDigits:3}); }
+// hora <-> posición lógica (índice de vela, con decimales; fuera de los datos se sigue al mismo paso)
+function t2l(ch,t){ var T=ch._T, n=T.length, s=ch._step; if(t<=T[0]) return (t-T[0])/s; if(t>=T[n-1]) return n-1+(t-T[n-1])/s;
+  var lo=0,hi=n-1; while(hi-lo>1){ var m=(lo+hi)>>1; if(T[m]<=t) lo=m; else hi=m; } return lo+(t-T[lo])/((T[hi]-T[lo])||s); }
+function l2t(ch,l){ var T=ch._T, n=T.length, s=ch._step; if(l<=0) return T[0]+l*s; if(l>=n-1) return T[n-1]+(l-(n-1))*s;
+  var i=Math.floor(l); return T[i]+(l-i)*(T[i+1]-T[i]); }
+// la librería solo convierte posiciones enteras (con decimales devuelve 0): se interpola entre dos velas
+function l2x(ts,l){ var f=Math.floor(l), a=ts.logicalToCoordinate(f), b=ts.logicalToCoordinate(f+1); return (a==null||b==null)?null:a+(l-f)*(b-a); }
+function x2l(ts,x){ var l0=ts.coordinateToLogical(x); if(l0==null) return null; var a=ts.logicalToCoordinate(l0), b=ts.logicalToCoordinate(l0+1); return (a==null||b==null)?l0:l0+(x-a)/((b-a)||1); }
+function toXY(pt){ var ch=GX.ch; if(!ch) return null; var x=l2x(ch.timeScale(),t2l(ch,pt.t)), y=ch._main.priceToCoordinate(pt.p); return (x==null||y==null)?null:{x:x,y:y}; }
+function toPt(x,y){ var ch=GX.ch; if(!ch) return null; var l=x2l(ch.timeScale(),x), p=ch._main.coordinateToPrice(y); return (l==null||p==null)?null:{t:l2t(ch,l),p:p}; }
+function priceY(p){ return GX.ch._main.priceToCoordinate(p); }
+function plotW(){ return gxEl("gxOv").clientWidth-(GX.ch?GX.ch.priceScale("right").width():60); }
+function plotH(){ return gxEl("gxOv").clientHeight-(GX.ch?GX.ch.timeScale().height():28); }
+function setTool(t){
+  D.tool=t; D.tmp=null;
+  document.querySelectorAll(".gx-dt[data-tool]").forEach(function(b){ b.setAttribute("aria-pressed",String(b.getAttribute("data-tool")===t)); });
+  gxEl("gxOv").classList.toggle("drawing",t!=="cursor");
+  var h=gxEl("gxHint"); h.hidden=t==="cursor"; h.textContent=HINT[t]||"";
+}
+function dDelSel(){ if(D.sel>=0){ D.list.splice(D.sel,1); D.sel=-1; dSave(); pnOpen(false); } }
+function fmtDur(s){ s=Math.abs(s); var d=Math.floor(s/86400), h=Math.floor(s%86400/3600), m=Math.round(s%3600/60); return (d?d+" d ":"")+(h?h+" h ":"")+(d?"":m+" min"); }
+function pill(g,x,y,txt,bg,fg){ g.font="600 12px Manrope, system-ui, sans-serif"; var w=g.measureText(txt).width+14;
+  x=Math.max(w/2+4,Math.min(plotW()-w/2-4,x));   // que no se salga de la gráfica
+  g.fillStyle=bg; g.beginPath(); g.roundRect(x-w/2,y-11,w,22,6); g.fill(); g.fillStyle=fg; g.textAlign="center"; g.textBaseline="middle"; g.fillText(txt,x,y+.5); }
+// cada fotograma mientras la pantalla completa está abierta: sigue al zoom, al arrastre y a la escala
+function dFrame(){
+  D.raf=requestAnimationFrame(dFrame);
+  var c=gxEl("gxOv"); if(!GX.ch||!c) return;
+  if(D.tool!=="cursor"||D.drag) gxEl("gxTip").hidden=true;
+  var dpr=window.devicePixelRatio||1, W=c.clientWidth, H=c.clientHeight;
+  if(c.width!==Math.round(W*dpr)||c.height!==Math.round(H*dpr)){ c.width=Math.round(W*dpr); c.height=Math.round(H*dpr); }
+  var g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
+  var pw=plotW(), ph=plotH();
+  g.save(); g.beginPath(); g.rect(0,0,pw,ph); g.clip();
+  var all=D.list.slice(); if(D.tmp) all.push(D.tmp);
+  all.forEach(function(d,i){ try{ drawOne(g,d,i===D.sel&&d!==D.tmp,pw,ph); }catch(e){} g.setLineDash([]); g.globalAlpha=1; g.shadowBlur=0; });
+  g.restore();
+  placeBar(pw,ph);
+  // etiquetas en la escala de precios (líneas horizontales)
+  all.forEach(function(d){ if(d.k!=="hline") return; var a=toXY(d.pts[0]); if(!a||a.y<0||a.y>ph) return;
+    var txt=lwcNum(d.pts[0].p); g.font="600 11px Manrope, system-ui, sans-serif"; var w=Math.min(W-pw-2,g.measureText(txt).width+12);
+    g.fillStyle=d.c||"#7c5cf0"; g.fillRect(pw+1,a.y-10,w,20); g.fillStyle=ink(d.c||"#7c5cf0"); g.textAlign="left"; g.textBaseline="middle"; g.fillText(txt,pw+6,a.y+.5); });
+}
+function dBox(d,pw){
+  if(d.k==="text") return d._box||null;
+  var P=d.pts.map(toXY); if(P.some(function(p){ return !p; })) return null;
+  var xs=P.map(function(p){ return p.x; }), ys=P.map(function(p){ return p.y; });
+  if(d.k==="hline"){ xs=[pw*.35,pw*.65]; }
+  if(d.k==="fib"){ (d.lv||[]).forEach(function(l){ if(!l.on) return; var y=priceY(d.pts[1].p+(d.pts[0].p-d.pts[1].p)*l.v); if(y!=null) ys.push(y); }); if(d.ext) xs.push(pw); }
+  return {x0:Math.min.apply(null,xs),x1:Math.max.apply(null,xs),y0:Math.min.apply(null,ys),y1:Math.max.apply(null,ys)};
+}
+function placeBar(pw,ph){
+  if(!TX.el.hidden) placeTxt();
+  var bar=gxEl("gxBar"), pn=gxEl("gxPn"), d=D.list[D.sel], bx=d&&!D.drag&&D.tool==="cursor"?dBox(d,pw):null;
+  if(!bx){ bar.hidden=true; if(!pn.hidden&&!d) pnOpen(false); return; }
+  bar.hidden=false; gxEl("gxSet").hidden=d.k==="ruler"; gxEl("gxEdit").hidden=d.k!=="text";
+  var cx=Math.max(70,Math.min(pw-70,(bx.x0+bx.x1)/2)), top=Math.max(48,Math.min(ph-10,bx.y0-12));
+  bar.style.left=cx+"px"; bar.style.top=top+"px";
+  // el panel, al lado del dibujo (a la derecha si cabe, si no a la izquierda) para ver el efecto de cada cambio
+  if(!pn.hidden){ var W2=pn.offsetWidth+12, lx=bx.x1+12<=pw-W2?bx.x1+12:bx.x0-W2>=0?bx.x0-W2:Math.max(8,Math.min(pw-W2,cx-W2/2));
+    pn.style.left=lx+"px"; pn.style.top=Math.max(8,Math.min(bx.y0,ph-pn.offsetHeight-8))+"px"; }
+}
+function drawOne(g,d,sel,pw,ph){
+  var S0=STY0[d.k]||{}, col=d.c||S0.c||"#c4b5fd", P=d.pts.map(toXY); if(P.some(function(p){ return !p; })) return;
+  var fillA=sel?"2e":"1f";   // relleno: el mismo color, transparente
+  g.lineWidth=(d.w||S0.w||1.6)+(sel?.6:0); g.strokeStyle=col;
+  g.setLineDash(d.dash&&/^(trend|hline|rect|tri)$/.test(d.k)?[8,6]:[]);
+  var a=P[0], b=P[1]||P[0];
+  if(d.k==="trend"){ g.beginPath(); g.moveTo(a.x,a.y); g.lineTo(b.x,b.y); g.stroke(); }
+  if(d.k==="hline"){ g.beginPath(); g.moveTo(0,a.y); g.lineTo(pw,a.y); g.stroke(); }
+  if(d.k==="rect"){ g.fillStyle=col+fillA; g.fillRect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(b.x-a.x),Math.abs(b.y-a.y)); g.strokeRect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(b.x-a.x),Math.abs(b.y-a.y)); }
+  if(d.k==="text"){
+    if(d===TX.d) return;   // mientras se edita, se ve el cuadro de escribir
+    var lines=String(d.txt||"").split("\n"), fs=d.fs||14, lh=Math.round(fs*1.3), pad=6, w=0;
+    g.font="600 "+fs+"px Manrope, system-ui, sans-serif";
+    lines.forEach(function(l){ w=Math.max(w,g.measureText(l).width); });
+    var bw=w+pad*2, bh=lines.length*lh+pad*2-2;
+    d._box={x0:a.x,y0:a.y,x1:a.x+bw,y1:a.y+bh};
+    g.fillStyle="rgba(20,15,51,.82)"; g.beginPath(); g.roundRect(a.x,a.y,bw,bh,6); g.fill();
+    if(sel){ g.strokeStyle="#8ec5cf"; g.lineWidth=1.5; g.stroke(); }
+    g.fillStyle=col; g.textAlign="left"; g.textBaseline="top";
+    lines.forEach(function(l,i){ g.fillText(l,a.x+pad,a.y+pad+i*lh); });
+    return;
+  }
+  if(d.k==="brush"){
+    g.lineJoin="round"; g.lineCap="round";
+    if(sel){ g.shadowColor="#8ec5cf"; g.shadowBlur=10; }   // elegido: con un halo, que no tiene puntos de agarre
+    g.beginPath(); g.moveTo(P[0].x,P[0].y);
+    for(var bi=1;bi<P.length-1;bi++) g.quadraticCurveTo(P[bi].x,P[bi].y,(P[bi].x+P[bi+1].x)/2,(P[bi].y+P[bi+1].y)/2);
+    if(P.length>1) g.lineTo(P[P.length-1].x,P[P.length-1].y);
+    g.stroke(); g.lineJoin="miter"; g.lineCap="butt"; g.shadowBlur=0;
+    return;
+  }
+  if(d.k==="gann"){
+    g.setLineDash([]);
+    var gl=(d.lv||fibDef("gann").lv).filter(function(l){ return l.on&&isFinite(l.v); }).sort(function(u,v){ return u.v-v.v; });
+    var gp0=d.pts[0].p, gp1=d.pts[1].p, gx=function(f){ return a.x+(b.x-a.x)*f; }, gy=function(f){ var y=priceY(gp0+(gp1-gp0)*f); return y==null?a.y+(b.y-a.y)*f:y; };
+    var gx0=Math.min(a.x,b.x), gx1=Math.max(a.x,b.x), gy0=Math.min(a.y,b.y), gy1=Math.max(a.y,b.y);
+    for(var gi=1;gi<gl.length;gi++){ var ya=gy(gl[gi-1].v), yb=gy(gl[gi].v); g.fillStyle=gl[gi].c+"14"; g.fillRect(gx0,Math.min(ya,yb),gx1-gx0,Math.abs(yb-ya)); }
+    gl.forEach(function(L){
+      var y=gy(L.v), x=gx(L.v), piv=L.v===.5;   // el 0,5 (punto de pivote), más marcado en horizontal y en vertical
+      g.strokeStyle=L.c; g.lineWidth=piv?(sel?2.8:2.4):(sel?1.4:1); g.globalAlpha=piv?1:.85;
+      g.beginPath(); g.moveTo(gx0,y); g.lineTo(gx1,y); g.moveTo(x,gy0); g.lineTo(x,gy1); g.stroke(); g.globalAlpha=1;
+      g.font=(piv?"700 11px":"600 10px")+" Manrope, system-ui, sans-serif";
+      g.fillStyle=L.c; g.textAlign="right"; g.textBaseline="middle"; g.fillText(fmtLv(L.v),gx0-4,y);
+      g.textAlign="center"; g.textBaseline="top"; g.fillText(fmtLv(L.v),x,gy1+4);
+    });
+    if(d.ext){ g.strokeStyle=col; g.lineWidth=1; g.globalAlpha=.6; g.beginPath();
+      gl.forEach(function(L){ if(L.v<=0) return; g.moveTo(a.x,a.y); g.lineTo(b.x,gy(L.v)); g.moveTo(a.x,a.y); g.lineTo(gx(L.v),b.y); });
+      g.stroke(); g.globalAlpha=1; }
+    g.strokeStyle=col; g.lineWidth=sel?2:1.4; g.strokeRect(gx0,gy0,gx1-gx0,gy1-gy0);
+  }
+  if(d.k==="tri"){
+    g.beginPath(); g.moveTo(P[0].x,P[0].y); P.slice(1).forEach(function(p){ g.lineTo(p.x,p.y); });
+    if(P.length>2){ g.closePath(); g.fillStyle=col+fillA; g.fill(); }
+    g.stroke(); g.setLineDash([]);
+  }
+  if(d.k==="fib"){
+    var x0=Math.min(a.x,b.x), x1=d.ext?pw:Math.max(a.x,b.x), p0=d.pts[0].p, p1=d.pts[1].p;
+    // 0 en el segundo punto (donde acaba el movimiento) y 1 en el primero, como en TradingView
+    var prev=null, lv=(d.lv||fibDef().lv).filter(function(l){ return l.on&&isFinite(l.v); }).sort(function(u,v){ return u.v-v.v; });
+    lv.forEach(function(L){ var f=L.v, pr=p1+(p0-p1)*f, y=priceY(pr); if(y==null) return;
+      if(prev!==null){ g.fillStyle=L.c+"18"; g.fillRect(x0,Math.min(prev,y),x1-x0,Math.abs(y-prev)); }
+      g.strokeStyle=L.c; g.lineWidth=sel?1.6:1.2; g.beginPath(); g.moveTo(x0,y); g.lineTo(x1,y); g.stroke();
+      // etiqueta a la izquierda de la línea; si no cabe (dibujo pegado al borde), encima de ella por dentro
+      var lab=fmtLv(f)+" ("+(pr>0?lwcNum(pr):"—")+")", out=x0>150;
+      g.fillStyle=L.c; g.font="600 11px Manrope, system-ui, sans-serif"; g.textAlign=out?"right":"left"; g.textBaseline=out?"middle":"bottom";
+      g.fillText(lab,out?x0-6:x0+4,out?y:y-3); prev=y; });
+    g.strokeStyle=col; g.setLineDash([4,4]); g.lineWidth=1; g.beginPath(); g.moveTo(a.x,a.y); g.lineTo(b.x,b.y); g.stroke(); g.setLineDash([]);
+  }
+  if(d.k==="ruler"){
+    var upr=d.pts[1].p>=d.pts[0].p, cl=upr?"74,222,128":"255,107,107";
+    g.fillStyle="rgba("+cl+",.16)"; g.fillRect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(b.x-a.x),Math.abs(b.y-a.y));
+    g.strokeStyle="rgba("+cl+",.9)"; g.lineWidth=1.4;
+    g.beginPath(); g.moveTo(a.x,(a.y+b.y)/2); g.lineTo(b.x,(a.y+b.y)/2); g.moveTo((a.x+b.x)/2,a.y); g.lineTo((a.x+b.x)/2,b.y); g.stroke();
+    var ch=GX.ch, pc=(d.pts[1].p/d.pts[0].p-1)*100, dt=d.pts[1].t-d.pts[0].t, bars=Math.round(Math.abs(t2l(ch,d.pts[1].t)-t2l(ch,d.pts[0].t)));
+    var ly=upr?Math.min(a.y,b.y)-16:Math.max(a.y,b.y)+16;
+    pill(g,(a.x+b.x)/2,Math.max(14,Math.min(ph-14,ly)),gxPct(pc)+" · "+fmtDur(dt)+" · "+bars+" "+(bars===1?"candle":"candles"),upr?"#1f6b45":"#8a2c2c","#fff");
+  }
+  if(sel||d.tmp) P.forEach(function(p){ g.fillStyle="#0b0820"; g.strokeStyle="#8ec5cf"; g.lineWidth=2; g.setLineDash([]); g.beginPath(); g.arc(d.k==="hline"?Math.min(p.x,pw-20):p.x,p.y,5,0,7); g.fill(); g.stroke(); });
+}
+// ¿qué dibujo hay bajo el dedo o el ratón? (para elegirlo, moverlo o borrarlo)
+function segDist(p,a,b){ var dx=b.x-a.x, dy=b.y-a.y, L=dx*dx+dy*dy, u=L?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/L)):0; return Math.hypot(p.x-a.x-u*dx,p.y-a.y-u*dy); }
+function inTri(p,a,b,c){ function sg(p1,p2,p3){ return (p1.x-p3.x)*(p2.y-p3.y)-(p2.x-p3.x)*(p1.y-p3.y); }
+  var d1=sg(p,a,b), d2=sg(p,b,c), d3=sg(p,c,a); return !((d1<0||d2<0||d3<0)&&(d1>0||d2>0||d3>0)); }
+function hit(x,y){
+  var m={x:x,y:y}, R=8;
+  for(var i=D.list.length-1;i>=0;i--){ var d=D.list[i], P=d.pts.map(toXY); if(P.some(function(p){ return !p; })) continue;
+    if(d.k==="text"){ var tb=d._box; if(tb&&x>=tb.x0-4&&x<=tb.x1+4&&y>=tb.y0-4&&y<=tb.y1+4) return {i:i,pt:-1}; continue; }
+    if(d.k==="brush"){ for(var bj=1;bj<P.length;bj++) if(segDist(m,P[bj-1],P[bj])<=R) return {i:i,pt:-1}; continue; }
+    for(var j=0;j<P.length;j++) if(Math.hypot(P[j].x-x,P[j].y-y)<=R+2&&d.k!=="hline") return {i:i,pt:j};
+    var a=P[0], b=P[1]||P[0], inBox=x>=Math.min(a.x,b.x)-R&&x<=Math.max(a.x,b.x)+R&&y>=Math.min(a.y,b.y)-R&&y<=Math.max(a.y,b.y)+R;
+    if(d.k==="trend"&&segDist(m,a,b)<=R) return {i:i,pt:-1};
+    if(d.k==="hline"&&Math.abs(y-a.y)<=R) return {i:i,pt:-1};
+    if((d.k==="rect"||d.k==="ruler"||d.k==="gann")&&inBox) return {i:i,pt:-1};
+    if(d.k==="tri"&&P.length===3&&(inTri(m,P[0],P[1],P[2])||segDist(m,P[0],P[1])<=R||segDist(m,P[1],P[2])<=R||segDist(m,P[2],P[0])<=R)) return {i:i,pt:-1};
+    if(d.k==="fib"){ var ys=(d.lv||fibDef().lv).filter(function(l){ return l.on; }).map(function(l){ return priceY(d.pts[1].p+(d.pts[0].p-d.pts[1].p)*l.v); }).filter(function(v){ return v!=null; });
+      var fx1=d.ext?plotW():Math.max(a.x,b.x);
+      if(ys.length&&x>=Math.min(a.x,b.x)-R&&x<=fx1+R&&y>=Math.min.apply(null,ys)-R&&y<=Math.max.apply(null,ys)+R) return {i:i,pt:-1}; }
+  }
+  return null;
+}
+function local(e){ var r=gxEl("gxOv").getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; }
+// dibujar: el último punto sigue al ratón o al dedo hasta que se fija (arrastrando o pulsando)
+function dFinish(){
+  var t=D.tmp, d={k:t.k,pts:t.pts.slice(0,NEED[t.k])};
+  if(d.k==="fib"||d.k==="gann"){ var df=fibDef(d.k); d.lv=JSON.parse(JSON.stringify(df.lv)); d.ext=!!df.ext; }
+  styApply(d); D.list.push(d); D.sel=D.list.length-1; dSave(); setTool("cursor");
+}
+(function(){
+  var ov=gxEl("gxOv"), plot=gxEl("gxPlot");
+  ov.addEventListener("pointerdown",function(e){
+    if(D.tool==="cursor"||e.button!==0) return;   // el clic derecho no dibuja: cancela (ver contextmenu)
+    var q=local(e), pt=toPt(q.x,q.y); if(!pt) return;
+    ov.setPointerCapture(e.pointerId);
+    if(D.tool==="brush"){ D.tmp={k:"brush",pts:[pt],tmp:true,last:q}; return; }
+    var t=D.tmp;
+    if(t){ t.pts[t.pts.length-1]=pt; t.placed++; t.skipUp=true; if(t.placed>=NEED[t.k]) dFinish(); else t.pts.push(pt); return; }
+    D.tmp={k:D.tool,pts:NEED[D.tool]===1?[pt]:[pt,pt],placed:1,tmp:true,down:q};
+  });
+  ov.addEventListener("pointermove",function(e){ var t=D.tmp; if(!t||NEED[t.k]===1) return;
+    if(t.k==="brush"){ var bq=local(e); if(Math.hypot(bq.x-t.last.x,bq.y-t.last.y)<3) return; var bp=toPt(bq.x,bq.y); if(bp){ t.pts.push(bp); t.last=bq; } return; }
+    var q=local(e), pt=toPt(q.x,q.y); if(pt) t.pts[t.pts.length-1]=pt; });
+  ov.addEventListener("pointerup",function(e){
+    var t=D.tmp; if(!t) return;
+    if(t.k==="brush"){ if(t.pts.length>1){ D.list.push(styApply({k:"brush",pts:t.pts})); D.sel=-1; dSave(); } D.tmp=null; return; }   // el pincel sigue puesto
+    if(t.skipUp){ t.skipUp=false; return; }
+    if(t.k==="text"){ var tp=t.pts[0]; D.tmp=null; setTool("cursor"); txtOpen(null,tp); return; }
+    if(NEED[t.k]===1){ dFinish(); return; }
+    var q=local(e), pt=toPt(q.x,q.y), moved=Math.hypot(q.x-t.down.x,q.y-t.down.y);
+    if(moved<4) return;   // un toque: se siguen poniendo puntos pulsando
+    if(pt) t.pts[t.pts.length-1]=pt;
+    t.placed=2;
+    if(t.placed>=NEED[t.k]) dFinish(); else t.pts.push(t.pts[t.pts.length-1]);
+  });
+  // con el cursor: elegir un dibujo, moverlo entero o mover uno de sus puntos (sin mover la gráfica)
+  plot.addEventListener("pointerdown",function(e){
+    if(D.tool!=="cursor"||e.target===ov&&ov.classList.contains("drawing")) return;
+    if(e.target.closest&&e.target.closest("#gxPn,#gxBar,#gxTxt")) return;
+    var q=local(e), h=hit(q.x,q.y);
+    if(!h){ D.sel=-1; return; }
+    D.sel=h.i; e.stopPropagation(); e.preventDefault();
+    var start=toPt(q.x,q.y), orig=JSON.parse(JSON.stringify(D.list[h.i].pts));
+    D.drag={pt:h.pt,start:start,orig:orig};
+    function mv(ev){ var r=local(ev), p=toPt(r.x,r.y); if(!p||!D.drag) return; var d=D.list[D.sel]; if(!d) return;
+      if(D.drag.pt>=0) d.pts[D.drag.pt]=p;
+      else d.pts=D.drag.orig.map(function(o){ return {t:o.t+(p.t-D.drag.start.t),p:o.p*(p.p/D.drag.start.p)}; }); }   // el precio se mueve en proporción: vale también en escala log
+    function up(){ window.removeEventListener("pointermove",mv,true); window.removeEventListener("pointerup",up,true); D.drag=null; dSave(); }
+    window.addEventListener("pointermove",mv,true); window.addEventListener("pointerup",up,true);
+  },true);
+  plot.addEventListener("pointermove",function(e){ if(D.tool!=="cursor"||D.drag) return; var q=local(e); plot.style.cursor=hit(q.x,q.y)?"move":""; },true);
+  plot.addEventListener("contextmenu",function(e){ if(D.tool!=="cursor"){ e.preventDefault(); setTool("cursor"); } });
+  plot.addEventListener("dblclick",function(e){
+    if(D.tool!=="cursor") return; var q=local(e), h=hit(q.x,q.y); if(!h) return;
+    var d=D.list[h.i]; if(d.k==="text"){ e.preventDefault(); txtOpen(d,null); }
+  },true);
+})();
+
+/* ---- texto: escribir y editar ---- */
+var TX={el:gxEl("gxTxt"),d:null,pt:null};
+function placeTxt(){ var a=toXY(TX.d?TX.d.pts[0]:TX.pt); if(!a) return; TX.el.style.left=a.x+"px"; TX.el.style.top=a.y+"px"; }
+function txtFit(){ TX.el.style.height="auto"; TX.el.style.height=TX.el.scrollHeight+"px"; }
+function txtOpen(d,pt){
+  TX.d=d; TX.pt=pt; TX.el.value=d?d.txt:""; TX.el.hidden=false;
+  var ts=d||styDef("text"); TX.el.style.fontSize=(ts.fs||14)+"px"; TX.el.style.lineHeight=Math.round((ts.fs||14)*1.3)+"px"; TX.el.style.color=ts.c||"#f1eeff";
+  placeTxt(); txtFit();
+  setTimeout(function(){ TX.el.focus(); TX.el.select(); },0);
+}
+function txtClose(save){
+  if(TX.el.hidden) return;
+  var v=TX.el.value.replace(/\s+$/,"");
+  if(save&&v){
+    if(TX.d) TX.d.txt=v; else { D.list.push(styApply({k:"text",pts:[TX.pt],txt:v})); D.sel=D.list.length-1; }
+    dSave();
+  } else if(save&&TX.d){ var i=D.list.indexOf(TX.d); if(i>=0){ D.list.splice(i,1); D.sel=-1; dSave(); } }   // texto vaciado: se borra
+  TX.el.hidden=true; TX.d=null; TX.pt=null;
+}
+TX.el.addEventListener("input",txtFit);
+TX.el.addEventListener("keydown",function(e){
+  if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); txtClose(true); }
+  else if(e.key==="Escape"){ e.preventDefault(); txtClose(false); }
+  e.stopPropagation();   // las teclas del texto no mueven ni cierran nada más
+});
+TX.el.addEventListener("blur",function(){ txtClose(true); });
+
+/* ---- panel de ajustes de un dibujo: color, grosor, estilo, tamaño y niveles ---- */
+var PN={el:gxEl("gxPn"),d:null,seen:-2};
+function pnRender(){
+  var d=D.list[D.sel]; if(d&&d.k==="ruler") d=null; PN.d=d; if(!d){ pnOpen(false); return; }
+  var gn=d.k==="gann", lvls=d.k==="fib"||gn, S0=STY0[d.k]||{}, c=d.c||S0.c;
+  if(lvls&&!d.lv){ var d0=fibDef(d.k); d.lv=JSON.parse(JSON.stringify(d0.lv)); d.ext=!!d0.ext; }
+  function seg(attr,cur,opts){ return "<div class='gx-sg'>"+opts.map(function(o){ return "<button type='button' "+attr+"='"+o[0]+"' aria-pressed='"+(String(cur)===String(o[0]))+"'"+(o[2]?" aria-label='"+o[2]+"'":"")+">"+o[1]+"</button>"; }).join("")+"</div>"; }
+  function line(w,dash){ return "<svg viewBox='0 0 34 10'><path d='M2 5h30' stroke='currentColor' stroke-width='"+w+"' stroke-linecap='round'"+(dash?" stroke-dasharray='6 4'":"")+"/></svg>"; }
+  var html="<h4>"+esc(KNAME[d.k])+"</h4><p class='who'>"+(gn?"The same levels in price and in time. ":"")+"Your next drawings of this kind will look the same."+"</p>"+
+    "<p class='lab'>"+"Colour"+"</p><div class='gx-sw'>"+PAL.map(function(p){ return "<button type='button' data-col='"+p+"' style='background:"+p+"' aria-pressed='"+(p===c)+"' aria-label='"+p+"'></button>"; }).join("")+"</div>";
+  if(/^(trend|hline|rect|tri|brush)$/.test(d.k)) html+="<p class='lab'>"+"Thickness"+"</p>"+seg("data-w",d.w||S0.w,[[1,line(1),"1"],[2,line(2),"2"],[3,line(3),"3"],[4,line(4),"4"]]);
+  if(/^(trend|hline|rect|tri)$/.test(d.k)) html+="<p class='lab'>"+"Style"+"</p>"+seg("data-dash",d.dash?1:0,[[0,line(2),"Solid"],[1,line(2,1),"Dashed"]]);
+  if(d.k==="text") html+="<p class='lab'>"+"Size"+"</p>"+seg("data-fs",d.fs||14,[[12,"Small"],[14,"Medium"],[18,"Large"]]);
+  if(lvls){
+    html+="<p class='lab'>"+"Levels"+"</p>"+d.lv.map(function(l,i){ return "<div class='gx-lv"+(l.on?"":" off")+"'><input type='checkbox' data-fon='"+i+"'"+(l.on?" checked":"")+" aria-label='"+fmtLv(l.v)+"'>"+
+      "<input type='text' inputmode='decimal' data-fv='"+i+"' value='"+fmtLv(l.v)+"' aria-label='"+"Level value"+"'><button type='button' class='dot' data-fcol='"+i+"' style='background:"+l.c+"' title='"+"Change this level's colour"+"' aria-label='"+"Change this level's colour"+"'></button>"+
+      "<button type='button' class='x' data-fdel='"+i+"' title='"+"Remove this level"+"' aria-label='"+"Remove this level"+"'>✕</button></div>"; }).join("")+
+      "<label class='gx-ck'><input type='checkbox' id='gxExt'"+(d.ext?" checked":"")+">"+(gn?"Show the angles":"Extend the lines to the right")+"</label>"+
+      "<div class='gx-bb'><button type='button' id='gxAdd'>"+"+ Add level"+"</button><button type='button' id='gxReset'>"+"Reset"+"</button></div>";
+  }
+  PN.el.innerHTML=html+"<div class='gx-bb'><button type='button' class='ok' id='gxOk'>"+"Done"+"</button></div>";
+}
+function pnCommit(d){ if(d.lv) fibSaveDef(d,d.k); stySave(d); dSave(); }
+function pnOpen(on){ PN.el.hidden=!on; gxEl("gxSet").setAttribute("aria-expanded",String(on)); if(on){ PN.seen=D.sel; pnRender(); } }
+PN.el.addEventListener("change",function(e){
+  var d=PN.d, el=e.target; if(!d) return;
+  if(el.hasAttribute("data-fon")) d.lv[+el.getAttribute("data-fon")].on=el.checked?1:0;
+  if(el.hasAttribute("data-fv")){ var v=parseFloat(String(el.value).replace(",",".")); if(isFinite(v)) d.lv[+el.getAttribute("data-fv")].v=v; }
+  if(el.id==="gxExt") d.ext=el.checked;
+  pnCommit(d); pnRender();
+});
+PN.el.addEventListener("click",function(e){
+  var d=PN.d, b=e.target.closest("button"); if(!b||!d) return;
+  if(b.hasAttribute("data-col")) d.c=b.getAttribute("data-col");
+  else if(b.hasAttribute("data-w")) d.w=+b.getAttribute("data-w");
+  else if(b.hasAttribute("data-dash")) d.dash=+b.getAttribute("data-dash");
+  else if(b.hasAttribute("data-fs")) d.fs=+b.getAttribute("data-fs");
+  else if(b.hasAttribute("data-fcol")){ var L=d.lv[+b.getAttribute("data-fcol")]; L.c=PAL[(PAL.indexOf(L.c)+1)%PAL.length]; }   // cada toque, el siguiente color
+  else if(b.hasAttribute("data-fdel")) d.lv.splice(+b.getAttribute("data-fdel"),1);
+  else if(b.id==="gxAdd") d.lv.push({v:d.k==="gann"?.875:1.272,on:1,c:FIBC[d.lv.length%FIBC.length]});
+  else if(b.id==="gxReset"){ var f=fibFactory(d.k); d.lv=f.lv; d.ext=f.ext; }
+  else if(b.id==="gxOk"){ pnOpen(false); return; }
+  else return;
+  pnCommit(d); pnRender();
+});
+// si se elige otro dibujo con el panel abierto, el panel pasa a ese
+setInterval(function(){ if(!PN.el.hidden&&D.sel!==PN.seen){ PN.seen=D.sel; pnRender(); } },250);
+
+/* ---- botones y teclado ---- */
+gxEl("gxClose").onclick=gxClose;
+gxEl("gx").addEventListener("click",function(e){ if(e.target===gxEl("gx")) gxClose(); });
+gxEl("gxSegs").addEventListener("click",function(e){ var b=e.target.closest("[data-gxk]"); if(!b) return; GX.k=b.getAttribute("data-gxk"); gxSegs(); gxPaint(); });
+gxEl("gxZin").onclick=function(){ gxZoom(.65); };
+gxEl("gxZout").onclick=function(){ gxZoom(1.55); };
+gxEl("gxFit").onclick=function(){ if(GX.ch) GX.ch.timeScale().fitContent(); };
+gxEl("gxCandle").onclick=function(){ GX.line=false; gxPaint(true); };
+gxEl("gxLine").onclick=function(){ GX.line=true; gxPaint(true); };
+gxEl("gxLog").onclick=function(){ GX.log=!GX.log; gxPaint(true); };
+gxEl("gxVol").onclick=function(){ GX.vol=!GX.vol; gxPaint(true); };
+gxEl("gxRotX").onclick=function(){ gxEl("gxRot").remove(); gxEl("gxD").classList.add("norot"); };
+// pulsar otra vez la herramienta activa la quita (vuelve el cursor)
+gxEl("gxTools").addEventListener("click",function(e){ var b=e.target.closest("[data-tool]"); if(!b) return;
+  var t=b.getAttribute("data-tool"); setTool(t===D.tool&&t!=="cursor"?"cursor":t); });
+gxEl("gxAll").onclick=function(){ if(!D.list.length) return; D.list=[]; D.sel=-1; dSave(); pnOpen(false); };
+gxEl("gxSet").onclick=function(){ pnOpen(PN.el.hidden); };
+gxEl("gxEdit").onclick=function(){ var d=D.list[D.sel]; if(d&&d.k==="text") txtOpen(d,null); };
+gxEl("gxDel").onclick=dDelSel;
+document.addEventListener("click",function(e){ if(e.target.closest&&e.target.closest("[data-gx]")){ e.preventDefault(); gxOpen(); } });
+document.addEventListener("keydown",function(e){
+  if(gxEl("gx").hidden) return;
+  if(e.target&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+  if((e.key==="Delete"||e.key==="Backspace")&&D.sel>=0){ e.preventDefault(); dDelSel(); return; }
+  if(e.key==="Escape"){ e.preventDefault(); e.stopPropagation(); if(D.tool!=="cursor") setTool("cursor"); else gxClose(); return; }
+  if(e.key==="Tab"){ var f=[].slice.call(gxEl("gx").querySelectorAll("button,a,input")).filter(function(x){ return x.offsetParent; }); var a=f[0], z=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===a){ e.preventDefault(); z.focus(); } else if(!e.shiftKey&&document.activeElement===z){ e.preventDefault(); a.focus(); } }
+},true);
+
+/* ---------- marcas en la gráfica: cuándo vendieron el creador, los compradores del lanzamiento y las ballenas (15/11,
+   maqueta maquetas/grafica/marcas-grafica.html). Sale de las últimas 300 operaciones de GeckoTerminal (cada una con su
+   wallet), del creador del análisis, de quién compró en el primer segundo (revisión del lanzamiento) y del registro.
+   «El X % de lo suyo» solo cuando su compra está dentro de esas mismas operaciones: si no, no se pone ---------- */
+var MKCOL={cr:"#ff4d6d",la:"#fb923c",wb:"#38bdf8",tu:"#c4b5fd"};
+var MK={on:{cr:true,la:true,wb:true,tu:true},data:{}};
+try{ var mk0=JSON.parse(localStorage.getItem("sf.mk")||"null"); if(mk0) Object.keys(MK.on).forEach(function(k){ if(typeof mk0[k]==="boolean") MK.on[k]=mk0[k]; }); }catch(e){}
+function mkSave(){ try{ localStorage.setItem("sf.mk",JSON.stringify(MK.on)); }catch(e){} }
+async function mkWait(get,ms){ for(var t=0;t<ms;t+=400){ var v=get(); if(v!=="loading"&&v!==undefined) return v; await new Promise(function(res){ setTimeout(res,400); }); } return get(); }
+async function mkLoad(r){
+  var m=r.mint; if(!r.par||!r.par.pairAddress||MK.data[m]!==undefined) return;
+  MK.data[m]="loading";
+  try{
+    var j=await jfetch(GT+"pools/"+r.par.pairAddress+"/trades");
+    // quién es quién: se espera un poco al registro y a la revisión del lanzamiento, que van a la vez
+    var wh=await mkWait(function(){ return who[m]; },12000), bd=await mkWait(function(){ return bundles[m]; },15000);
+    var cr={}, la={}, top={};
+    if(r.cr) cr[r.cr]=1;
+    if(wh&&wh.behind&&wh.behind.creator&&wh.behind.creator.wallet) cr[wh.behind.creator.wallet]=1;
+    if(bd&&bd.ws) bd.ws.forEach(function(x){ if(!cr[x.w]) la[x.w]=1; });
+    if(wh&&wh.firstBuyers) wh.firstBuyers.forEach(function(x){ if(x.wallet&&!cr[x.wallet]) la[x.wallet]=1; });
+    if(state.hold&&state.hold.mint===m&&state.hold.rows) state.hold.rows.filter(function(x){ return x.kind==="wallet"; }).slice(0,10).forEach(function(x){ top[x.owner]=1; });
+    var liq=Number(r.par.liquidity&&r.par.liquidity.usd)||0, big=Math.max(500,liq*.02);
+    var tr=((j&&j.data)||[]).map(function(d){ var a=d.attributes||{}, sell=a.from_token_address===m, buy=a.to_token_address===m;
+      if(a.is_anomalous||!(sell||buy)) return null;
+      return {ts:Date.parse(a.block_timestamp),sell:sell,w:a.tx_from_address,usd:Number(a.volume_in_usd)||0,amt:Number(sell?a.from_token_amount:a.to_token_amount)||0,tx:a.tx_hash}; })
+      .filter(function(x){ return x&&x.ts&&x.w; }).sort(function(a,b){ return a.ts-b.ts; });
+    var bought={}, sold={}, ev=[];
+    tr.forEach(function(x){
+      if(!x.sell){ bought[x.w]=(bought[x.w]||0)+x.amt; }
+      var k=cr[x.w]?"cr":la[x.w]?"la":(x.usd>=big||top[x.w])?"wb":null;
+      if(x.sell) sold[x.w]=(sold[x.w]||0)+x.amt;
+      if(!k||(k!=="wb"&&!x.sell)) return;   // del creador y del lanzamiento interesan las ventas; de las ballenas, las dos
+      var e={ts:x.ts,k:k,sell:x.sell,w:x.w,usd:x.usd,tx:x.tx};
+      if(x.sell&&bought[x.w]>0) e.pct=Math.min(100,Math.round(x.amt/bought[x.w]*100));
+      ev.push(e);
+    });
+    // Si esas 300 operaciones no llegan al nacimiento del token, la historia completa del creador y de los que más
+    // compraron en el lanzamiento (Helius, en nuestra API; hasta 5 wallets). Sustituye a lo de GeckoTerminal de esas wallets
+    var born=(bd&&bd.born)||r.par.pairCreatedAt||0, hel=null;   // el nacimiento del token, no el del pool (graduados)
+    if(born&&tr.length&&tr[0].ts>born+120000&&Date.now()-born<30*86400000){
+      var lw=Object.keys(la).sort(function(a,b){ var pa=bd&&bd.ws?(bd.ws.filter(function(x){ return x.w===a; })[0]||{}).pct||0:0, pb=bd&&bd.ws?(bd.ws.filter(function(x){ return x.w===b; })[0]||{}).pct||0:0; return pb-pa; });
+      var ws=Object.keys(cr).concat(lw).slice(0,5);
+      // v=2: que no valga lo guardado en la caché por versiones anteriores de esta petición
+      try{ var q=await fetch(API+"ventas/"+m+"?w="+ws.join(",")+"&desde="+Math.floor(born/1000)+"&v=2"); if(q.ok) hel=await q.json(); }catch(e){}
+    }
+    var hw=hel&&hel.wallets?Object.keys(hel.wallets).filter(function(w){ return hel.wallets[w]; }):[];
+    if(hw.length){
+      var pn=Number(r.par.priceNative), solUsd=pn>0?Number(r.par.priceUsd)/pn:0;
+      ev=ev.filter(function(e){ return hw.indexOf(e.w)<0; });
+      hw.forEach(function(w){ var k=cr[w]?"cr":"la", got=0, gone=0;
+        hel.wallets[w].ev.forEach(function(x){
+          if(x.d>0){ got+=x.d; return; }
+          gone+=-x.d;
+          // vende si recibe SOL a cambio; si no, «se deshace» (venderlo o pasarlo a otra wallet)
+          var e={ts:x.t*1000,k:k,sell:true,w:w,tx:x.sig,mv:!(x.sol>0)};
+          if(x.sol>0&&solUsd) e.usd=x.sol*solUsd;
+          if(got>0) e.pct=Math.min(100,Math.round(-x.d/got*100));
+          ev.push(e);
+        });
+        bought[w]=got; sold[w]=gone; });
+      ev.sort(function(a,b){ return a.ts-b.ts; });
+    }
+    var laSold={}; ev.forEach(function(e){ if(e.k==="la") laSold[e.w]=1; });
+    var crW=Object.keys(cr).filter(function(w){ return bought[w]>0; })[0];
+    MK.data[m]={ev:ev,from:tr.length?tr[0].ts:0,n:tr.length,laTotal:Object.keys(la).length,laSold:Object.keys(laSold).length,
+      crPct:crW?Math.min(100,Math.round((sold[crW]||0)/bought[crW]*100)):null,crSells:ev.filter(function(e){ return e.k==="cr"; }).length,big:big,
+      hel:hw.length,helCr:hw.some(function(w){ return cr[w]; })};
+  }catch(e){ if(e&&e.message==="cancelado"){ delete MK.data[m]; return; } MK.data[m]="err"; }
+  if(state.token===r) mkPaint();
+}
+// las marcas de una gráfica: «Tú» (historial) y, si están, las del creador, el lanzamiento y las ballenas, una por vela y tipo.
+// Guarda en la serie qué pasó en cada vela, para el detalle al pasar el ratón
+function mkSet(series,times,r,step,tz){
+  if(!series||!times||!times.length) return;
+  var by={}, last=times[times.length-1], d=MK.data[r.mint];
+  function idx(t){ if(t<times[0]||t>last+Math.max(3*step,600)) return -1; var k=times.length-1; while(k>0&&times[k]>t) k--; return k; }
+  var add=function(i,e){ (by[times[i]]=by[times[i]]||[]).push(e); };
+  if(MK.on.tu) (r.hist||[]).forEach(function(h){ var i=idx(Math.floor(h.ts/1000)-tz); if(i>=0&&!(by[times[i]]||[]).some(function(x){ return x.k==="tu"; })) add(i,{k:"tu",ts:h.ts}); });
+  if(d&&d.ev) d.ev.forEach(function(e){ if(!MK.on[e.k]) return; var i=idx(Math.floor(e.ts/1000)-tz); if(i>=0) add(i,e); });
+  var mk=[];
+  Object.keys(by).forEach(function(t){
+    var g={}; by[t].forEach(function(e){ var key=e.k+(e.sell?"s":"b"); (g[key]=g[key]||[]).push(e); });
+    Object.keys(g).forEach(function(key){ var e=g[key][0], n=g[key].length, up=e.k==="wb"&&!e.sell;
+      // texto solo en lo importante (creador y tú); el resto, flechas de color
+      mk.push({time:+t,position:up?"belowBar":"aboveBar",color:MKCOL[e.k],shape:up?"arrowUp":"arrowDown",size:e.k==="cr"?1.4:1,
+        text:e.k==="cr"?"Creator":e.k==="tu"?"You":n>1?"×"+n:""}); });
+  });
+  mk.sort(function(a,b){ return a.time-b.time; });
+  series.setMarkers(mk); series._mkBy=by;
+}
+function mkWho(k,sell,mv){
+  if(mv) return k==="cr"?"The creator dumps their tokens":"Launch buyer dumps their tokens";
+  return k==="cr"?"The creator sells":k==="la"?"Launch buyer sells":k==="wb"?(sell?"Whale sells":"Whale buys"):"You scanned it here"; }
+function mkPct(e){ return (e.k==="wb"?"{n}% of their bag":"{n}% of their bag").replace("{n}",e.pct); }
+function mkLine(e,pre){ return mkWho(e.k,e.sell,e.mv)+(e.usd?" · "+usd(e.usd):"")+(e.pct!=null?" · "+mkPct(e):"")+(pre?" · "+"on the curve, before graduating":""); }
+// el detalle de una vela con marcas, al pasar el ratón o tocar
+function mkTip(tip,series,pr,box){
+  var evs=pr&&pr.time!=null&&series&&series._mkBy?series._mkBy[pr.time]:null;
+  if(!tip) return;
+  if(!evs||!evs.length||!pr.point){ tip.hidden=true; return; }
+  tip.innerHTML=evs.map(function(e){ return "<div class='mke'><i style='background:"+MKCOL[e.k]+"'></i><span><b>"+esc(mkWho(e.k,e.sell,e.mv))+"</b>"+
+    (e.usd?" · "+esc(usd(e.usd)):"")+(e.pct!=null?" · "+esc(mkPct(e)):"")+"</span>"+(e.w?"<small>"+esc(short(e.w))+" · "+esc(ftime(e.ts))+"</small>":"")+"</div>"; }).join("");
+  tip.hidden=false;
+  var w=box.clientWidth, x=pr.point.x+16; if(x+270>w) x=pr.point.x-276;
+  tip.style.left=Math.max(4,x)+"px"; tip.style.top=Math.max(4,pr.point.y-20)+"px";
+}
+// interruptores (en la pequeña y en la grande), con cuántas hay de cada tipo
+function mkChipsHtml(m){
+  var d=MK.data[m], ev=d&&d.ev||[], n=function(k){ return ev.filter(function(e){ return e.k===k; }).length; };
+  if(!d||d==="loading") return "<span class='mkw'>"+"Looking for creator and whale sells…"+"</span>";
+  if(d==="err") return "";
+  return [["cr","Creator",n("cr")],["la","Launch buyers",n("la")],["wb","Whales",n("wb")],["tu","You",null]].map(function(x){
+    return "<button type='button' class='mkc' data-mk='"+x[0]+"' aria-pressed='"+MK.on[x[0]]+"'><i style='background:"+MKCOL[x[0]]+"'></i>"+esc(x[1])+(x[2]!=null?" <b>"+x[2]+"</b>":"")+"</button>"; }).join("")+
+    "<button type='button' class='mkq' data-mkq>"+"What does each mark mean?"+"</button>";
+}
+function mkHelpHtml(){
+  return "<ul class='mkh' hidden><li><i style='background:"+MKCOL.cr+"'></i><span><b>"+"Creator"+"</b>: "+"the wallet that created the token sells or dumps its tokens, that is, sells them or moves them to another wallet (big red arrow)."+"</span></li>"+
+    "<li><i style='background:"+MKCOL.la+"'></i><span><b>"+"Launch buyers"+"</b>: "+"those who bought in the first block sell. “×3” = three in the same candle."+"</span></li>"+
+    "<li><i style='background:"+MKCOL.wb+"'></i><span><b>"+"Whales"+"</b>: "+"buys (below) or sells (above) worth more than 2% of the liquidity (and at least $500), or by the 10 biggest holders if you opened “Whales”."+"</span></li>"+
+    "<li><i style='background:"+MKCOL.tu+"'></i><span><b>"+"You"+"</b>: "+"when you scanned it."+"</span></li></ul>";
+}
+// lo que pasó: tres cifras y la lista en orden; pulsar una fila lleva la gráfica a esa vela
+function mkStory(r){
+  var box=$("#mkstory"); if(!box) return;
+  var d=MK.data[r.mint];
+  if(!d||d==="loading"||d==="err"||!d.ev.length){ box.innerHTML=d&&d.ev&&!d.ev.length?"<p class='mks'>"+"In the latest trades we see no sells by the creator or the launch buyers, and no whale trades."+" "+esc(mkSrc(d))+"</p>":""; return; }
+  var cifras=[];
+  if(d.crPct!=null&&d.crSells) cifras.push("<div><b>"+d.crPct+" %</b><span>"+"of their bag the creator has sold"+(d.crSells>1?", "+"in {n} sells".replace("{n}",d.crSells):"")+"</span></div>");
+  else if(d.crSells) cifras.push("<div><b>"+d.crSells+"</b><span>"+(d.crSells===1?"sell by the creator":"sells by the creator")+"</span></div>");
+  if(d.laTotal) cifras.push("<div><b>"+"{a} of {b}".replace("{a}",d.laSold).replace("{b}",d.laTotal)+"</b><span>"+"launch buyers have sold"+"</span></div>");
+  var wb=d.ev.filter(function(e){ return e.k==="wb"; }), wbS=wb.filter(function(e){ return e.sell; }).length;
+  if(wb.length) cifras.push("<div><b>"+(wb.length-wbS)+" / "+wbS+"</b><span>"+"whale buys / sells"+"</span></div>");
+  var list=d.ev.slice().reverse().slice(0,40);
+  box.innerHTML="<h3 class='mkt'>"+"What happened"+"</h3><p class='mks'>"+"The buys and sells that matter, newest first. These are on-chain facts, not accusations."+"</p>"+
+    (cifras.length?"<div class='mksum'>"+cifras.join("")+"</div>":"")+
+    "<ul class='mktl'>"+list.map(function(e){ var pre=r.par&&r.par.pairCreatedAt&&!/^pump-?fun$/i.test(r.par.dexId||"")&&e.ts<r.par.pairCreatedAt-60000;   // antes de que existiera este pool
+      return "<li data-mkts='"+e.ts+"'><time>"+esc(ftime(e.ts))+"</time><i style='background:"+MKCOL[e.k]+"'></i><span>"+esc(mkLine(e,pre))+" <small>"+esc(short(e.w))+"</small></span>"+
+      "<a href='https://solscan.io/tx/"+esc(e.tx)+"' target='_blank' rel='noopener'>Solscan ↗</a></li>"; }).join("")+"</ul>"+
+    (d.ev.length>40?"<p class='mks'>"+"Showing the 40 most recent."+"</p>":"")+
+    "<p class='mks'>"+esc(mkSrc(d))+"</p>";
+}
+function mkSrc(d){ return "GeckoTerminal trades (the last {n}{desde}) and the SolFlag registry.".replace("{n}",d&&d.n||300).replace("{desde}",d&&d.from?", since {f}".replace("{f}",fdate(d.from)+" "+ftime(d.from)):"")+
+  (d&&d.hel?" "+(d.helCr&&d.hel===1?"For the creator, their whole history with this token (Helius).":d.helCr?"For the creator and {n} launch buyers, their whole history with this token (Helius).":"For {n} launch buyers, their whole history with this token (Helius).").replace("{n}",d.hel-(d.helCr?1:0)):""); }
+// repintar marcas, interruptores y «Lo que pasó» (al llegar los datos o al pulsar un interruptor)
+function mkPaint(){
+  var r=state.token; if(!r) return;
+  document.querySelectorAll(".mkrow").forEach(function(el){
+    if(el.classList.contains("mkrow-b")){ el.innerHTML=mkChipsHtml(r.mint).replace(/<button type='button' class='mkq'[\s\S]*$/,""); return; }
+    var help=el.querySelector(".mkh"), open=help&&!help.hidden; el.innerHTML=mkChipsHtml(r.mint)+mkHelpHtml(); if(open) el.querySelector(".mkh").hidden=false; });
+  if(state.lwcS) mkSet(state.lwcS.series,state.lwcS.times,r,state.lwcS.step,state.lwcS.tz);
+  if(GX.ch&&GX.r===r) mkSet(GX.ch._main,GX.ch._T,r,GX.ch._step,new Date().getTimezoneOffset()*60);
+  mkStory(r);
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest&&e.target.closest("[data-mk]");
+  if(b){ var k=b.getAttribute("data-mk"); MK.on[k]=!MK.on[k]; mkSave(); mkPaint(); return; }
+  if(e.target.closest&&e.target.closest("[data-mkq]")){ var row=e.target.closest(".mkrow"), h=row&&row.querySelector(".mkh"); if(h) h.hidden=!h.hidden; return; }
+  var li=e.target.closest&&e.target.closest("[data-mkts]");
+  if(li&&!e.target.closest("a")&&state.lwc&&state.lwcS){   // a esa vela, en la pequeña
+    var t=Math.floor(+li.getAttribute("data-mkts")/1000)-state.lwcS.tz, T=state.lwcS.times, k=T.length-1; while(k>0&&T[k]>t) k--;
+    if(t<T[0]){ GX.focus=+li.getAttribute("data-mkts"); gxOpen(); return; }   // antes de lo que enseña la pequeña: en grande, con toda la historia
+    state.lwc.timeScale().setVisibleLogicalRange({from:k-30,to:k+30});
+    var pc=$("#t-chart"); if(pc) pc.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+});
 /* ---------- eventos ---------- */
 document.addEventListener("click",function(ev){
   var ctf=ev.target.closest&&ev.target.closest("[data-ctf]");
+  var crt=ev.target.closest&&ev.target.closest("[data-cretry]");
+  if(crt&&state.token&&state.token.par){
+    var ck=chartKey(state.token);
+    if(charts[ck]==="err"){ delete charts[ck]; chartErr[ck]=0; }
+    var pb0=$("#pcbody"); if(pb0) pb0.innerHTML="<p class='hint'>Loading chart…</p>";
+    paintChart(); return;
+  }
   if(ctf){
-    state.ctf=ctf.getAttribute("data-ctf");
+    state.ctf=ctf.getAttribute("data-ctf"); state.ctfAuto=false; if(state.token) state.ctfUser=state.token.mint;
     Array.prototype.forEach.call(document.querySelectorAll("[data-ctf]"),function(b){ b.setAttribute("aria-pressed",String(b===ctf)); });
     var pb=$("#pcbody"); if(pb) pb.innerHTML="<p class='hint'>Loading chart…</p>";
     paintChart(); return;
