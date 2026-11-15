@@ -1305,8 +1305,8 @@ body.scanp #form .eyebrow{margin-bottom:8px}
 .tnav button.on{background:var(--surface-2);color:var(--fg)}
 .tnav button.tnmap{color:var(--kick)}
 .tnav .tnv{display:inline-block}
-#t-chart{order:3}
-#results.tview #list{order:4}
+#t-chart{order:4}
+#results.tview #list{order:3}
 #t-quote{order:5}
 #t-who{order:5}
 #t-hold{order:6}
@@ -1737,6 +1737,7 @@ body.landing #adv{margin-top:10px}
 #results.tview:not(.wview) #summary .tdesk>details.tavisos{order:-1}
 #results.tview:not(.wview) #summary .tdesk>details.tavisos>summary.btn{background:var(--kick)!important;border-color:var(--kick)!important;color:#07111a!important}
 #results.tview .tdc,#results.tview #list{scroll-margin-top:150px}
+a.stamp{text-decoration:none;cursor:pointer}a.stamp:hover{filter:brightness(1.15)}a.stamp:focus-visible{outline:2px solid var(--kick);outline-offset:4px}
 #results.tview:not(.wview) .stamp .st-new .st-k{font:700 1.7rem/1 Unbounded,'Arial Black',sans-serif;letter-spacing:-.02em;text-transform:none;opacity:1}
 #results.tview:not(.wview) .stamp .st-new b.st-two{font:700 1.15rem/1.05 'Barlow Condensed',sans-serif!important;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 0;max-width:122px;text-align:center}
 #t-hold.hcompact #hsummary{padding:0;background:none;border:0;box-shadow:none}
@@ -3578,13 +3579,13 @@ function stampHtml(r){
   var bad=strongAlerts(r), warn=(r.lights||[]).filter(function(l){ return l.s==="warn"; }).length;
   var sub=dataOnly(r)?"missing data":bad?bad+(bad===1?" strong alert":" strong alerts"):warn?warn+(warn===1?" warning":" warnings"):r.lights?"no alerts":"";
   var top=/^(ALTO|MEDIO|BAJO)$/.test(r.lvl)?"risk":TIERS5.indexOf(r.lvl)>=0?"tier":"";
-  return "<div class='stamp"+(lbl.length>6?" long":"")+"' style='--sc:"+col+"' role='img' aria-label='SolFlag verdict: "+esc(LEVELS[r.lvl].label+(sub?", "+sub:""))+"'>"+
+  return "<a class='stamp"+(lbl.length>6?" long":"")+"' style='--sc:"+col+"' href='"+LHOW+"#nivel' target='_blank' rel='noopener' title='How the level is decided' aria-label='SolFlag verdict: "+esc(LEVELS[r.lvl].label+(sub?", "+sub:""))+"'>"+
     "<svg class='st-ring' viewBox='0 0 140 140' aria-hidden='true'><circle cx='70' cy='70' r='66' stroke-width='4.5' stroke-dasharray='58 5 31 3 74 11 22 4 49 2 63 8 36 6 30 100' transform='rotate(-38 70 70)'/>"+
       "<circle cx='70' cy='70' r='58.5' stroke-width='1.6' stroke-dasharray='41 7 88 4 26 13 67 3 52 9 60 10' transform='rotate(25 70 70)'/></svg>"+
     (TIERS5.indexOf(r.lvl)>=0?
       // cinco niveles (15/11): el color del aro ya dice el nivel; dentro, «SolFlag» y lo que encontró
-      "<span class='st-in st-new'><span class='st-k'>SolFlag</span><b class='st-two'>"+esc(r.lvl==="DIAMANTE"?"big project":sub||"no alerts")+"</b></span></div>":
-      "<span class='st-in'><span class='st-k'>SolFlag</span>"+(top?"<span class='st-t'>"+esc(top)+"</span>":"")+"<b>"+esc(lbl)+"</b>"+(sub?"<span class='st-s'>"+esc(sub)+"</span>":"")+"</span></div>");
+      "<span class='st-in st-new'><span class='st-k'>SolFlag</span><b class='st-two'>"+esc(r.lvl==="DIAMANTE"?"big project":sub||"no alerts")+"</b></span></a>":
+      "<span class='st-in'><span class='st-k'>SolFlag</span>"+(top?"<span class='st-t'>"+esc(top)+"</span>":"")+"<b>"+esc(lbl)+"</b>"+(sub?"<span class='st-s'>"+esc(sub)+"</span>":"")+"</span></a>");
 }
 // Insignia bajo el veredicto (cinco niveles, 14/11): un gran proyecto de la lista, o un recién nacido que no puede
 // pasar del amarillo hasta los 7 días (y desde cuándo podrá salir verde)

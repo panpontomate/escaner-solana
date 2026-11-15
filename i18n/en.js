@@ -1295,7 +1295,7 @@ export const TEXT = {
   ": cara conocida en SolFlag. ": ": known face on SolFlag. ",
   " murieron en 24 h": " died within 24 h",
   "<button class='btn small wshare' type='button' data-wshare><span class='ic'>↗</span><span class='lb'>Compartir</span></button>": "<button class='btn small wshare' type='button' data-wshare><span class='ic'>↗</span><span class='lb'>Share</span></button>",
-  "' role='img' aria-label='Veredicto de SolFlag: ": "' role='img' aria-label='SolFlag verdict: ",
+  "#nivel' target='_blank' rel='noopener' title='Cómo se decide el nivel' aria-label='Veredicto de SolFlag: ": "#nivel' target='_blank' rel='noopener' title='How the level is decided' aria-label='SolFlag verdict: ",
   "' title='Copiar dirección del token'>": "' title='Copy token address'>",
   "Riesgo medio por falta de datos": "Medium risk due to missing data",
   "Máx. ": "High ",
