@@ -11,6 +11,7 @@
 //   GET  /api/logo/<mint>         el logo del token (getAsset de Helius), una semana en la caché
 //   GET  /api/acciones            acciones tokenizadas frente a la acción real: prima, bolsa abierta, liquidez (acciones.js)
 //   GET  /api/cotiza/<mint>        dónde se negocia: pools de la cadena y exchanges con comisión, identidad y MiCA (cotiza.js)
+//   GET  /api/top/<mint>           mayores cuentas del token (Helius, 2 min en caché, 30/min por conexión)
 //   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
 //   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
 //                                  veces (tabla pedidos), nada de quién. El recolector lo analiza después él mismo
@@ -155,6 +156,16 @@ export async function logo(env, m, fetchFn) {
   const f = (c.files || []).find((x) => x && x.uri && /^image\//.test(x.mime || "image/"));
   return logoUrl((c.links && c.links.image) || (f && f.uri) || null);
 }
+// Mayores cuentas de un token (getTokenLargestAccounts) con Helius, para el análisis de la web (15/11): el RPC público
+// que las da (Solana Vibe Station) va en cola a 1 por segundo y era el paso más lento del veredicto (~1,6 s en móvil).
+// Devuelve el «result» de la llamada tal cual, o undefined si Helius no contestó (la web vuelve entonces al público)
+export async function top(env, m, fetchFn) {
+  if (!env.SOLANA_RPC) return undefined;
+  const j = await fetchFn(env.SOLANA_RPC, { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getTokenLargestAccounts", params: [m] }) })
+    .then((r) => r.ok ? r.json() : null).catch(() => null);
+  return j && j.result && Array.isArray(j.result.value) ? j.result : undefined;
+}
 // ipfs.io y dweb.link contestan 429 a menudo: lo de IPFS va por la pasarela de Pump.fun. Todo pasa por el CDN de
 // Helius a 192 px (un logo de 320 KB queda en ~13 KB y en su caché)
 export const LOGO_CDN = "https://cdn.helius-rpc.com/cdn-cgi/image/width=192/";
@@ -231,6 +242,19 @@ export async function handle(req, env) {
     const res = json({ v: V, mint: p[3], img: img });
     // un logo no cambia: una semana en la caché; si aún no tiene, se vuelve a mirar en una hora
     res.headers.set("cache-control", "public, max-age=" + (img ? 604800 : 3600));
+    return res;
+  }
+  if (p.length === 4 && p[1] === "api" && p[2] === "top") {
+    if (!ADDR.test(p[3])) return fail(400, "not a Solana address");
+    if (!env.SOLANA_RPC) return fail(503, "rpc unavailable");
+    if (env.TOP_LIMIT) {
+      const { success } = await env.TOP_LIMIT.limit({ key: req.headers.get("cf-connecting-ip") || "?" });
+      if (!success) return fail(429, "too many requests");
+    }
+    const r = await top(env, p[3], fetch);
+    if (!r) return fail(503, "rpc unavailable");
+    const res = json({ v: V, mint: p[3], result: r });
+    res.headers.set("cache-control", "public, max-age=120");   // las mayores cuentas cambian poco en 2 min; cada token nuevo, 1 crédito
     return res;
   }
   if (p.length === 3 && p[1] === "api" && p[2] === "acciones") {

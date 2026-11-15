@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio } from "./worker.js";
+import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top } from "./worker.js";
 import { SCHEMA } from "../caras/plano.mjs";
 
 const A = "PAY1111111111111111111111111111111", B = "FUND111111111111111111111111111111", C = "BUY1111111111111111111111111111111";
@@ -208,4 +208,13 @@ test("ventas: token change of each wallet per transaction, SOL change and whethe
   assert.equal(v.wallets[W].ev.length, 2); assert.equal(v.wallets[W].full, true); assert.equal(v.wallets[A], null);
   assert.equal(v.desde, 1690000000);   // el nacimiento del token, si es anterior a lo que dice la web
   assert.equal((await handle(new Request("https://api.solflag.com/api/ventas/" + M1 + "?w=" + W), env)).status, 400);   // falta desde
+});
+
+test("top: mayores cuentas con Helius; sin respuesta o sin lista, undefined (la web vuelve al RPC público)", async () => {
+  const env = { SOLANA_RPC: "https://helius.example" };
+  const ok = async () => ({ ok: true, json: async () => ({ result: { context: { slot: 1 }, value: [{ address: "A", uiAmount: 5 }] } }) });
+  assert.deepEqual(await top(env, "Mint1", ok), { context: { slot: 1 }, value: [{ address: "A", uiAmount: 5 }] });
+  assert.equal(await top(env, "Mint1", async () => ({ ok: true, json: async () => ({ error: { message: "x" } }) })), undefined);
+  assert.equal(await top(env, "Mint1", async () => { throw new Error("red"); }), undefined);
+  assert.equal(await top({}, "Mint1", ok), undefined);
 });

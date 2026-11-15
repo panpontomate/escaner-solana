@@ -29,3 +29,9 @@ simple = { limit = 20, period = 60 }
 name = "VENTAS_LIMIT"
 namespace_id = "1002"
 simple = { limit = 10, period = 60 }
+
+# límite de /api/top (mayores cuentas para el análisis, gasta créditos de Helius): 30 por minuto por conexión
+[[ratelimits]]
+name = "TOP_LIMIT"
+namespace_id = "1003"
+simple = { limit = 30, period = 60 }

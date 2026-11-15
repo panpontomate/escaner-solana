@@ -2404,7 +2404,8 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
   e.innerHTML="The scanner engine could not load from cdn.jsdelivr.net. Check your internet connection and reload the page."; e.hidden=false; },10000);
 </script>
 <script type="module">
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.6.0/src/index.js";
+// el motor en un solo archivo (jsDelivr lo empaqueta): antes eran 22 archivos en dos tandas, ~0,9 s en un móvil
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.6.0/+esm";
 window.__escOk=true;
 // Lista de emisores revisada (emisores.json): una rotación de claves aprobada no necesita otra versión del motor
 fetch("/emisores.json",{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j&&SRE.setIssuers) SRE.setIssuers(j.emisores); }).catch(function(){});
@@ -3145,11 +3146,40 @@ var SRE_KIND={program:"programa",active:"activa"};
 // Un cliente por análisis: guarda la cola de Vibe Station y los métodos que PublicNode rechaza.
 // «Cancelar» aborta su señal; un análisis nuevo pone state.cancel=false y estrena otra
 var eng={c:null,rpc:null,ac:null};
+// Mayores cuentas de un token (15/11): el RPC público que las da va en cola a 1 por segundo y era lo más lento del
+// veredicto. Se piden a nuestra API (Helius, 2 min en caché) y, si no contesta, al público como antes
+function topFetch(url,init){
+  var q; try{ q=JSON.parse(init.body); }catch(e){ return fetch(url,init); }
+  var m=q&&q.params&&q.params[0];
+  if(typeof m!=="string") return fetch(url,init);
+  // Carrera: nuestra API sale primero; si en 0,9 s no ha contestado (tokens enormes como BONK tardan en Helius, o falla)
+  // también se pregunta al público, y gana el primero que traiga la lista. Nunca va más lento que antes
+  var sig=init.signal, aA=new AbortController(), aP=new AbortController();
+  if(sig) sig.addEventListener("abort",function(){ aA.abort(); aP.abort(); });
+  var api=fetch(API+"top/"+m,{signal:aA.signal}).then(function(r){ return r.ok?r.json():null; }).then(function(j){
+    return j&&j.result?new Response(JSON.stringify({jsonrpc:"2.0",id:q.id,result:j.result}),{status:200,headers:{"content-type":"application/json"}}):null;
+  }).catch(function(){ return null; });
+  var pub=new Promise(function(r){ setTimeout(r,900); }).then(function(){
+    if(aP.signal.aborted) return null;
+    return fetch(url,{method:init.method,headers:init.headers,body:init.body,signal:aP.signal}).then(function(r){ return r.ok?r:null; }).catch(function(){ return null; });
+  });
+  return new Promise(function(res,rej){
+    var left=2, done=false;
+    function fin(v,who){
+      if(done) return;
+      if(sig&&sig.aborted){ done=true; return rej(new DOMException("Aborted","AbortError")); }
+      if(v){ done=true; (who==="api"?aP:aA).abort(); return res(v); }
+      if(--left===0){ done=true; fetch(url,init).then(res,rej); }
+    }
+    api.then(function(v){ fin(v,"api"); }); pub.then(function(v){ fin(v,"pub"); });
+  });
+}
 // Cola para GeckoTerminal (15/11): corta por ráfagas (429), y al entrar se pedían a la vez las listas y las
 // operaciones de los 10 tokens en tendencia. Ahora sale una petición cada GT_GAP ms; lo que se ve (listas, gráfica)
 // pasa delante de las operaciones de los análisis, y tras un 429 se espera unos segundos en vez de insistir
 var GT_GAP=1300, gtq={last:0,pause:0,q:[],timer:null};
 function gtFetch(url,init){
+  if(url===VIBE_RPC&&init&&typeof init.body==="string"&&init.body.indexOf('"getTokenLargestAccounts"')>=0) return topFetch(url,init);
   if(typeof url!=="string"||url.indexOf("api.geckoterminal.com")<0) return fetch(url,init);
   var sig=init&&init.signal, hi=!/\/trades(\?|$)/.test(url);
   return new Promise(function(res,rej){
