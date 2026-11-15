@@ -2845,9 +2845,33 @@ var SRE_KIND={program:"programa",active:"activa"};
 // Un cliente por análisis: guarda la cola de Vibe Station y los métodos que PublicNode rechaza.
 // «Cancelar» aborta su señal; un análisis nuevo pone state.cancel=false y estrena otra
 var eng={c:null,rpc:null,ac:null};
+// Cola para GeckoTerminal (15/11): corta por ráfagas (429), y al entrar se pedían a la vez las listas y las
+// operaciones de los 10 tokens en tendencia. Ahora sale una petición cada GT_GAP ms; lo que se ve (listas, gráfica)
+// pasa delante de las operaciones de los análisis, y tras un 429 se espera unos segundos en vez de insistir
+var GT_GAP=1300, gtq={last:0,pause:0,q:[],timer:null};
+function gtFetch(url,init){
+  if(typeof url!=="string"||url.indexOf("api.geckoterminal.com")<0) return fetch(url,init);
+  var sig=init&&init.signal, hi=!/\/trades(\?|$)/.test(url);
+  return new Promise(function(res,rej){
+    function abortErr(){ return new DOMException("Aborted","AbortError"); }
+    if(sig&&sig.aborted) return rej(abortErr());
+    var it={hi:hi,go:function(){
+      fetch(url,init).then(function(r){ if(r.status===429) gtq.pause=Date.now()+8000; res(r); },
+        function(e){ if(!(sig&&sig.aborted)) gtq.pause=Date.now()+8000; rej(e); });   // un 429 sin CORS llega como fallo de red
+    }};
+    if(sig) sig.addEventListener("abort",function(){ var i=gtq.q.indexOf(it); if(i>=0){ gtq.q.splice(i,1); rej(abortErr()); } });
+    if(hi){ var k=0; while(k<gtq.q.length&&gtq.q[k].hi) k++; gtq.q.splice(k,0,it); } else gtq.q.push(it);
+    gtPump();
+  });
+}
+function gtPump(){
+  if(gtq.timer||!gtq.q.length) return;
+  var wait=Math.max(0,gtq.last+GT_GAP-Date.now(),gtq.pause-Date.now());
+  gtq.timer=setTimeout(function(){ gtq.timer=null; var it=gtq.q.shift(); if(it){ gtq.last=Date.now(); it.go(); } gtPump(); },wait);
+}
 function client(){
   if(!eng.ac||(eng.ac.signal.aborted&&!state.cancel)){ eng.ac=new AbortController(); eng.c=null; }
-  if(!eng.c||eng.rpc!==state.rpc){ eng.c=SRE.createClient({rpcUrl:state.rpc,signal:eng.ac.signal}); eng.rpc=state.rpc; }
+  if(!eng.c||eng.rpc!==state.rpc){ eng.c=SRE.createClient({rpcUrl:state.rpc,signal:eng.ac.signal,fetch:gtFetch}); eng.rpc=state.rpc; }
   return eng.c;
 }
 function cancelEngine(){ if(eng.ac) eng.ac.abort(); }
@@ -3888,11 +3912,11 @@ async function loadTrend(){
       x.st="done";
       if(run===trend.run){ paintTrend(); paintCinta(); }
     });
-  }catch(e){ if(run===trend.run){ trend.err=true; paintTrend(); } }
+  }catch(e){ if(run===trend.run){ trend.err=true; trend.ts=Date.now()-280000; paintTrend(); } }   // otro intento en ~20 s
 }
 function paintTrend(){
   var box=$("#strows"); if(!box) return;
-  if(trend.err){ box.innerHTML="<p class='hint'>No se pudo cargar la tendencia ahora mismo. Se vuelve a intentar en unos minutos.</p>"; return; }
+  if(trend.err){ box.innerHTML="<p class='hint'>GeckoTerminal está saturado: lo volvemos a intentar en unos segundos.</p>"; return; }
   if(!trend.rows){ box.innerHTML="<p class='hint'>Cargando la tendencia…</p>"; return; }
   if(!trend.rows.length){ box.innerHTML="<p class='hint'>GeckoTerminal no tiene tokens en tendencia ahora mismo.</p>"; return; }
   box.innerHTML=trend.rows.map(function(x,i){
@@ -3926,13 +3950,13 @@ async function loadFresh(){
     if(run!==fresh.run) return;
     rows.forEach(function(x){ fresh.seen[x.mint]=1; });
     fresh.rows=rows; fresh.err=false;
-  }catch(e){ if(run===fresh.run&&!fresh.rows) fresh.err=true; }
+  }catch(e){ if(run===fresh.run&&!fresh.rows){ fresh.err=true; fresh.ts=Date.now()-20000; } }   // otro intento en ~10 s
   paintFresh();
 }
 function paintFresh(keepAnim){
   var box=$("#snrows"); if(!box) return;
-  if(fresh.err){ box.innerHTML="<p class='hint'>No se pudieron cargar los últimos lanzamientos ahora mismo.</p>"; return; }
-  if(!fresh.rows) return;
+  if(fresh.err){ box.innerHTML="<p class='hint'>GeckoTerminal está saturado: lo volvemos a intentar en unos segundos.</p>"; return; }
+  if(!fresh.rows){ box.innerHTML="<p class='hint'>Buscando los últimos lanzamientos…</p>"; return; }
   box.innerHTML=fresh.rows.map(function(x){
     return "<div class='tr nr"+(x.isNew&&!keepAnim?" in":"")+"' role='button' tabindex='0' data-analyze='"+esc(x.mint)+"'>"+tokAv(x.img,x.sym)+
       "<span style='min-width:0'><b>$"+esc(x.sym)+"</b><small>"+esc([DEXN[x.dex]||x.dex,x.liq?"Liquidez "+usd(x.liq):""].filter(Boolean).join(" · "))+"</small>"+fichaA(x.mint)+"</span>"+
@@ -3961,7 +3985,7 @@ function paintHot(){
   var src=$("#hotsrc");
   if(hot.tab==="t"){
     src.innerHTML="Fuente: tendencia de GeckoTerminal (por actividad real, sin puestos de pago). Que un token esté en tendencia solo dice que se mueve mucho: no es una recomendación de compra. <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a>.";
-    if(trend.err){ box.innerHTML="<p class='hint'>No se pudo cargar la tendencia ahora mismo. Se vuelve a intentar en unos minutos.</p>"; return; }
+    if(trend.err){ box.innerHTML="<p class='hint'>GeckoTerminal está saturado: lo volvemos a intentar en unos segundos.</p>"; return; }
     if(!trend.rows){ box.innerHTML="<p class='hint'>Cargando la tendencia…</p>"; return; }
     if(!tr.length){ box.innerHTML="<p class='hint'>GeckoTerminal no tiene tokens en tendencia ahora mismo.</p>"; return; }
     box.innerHTML="<div class='hr hh' aria-hidden='true'><span>#</span><span>TOKEN</span><span class='c3'>PRECIO 1 H</span><span class='c4'>VOLUMEN 24 H</span><span class='c5'>SEÑAL</span><span>RIESGO</span></div>"+
@@ -3974,7 +3998,7 @@ function paintHot(){
       }).join("");
   } else {
     src.innerHTML="Los 5 últimos de Solana (Pump.fun y otros). De lo que nace, <b>el 99 %</b> está muerto en 24 h (registro de SolFlag). <a href='#' data-trynew>Ver todos en Tokens nuevos →</a> · <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a>";
-    if(fresh.err){ box.innerHTML="<p class='hint'>No se pudieron cargar los últimos lanzamientos ahora mismo.</p>"; return; }
+    if(fresh.err){ box.innerHTML="<p class='hint'>GeckoTerminal está saturado: lo volvemos a intentar en unos segundos.</p>"; return; }
     if(!fresh.rows){ box.innerHTML="<p class='hint'>Buscando los últimos lanzamientos…</p>"; return; }
     box.innerHTML="<div class='hr hh' aria-hidden='true'><span>#</span><span>TOKEN</span><span class='c3'>EDAD</span><span class='c4'>LIQUIDEZ</span><span class='c5'>DEX</span><span>RIESGO</span></div>"+
       fr.map(function(x,i){
@@ -4184,6 +4208,19 @@ function chartNA(why,retry){
 // GeckoTerminal corta por ráfagas (429 sin CORS: el navegador lo ve como fallo de red). Un fallo no se guarda para
 // siempre: se reintenta solo a los 15, 30 y 45 s y queda el botón «Reintentar» (15/11)
 var chartErr={};
+// lo que se guarda de un token: las velas de 1 min (para 1, 5 y 15 min) o las de 1 h / 1 d
+function chartKey(r){ return r.par.pairAddress+"|"+(CHART_TF[state.ctf][0]==="minute"?"min":state.ctf); }
+// junta velas de 1 min [ms, cierre, apertura, máx, mín, volumen] en velas de n minutos
+function candlesJoin(c,n){
+  if(n<=1) return c;
+  var out=[], w=n*60000, cur=null;
+  c.forEach(function(p){
+    var t=Math.floor(p[0]/w)*w;
+    if(!cur||cur[0]!==t){ cur=[t,p[1],p[2],p[3],p[4],p[5]]; out.push(cur); }
+    else{ cur[1]=p[1]; cur[3]=Math.max(cur[3],p[3]); cur[4]=Math.min(cur[4],p[4]); cur[5]+=p[5]; }
+  });
+  return out;
+}
 function ctfButtons(){ Array.prototype.forEach.call(document.querySelectorAll("[data-ctf]"),function(b){ b.setAttribute("aria-pressed",String(b.getAttribute("data-ctf")===state.ctf)); }); }
 function chartHtml(r){
   if(!r.par||!r.par.pairAddress) return "";
@@ -4196,20 +4233,21 @@ async function paintChart(){
   if(!r||!r.par||!r.par.pairAddress||!box) return;
   // el paso a 1 min de un token joven no se arrastra al siguiente token
   if(state.cmint!==r.mint){ state.cmint=r.mint; if(state.ctfAuto){ state.ctf="m5"; state.ctfAuto=false; ctfButtons(); } }
-  var key=r.par.pairAddress+"|"+state.ctf, c=charts[key];
+  var tf=CHART_TF[state.ctf], key=chartKey(r), c=charts[key];
   if(c===undefined){
     charts[key]="loading";
-    var tf=CHART_TF[state.ctf];
     try{
       // token=: el precio de ESTE token. Sin él GeckoTerminal da el de su token base del pool, que puede ser el otro
       // (USDC/SOL en DexScreener es SOL/USDC en GeckoTerminal: la gráfica de USDC salía a ~95 $)
-      var j=await jfetch(GT+"pools/"+r.par.pairAddress+"/ohlcv/"+tf[0]+"?aggregate="+tf[1]+"&limit="+tf[2]+"&currency=usd&token="+encodeURIComponent(r.mint));
+      // 1, 5 y 15 min salen de UNA sola petición de 1.000 velas de 1 min (unas 16 h); 1 h y 1 d van aparte (15/11)
+      var j=await jfetch(GT+"pools/"+r.par.pairAddress+"/ohlcv/"+tf[0]+"?aggregate="+(tf[0]==="minute"?1:tf[1])+"&limit="+(tf[0]==="minute"?1000:tf[2])+"&currency=usd&token="+encodeURIComponent(r.mint));
       var l=(j&&j.data&&j.data.attributes&&j.data.attributes.ohlcv_list)||[];
       charts[key]=l.map(function(v){ return [v[0]*1000,Number(v[4]),Number(v[1]),Number(v[2]),Number(v[3]),Number(v[5])||0]; }).filter(function(p){ return p[1]>0&&p[2]>0&&p[3]>0&&p[4]>0; }).sort(function(a,b){ return a[0]-b[0]; });
     }catch(e){ charts[key]="err"; }
     return paintChart();   // puede que entretanto se haya cambiado de token o de periodo
   }
   if(c==="loading") return;
+  if(c!=="err"&&tf[0]==="minute") c=candlesJoin(c,tf[1]).slice(-tf[2]);
   state.cpts=null;
   // token joven: a 5 min solo hay 1–3 velas; si no lo ha elegido la persona, pasa solo a 1 min
   if(c!=="err"&&c.length<12&&state.ctf==="m5"&&state.ctfUser!==r.mint&&r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<3*3600000){
@@ -4228,10 +4266,10 @@ async function paintChart(){
     box.innerHTML=chartNA("Todavía no hay operaciones suficientes para dibujar las velas.");
     $("#pcchg").textContent=""; return;
   }
-  var key0=key;
+  var ctf0=state.ctf;
   try{
     await loadLWC();
-    if(state.token!==r||!document.body.contains(box)||r.par.pairAddress+"|"+state.ctf!==key0) return;
+    if(state.token!==r||!document.body.contains(box)||state.ctf!==ctf0) return;
     lwcDraw(box,c,r); return;
   }catch(e){}   // sin la librería, velas dibujadas aquí mismo
   if(state.lwc){ try{ state.lwc.remove(); }catch(e){} state.lwc=null; }
@@ -6039,7 +6077,7 @@ document.addEventListener("click",function(ev){
   var ctf=ev.target.closest&&ev.target.closest("[data-ctf]");
   var crt=ev.target.closest&&ev.target.closest("[data-cretry]");
   if(crt&&state.token&&state.token.par){
-    var ck=state.token.par.pairAddress+"|"+state.ctf;
+    var ck=chartKey(state.token);
     if(charts[ck]==="err"){ delete charts[ck]; chartErr[ck]=0; }
     var pb0=$("#pcbody"); if(pb0) pb0.innerHTML="<p class='hint'>Cargando gráfica…</p>";
     paintChart(); return;
