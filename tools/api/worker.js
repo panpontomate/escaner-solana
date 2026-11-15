@@ -10,6 +10,7 @@
 //                                  (Helius), para las marcas de la gráfica; 30 min en la caché
 //   GET  /api/logo/<mint>         el logo del token (getAsset de Helius), una semana en la caché
 //   GET  /api/acciones            acciones tokenizadas frente a la acción real: prima, bolsa abierta, liquidez (acciones.js)
+//   GET  /api/cotiza/<mint>        dónde se negocia: pools de la cadena y exchanges con comisión, identidad y MiCA (cotiza.js)
 //   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
 //   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
 //                                  veces (tabla pedidos), nada de quién. El recolector lo analiza después él mismo
@@ -19,6 +20,7 @@
 
 import { ficha, HOST as FICHA_HOST } from "./ficha.js";
 import { acciones } from "./acciones.js";
+import { cotiza } from "./cotiza.js";
 
 export const V = 1;
 export const LIST = 25;            // lanzamientos y compras que se devuelven, los más recientes
@@ -238,6 +240,14 @@ export async function handle(req, env) {
       if (a.filas.some((f) => f.precio === null || f.real === null) || (a.dolares || []).some((d) => d.valor === null)) res.headers.set("cache-control", "public, max-age=60");
       return res;
     } catch (e) { return fail(503, "prices unavailable"); }
+  }
+  if (p.length === 4 && p[1] === "api" && p[2] === "cotiza") {
+    if (!ADDR.test(p[3])) return fail(400, "not a Solana address");
+    try {
+      const c = await cotiza(env, p[3]), res = json(c);
+      if (c.cex === null) res.headers.set("cache-control", "public, max-age=60");   // CoinGecko no contestó: reintentar pronto
+      return res;
+    } catch (e) { return fail(503, "markets unavailable"); }
   }
   // /api/<tipo>/<dirección>
   if (p.length !== 4 || p[1] !== "api" || !/^(wallet|token)$/.test(p[2])) return fail(404, "use /api/wallet/<address> or /api/token/<mint>");
