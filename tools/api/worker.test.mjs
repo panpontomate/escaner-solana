@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import { handle, V, portada, DAY, logo, LOGO_CDN } from "./worker.js";
+import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio } from "./worker.js";
 import { SCHEMA } from "../caras/plano.mjs";
 
 const A = "PAY1111111111111111111111111111111", B = "FUND111111111111111111111111111111", C = "BUY1111111111111111111111111111111";
@@ -194,3 +194,18 @@ test("logo: Helius getAsset gives the image through the CDN at 192 px; IPFS goes
   assert.equal(await logo({}, M1, answer({})), undefined);
 });
 
+test("ventas: token change of each wallet per transaction, SOL change and whether the whole history came back", async () => {
+  const W = "WAL1111111111111111111111111111111", tx = (pre, post, solPre, solPost, err) => ({ blockTime: 1800000000, transaction: { signatures: ["sig"], message: { accountKeys: [{ pubkey: W }] } },
+    meta: { err: err || null, preBalances: [solPre], postBalances: [solPost],
+      preTokenBalances: pre === null ? [] : [{ mint: M1, owner: W, uiTokenAmount: { uiAmount: pre } }], postTokenBalances: [{ mint: M1, owner: W, uiTokenAmount: { uiAmount: post } }] } });
+  assert.deepEqual(cambio(tx(null, 1000, 5e9, 4e9), M1, W), { t: 1800000000, d: 1000, sol: -1, sig: "sig" });       // compra
+  assert.deepEqual(cambio(tx(1000, 400, 4e9, 4.5e9), M1, W), { t: 1800000000, d: -600, sol: 0.5, sig: "sig" });      // vende 600
+  assert.equal(cambio(tx(1000, 1000, 4e9, 4e9), M1, W), null);                                                        // no toca el token
+  assert.equal(cambio(tx(1000, 0, 4e9, 5e9, { x: 1 }), M1, W), null);                                                 // fallida
+  const env = { SOLANA_RPC: "https://rpc.example" };
+  const v = await ventas(env, M1, [W, A], 1700000000, async (u, init) => { const q = JSON.parse(init.body).params;
+    return { json: async () => q[0] === M1 ? { result: { data: [{ blockTime: 1690000000 }] } } : q[0] === W ? { result: { data: [tx(null, 1000, 5e9, 4e9), tx(1000, 0, 4e9, 6e9)] } } : { error: { message: "x" } } }; });
+  assert.equal(v.wallets[W].ev.length, 2); assert.equal(v.wallets[W].full, true); assert.equal(v.wallets[A], null);
+  assert.equal(v.desde, 1690000000);   // el nacimiento del token, si es anterior a lo que dice la web
+  assert.equal((await handle(new Request("https://api.solflag.com/api/ventas/" + M1 + "?w=" + W), env)).status, 400);   // falta desde
+});

@@ -4663,7 +4663,9 @@ async function launchBuys(mint){
     try{ var now=await holdNow(mint,ws.map(function(x){ return x.w; })); after=ws.map(function(x){ return {w:x.w,creator:x.creator,raw:x.raw,now:now[x.w]||0}; }); }
     catch(e){ if(e.message==="cancelado") throw e; }
   }
-  return {ws:ws,capped:capped,creator:creator,serial:serial,after:after,supply:sup};
+  // born: cuándo nació el token (su primera firma); el pool de DexScreener puede ser el de después de graduar
+  var born=Math.min.apply(null,ok.map(function(s){ return s.blockTime||Infinity; }));
+  return {ws:ws,capped:capped,creator:creator,serial:serial,after:after,supply:sup,born:isFinite(born)?born*1000:0};
 }
 // Otros tokens que lanzó en 24 h la wallet que pagó este (el propio token también sale en la cuenta)
 function serialOthers(b,mint){
@@ -6365,6 +6367,8 @@ async function gxPaint(keep){
   box.innerHTML="<div class='lwc-lg' id='gxLg'></div>";
   // se abre enseñando lo mismo que la pequeña (en el móvil en vertical, menos velas para que se vean)
   var n=c.length, show=CHART_TF[GX.k][2]; if(matchMedia("(max-width:700px)").matches) show=Math.min(show,60);
+  // si se viene de «Lo que pasó», centrada en ese momento
+  if(!range&&GX.focus){ var ft=GX.focus, fk=c.length-1; while(fk>0&&c[fk][0]>ft) fk--; range=ft<c[0][0]?{from:-3,to:80}:{from:fk-40,to:fk+40}; GX.focus=0; }   // antes de las velas (otro pool): al principio
   GX.ch=gxDraw(box,c,r,range||{from:Math.max(0,n-show)-.5,to:n+3});
   mkPaint();
   var cs=c.slice(-CHART_TF[GX.k][2]), hi=0; cs.forEach(function(p){ if(p[3]>hi) hi=p[3]; });
@@ -6796,10 +6800,37 @@ async function mkLoad(r){
       if(x.sell&&bought[x.w]>0) e.pct=Math.min(100,Math.round(x.amt/bought[x.w]*100));
       ev.push(e);
     });
+    // Si esas 300 operaciones no llegan al nacimiento del token, la historia completa del creador y de los que más
+    // compraron en el lanzamiento (Helius, en nuestra API; hasta 5 wallets). Sustituye a lo de GeckoTerminal de esas wallets
+    var born=(bd&&bd.born)||r.par.pairCreatedAt||0, hel=null;   // el nacimiento del token, no el del pool (graduados)
+    if(born&&tr.length&&tr[0].ts>born+120000&&Date.now()-born<30*86400000){
+      var lw=Object.keys(la).sort(function(a,b){ var pa=bd&&bd.ws?(bd.ws.filter(function(x){ return x.w===a; })[0]||{}).pct||0:0, pb=bd&&bd.ws?(bd.ws.filter(function(x){ return x.w===b; })[0]||{}).pct||0:0; return pb-pa; });
+      var ws=Object.keys(cr).concat(lw).slice(0,5);
+      // v=2: que no valga lo guardado en la caché por versiones anteriores de esta petición
+      try{ var q=await fetch(API+"ventas/"+m+"?w="+ws.join(",")+"&desde="+Math.floor(born/1000)+"&v=2"); if(q.ok) hel=await q.json(); }catch(e){}
+    }
+    var hw=hel&&hel.wallets?Object.keys(hel.wallets).filter(function(w){ return hel.wallets[w]; }):[];
+    if(hw.length){
+      var pn=Number(r.par.priceNative), solUsd=pn>0?Number(r.par.priceUsd)/pn:0;
+      ev=ev.filter(function(e){ return hw.indexOf(e.w)<0; });
+      hw.forEach(function(w){ var k=cr[w]?"cr":"la", got=0, gone=0;
+        hel.wallets[w].ev.forEach(function(x){
+          if(x.d>0){ got+=x.d; return; }
+          gone+=-x.d;
+          // vende si recibe SOL a cambio; si no, «se deshace» (venderlo o pasarlo a otra wallet)
+          var e={ts:x.t*1000,k:k,sell:true,w:w,tx:x.sig,mv:!(x.sol>0)};
+          if(x.sol>0&&solUsd) e.usd=x.sol*solUsd;
+          if(got>0) e.pct=Math.min(100,Math.round(-x.d/got*100));
+          ev.push(e);
+        });
+        bought[w]=got; sold[w]=gone; });
+      ev.sort(function(a,b){ return a.ts-b.ts; });
+    }
     var laSold={}; ev.forEach(function(e){ if(e.k==="la") laSold[e.w]=1; });
     var crW=Object.keys(cr).filter(function(w){ return bought[w]>0; })[0];
     MK.data[m]={ev:ev,from:tr.length?tr[0].ts:0,n:tr.length,laTotal:Object.keys(la).length,laSold:Object.keys(laSold).length,
-      crPct:crW?Math.min(100,Math.round((sold[crW]||0)/bought[crW]*100)):null,crSells:ev.filter(function(e){ return e.k==="cr"; }).length,big:big};
+      crPct:crW?Math.min(100,Math.round((sold[crW]||0)/bought[crW]*100)):null,crSells:ev.filter(function(e){ return e.k==="cr"; }).length,big:big,
+      hel:hw.length,helCr:hw.some(function(w){ return cr[w]; })};
   }catch(e){ if(e&&e.message==="cancelado"){ delete MK.data[m]; return; } MK.data[m]="err"; }
   if(state.token===r) mkPaint();
 }
@@ -6823,15 +6854,17 @@ function mkSet(series,times,r,step,tz){
   mk.sort(function(a,b){ return a.time-b.time; });
   series.setMarkers(mk); series._mkBy=by;
 }
-function mkWho(k,sell){ return k==="cr"?"The creator sells":k==="la"?"Launch buyer sells":k==="wb"?(sell?"Whale sells":"Whale buys"):"You scanned it here"; }
+function mkWho(k,sell,mv){
+  if(mv) return k==="cr"?"The creator dumps their tokens":"Launch buyer dumps their tokens";
+  return k==="cr"?"The creator sells":k==="la"?"Launch buyer sells":k==="wb"?(sell?"Whale sells":"Whale buys"):"You scanned it here"; }
 function mkPct(e){ return (e.k==="wb"?"{n}% of their bag":"{n}% of their bag").replace("{n}",e.pct); }
-function mkLine(e){ return mkWho(e.k,e.sell)+(e.usd?" · "+usd(e.usd):"")+(e.pct!=null?" · "+mkPct(e):""); }
+function mkLine(e,pre){ return mkWho(e.k,e.sell,e.mv)+(e.usd?" · "+usd(e.usd):"")+(e.pct!=null?" · "+mkPct(e):"")+(pre?" · "+"on the curve, before graduating":""); }
 // el detalle de una vela con marcas, al pasar el ratón o tocar
 function mkTip(tip,series,pr,box){
   var evs=pr&&pr.time!=null&&series&&series._mkBy?series._mkBy[pr.time]:null;
   if(!tip) return;
   if(!evs||!evs.length||!pr.point){ tip.hidden=true; return; }
-  tip.innerHTML=evs.map(function(e){ return "<div class='mke'><i style='background:"+MKCOL[e.k]+"'></i><span><b>"+esc(mkWho(e.k,e.sell))+"</b>"+
+  tip.innerHTML=evs.map(function(e){ return "<div class='mke'><i style='background:"+MKCOL[e.k]+"'></i><span><b>"+esc(mkWho(e.k,e.sell,e.mv))+"</b>"+
     (e.usd?" · "+esc(usd(e.usd)):"")+(e.pct!=null?" · "+esc(mkPct(e)):"")+"</span>"+(e.w?"<small>"+esc(short(e.w))+" · "+esc(ftime(e.ts))+"</small>":"")+"</div>"; }).join("");
   tip.hidden=false;
   var w=box.clientWidth, x=pr.point.x+16; if(x+270>w) x=pr.point.x-276;
@@ -6847,7 +6880,7 @@ function mkChipsHtml(m){
     "<button type='button' class='mkq' data-mkq>"+"What does each mark mean?"+"</button>";
 }
 function mkHelpHtml(){
-  return "<ul class='mkh' hidden><li><i style='background:"+MKCOL.cr+"'></i><span><b>"+"Creator"+"</b>: "+"the wallet that created the token sells (big red arrow)."+"</span></li>"+
+  return "<ul class='mkh' hidden><li><i style='background:"+MKCOL.cr+"'></i><span><b>"+"Creator"+"</b>: "+"the wallet that created the token sells or dumps its tokens, that is, sells them or moves them to another wallet (big red arrow)."+"</span></li>"+
     "<li><i style='background:"+MKCOL.la+"'></i><span><b>"+"Launch buyers"+"</b>: "+"those who bought in the first block sell. “×3” = three in the same candle."+"</span></li>"+
     "<li><i style='background:"+MKCOL.wb+"'></i><span><b>"+"Whales"+"</b>: "+"buys (below) or sells (above) worth more than 2% of the liquidity (and at least $500), or by the 10 biggest holders if you opened “Whales”."+"</span></li>"+
     "<li><i style='background:"+MKCOL.tu+"'></i><span><b>"+"You"+"</b>: "+"when you scanned it."+"</span></li></ul>";
@@ -6866,12 +6899,14 @@ function mkStory(r){
   var list=d.ev.slice().reverse().slice(0,40);
   box.innerHTML="<h3 class='mkt'>"+"What happened"+"</h3><p class='mks'>"+"The buys and sells that matter, newest first. These are on-chain facts, not accusations."+"</p>"+
     (cifras.length?"<div class='mksum'>"+cifras.join("")+"</div>":"")+
-    "<ul class='mktl'>"+list.map(function(e){ return "<li data-mkts='"+e.ts+"'><time>"+esc(ftime(e.ts))+"</time><i style='background:"+MKCOL[e.k]+"'></i><span>"+esc(mkLine(e))+" <small>"+esc(short(e.w))+"</small></span>"+
+    "<ul class='mktl'>"+list.map(function(e){ var pre=r.par&&r.par.pairCreatedAt&&!/^pump-?fun$/i.test(r.par.dexId||"")&&e.ts<r.par.pairCreatedAt-60000;   // antes de que existiera este pool
+      return "<li data-mkts='"+e.ts+"'><time>"+esc(ftime(e.ts))+"</time><i style='background:"+MKCOL[e.k]+"'></i><span>"+esc(mkLine(e,pre))+" <small>"+esc(short(e.w))+"</small></span>"+
       "<a href='https://solscan.io/tx/"+esc(e.tx)+"' target='_blank' rel='noopener'>Solscan ↗</a></li>"; }).join("")+"</ul>"+
     (d.ev.length>40?"<p class='mks'>"+"Showing the 40 most recent."+"</p>":"")+
     "<p class='mks'>"+esc(mkSrc(d))+"</p>";
 }
-function mkSrc(d){ return "GeckoTerminal trades (the last {n}{desde}) and the SolFlag registry.".replace("{n}",d&&d.n||300).replace("{desde}",d&&d.from?", since {f}".replace("{f}",fdate(d.from)+" "+ftime(d.from)):""); }
+function mkSrc(d){ return "GeckoTerminal trades (the last {n}{desde}) and the SolFlag registry.".replace("{n}",d&&d.n||300).replace("{desde}",d&&d.from?", since {f}".replace("{f}",fdate(d.from)+" "+ftime(d.from)):"")+
+  (d&&d.hel?" "+(d.helCr&&d.hel===1?"For the creator, their whole history with this token (Helius).":d.helCr?"For the creator and {n} launch buyers, their whole history with this token (Helius).":"For {n} launch buyers, their whole history with this token (Helius).").replace("{n}",d.hel-(d.helCr?1:0)):""); }
 // repintar marcas, interruptores y «Lo que pasó» (al llegar los datos o al pulsar un interruptor)
 function mkPaint(){
   var r=state.token; if(!r) return;
@@ -6889,6 +6924,7 @@ document.addEventListener("click",function(e){
   var li=e.target.closest&&e.target.closest("[data-mkts]");
   if(li&&!e.target.closest("a")&&state.lwc&&state.lwcS){   // a esa vela, en la pequeña
     var t=Math.floor(+li.getAttribute("data-mkts")/1000)-state.lwcS.tz, T=state.lwcS.times, k=T.length-1; while(k>0&&T[k]>t) k--;
+    if(t<T[0]){ GX.focus=+li.getAttribute("data-mkts"); gxOpen(); return; }   // antes de lo que enseña la pequeña: en grande, con toda la historia
     state.lwc.timeScale().setVisibleLogicalRange({from:k-30,to:k+30});
     var pc=$("#t-chart"); if(pc) pc.scrollIntoView({behavior:"smooth",block:"start"});
   }

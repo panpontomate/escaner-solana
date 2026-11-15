@@ -6,6 +6,8 @@
 //   GET  /api/token/<mint>         un lanzamiento: quién está detrás (con su historial) y sus primeros compradores
 //   GET  /api/portada              lo de las últimas 24 h para la portada: lanzamientos por DEX y nivel, creadores
 //                                  en serie, financiadores de varios creadores y quién compra en los primeros bloques
+//   GET  /api/ventas/<mint>?w=<w1,w2…>&desde=<unix>   compras y ventas de ese token de hasta 5 wallets desde que nació
+//                                  (Helius), para las marcas de la gráfica; 30 min en la caché
 //   GET  /api/logo/<mint>         el logo del token (getAsset de Helius), una semana en la caché
 //   GET  /api/acciones            acciones tokenizadas frente a la acción real: prima, bolsa abierta, liquidez (acciones.js)
 //   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
@@ -161,6 +163,41 @@ export function logoUrl(u) {
   return /^https:\/\//.test(u) ? LOGO_CDN + u : null;
 }
 
+// Marcas de la gráfica (15/11): lo que compraron y vendieron de este token el creador y los compradores del lanzamiento,
+// desde que nació, con getTransactionsForAddress de Helius (100 transacciones por wallet, ~10 créditos). La web la
+// pide solo cuando las últimas 300 operaciones de GeckoTerminal no llegan al nacimiento del token
+export const VENTAS_MAX = 5;
+export function cambio(t, m, w) {
+  if (!t || !t.meta || t.meta.err || !t.transaction) return null;
+  let d = 0;
+  const add = (b, sg) => { if (b && b.mint === m && b.owner === w) d += sg * (Number(b.uiTokenAmount && b.uiTokenAmount.uiAmount) || 0); };
+  (t.meta.preTokenBalances || []).forEach((b) => add(b, -1));
+  (t.meta.postTokenBalances || []).forEach((b) => add(b, 1));
+  if (Math.abs(d) < 1e-9) return null;
+  const keys = (t.transaction.message && t.transaction.message.accountKeys || []).map((k) => k.pubkey || k);
+  const i = keys.indexOf(w), sol = i >= 0 ? ((t.meta.postBalances[i] || 0) - (t.meta.preBalances[i] || 0)) / 1e9 : 0;
+  return { t: t.blockTime, d: d, sol: Math.round(sol * 1e6) / 1e6, sig: t.transaction.signatures && t.transaction.signatures[0] };
+}
+export async function ventas(env, m, ws, desde, fetchFn) {
+  const out = {};
+  // cuándo nació el token: su transacción más antigua (la web solo sabe la fecha del pool, que en un graduado es posterior)
+  const f = await fetchFn(env.SOLANA_RPC, { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getTransactionsForAddress", params: [m, { transactionDetails: "signatures", sortOrder: "asc", limit: 1 }] }) })
+    .then((r) => r.json()).catch(() => null);
+  const born = f && f.result && f.result.data && f.result.data[0] && f.result.data[0].blockTime;
+  if (born && born < desde) desde = born;
+  for (const w of ws) {
+    const j = await fetchFn(env.SOLANA_RPC, { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getTransactionsForAddress", params: [w, { transactionDetails: "full", sortOrder: "asc", limit: 100,
+        encoding: "jsonParsed", maxSupportedTransactionVersion: 0, filters: { blockTime: { gte: desde } } }] }) })
+      .then((r) => r.json()).catch(() => null);
+    const data = j && j.result && j.result.data;
+    // full: si son menos de 100, está toda su historia desde que nació el token
+    out[w] = Array.isArray(data) ? { ev: data.map((t) => cambio(t, m, w)).filter(Boolean), full: data.length < 100 } : null;
+  }
+  return { v: V, mint: m, desde: desde, wallets: out };
+}
+
 export async function handle(req, env) {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: Object.assign({}, HEAD, { "access-control-allow-methods": "GET, POST", "access-control-max-age": "86400" }) });
   const p = new URL(req.url).pathname.replace(/\/+$/, "").split("/");
@@ -168,6 +205,22 @@ export async function handle(req, env) {
   if (req.method !== "GET") return fail(405, "only GET");
   if (p.length === 3 && p[1] === "api" && p[2] === "portada") {
     try { return json(await portada(env.DB, Date.now())); } catch (e) { return fail(503, "database unavailable"); }
+  }
+  if (p.length === 4 && p[1] === "api" && p[2] === "ventas") {
+    if (!ADDR.test(p[3])) return fail(400, "not a Solana address");
+    const q = new URL(req.url).searchParams, ws = String(q.get("w") || "").split(",").filter((w) => ADDR.test(w)).slice(0, VENTAS_MAX);
+    const desde = Math.floor(Number(q.get("desde")));
+    if (!ws.length || !(desde > 1.6e9) || desde > Date.now() / 1000) return fail(400, "use ?w=<wallets>&desde=<unix seconds>");
+    if (!env.SOLANA_RPC) return fail(503, "rpc unavailable");
+    if (env.VENTAS_LIMIT) {
+      const { success } = await env.VENTAS_LIMIT.limit({ key: req.headers.get("cf-connecting-ip") || "?" });
+      if (!success) return fail(429, "too many requests");
+    }
+    const v = await ventas(env, p[3], ws, desde, fetch);
+    const res = json(v);
+    // si alguna wallet no contestó, que no se quede media hora en la caché
+    res.headers.set("cache-control", "public, max-age=" + (Object.values(v.wallets).some((x) => !x) ? 60 : 1800));
+    return res;
   }
   if (p.length === 4 && p[1] === "api" && p[2] === "logo") {
     if (!ADDR.test(p[3])) return fail(400, "not a Solana address");
