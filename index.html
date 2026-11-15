@@ -1722,6 +1722,45 @@ body.landing #adv{margin-top:10px}
 #results.tview .tok.one .lt .lfl{float:right;margin-left:10px;font:700 .66rem var(--f-body);letter-spacing:.12em;text-transform:uppercase;padding:4px 9px;border-radius:999px;border:1px solid currentColor}
 #results.tview .tok.one .lt span{color:var(--muted)}
 #results.tview .tok.one .lt{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:16px 0}
+/* ---- resultado de un token (15/11, maqueta resultado-mejorado): buscador en una barra, botones iguales con Avisos
+   delante, sin hueco de nebulosa, índice fijo a todo el ancho, Quién está detrás bajo las banderas, ballenas en corto,
+   sello con «SolFlag» y lo que encontró (el color ya dice el nivel) y cielo de estrellas detrás ---- */
+.tv-wide #setup,.tv-wide #adv{display:none!important}
+#results.tview:not(.wview) .rseam{display:none!important}
+#results .sky{position:fixed;inset:0;width:100vw;height:100vh;z-index:-2;pointer-events:none}
+#results:not(.tview) .sky,#results.wview .sky{display:none}
+#results.tview:not(.wview) #summary .tdesk{display:flex!important;flex-wrap:wrap;gap:8px!important;align-items:center}
+#results.tview:not(.wview) #summary .tdesk>.btn,#results.tview:not(.wview) #summary .tdesk>details>summary.btn{flex:0 0 auto!important;width:auto!important;margin:0!important;min-height:40px;padding:0 16px!important;border-radius:999px!important;background:rgba(255,255,255,.04)!important;border:1px solid rgba(196,181,253,.24)!important;color:var(--fg)!important;box-shadow:none!important;font-weight:700;display:inline-flex!important;align-items:center;gap:7px}
+#results.tview:not(.wview) #summary .tdesk>.btn:hover,#results.tview:not(.wview) #summary .tdesk>details>summary.btn:hover{border-color:rgba(196,181,253,.5)!important;background:rgba(255,255,255,.07)!important}
+#results.tview:not(.wview) #summary .tdesk>.tmap{order:5;grid-column:auto}
+#results.tview:not(.wview) #summary .tdesk>.tmap .tmsub{display:none}
+#results.tview:not(.wview) #summary .tdesk>details.tavisos{order:-1}
+#results.tview:not(.wview) #summary .tdesk>details.tavisos>summary.btn{background:var(--kick)!important;border-color:var(--kick)!important;color:#07111a!important}
+#results.tview .tdc,#results.tview #list{scroll-margin-top:150px}
+#results.tview:not(.wview) .stamp .st-new .st-k{font:700 1.7rem/1 Unbounded,'Arial Black',sans-serif;letter-spacing:-.02em;text-transform:none;opacity:1}
+#results.tview:not(.wview) .stamp .st-new b.st-two{font:700 1.15rem/1.05 'Barlow Condensed',sans-serif!important;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 0;max-width:122px;text-align:center}
+#t-hold.hcompact #hsummary{padding:0;background:none;border:0;box-shadow:none}
+#t-hold.hcompact #hsummary>:not(.htiles){display:none}
+#t-hold.hcompact .hside2,#t-hold.hcompact .hmain>h3,#t-hold.hcompact .hmain>.hrow:nth-of-type(n+4){display:none}
+#t-hold.hcompact .hgrid{display:block}
+#t-hold{display:flex;flex-direction:column}
+#t-hold .hfull{order:9;align-self:flex-start;margin-top:14px}
+#t-hold .hfull[hidden],#thlazy[hidden]{display:none!important}
+@media (min-width:1100px){
+  #results.tview:not(.wview) .tnav{position:sticky!important;top:76px;grid-column:1/-1;order:2;z-index:30;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  #results.tview:not(.wview) .tc2{grid-row:span 2}
+  #results.tview:not(.wview) #list{align-self:start}
+  #results.tview:not(.wview) #t-who{grid-column:1!important;order:3;align-self:start}
+  #results.tview:not(.wview) #t-quote,#results.tview:not(.wview) #t-hold{order:4}
+}
+@media (max-width:960px){
+  #results.tview:not(.wview) .stamp .st-new .st-k{font-size:1.3rem}
+  #results.tview:not(.wview) .stamp .st-new b.st-two{font-size:.9rem!important;max-width:96px}
+}
+@media (max-width:560px){
+  #results.tview:not(.wview) .stamp .st-new .st-k{font-size:.9rem}
+  #results.tview:not(.wview) .stamp .st-new b.st-two{font-size:.62rem!important;max-width:70px;margin-top:3px}
+}
 /* con un resultado abierto, el buscador va sin caja, como en la maqueta */
 body:not(.landing):not(.scanp) .hero>.scan{background:none;border:0;box-shadow:none;padding:8px 0 0}
 body:not(.landing):not(.scanp) #form .eyebrow{display:none}
@@ -2172,6 +2211,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
   </section>
 
   <section id="results" hidden>
+    <canvas class="sky" id="sky" aria-hidden="true"></canvas>
     <canvas class="neb rneb" data-neb="head" aria-hidden="true"></canvas>
     <div class="seam rseam"><canvas data-seam="2" aria-hidden="true"></canvas></div>
     <div id="tside">
@@ -3541,7 +3581,10 @@ function stampHtml(r){
   return "<div class='stamp"+(lbl.length>6?" long":"")+"' style='--sc:"+col+"' role='img' aria-label='Veredicto de SolFlag: "+esc(LEVELS[r.lvl].label+(sub?", "+sub:""))+"'>"+
     "<svg class='st-ring' viewBox='0 0 140 140' aria-hidden='true'><circle cx='70' cy='70' r='66' stroke-width='4.5' stroke-dasharray='58 5 31 3 74 11 22 4 49 2 63 8 36 6 30 100' transform='rotate(-38 70 70)'/>"+
       "<circle cx='70' cy='70' r='58.5' stroke-width='1.6' stroke-dasharray='41 7 88 4 26 13 67 3 52 9 60 10' transform='rotate(25 70 70)'/></svg>"+
-    "<span class='st-in'><span class='st-k'>SolFlag</span>"+(top?"<span class='st-t'>"+esc(top)+"</span>":"")+"<b>"+esc(lbl)+"</b>"+(sub?"<span class='st-s'>"+esc(sub)+"</span>":"")+"</span></div>";
+    (TIERS5.indexOf(r.lvl)>=0?
+      // cinco niveles (15/11): el color del aro ya dice el nivel; dentro, «SolFlag» y lo que encontró
+      "<span class='st-in st-new'><span class='st-k'>SolFlag</span><b class='st-two'>"+esc(r.lvl==="DIAMANTE"?"gran proyecto":sub||"sin alertas")+"</b></span></div>":
+      "<span class='st-in'><span class='st-k'>SolFlag</span>"+(top?"<span class='st-t'>"+esc(top)+"</span>":"")+"<b>"+esc(lbl)+"</b>"+(sub?"<span class='st-s'>"+esc(sub)+"</span>":"")+"</span></div>");
 }
 // Insignia bajo el veredicto (cinco niveles, 14/11): un gran proyecto de la lista, o un recién nacido que no puede
 // pasar del amarillo hasta los 7 días (y desde cuándo podrá salir verde)
@@ -3862,14 +3905,15 @@ function tokenDetail(r){
   listHome(); $("#wnum").hidden=true;
   var young=r.par&&r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<7*86400000;
   // atajos y gráfica en una sola caja: en pantalla ancha van juntos a la derecha aunque las banderas sean más altas (15/11)
-  d.innerHTML="<div class='tc2'><nav class='tnav' aria-label='Apartados del token'>"+
+  d.innerHTML="<nav class='tnav' aria-label='Apartados del token'>"+
       "<button type='button' class='tnv' data-tgo='summary'>Veredicto</button>"+
+      "<button type='button' data-tgo='list'>Banderas</button>"+
       "<button type='button' data-tgo='t-chart'>Gráfica</button>"+
       "<button type='button' data-tgo='t-quote'>Dónde cotiza</button>"+
       (r.emisor?"":"<button type='button' class='tnmap' data-map='"+esc(r.mint)+"'>◉ Mapa</button>")+
       "<button type='button' data-tgo='t-who'>Quién está detrás</button>"+
       (r.emisor?"":"<button type='button' data-tgo='t-hold'>Ballenas</button>")+"</nav>"+
-    "<section class='card tdc' id='t-chart'><h2>Gráfica <small>precio en $</small></h2>"+
+    "<div class='tc2'><section class='card tdc' id='t-chart'><h2>Gráfica <small>precio en $</small></h2>"+
       (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("Sin mercado: no hay precio que dibujar.")+"</div>")+histHtml(r)+"<div class='mkstory' id='mkstory'></div></section></div>"+
     "<section class='card tdc' id='t-quote'><h2>Dónde cotiza <small>y cuánto cuesta entrar y salir</small></h2>"+
       "<div id='quotebox'><p class='hint'>Buscando dónde se negocia…</p></div></section>"+
@@ -3877,8 +3921,9 @@ function tokenDetail(r){
       (young?"<div class='lights' style='margin:0 0 12px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>":"")+
       "<div id='whobox'><p class='hint'>Buscando en el registro de SolFlag…</p></div>"+
       "<p class='wsrc'>Hechos del registro de SolFlag (desde el 29/10/2026): quién pagó, creó y financió cada lanzamiento y cómo acabó a las 24 h. Son datos, no acusaciones. ¿Un dato mal? <a href='mailto:solflag.team@gmail.com'>Escríbenos</a>.</p></section>"+
-    (r.emisor?"":"<section class='card tdc' id='t-hold'><h2>Ballenas <small>las cuentas con más saldo</small></h2>"+
-      "<div class='tlazy' id='thlazy'><span>Mira quién tiene más de este token: personas, exchanges, pools y grupos que comparten financiador.</span><button type='button' class='btn small' data-hold='"+esc(r.mint)+"'>Ver las ballenas</button></div></section>");
+    (r.emisor?"":"<section class='card tdc hcompact' id='t-hold'><h2>Ballenas <small>las cuentas con más saldo</small></h2>"+
+      "<div class='tlazy' id='thlazy'><span>Mira quién tiene más de este token: personas, exchanges, pools y grupos que comparten financiador.</span><button type='button' class='btn small' data-hold='"+esc(r.mint)+"'>Ver las ballenas</button></div>"+
+      "<button type='button' class='btn small hfull' id='hfull' hidden>Ver todas las ballenas →</button></section>");
   // si ya se buscaron las ballenas de este token, se enseñan otra vez sin repetir la búsqueda
   if(r.emisor){}   // sin apartado de ballenas
   else if(state.hold&&state.hold.mint===r.mint){ whalesHere(); renderHolders(true); }
@@ -3887,7 +3932,24 @@ function tokenDetail(r){
   loadQuote(r);
   if(!r.img) tokenLogo(r);
   tnavSpy();
+  holdAuto(r);
 }
+// Ballenas solas (15/11): la búsqueda empieza cuando el apartado aparece en pantalla y enseña el resumen y las 3
+// primeras; «Ver todas» abre el resto. Va desde el navegador con los servicios públicos (o tu Helius), como el botón.
+var holdObs=null;
+function holdAuto(r){
+  if(holdObs){ holdObs.disconnect(); holdObs=null; }
+  var box=$("#t-hold"); if(!box||!("IntersectionObserver" in window)) return;
+  if(state.hold&&state.hold.mint===r.mint){ showHfull(); return; }
+  holdObs=new IntersectionObserver(function(es){
+    if(!es.some(function(e){ return e.isIntersecting; })) return;
+    holdObs.disconnect(); holdObs=null;
+    if(state.token!==r||state.hin===r.mint) return;
+    state.holdAuto=true; whalesInline(r.mint).finally(function(){ state.holdAuto=false; showHfull(); });
+  },{rootMargin:"0px 0px 200px 0px"});
+  holdObs.observe(box);
+}
+function showHfull(){ var b=$("#hfull"), box=$("#t-hold"); if(b&&box&&state.hold&&state.token&&state.hold.mint===state.token.mint) b.hidden=!box.classList.contains("hcompact"); }
 // Sin logo en DexScreener (casi todos los de Pump.fun): se pide a GeckoTerminal y se pone en el resumen
 var logos={};
 async function tokenLogo(r){
@@ -5819,7 +5881,7 @@ async function holders(){
     state.hold={mode:mode,ageDays:ageDays,signals:signals,mint:mint,sym:(par&&par.baseToken&&par.baseToken.symbol)||short(mint),
       name:(par&&par.baseToken&&par.baseToken.name)||"",price:hr.price,rows:hr.rows,
       mintAuth:!!b.info.mintAuth,freezeAuth:!!b.info.freezeAuth,clusters:clusters,hotGroups:hotGroups,creator:creator};
-    renderHolders(); navGo(); track("whales");
+    renderHolders(state.holdAuto); if(!state.holdAuto) navGo(); track("whales");
   }catch(e){
     if(e.message!=="cancelado") showError(friendlyError(e));
   }finally{
@@ -6196,6 +6258,7 @@ function renderHolders(keep){
   }).join("")+"</div><aside class='hside2'>"+side+"</aside></div>";
   state.shown.H=true;
   if(state.mode==="H"||state.hin===h.mint) $("#hresults").hidden=false;
+  if(state.hin===h.mint) showHfull();
   if(!keep) $("#hresults").scrollIntoView({behavior:"smooth",block:"start"});
 }
 
@@ -7130,10 +7193,11 @@ document.addEventListener("click",function(ev){
   if(dl){ var k=dl.getAttribute("data-del"); if(lista.w[k]&&!lista.w[k].fav){ delete lista.w[k]; saveList(); renderLista(); } return; }
   var hd=ev.target.closest&&ev.target.closest("[data-hold]");
   if(hd){ var hm=hd.getAttribute("data-hold");
-    if(state.mode==="W"&&state.token&&state.token.mint===hm&&!$("#results").hidden&&$("#t-hold")){ $("#t-hold").scrollIntoView({behavior:"smooth",block:"start"}); whalesInline(hm); return; }
+    if(state.mode==="W"&&state.token&&state.token.mint===hm&&!$("#results").hidden&&$("#t-hold")){ $("#t-hold").classList.remove("hcompact"); if($("#hfull")) $("#hfull").hidden=true; $("#t-hold").scrollIntoView({behavior:"smooth",block:"start"}); whalesInline(hm); return; }
     setMode("H"); $("#mint").value=hm; holders(); return; }
   var td=ev.target.closest&&ev.target.closest("[data-tdur]");
   if(td){ trend.dur=td.getAttribute("data-tdur"); document.querySelectorAll("[data-tdur]").forEach(function(b){ b.setAttribute("aria-pressed",String(b===td)); }); loadTrend(); return; }
+  if(ev.target.id==="hfull"){ var hb=$("#t-hold"); if(hb){ hb.classList.remove("hcompact"); ev.target.hidden=true; } return; }
   var tg=ev.target.closest&&ev.target.closest("[data-tgo]");
   if(tg){ var te=document.getElementById(tg.getAttribute("data-tgo")); if(te) te.scrollIntoView({behavior:"smooth",block:"start"}); return; }
   var ac=ev.target.closest&&ev.target.closest("[data-addc]");
@@ -7320,5 +7384,13 @@ updateLanding();
 </script>
 <script src="/puntos.js?v=20261111b" defer></script>
 <script src="/fondo.js?v=20261111d" defer></script>
+<script>
+// cielo de estrellas detrás del resultado de un token (15/11): el mismo que Dónde cotiza y Acciones, fijo
+(function(){ var cv=document.getElementById("sky"); if(!cv) return; var x=cv.getContext("2d");
+  function paint(){ var D=Math.min(2,devicePixelRatio||1), W=innerWidth, H=innerHeight; cv.width=W*D; cv.height=H*D; x.setTransform(D,0,0,D,0,0); x.clearRect(0,0,W,H);
+    var s=7, r=function(){ return (s=s*16807%2147483647)/2147483647; };
+    for(var i=0;i<W*H/2600;i++){ var a=.12+r()*.55, z=r()<.06?1.8:1.1; x.fillStyle=(r()<.12?"rgba(170,200,255,":"rgba(241,238,255,")+a+")"; x.fillRect(r()*W,r()*H,z,z); } }
+  paint(); addEventListener("resize",paint); })();
+</script>
 </body>
 </html>
