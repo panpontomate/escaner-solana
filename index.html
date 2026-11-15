@@ -1397,6 +1397,12 @@ body:not(.landing) #goH{display:none}
 .tr .tx .up{color:var(--bajo)}.tr .tx .dn{color:var(--alto)}
 .tr .tp{display:block;margin-top:2px;font-weight:800;color:var(--c,var(--muted))}
 .tr .tp.wait{color:var(--muted);font-weight:600}
+/* nivel como círculo de color (el nombre del nivel va en el título y para lectores de pantalla) */
+.lvdot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;background:var(--muted);box-shadow:0 0 10px -1px currentColor;flex:none}
+.tr .tp .lvdot{width:13px;height:13px}
+.hseal.dot{border:0;background:none;padding:5px 0!important}
+.rcp.dot{border:0!important;background:none!important;padding:0 6px!important}
+.ct em .lvdot{width:9px;height:9px;vertical-align:0;margin-left:3px}
 .tr.lvl-alto{--c:var(--alto)}.tr.lvl-medio{--c:var(--medio)}.tr.lvl-nar{--c:var(--nar)}.tr.lvl-bajo{--c:var(--bajo)}.tr.lvl-dia{--c:var(--dia)}
 .nr{grid-template-columns:auto minmax(0,1fr) auto}
 .nr.in{animation:nrIn .5s ease-out both}
@@ -3255,6 +3261,8 @@ function missingText(r){
   return r.lights.filter(function(l){ return l.s==="na"; }).map(function(l){ return MISSING[l.k]; }).join(" y ");
 }
 function lvlLabel(r){ return dataOnly(r)?"Medio por falta de datos":LEVELS[r.lvl].label; }
+// El nivel como un círculo de su color; el nombre queda en el título (al pasar el ratón) y para lectores de pantalla
+function lvDot(r){ var lab=lvlLabel(r), col=dataOnly(r)?LVCOL.MEDIO:(LVCOL[r.lvl]||"var(--muted)"); return "<i class='lvdot' style='background:"+col+";color:"+col+"' role='img' title='"+esc(lab)+"' aria-label='"+esc(lab)+"'></i>"; }
 function lightsWhy(lights){
   var w=lights.filter(function(l){ return l.s==="bad"||l.s==="warn"||l.s==="na"; }).map(function(l){ return l.t; });
   return w;
@@ -4102,7 +4110,7 @@ function recentHtml(x){
     "<span><b class='mono'>"+esc(short(x.a))+"</b><small>wallet · "+esc(hace(x.ts))+(x.n!=null?" · "+x.n+(x.n===1?" token":" tokens"):"")+"</small></span><span class='rcp'>wallet</span></button>";
   var L=LEVELS[x.lvl]||LEVELS["SIN DATOS"];
   return "<button type='button' class='rc rc-"+esc(L.cls)+"' data-analyze='"+esc(x.a)+"'>"+tokAv(x.img,x.sym)+
-    "<span><b>"+esc(x.sym||short(x.a))+"</b><small>token · "+esc(hace(x.ts))+"</small></span><span class='rcp'>"+esc(L.label)+"</span></button>";
+    "<span><b>"+esc(x.sym||short(x.a))+"</b><small>token · "+esc(hace(x.ts))+"</small></span><span class='rcp dot'>"+(LEVELS[x.lvl]?lvDot({lvl:x.lvl}):esc(L.label))+"</span></button>";
 }
 var sdatos={ok:false,run:false,green:[]};
 /* En tendencia ahora: los pools en tendencia de GeckoTerminal (por actividad, no hay puestos de pago). El veredicto
@@ -4150,7 +4158,7 @@ function paintTrend(){
     return "<button type='button' class='tr"+(L?" lvl-"+L.cls:"")+"' data-analyze='"+esc(x.mint)+"'><span class='tn'>"+(i+1)+"</span>"+tokAv(x.img,x.sym)+
       "<span style='min-width:0'><b>$"+esc(x.sym)+"</b><small>"+esc(meta)+"</small></span>"+
       "<span class='tx'>"+(ch!==null?"<em class='"+(ch>=0?"up":"dn")+"'>"+(ch>=0?"+":"")+esc(fmtPct(ch))+"</em>":"")+
-      (x.st==="done"?(L?"<span class='tp'>"+esc(lvlLabel(x.r))+"</span>":"<span class='tp wait'>Sin veredicto</span>"):"<span class='tp wait'>Analizando…</span>")+"</span></button>";
+      (x.st==="done"?(L?"<span class='tp'>"+lvDot(x.r)+"</span>":"<span class='tp wait'>Sin veredicto</span>"):"<span class='tp wait'>Analizando…</span>")+"</span></button>";
   }).join("");
   paintHot();
 }
@@ -4195,7 +4203,7 @@ function paintFresh(keepAnim){
 var hot={tab:"t"};
 function hotSeal(r){
   var L=r&&LEVELS[r.lvl]; if(!L) return "<span class='hseal'>—</span>";
-  return "<span class='hseal s-"+esc(L.cls)+"'>"+esc((dataOnly(r)?LEVELS.MEDIO.short:L.short).toUpperCase())+"</span>";
+  return "<span class='hseal dot'>"+lvDot(r)+"</span>";
 }
 function hotSignal(r){
   if(!r||!r.lights) return "";
@@ -4342,13 +4350,13 @@ function paintCinta(){
   (trend.rows||[]).forEach(function(x){ if(x.r&&/^(VERDE|DIAMANTE|BAJO)$/.test(x.r.lvl)) it.push({g:1,a:x.mint,sym:"$"+x.sym,img:x.img,k:"En verde ahora",t:"Pasó los chequeos · en tendencia"}); });
   sdatos.green.forEach(function(x){ if(!it.some(function(y){ return y.a===x.m; })) it.push({g:1,a:x.m,sym:"$"+x.s,img:null,k:"En verde al nacer",t:"Sigue vivo"+(x.mc?" · cap. "+usd(x.mc):"")}); });
   recentAll().slice(0,8).forEach(function(x){ if(it.some(function(y){ return y.a===x.a; })) return;
-    it.push(x.k==="w"?{a:x.a,sym:short(x.a),img:null,k:"Wallet que viste",t:hace(x.ts)}:{a:x.a,sym:"$"+(x.sym||short(x.a)),img:x.img,k:"Lo viste",t:hace(x.ts)+(x.lvl&&LEVELS[x.lvl]?" · "+LEVELS[x.lvl].label.toLowerCase():"")}); });
+    it.push(x.k==="w"?{a:x.a,sym:short(x.a),img:null,k:"Wallet que viste",t:hace(x.ts)}:{a:x.a,sym:"$"+(x.sym||short(x.a)),img:x.img,k:"Lo viste",t:hace(x.ts),d:x.lvl&&LEVELS[x.lvl]?lvDot({lvl:x.lvl}):""}); });
   var sig=it.map(function(x){ return x.a+x.k+x.t; }).join("|");
   if(sig===cintaSig) return; cintaSig=sig;
   var c=$("#scinta"); c.hidden=it.length<3; $("#scdisc").hidden=c.hidden||!it.some(function(x){ return x.g; });
   if(c.hidden) return;
   var one=it.map(function(x){ return "<button type='button' class='ct"+(x.g?" grn":"")+"' data-analyze='"+esc(x.a)+"'>"+tokAv(x.img,x.sym.replace(/^\$/,""))+
-    "<span><small>"+esc(x.k)+"</small><b>"+esc(x.sym)+"</b><em>"+esc(x.t)+"</em></span></button>"; }).join("");
+    "<span><small>"+esc(x.k)+"</small><b>"+esc(x.sym)+"</b><em>"+esc(x.t)+(x.d||"")+"</em></span></button>"; }).join("");
   // dos copias seguidas para que la vuelta no se note; la velocidad no depende de cuántos haya
   $("#sctrack").innerHTML=one+one.replace(/<button /g,"<button tabindex='-1' aria-hidden='true' ");
   $("#sctrack").style.setProperty("--cd",Math.max(30,it.length*6)+"s");

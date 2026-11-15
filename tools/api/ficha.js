@@ -103,7 +103,8 @@ const T = {
     secciones: ["Identificación", "Veredicto al lanzarse", "Riesgo técnico ahora", "Cifras clave", "Historial cronológico", "Qué dijimos y qué pasó", "Dónde cotiza", "Quién está detrás", "Primeros compradores", "Otros tokens del mismo creador"],
     fuentes: "Fuentes", fuentesTxt: "Base de SolFlag, RugCheck, DexScreener y nodos de Solana", citar: "Citar esta ficha", datos: "datos", correccion: "Corrección", algunDato: "¿Algún dato está mal?", pide: "Pide que lo corrijamos", asunto: "Corrección ficha ",
     nota: "Nota", notaTxt: "Solo hechos de la cadena. No es consejo de inversión.",
-    nfTit: "Token no encontrado · SolFlag", nfH: "No encontramos este token", nfNoBase: "No está en nuestra base ni tiene mercado en DexScreener. ", nfInval: "Esa dirección no es válida. ", nfBusca: "Búscalo en el escáner de SolFlag"
+    nfTit: "Token no encontrado · SolFlag", nfH: "No encontramos este token", nfNoBase: "No está en nuestra base ni tiene mercado en DexScreener. ", nfInval: "Esa dirección no es válida. ", nfBusca: "Búscalo en el escáner de SolFlag",
+    nfFalloH: "No hemos podido cargar esta ficha", nfFallo: "Ahora mismo no nos llegan los datos del mercado. Recarga la página en un minuto o "
   },
   en: {
     lang: "en", path: "en/", web: "https://solflag.com/en/", acierto: "https://solflag.com/en/accuracy/", como: "https://solflag.com/en/how-it-works/#nivel", comoTxt: "How the level is decided →", cc: "deed.en",
@@ -147,7 +148,8 @@ const T = {
     secciones: ["Identification", "Verdict at launch", "Technical risk now", "Key figures", "Timeline", "What we said and what happened", "Where it trades", "Who is behind it", "First buyers", "Other tokens by the same creator"],
     fuentes: "Sources", fuentesTxt: "SolFlag database, RugCheck, DexScreener and Solana nodes", citar: "Cite this file", datos: "data", correccion: "Correction", algunDato: "Is any data wrong?", pide: "Ask us to fix it", asunto: "Correction token file ",
     nota: "Note", notaTxt: "On-chain facts only. Not investment advice.",
-    nfTit: "Token not found · SolFlag", nfH: "We couldn't find this token", nfNoBase: "It's not in our database and has no market on DexScreener. ", nfInval: "That address isn't valid. ", nfBusca: "Look it up in the SolFlag scanner"
+    nfTit: "Token not found · SolFlag", nfH: "We couldn't find this token", nfNoBase: "It's not in our database and has no market on DexScreener. ", nfInval: "That address isn't valid. ", nfBusca: "Look it up in the SolFlag scanner",
+    nfFalloH: "We couldn't load this token file", nfFallo: "The market data isn't reaching us right now. Reload the page in a minute or "
   }
 };
 export const NIVEL_CLASE = { RED: "hi", ORANGE: "or", YELLOW: "mi", GREEN: "lo", DIAMOND: "di", HIGH: "hi", MEDIUM: "mi", LOW: "lo", SPAM: "hi", NO_DATA: "", NO_MARKET: "" };
@@ -198,11 +200,17 @@ export function mercado(pairs, m) {
     dexes: Object.keys(dexes).map((k) => ({ dex: k, liq: dexes[k] })).sort((a, b) => b.liq - a.liq) };
 }
 
+// null = no se pudo preguntar (corte, límite, error): no es lo mismo que «no existe». Un intento más y los fallos no se guardan en la caché
 async function getJSON(url, ttl) {
-  try {
-    const r = await fetch(url, { signal: AbortSignal.timeout(4000), cf: { cacheTtl: ttl, cacheEverything: true } });
-    return r.ok ? await r.json() : null;
-  } catch (e) { return null; }
+  for (let i = 0; i < 2; i++) {
+    try {
+      const r = await fetch(url, { headers: { "user-agent": "SolFlag/1.0 (+https://solflag.com)" }, signal: AbortSignal.timeout(4000),
+        cf: { cacheTtlByStatus: { "200-299": ttl, "300-599": 0 }, cacheEverything: true } });
+      if (r.ok) return await r.json();
+    } catch (e) { /* otro intento */ }
+    if (i === 0) await new Promise((res) => setTimeout(res, 700));
+  }
+  return null;
 }
 
 // Frase del veredicto: el hecho más fuerte que tenemos, en números
@@ -369,11 +377,11 @@ export function pagina(m, d, mk, reg, now, lang) {
     '<script src="https://solflag.com/fondo.js?v=20261111d" defer></script></body></html>';
 }
 
-export function noEncontrado(m, lang) {
+export function noEncontrado(m, lang, fallo) {
   const t = T[lang] || T.es;
   return '<!doctype html><html lang="' + t.lang + '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + t.nfTit + "</title>" +
     '<meta name="robots" content="noindex"><link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Manrope:wght@400;700&family=Unbounded:wght@700&display=swap" rel="stylesheet"><style>' + CSS + "</style></head><body>" + cabecera(t, null) +
-    '<div class="wrap"><section class="card"><div class="pad"><h1 class="nf">' + t.nfH + '</h1><p class="muted">' + (m ? t.nfNoBase : t.nfInval) +
+    '<div class="wrap"><section class="card"><div class="pad"><h1 class="nf">' + (fallo ? t.nfFalloH : t.nfH) + '</h1><p class="muted">' + (fallo ? t.nfFallo : m ? t.nfNoBase : t.nfInval) +
     '<a href="' + t.web + (m ? "?token=" + esc(m) : "") + '">' + t.nfBusca + '</a>.</p></div></section></div><script src="https://solflag.com/fondo.js?v=20261111d" defer></script></body></html>';
 }
 
@@ -409,7 +417,7 @@ export async function ficha(req, env, fetchJSON) {
     day && d.lanz.lvl ? get("https://solflag.com/datos/registro/" + day + ".json", 3600) : null
   ]);
   const mk = mercado(pairs, m), reg = regDay && regDay.tokens ? regDay.tokens[m] || null : null;
-  if (!d.lanz && !mk) return page(noEncontrado(m, lang), 404);
+  if (!d.lanz && !mk) return pairs === null ? page(noEncontrado(m, lang, true), 503) : page(noEncontrado(m, lang), 404);   // 503: DexScreener no contestó, no es que no exista
   return page(pagina(m, d, mk, reg, Date.now(), lang), 200, 21600);   // 6 h en la caché de Cloudflare
 }
 

@@ -199,6 +199,7 @@ export const TEXT = {
   "' target='_blank' rel='noopener' title='Quién lo lanzó, quién lo financió, quién compró primero y qué pasó después'><span class='ic'>📄</span><span class='lb'>Ficha completa</span></a>": "' target='_blank' rel='noopener' title='Who launched it, who funded it, who bought first and what happened next'><span class='ic'>📄</span><span class='lb'>Full token file</span></a>",
   "' target='_blank' rel='noopener'><span class='ic'>📄</span><span class='lb'>Ficha completa</span></a></div>": "' target='_blank' rel='noopener'><span class='ic'>📄</span><span class='lb'>Full token file</span></a></div>",
   "Tokens calientes": "Hot tokens",
+  "Billeteras calientes": "Hot wallets",
   "ahora mismo.": "right now.",
   "Lo que más se mueve en Solana, con su nivel de riesgo al lado. Antes de entrar, mira las banderas.": "What moves the most on Solana, with its risk level next to it. Before you buy in, check the flags.",
   "Lista de tokens": "Token list",

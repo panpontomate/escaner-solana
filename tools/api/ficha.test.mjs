@@ -169,3 +169,12 @@ test("the public page shows the five-tier level when the collector saved it, and
   const en = pagina("M1", Object.assign({}, d, { lanz: Object.assign({}, d.lanz, { tr: "DIAMOND" }) }), null, null, Date.UTC(2026, 10, 15), "en");
   assert.match(en, /class="sello DIAMOND"><b>DIAMOND</);
 });
+
+test("si DexScreener no contesta, 503 «no hemos podido cargar» y no «no encontrado»", async () => {
+  const r = await ficha(new Request("https://token.solflag.com/en/" + NADA), env, async () => null);
+  assert.equal(r.status, 503);
+  const b = await r.text();
+  assert.match(b, /We couldn't load this token file/);
+  assert.doesNotMatch(b, /We couldn't find this token/);
+  assert.equal(r.headers.get("cache-control"), "no-store");
+});
