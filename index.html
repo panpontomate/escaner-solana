@@ -1298,6 +1298,7 @@ body.scanp #form .eyebrow{margin-bottom:8px}
 #results.tview #list{margin-top:0!important}
 #results.tview #summary{order:1}
 #results.tview #tdetail{display:contents}
+.tc2{display:contents}
 .tnav{order:2;position:sticky;top:8px;z-index:20;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px;border-radius:14px;background:rgba(24,17,62,.94);border:1px solid var(--line);backdrop-filter:blur(8px)}
 .tnav::-webkit-scrollbar{display:none}
 .tnav button{flex:none;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:.88rem;padding:8px 12px;border-radius:10px;cursor:pointer;min-height:38px;white-space:nowrap}
@@ -1697,9 +1698,9 @@ body:not(.landing):not(.scanp) #form .row .btn{min-height:40px;border-radius:999
   #results.tview:not(.wview){grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-auto-flow:row dense;column-gap:28px;row-gap:16px;max-width:1320px}
   #results.tview:not(.wview) #tside,#results.tview:not(.wview) #tdetail{display:contents}
   #results.tview:not(.wview) #summary,#results.tview:not(.wview) .rseam,#results.tview:not(.wview) #t-who,#results.tview:not(.wview) #t-hold{grid-column:1/-1}
-  #results.tview:not(.wview) #list{grid-column:1;grid-row:span 2;order:3}
-  #results.tview:not(.wview) .tnav{grid-column:2;order:3;position:static}
-  #results.tview:not(.wview) #t-chart{grid-column:2;order:4}
+  #results.tview:not(.wview) #list{grid-column:1;order:3}
+  #results.tview:not(.wview) .tc2{display:flex;flex-direction:column;gap:16px;grid-column:2;order:3;align-self:start;min-width:0}
+  #results.tview:not(.wview) .tnav{position:static}
   #results.tview:not(.wview) .tnav .tnv{display:none}
 }
 @media (max-width:960px){
@@ -2911,8 +2912,6 @@ function curvaHtml(r){
   var m=Math.max(1,Math.round(c.min));
   return "<div class='curva'><p class='kick'><i></i>"+"Sigue en la curva de Pump.fun"+"</p>"+
     "<p>"+"Todavía no ha graduado: se compra y se vende contra la curva de Pump.fun, no en un pool normal."+"</p>"+
-    "<div class='cfacts'><div><b>"+"Menos de 2 de 100"+"</b><span>"+"tokens que vemos en la curva llegan a graduar"+"</span></div>"+
-    "<div><b>"+"9 de cada 10"+"</b><span>"+"de los que gradúan mueren en un día"+"</span></div></div>"+
     (c.fast?"<div class='cfast'><span class='tg'>"+"MUY DEPRISA"+"</span><p>"+"Ya vale "+usd(c.mc)+" a los "+m+(m===1?" minuto":" minutos")+" ("+usd(c.ritmo)+" por minuto). "+"De los que iban así, más de la mitad graduó. "+"<b>"+"Graduar no es ir bien:"+"</b> "+"la mayoría muere igual ese mismo día."+"</p></div>":"")+
     "<p class='csrc'>"+"Datos del registro de SolFlag, 1–12/11"+" · <a href='"+LACIERTO+"' target='_blank' rel='noopener'>"+"Datos y acierto"+"</a> · <a href='"+LHOW+"#mercado' target='_blank' rel='noopener'>"+"Cómo funciona"+"</a></p></div>";
 }
@@ -3162,9 +3161,26 @@ function xBtn(r){
 }
 // En la curva de Pump.fun DexScreener no da liquidez y el token salía con «liquidez 0 $»; GeckoTerminal sí
 // sabe lo que hay en la curva (el mismo pool), que es contra lo que se vende
+// 15/11: primero se lee la propia cuenta de la curva en Solana (sin gastar GeckoTerminal, que hace falta para la
+// gráfica). Mismo cálculo que GeckoTerminal: el SOL de la curva más los tokens que le quedan, al precio de ahora
+var PUMP_PROG="6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
+async function curveLiquidity(par){
+  if(!/^pump-?fun$/i.test(par.dexId||"")) return 0;
+  var pu=Number(par.priceUsd), pn=Number(par.priceNative); if(!(pu>0&&pn>0)) return 0;
+  try{
+    var a=await rpc("getAccountInfo",[par.pairAddress,{encoding:"base64"}]), v=a&&a.value;
+    if(!v||v.owner!==PUMP_PROG) return 0;
+    var b=Uint8Array.from(atob(v.data[0]),function(ch){ return ch.charCodeAt(0); }); if(b.length<49) return 0;
+    var dv=new DataView(b.buffer);
+    function u64(o){ return dv.getUint32(o,true)+dv.getUint32(o+4,true)*4294967296; }
+    // cuenta de la curva: 8 de cabecera, reservas virtuales de token y SOL, reservas reales de token (24) y SOL (32)
+    return u64(32)/1e9*(pu/pn)+u64(24)/1e6*pu;
+  }catch(e){ if(e&&e.message==="cancelado") throw e; return 0; }
+}
 async function fillLiquidity(par,known){
   if(!par||(par.liquidity&&par.liquidity.usd)||!par.pairAddress) return;
   var v=known||0;
+  if(!v) v=await curveLiquidity(par);
   if(!v){ try{ var j=await jfetch(GT+"pools/"+par.pairAddress); v=Number(j&&j.data&&j.data.attributes&&j.data.attributes.reserve_in_usd)||0; }catch(e){} }
   if(v>0) par.liquidity=Object.assign({},par.liquidity,{usd:v});
 }
@@ -3559,14 +3575,15 @@ function tokenDetail(r){
   $("#results").classList.add("tview"); $("#results").classList.remove("wview"); $(".wrap").classList.add("tv-wide"); d.hidden=false;
   listHome(); $("#wnum").hidden=true;
   var young=r.par&&r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<7*86400000;
-  d.innerHTML="<nav class='tnav' aria-label='Apartados del token'>"+
+  // atajos y gráfica en una sola caja: en pantalla ancha van juntos a la derecha aunque las banderas sean más altas (15/11)
+  d.innerHTML="<div class='tc2'><nav class='tnav' aria-label='Apartados del token'>"+
       "<button type='button' class='tnv' data-tgo='summary'>Veredicto</button>"+
       "<button type='button' data-tgo='t-chart'>Gráfica</button>"+
       (r.emisor?"":"<button type='button' class='tnmap' data-map='"+esc(r.mint)+"'>◉ Mapa</button>")+
       "<button type='button' data-tgo='t-who'>Quién está detrás</button>"+
       (r.emisor?"":"<button type='button' data-tgo='t-hold'>Ballenas</button>")+"</nav>"+
     "<section class='card tdc' id='t-chart'><h2>Gráfica <small>precio en $</small></h2>"+
-      (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("Sin mercado: no hay precio que dibujar.")+"</div>")+histHtml(r)+"</section>"+
+      (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("Sin mercado: no hay precio que dibujar.")+"</div>")+histHtml(r)+"</section></div>"+
     "<section class='card tdc' id='t-who'><h2>Quién está detrás<span class='tnew'>nuevo</span> <small>lo que hicieron antes</small></h2>"+
       (young?"<div class='lights' style='margin:0 0 12px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>":"")+
       "<div id='whobox'><p class='hint'>Buscando en el registro de SolFlag…</p></div>"+
@@ -3586,7 +3603,9 @@ var logos={};
 async function tokenLogo(r){
   if(logos[r.mint]===undefined){
     logos[r.mint]=null;
-    try{ var j=await jfetch(GT+"tokens/"+r.mint), u=j&&j.data&&j.data.attributes&&j.data.attributes.image_url; if(u&&!/missing/.test(u)) logos[r.mint]=u; }catch(e){}
+    // primero nuestra API (Helius, en caché una semana): GeckoTerminal se guarda para la gráfica (15/11)
+    try{ var q=await fetch(API+"logo/"+r.mint+"?w=192"); if(q.ok){ var qj=await q.json(); if(qj&&qj.img) logos[r.mint]=qj.img; else if(qj&&qj.img===null) logos[r.mint]=""; } }catch(e){}
+    if(logos[r.mint]===null) try{ var j=await jfetch(GT+"tokens/"+r.mint), u=j&&j.data&&j.data.attributes&&j.data.attributes.image_url; if(u&&!/missing/.test(u)) logos[r.mint]=u; }catch(e){}
   }
   var u=logos[r.mint]; if(!u||state.token!==r) return;
   r.img=u;
@@ -4010,7 +4029,10 @@ function paintHotW(){
   $("#hotdsrc").textContent=d.length?"Registro de SolFlag: "+(L.n||0).toLocaleString("de-DE")+" lanzamientos en las últimas 24 h, "+(L.analyzed||0).toLocaleString("de-DE")+" analizados. Se actualiza cada 5 min.":"";
 }
 function paintHome(){
-  if(!trend.rows||Date.now()-trend.ts>300000) setTimeout(loadTrend,300); else paintTrend();
+  // con un enlace directo (?token=, ?wallet=…) el análisis ya ha empezado: la portada no llega a verse y no se
+  // gasta GeckoTerminal en sus listas, que hace falta para la gráfica (15/11)
+  if(!document.body.classList.contains("landing")) return;
+  if(!trend.rows||Date.now()-trend.ts>300000) setTimeout(function(){ if(liveOn()) loadTrend(); },300); else paintTrend();
   if(Date.now()-fresh.ts>=30000) loadFresh(); else paintFresh(true);
   if(!fresh.timer) fresh.timer=setInterval(liveTick,10000);
   loadDatos(); loadHotW();
@@ -4083,7 +4105,7 @@ function paintCinta(){
   $("#sctrack").style.setProperty("--cd",Math.max(30,it.length*6)+"s");
 }
 function paintScanPage(){
-  if(!trend.rows||Date.now()-trend.ts>300000) setTimeout(loadTrend,300); else paintTrend();
+  if(!trend.rows||Date.now()-trend.ts>300000) setTimeout(function(){ if(liveOn()) loadTrend(); },300); else paintTrend();
   if(Date.now()-fresh.ts>=30000) loadFresh(); else paintFresh(true);
   if(!fresh.timer) fresh.timer=setInterval(liveTick,10000);
   paintCinta(); loadMoment();
@@ -4155,9 +4177,14 @@ var CHART_TF={m1:["minute",1,120,"1 min"],m5:["minute",5,120,"5 min"],m15:["minu
 var charts={};   // "pool|periodo" -> [[ms, cierre]...], "loading" o "err"
 state.ctf="m5";
 // en vez de una gráfica vacía, un aviso del mismo tamaño
-function chartNA(why){
-  return "<div class='pc-na'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M3 3v18h18'/><path d='m7 15 4-4 3 3 5-6'/></svg><b>Gráfica no disponible en este momento</b><span>"+esc(why)+"</span></div>";
+function chartNA(why,retry){
+  return "<div class='pc-na'><svg viewBox='0 0 24 24' aria-hidden='true'><path d='M3 3v18h18'/><path d='m7 15 4-4 3 3 5-6'/></svg><b>Gráfica no disponible en este momento</b><span>"+esc(why)+"</span>"+
+    (retry?"<button type='button' class='btn small' data-cretry>"+"Reintentar"+"</button>":"")+"</div>";
 }
+// GeckoTerminal corta por ráfagas (429 sin CORS: el navegador lo ve como fallo de red). Un fallo no se guarda para
+// siempre: se reintenta solo a los 15, 30 y 45 s y queda el botón «Reintentar» (15/11)
+var chartErr={};
+function ctfButtons(){ Array.prototype.forEach.call(document.querySelectorAll("[data-ctf]"),function(b){ b.setAttribute("aria-pressed",String(b.getAttribute("data-ctf")===state.ctf)); }); }
 function chartHtml(r){
   if(!r.par||!r.par.pairAddress) return "";
   return "<div class='pchart'><div class='pc-head'><b>Precio</b><span class='pc-chg' id='pcchg'></span><span class='segs'>"+
@@ -4167,6 +4194,8 @@ function chartHtml(r){
 async function paintChart(){
   var r=state.token, box=$("#pcbody");
   if(!r||!r.par||!r.par.pairAddress||!box) return;
+  // el paso a 1 min de un token joven no se arrastra al siguiente token
+  if(state.cmint!==r.mint){ state.cmint=r.mint; if(state.ctfAuto){ state.ctf="m5"; state.ctfAuto=false; ctfButtons(); } }
   var key=r.par.pairAddress+"|"+state.ctf, c=charts[key];
   if(c===undefined){
     charts[key]="loading";
@@ -4182,8 +4211,21 @@ async function paintChart(){
   }
   if(c==="loading") return;
   state.cpts=null;
-  if(c==="err"||c.length<2){
-    box.innerHTML=chartNA(c==="err"?"GeckoTerminal no responde o todavía no tiene este mercado.":"Todavía no hay operaciones suficientes para dibujar las velas.");
+  // token joven: a 5 min solo hay 1–3 velas; si no lo ha elegido la persona, pasa solo a 1 min
+  if(c!=="err"&&c.length<12&&state.ctf==="m5"&&state.ctfUser!==r.mint&&r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<3*3600000){
+    state.ctf="m1"; state.ctfAuto=true; ctfButtons(); return paintChart();
+  }
+  if(c==="err"){
+    var n0=chartErr[key]||0;
+    if(n0<3){
+      chartErr[key]=n0+1;
+      setTimeout(function(){ if(charts[key]==="err"){ delete charts[key]; paintChart(); } },15000*(n0+1));
+    }
+    box.innerHTML=chartNA(n0<3?"GeckoTerminal está saturado ahora mismo. Lo volvemos a intentar solo en unos segundos.":"GeckoTerminal no responde o todavía no tiene este mercado.",true);
+    $("#pcchg").textContent=""; return;
+  }
+  if(c.length<2){
+    box.innerHTML=chartNA("Todavía no hay operaciones suficientes para dibujar las velas.");
     $("#pcchg").textContent=""; return;
   }
   var key0=key;
@@ -4233,9 +4275,12 @@ function loadLWC(){
   return lwcP;
 }
 function lwcNum(v){
-  if(!v) return "0";
-  var d=v>=1?Math.max(2,4-Math.floor(Math.log10(v))):Math.min(12,2-Math.floor(Math.log10(v))+2);
-  return v.toLocaleString("es-ES",{minimumFractionDigits:Math.min(d,v>=1000?0:d),maximumFractionDigits:Math.min(d,v>=1000?0:d)});
+  // la escala puede bajar de 0 cuando el precio se hunde (15/11): con un negativo, log10 daba NaN y la gráfica no salía
+  if(v<0) return "";   // un precio no es negativo: esas marcas de la escala no se enseñan
+  var a=Math.abs(v); if(!a||!isFinite(a)) return "0";
+  var d=a>=1?Math.max(2,4-Math.floor(Math.log10(a))):Math.min(12,2-Math.floor(Math.log10(a))+2);
+  d=Math.min(d,a>=1000?0:d);
+  return v.toLocaleString("es-ES",{minimumFractionDigits:d,maximumFractionDigits:d});
 }
 function lwcVol(v){ return v>=1e6?(v/1e6).toLocaleString("es-ES",{maximumFractionDigits:2})+" M":v>=1e3?(v/1e3).toLocaleString("es-ES",{maximumFractionDigits:1})+" K":Math.round(v).toString(); }
 function lwcDraw(box,c,r){
@@ -5992,8 +6037,15 @@ $("#mform").addEventListener("submit",function(e){ e.preventDefault(); var v=$("
 /* ---------- eventos ---------- */
 document.addEventListener("click",function(ev){
   var ctf=ev.target.closest&&ev.target.closest("[data-ctf]");
+  var crt=ev.target.closest&&ev.target.closest("[data-cretry]");
+  if(crt&&state.token&&state.token.par){
+    var ck=state.token.par.pairAddress+"|"+state.ctf;
+    if(charts[ck]==="err"){ delete charts[ck]; chartErr[ck]=0; }
+    var pb0=$("#pcbody"); if(pb0) pb0.innerHTML="<p class='hint'>Cargando gráfica…</p>";
+    paintChart(); return;
+  }
   if(ctf){
-    state.ctf=ctf.getAttribute("data-ctf");
+    state.ctf=ctf.getAttribute("data-ctf"); state.ctfAuto=false; if(state.token) state.ctfUser=state.token.mint;
     Array.prototype.forEach.call(document.querySelectorAll("[data-ctf]"),function(b){ b.setAttribute("aria-pressed",String(b===ctf)); });
     var pb=$("#pcbody"); if(pb) pb.innerHTML="<p class='hint'>Cargando gráfica…</p>";
     paintChart(); return;

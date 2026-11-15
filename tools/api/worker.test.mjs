@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import { handle, V, portada, DAY } from "./worker.js";
+import { handle, V, portada, DAY, logo, LOGO_CDN } from "./worker.js";
 import { SCHEMA } from "../caras/plano.mjs";
 
 const A = "PAY1111111111111111111111111111111", B = "FUND111111111111111111111111111111", C = "BUY1111111111111111111111111111111";
@@ -180,3 +180,17 @@ test("acciones: el multiplicador de split se aplica desde su fecha", async () =>
   assert.equal(multiplicador(e, 1000 * 1000), 10);
   assert.equal(multiplicador(null, 0), 1);
 });
+
+test("logo: Helius getAsset gives the image through the CDN at 192 px; IPFS goes by the Pump.fun gateway; no logo is null; no RPC answer is undefined", async () => {
+  const env = { SOLANA_RPC: "https://rpc.example" };
+  const answer = (j) => async () => ({ json: async () => j });
+  assert.equal(await logo(env, M1, answer({ result: { content: { files: [{ uri: "https://ipfs.io/ipfs/bafyX", mime: "image/png" }], links: { image: "https://ipfs.io/ipfs/bafyX" } } } })), LOGO_CDN + "https://pump.mypinata.cloud/ipfs/bafyX");
+  assert.equal(await logo(env, M1, answer({ result: { content: { files: [], links: { image: "https://static.jup.ag/jup/icon.png" } } } })), LOGO_CDN + "https://static.jup.ag/jup/icon.png");
+  assert.equal(await logo(env, M1, answer({ result: { content: { files: [{ uri: "ipfs://bafyY/logo.png", mime: "image/png" }], links: {} } } })), LOGO_CDN + "https://pump.mypinata.cloud/ipfs/bafyY/logo.png");
+  assert.equal(await logo(env, M1, answer({ result: { content: { files: [], links: { image: "http://insecure.example/a.png" } } } })), null);
+  assert.equal(await logo(env, M1, answer({ result: { content: { files: [], links: {} } } })), null);
+  assert.equal(await logo(env, M1, answer({ error: { message: "not found" } })), null);
+  assert.equal(await logo(env, M1, async () => { throw new Error("down"); }), undefined);
+  assert.equal(await logo({}, M1, answer({})), undefined);
+});
+

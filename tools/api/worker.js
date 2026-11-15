@@ -6,7 +6,8 @@
 //   GET  /api/token/<mint>         un lanzamiento: quién está detrás (con su historial) y sus primeros compradores
 //   GET  /api/portada              lo de las últimas 24 h para la portada: lanzamientos por DEX y nivel, creadores
 //                                  en serie, financiadores de varios creadores y quién compra en los primeros bloques
-//   GET  /api/acciones             acciones tokenizadas frente a la acción real: prima, bolsa abierta, liquidez (acciones.js)
+//   GET  /api/logo/<mint>         el logo del token (getAsset de Helius), una semana en la caché
+//   GET  /api/acciones            acciones tokenizadas frente a la acción real: prima, bolsa abierta, liquidez (acciones.js)
 //   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
 //   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
 //                                  veces (tabla pedidos), nada de quién. El recolector lo analiza después él mismo
@@ -137,6 +138,29 @@ async function visto(req, env, m) {
   catch (e) { return empty(503); }
 }
 
+// Logo de un token con getAsset de Helius (secreto SOLANA_RPC), para que la web no gaste GeckoTerminal en eso
+// (15/11). null = no tiene logo; undefined = el RPC no contestó (no se guarda en la caché)
+export async function logo(env, m, fetchFn) {
+  if (!env.SOLANA_RPC) return undefined;
+  const j = await fetchFn(env.SOLANA_RPC, { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getAsset", params: { id: m } }) })
+    .then((r) => r.json()).catch(() => null);
+  if (!j) return undefined;
+  const c = j.result && j.result.content;
+  if (!c) return j.error ? null : undefined;
+  const f = (c.files || []).find((x) => x && x.uri && /^image\//.test(x.mime || "image/"));
+  return logoUrl((c.links && c.links.image) || (f && f.uri) || null);
+}
+// ipfs.io y dweb.link contestan 429 a menudo: lo de IPFS va por la pasarela de Pump.fun. Todo pasa por el CDN de
+// Helius a 192 px (un logo de 320 KB queda en ~13 KB y en su caché)
+export const LOGO_CDN = "https://cdn.helius-rpc.com/cdn-cgi/image/width=192/";
+export function logoUrl(u) {
+  if (!u || typeof u !== "string") return null;
+  const cid = u.match(/^ipfs:\/\/(?:ipfs\/)?([A-Za-z0-9]+)(\/[^?#]*)?/) || u.match(/^https:\/\/[^/]+\/ipfs\/([A-Za-z0-9]+)(\/[^?#]*)?/);
+  if (cid) u = "https://pump.mypinata.cloud/ipfs/" + cid[1] + (cid[2] || "");
+  return /^https:\/\//.test(u) ? LOGO_CDN + u : null;
+}
+
 export async function handle(req, env) {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: Object.assign({}, HEAD, { "access-control-allow-methods": "GET, POST", "access-control-max-age": "86400" }) });
   const p = new URL(req.url).pathname.replace(/\/+$/, "").split("/");
@@ -144,6 +168,15 @@ export async function handle(req, env) {
   if (req.method !== "GET") return fail(405, "only GET");
   if (p.length === 3 && p[1] === "api" && p[2] === "portada") {
     try { return json(await portada(env.DB, Date.now())); } catch (e) { return fail(503, "database unavailable"); }
+  }
+  if (p.length === 4 && p[1] === "api" && p[2] === "logo") {
+    if (!ADDR.test(p[3])) return fail(400, "not a Solana address");
+    const img = await logo(env, p[3], fetch);
+    if (img === undefined) return fail(503, "rpc unavailable");
+    const res = json({ v: V, mint: p[3], img: img });
+    // un logo no cambia: una semana en la caché; si aún no tiene, se vuelve a mirar en una hora
+    res.headers.set("cache-control", "public, max-age=" + (img ? 604800 : 3600));
+    return res;
   }
   if (p.length === 3 && p[1] === "api" && p[2] === "acciones") {
     try {
