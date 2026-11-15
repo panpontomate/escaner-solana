@@ -1971,6 +1971,46 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
   .gx-tools hr{margin:2px auto}
 }
 @media (prefers-reduced-motion:reduce){ .gx,.gx-d,.pc-x{transition:none} }
+/* marcas en la gráfica (creador, lanzamiento, ballenas, tú) y «Lo que pasó» */
+.mkrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 0}
+.mkrow:empty{display:none}
+.mkc{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(196,181,253,.3);background:rgba(255,255,255,.03);border-radius:999px;padding:5px 11px 5px 9px;font:600 .8rem var(--f-body);cursor:pointer;color:var(--fg)}
+.mkc i{width:10px;height:10px;border-radius:50%}
+.mkc b{font-weight:700;color:var(--muted)}
+.mkc[aria-pressed=false]{opacity:.45}
+.mkc[aria-pressed=false] i{background:transparent!important;box-shadow:inset 0 0 0 1.5px var(--muted)}
+.mkq{margin-left:auto;border:0;background:none;color:var(--muted);font:600 .78rem var(--f-body);padding:5px 2px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.mkw{font-size:.8rem;color:var(--muted)}
+.mkh{flex-basis:100%;list-style:none;margin:4px 0 2px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02);font-size:.82rem;color:var(--muted)}
+.mkh[hidden]{display:none}
+.mkh li{display:flex;gap:8px;align-items:baseline;padding:2px 0}
+.mkh i{width:9px;height:9px;border-radius:50%;flex:none}
+.mkh b{color:var(--fg)}
+.gx-t .mkrow{margin:0;flex-wrap:nowrap}
+.gx-t .mkc{padding:4px 9px 4px 8px;font-size:.78rem;white-space:nowrap}
+.mktip{position:absolute;z-index:6;width:260px;pointer-events:none;background:#140f33;border:1px solid rgba(196,181,253,.3);border-radius:12px;padding:8px 12px;box-shadow:0 14px 40px rgba(0,0,0,.55);font-size:.8rem;color:#f1eeff}
+.mktip[hidden]{display:none}
+.mke{display:grid;grid-template-columns:10px 1fr;gap:3px 8px;padding:5px 0;border-top:1px solid rgba(196,181,253,.18)}
+.mke:first-child{border-top:0}
+.mke i{width:10px;height:10px;border-radius:50%;margin-top:4px}
+.mke small{grid-column:2;color:#a59cc9;font:500 .72rem var(--f-mono)}
+.mkstory{margin-top:18px}
+.mkstory:empty{display:none}
+.mkt{margin:0 0 4px;font:700 1.25rem var(--f-display)}
+.mks{margin:6px 0 10px;color:var(--muted);font-size:.84rem}
+.mksum{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:10px}
+.mksum div{padding:14px 16px 12px 0}
+.mksum div+div{border-left:1px solid var(--line);padding-left:16px}
+.mksum b{display:block;font:300 1.7rem/1.05 var(--f-display)}
+.mksum span{display:block;margin-top:4px;font-size:.84rem;color:var(--muted)}
+.mktl{list-style:none;margin:0;padding:0}
+.mktl li{display:grid;grid-template-columns:52px 12px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-size:.88rem;cursor:pointer}
+.mktl li:hover{background:rgba(255,255,255,.02)}
+.mktl time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.82rem}
+.mktl i{width:10px;height:10px;border-radius:50%;align-self:center}
+.mktl small{color:var(--muted);font:500 .74rem var(--f-mono)}
+.mktl a{color:var(--kick,#7ab8c4);font-size:.8rem;text-decoration:none;white-space:nowrap}
+@media (max-width:560px){ .mksum div+div{border-left:0;padding-left:0;border-top:1px solid var(--line)} .mktl li{grid-template-columns:44px 10px minmax(0,1fr)} .mktl a{grid-column:3} .mkq{margin-left:0} }
 </style>
 </head>
 <body>
@@ -2250,6 +2290,8 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
         <button type="button" class="gx-b" id="gxLog" aria-pressed="false" title="Log scale: a ×2 looks the same at the bottom as at the top">Log</button>
         <button type="button" class="gx-b" id="gxVol" aria-pressed="true">Volume</button>
       </span>
+      <span class="gx-sep"></span>
+      <span class="mkrow mkrow-b" id="gxMk"></span>
     </div>
     <div class="gx-c">
       <div class="gx-tools" id="gxTools" role="toolbar" aria-orientation="vertical" aria-label="Drawing tools">
@@ -2267,7 +2309,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
         <hr>
         <button type="button" class="gx-dt del" id="gxAll" aria-label="Delete all drawings"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11l4 5M14 11l-4 5"/></svg></button>
       </div>
-      <div class="gx-plot" id="gxPlot"><div class="lwc" id="gxBig"><div class="lwc-lg" id="gxLg"></div></div><canvas id="gxOv"></canvas><div class="gx-hint" id="gxHint" hidden></div>
+      <div class="gx-plot" id="gxPlot"><div class="lwc" id="gxBig"><div class="lwc-lg" id="gxLg"></div></div><canvas id="gxOv"></canvas><div class="gx-hint" id="gxHint" hidden></div><div class="mktip" id="gxTip" hidden></div>
         <div class="gx-bar" id="gxBar" hidden role="toolbar" aria-label="Drawing options">
           <button type="button" id="gxSet" aria-expanded="false" title="Settings: colour and more"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</button>
           <button type="button" id="gxEdit" title="Change the text"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/></svg>Edit</button>
@@ -3790,7 +3832,7 @@ function tokenDetail(r){
       "<button type='button' data-tgo='t-who'>Who is behind</button>"+
       (r.emisor?"":"<button type='button' data-tgo='t-hold'>Whales</button>")+"</nav>"+
     "<section class='card tdc' id='t-chart'><h2>Chart <small>price in $</small></h2>"+
-      (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("No market: there is no price to draw.")+"</div>")+histHtml(r)+"</section></div>"+
+      (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("No market: there is no price to draw.")+"</div>")+histHtml(r)+"<div class='mkstory' id='mkstory'></div></section></div>"+
     "<section class='card tdc' id='t-who'><h2>Who is behind<span class='tnew'>new</span> <small>what they did before</small></h2>"+
       (young?"<div class='lights' style='margin:0 0 12px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Buys at launch</b><span>Checking who bought in the first second…</span></div></div></div>":"")+
       "<div id='whobox'><p class='hint'>Looking in the SolFlag registry…</p></div>"+
@@ -4414,7 +4456,7 @@ function chartHtml(r){
   if(!r.par||!r.par.pairAddress) return "";
   return "<div class='pchart'><div class='pc-head'><b>Price</b><span class='pc-chg' id='pcchg'></span><span class='segs'>"+
     Object.keys(CHART_TF).map(function(k){ return "<button type='button' class='seg' data-ctf='"+k+"' aria-pressed='"+(state.ctf===k)+"'>"+esc(CHART_TF[k][3])+"</button>"; }).join("")+
-    "</span><button type='button' class='pc-x' data-gx title='Full screen' aria-label='See the chart in full screen'><svg viewBox='0 0 24 24'><path d='M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7'/></svg></button></div><div class='pc-body' id='pcbody'><p class='hint'>Loading chart…</p></div></div>";
+    "</span><button type='button' class='pc-x' data-gx title='Full screen' aria-label='See the chart in full screen'><svg viewBox='0 0 24 24'><path d='M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7'/></svg></button></div><div class='mkrow'></div><div class='pc-body' id='pcbody'><p class='hint'>Loading chart…</p></div></div>";
 }
 async function paintChart(){
   var r=state.token, box=$("#pcbody");
@@ -4512,7 +4554,7 @@ function lwcDraw(box,c,r){
   var LC=window.LightweightCharts, tz=new Date().getTimezoneOffset()*60;   // la librería pinta en UTC: se pasa a la hora local
   var minP=Infinity; c.forEach(function(p){ if(p[4]<minP) minP=p[4]; });
   var prec=minP>=1?4:Math.min(12,Math.max(2,2-Math.floor(Math.log10(minP))+2));
-  box.innerHTML="<div class='lwc' id='lwcbox'><div class='lwc-lg' id='lwclg'></div></div>"+
+  box.innerHTML="<div class='lwc' id='lwcbox'><div class='lwc-lg' id='lwclg'></div><div class='mktip' id='lwctip' hidden></div></div>"+
     "<p class='lwc-attr'><span id='lwcmk'></span><a href='https://www.tradingview.com/' target='_blank' rel='noopener'>Chart: TradingView Lightweight Charts</a> · <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Data: Powered by CoinGecko</a></p>";
   var el=$("#lwcbox"), mob=window.matchMedia&&matchMedia("(max-width:520px)").matches;
   var ch=LC.createChart(el,{autoSize:true,height:mob?260:330,
@@ -4533,11 +4575,10 @@ function lwcDraw(box,c,r){
     data.push({time:t,open:p[2],high:p[3],low:p[4],close:p[1]});
     vol.push({time:t,value:p[5]||0,color:p[1]>=p[2]?"rgba(74,222,128,.35)":"rgba(255,107,107,.35)"}); });
   cs.setData(data); vs.setData(vol);
-  // dónde lo analizaste tú: flecha sobre la vela de ese momento (GeckoTerminal va unos minutos por detrás)
-  var step=data.length>1?data[1].time-data[0].time:60, mk=[];
-  (r.hist||[]).forEach(function(e){ var t=Math.floor(e.ts/1000)-tz; if(t<data[0].time||t>data[data.length-1].time+Math.max(3*step,600)) return;
-    var k=data.length-1; while(k>0&&data[k].time>t) k--; if(!mk.some(function(m){ return m.time===data[k].time; })) mk.push({time:data[k].time,position:"aboveBar",color:"#c4b5fd",shape:"arrowDown",text:"You"}); });
-  if(mk.length){ cs.setMarkers(mk); $("#lwcmk").innerHTML="<i></i>You analyzed it here"; }
+  // marcas: tú (donde lo analizaste), el creador, el lanzamiento y las ballenas (mkSet; llegan aparte con mkLoad)
+  var step=data.length>1?data[1].time-data[0].time:60;
+  state.lwcS={series:cs,times:data.map(function(d){ return d.time; }),step:step,tz:tz};
+  mkSet(cs,state.lwcS.times,r,step,tz);
   ch.timeScale().fitContent();
   // leyenda arriba a la izquierda, como en TradingView: la vela bajo la cruz o la última
   var lg=$("#lwclg"), byT={}; data.forEach(function(d,i){ byT[d.time]=i; });
@@ -4547,8 +4588,10 @@ function lwcDraw(box,c,r){
     lg.innerHTML="<span>O <b style='color:"+col+"'>"+lwcNum(d.open)+"</b></span><span>H <b style='color:"+col+"'>"+lwcNum(d.high)+"</b></span><span>L <b style='color:"+col+"'>"+lwcNum(d.low)+"</b></span><span>C <b style='color:"+col+"'>"+lwcNum(d.close)+"</b></span><span><b style='color:"+col+"'>"+(chg>=0?"+":"")+fmtPct(chg)+"</b></span><span>Vol <b>"+lwcVol(v.value)+" $</b></span>";
   }
   legend(data.length-1);
-  ch.subscribeCrosshairMove(function(pr){ var i=pr&&pr.time!=null?byT[pr.time]:undefined; legend(i===undefined?data.length-1:i); });
+  ch.subscribeCrosshairMove(function(pr){ var i=pr&&pr.time!=null?byT[pr.time]:undefined; legend(i===undefined?data.length-1:i); mkTip($("#lwctip"),cs,pr,el); });
   state.lwc=ch;
+  document.querySelectorAll(".mkrow").forEach(function(x){ if(!x.innerHTML) x.innerHTML=mkChipsHtml(r.mint)+mkHelpHtml(); });
+  mkLoad(r);
   var hi=0; c.forEach(function(p){ if(p[3]>hi) hi=p[3]; });
   var n=c.length, chg=(c[n-1][1]/c[0][2]-1)*100, fromHi=(c[n-1][1]/hi-1)*100, pe=$("#pcchg");
   if(pe){ pe.textContent=(chg>=0?"+":"")+fmtPct(chg)+" · "+priceUsd(c[n-1][1])+(fromHi<=-1?" · "+fmtPct(fromHi)+" from the high":""); pe.className="pc-chg "+(chg>=0?"up":"down"); }
@@ -6323,6 +6366,7 @@ async function gxPaint(keep){
   // se abre enseñando lo mismo que la pequeña (en el móvil en vertical, menos velas para que se vean)
   var n=c.length, show=CHART_TF[GX.k][2]; if(matchMedia("(max-width:700px)").matches) show=Math.min(show,60);
   GX.ch=gxDraw(box,c,r,range||{from:Math.max(0,n-show)-.5,to:n+3});
+  mkPaint();
   var cs=c.slice(-CHART_TF[GX.k][2]), hi=0; cs.forEach(function(p){ if(p[3]>hi) hi=p[3]; });
   var last=cs[cs.length-1][1], chg=(last/cs[0][2]-1)*100, fh=(last/hi-1)*100;
   gxEl("gxPrice").textContent=priceUsd(last);
@@ -6350,16 +6394,14 @@ function gxDraw(el,c,r,range){
     :ch.addCandlestickSeries({upColor:up,downColor:dn,borderUpColor:up,borderDownColor:dn,wickUpColor:up,wickDownColor:dn,priceFormat:pf});
   main.setData(GX.line?data.map(function(d){ return {time:d.time,value:d.close}; }):data);
   if(GX.vol){ var vs=ch.addHistogramSeries({priceScaleId:"",priceFormat:{type:"volume"},lastValueVisible:false,priceLineVisible:false}); vs.priceScale().applyOptions({scaleMargins:{top:.8,bottom:0}}); vs.setData(vols); }
-  // «Tú»: donde lo analizaste (como en la pequeña)
-  var step=data.length>1?data[1].time-data[0].time:60, mk=[];
-  if(!GX.line) (r.hist||[]).forEach(function(e){ var t=Math.floor(e.ts/1000)-tz; if(t<data[0].time||t>data[data.length-1].time+Math.max(3*step,600)) return;
-    var k=data.length-1; while(k>0&&data[k].time>t) k--; if(!mk.some(function(m){ return m.time===data[k].time; })) mk.push({time:data[k].time,position:"aboveBar",color:"#c4b5fd",shape:"arrowDown",text:"You"}); });
-  if(mk.length) main.setMarkers(mk);
+  // marcas (como en la pequeña): tú, el creador, el lanzamiento y las ballenas
+  var step=data.length>1?data[1].time-data[0].time:60;
+  if(!GX.line) mkSet(main,data.map(function(d){ return d.time; }),r,step,tz);
   var lg=gxEl("gxLg"), byT={}; data.forEach(function(d,i){ byT[d.time]=i; });
   function legend(i){ var d=data[i]; if(!d||!lg) return; var col=d.close>=d.open?up:dn, x=(d.close/d.open-1)*100;
     lg.innerHTML="<span>O <b style='color:"+col+"'>"+lwcNum(d.open)+"</b></span><span>H <b style='color:"+col+"'>"+lwcNum(d.high)+"</b></span><span>L <b style='color:"+col+"'>"+lwcNum(d.low)+"</b></span><span>C <b style='color:"+col+"'>"+lwcNum(d.close)+"</b></span><span><b style='color:"+col+"'>"+gxPct(x)+"</b></span><span>Vol <b>"+lwcVol(vols[i].value)+" $</b></span>"; }
   legend(data.length-1);
-  ch.subscribeCrosshairMove(function(pr){ var i=pr&&pr.time!=null?byT[pr.time]:undefined; legend(i===undefined?data.length-1:i); });
+  ch.subscribeCrosshairMove(function(pr){ var i=pr&&pr.time!=null?byT[pr.time]:undefined; legend(i===undefined?data.length-1:i); mkTip(gxEl("gxTip"),main,pr,el); });
   if(range) ch.timeScale().setVisibleLogicalRange(range); else ch.timeScale().fitContent();
   ch._main=main; ch._T=data.map(function(d){ return d.time; }); ch._step=(CHART_TF[GX.k][0]==="minute"?CHART_TF[GX.k][1]*60:CHART_TF[GX.k][0]==="hour"?3600:86400);
   return ch;
@@ -6423,6 +6465,7 @@ function pill(g,x,y,txt,bg,fg){ g.font="600 12px Manrope, system-ui, sans-serif"
 function dFrame(){
   D.raf=requestAnimationFrame(dFrame);
   var c=gxEl("gxOv"); if(!GX.ch||!c) return;
+  if(D.tool!=="cursor"||D.drag) gxEl("gxTip").hidden=true;
   var dpr=window.devicePixelRatio||1, W=c.clientWidth, H=c.clientHeight;
   if(c.width!==Math.round(W*dpr)||c.height!==Math.round(H*dpr)){ c.width=Math.round(W*dpr); c.height=Math.round(H*dpr); }
   var g=c.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
@@ -6716,6 +6759,140 @@ document.addEventListener("keydown",function(e){
     if(e.shiftKey&&document.activeElement===a){ e.preventDefault(); z.focus(); } else if(!e.shiftKey&&document.activeElement===z){ e.preventDefault(); a.focus(); } }
 },true);
 
+/* ---------- marcas en la gráfica: cuándo vendieron el creador, los compradores del lanzamiento y las ballenas (15/11,
+   maqueta maquetas/grafica/marcas-grafica.html). Sale de las últimas 300 operaciones de GeckoTerminal (cada una con su
+   wallet), del creador del análisis, de quién compró en el primer segundo (revisión del lanzamiento) y del registro.
+   «El X % de lo suyo» solo cuando su compra está dentro de esas mismas operaciones: si no, no se pone ---------- */
+var MKCOL={cr:"#ff4d6d",la:"#fb923c",wb:"#38bdf8",tu:"#c4b5fd"};
+var MK={on:{cr:true,la:true,wb:true,tu:true},data:{}};
+try{ var mk0=JSON.parse(localStorage.getItem("sf.mk")||"null"); if(mk0) Object.keys(MK.on).forEach(function(k){ if(typeof mk0[k]==="boolean") MK.on[k]=mk0[k]; }); }catch(e){}
+function mkSave(){ try{ localStorage.setItem("sf.mk",JSON.stringify(MK.on)); }catch(e){} }
+async function mkWait(get,ms){ for(var t=0;t<ms;t+=400){ var v=get(); if(v!=="loading"&&v!==undefined) return v; await new Promise(function(res){ setTimeout(res,400); }); } return get(); }
+async function mkLoad(r){
+  var m=r.mint; if(!r.par||!r.par.pairAddress||MK.data[m]!==undefined) return;
+  MK.data[m]="loading";
+  try{
+    var j=await jfetch(GT+"pools/"+r.par.pairAddress+"/trades");
+    // quién es quién: se espera un poco al registro y a la revisión del lanzamiento, que van a la vez
+    var wh=await mkWait(function(){ return who[m]; },12000), bd=await mkWait(function(){ return bundles[m]; },15000);
+    var cr={}, la={}, top={};
+    if(r.cr) cr[r.cr]=1;
+    if(wh&&wh.behind&&wh.behind.creator&&wh.behind.creator.wallet) cr[wh.behind.creator.wallet]=1;
+    if(bd&&bd.ws) bd.ws.forEach(function(x){ if(!cr[x.w]) la[x.w]=1; });
+    if(wh&&wh.firstBuyers) wh.firstBuyers.forEach(function(x){ if(x.wallet&&!cr[x.wallet]) la[x.wallet]=1; });
+    if(state.hold&&state.hold.mint===m&&state.hold.rows) state.hold.rows.filter(function(x){ return x.kind==="wallet"; }).slice(0,10).forEach(function(x){ top[x.owner]=1; });
+    var liq=Number(r.par.liquidity&&r.par.liquidity.usd)||0, big=Math.max(500,liq*.02);
+    var tr=((j&&j.data)||[]).map(function(d){ var a=d.attributes||{}, sell=a.from_token_address===m, buy=a.to_token_address===m;
+      if(a.is_anomalous||!(sell||buy)) return null;
+      return {ts:Date.parse(a.block_timestamp),sell:sell,w:a.tx_from_address,usd:Number(a.volume_in_usd)||0,amt:Number(sell?a.from_token_amount:a.to_token_amount)||0,tx:a.tx_hash}; })
+      .filter(function(x){ return x&&x.ts&&x.w; }).sort(function(a,b){ return a.ts-b.ts; });
+    var bought={}, sold={}, ev=[];
+    tr.forEach(function(x){
+      if(!x.sell){ bought[x.w]=(bought[x.w]||0)+x.amt; }
+      var k=cr[x.w]?"cr":la[x.w]?"la":(x.usd>=big||top[x.w])?"wb":null;
+      if(x.sell) sold[x.w]=(sold[x.w]||0)+x.amt;
+      if(!k||(k!=="wb"&&!x.sell)) return;   // del creador y del lanzamiento interesan las ventas; de las ballenas, las dos
+      var e={ts:x.ts,k:k,sell:x.sell,w:x.w,usd:x.usd,tx:x.tx};
+      if(x.sell&&bought[x.w]>0) e.pct=Math.min(100,Math.round(x.amt/bought[x.w]*100));
+      ev.push(e);
+    });
+    var laSold={}; ev.forEach(function(e){ if(e.k==="la") laSold[e.w]=1; });
+    var crW=Object.keys(cr).filter(function(w){ return bought[w]>0; })[0];
+    MK.data[m]={ev:ev,from:tr.length?tr[0].ts:0,n:tr.length,laTotal:Object.keys(la).length,laSold:Object.keys(laSold).length,
+      crPct:crW?Math.min(100,Math.round((sold[crW]||0)/bought[crW]*100)):null,crSells:ev.filter(function(e){ return e.k==="cr"; }).length,big:big};
+  }catch(e){ if(e&&e.message==="cancelado"){ delete MK.data[m]; return; } MK.data[m]="err"; }
+  if(state.token===r) mkPaint();
+}
+// las marcas de una gráfica: «Tú» (historial) y, si están, las del creador, el lanzamiento y las ballenas, una por vela y tipo.
+// Guarda en la serie qué pasó en cada vela, para el detalle al pasar el ratón
+function mkSet(series,times,r,step,tz){
+  if(!series||!times||!times.length) return;
+  var by={}, last=times[times.length-1], d=MK.data[r.mint];
+  function idx(t){ if(t<times[0]||t>last+Math.max(3*step,600)) return -1; var k=times.length-1; while(k>0&&times[k]>t) k--; return k; }
+  var add=function(i,e){ (by[times[i]]=by[times[i]]||[]).push(e); };
+  if(MK.on.tu) (r.hist||[]).forEach(function(h){ var i=idx(Math.floor(h.ts/1000)-tz); if(i>=0&&!(by[times[i]]||[]).some(function(x){ return x.k==="tu"; })) add(i,{k:"tu",ts:h.ts}); });
+  if(d&&d.ev) d.ev.forEach(function(e){ if(!MK.on[e.k]) return; var i=idx(Math.floor(e.ts/1000)-tz); if(i>=0) add(i,e); });
+  var mk=[];
+  Object.keys(by).forEach(function(t){
+    var g={}; by[t].forEach(function(e){ var key=e.k+(e.sell?"s":"b"); (g[key]=g[key]||[]).push(e); });
+    Object.keys(g).forEach(function(key){ var e=g[key][0], n=g[key].length, up=e.k==="wb"&&!e.sell;
+      // texto solo en lo importante (creador y tú); el resto, flechas de color
+      mk.push({time:+t,position:up?"belowBar":"aboveBar",color:MKCOL[e.k],shape:up?"arrowUp":"arrowDown",size:e.k==="cr"?1.4:1,
+        text:e.k==="cr"?"Creator":e.k==="tu"?"You":n>1?"×"+n:""}); });
+  });
+  mk.sort(function(a,b){ return a.time-b.time; });
+  series.setMarkers(mk); series._mkBy=by;
+}
+function mkWho(k,sell){ return k==="cr"?"The creator sells":k==="la"?"Launch buyer sells":k==="wb"?(sell?"Whale sells":"Whale buys"):"You scanned it here"; }
+function mkPct(e){ return (e.k==="wb"?"{n}% of their bag":"{n}% of their bag").replace("{n}",e.pct); }
+function mkLine(e){ return mkWho(e.k,e.sell)+(e.usd?" · "+usd(e.usd):"")+(e.pct!=null?" · "+mkPct(e):""); }
+// el detalle de una vela con marcas, al pasar el ratón o tocar
+function mkTip(tip,series,pr,box){
+  var evs=pr&&pr.time!=null&&series&&series._mkBy?series._mkBy[pr.time]:null;
+  if(!tip) return;
+  if(!evs||!evs.length||!pr.point){ tip.hidden=true; return; }
+  tip.innerHTML=evs.map(function(e){ return "<div class='mke'><i style='background:"+MKCOL[e.k]+"'></i><span><b>"+esc(mkWho(e.k,e.sell))+"</b>"+
+    (e.usd?" · "+esc(usd(e.usd)):"")+(e.pct!=null?" · "+esc(mkPct(e)):"")+"</span>"+(e.w?"<small>"+esc(short(e.w))+" · "+esc(ftime(e.ts))+"</small>":"")+"</div>"; }).join("");
+  tip.hidden=false;
+  var w=box.clientWidth, x=pr.point.x+16; if(x+270>w) x=pr.point.x-276;
+  tip.style.left=Math.max(4,x)+"px"; tip.style.top=Math.max(4,pr.point.y-20)+"px";
+}
+// interruptores (en la pequeña y en la grande), con cuántas hay de cada tipo
+function mkChipsHtml(m){
+  var d=MK.data[m], ev=d&&d.ev||[], n=function(k){ return ev.filter(function(e){ return e.k===k; }).length; };
+  if(!d||d==="loading") return "<span class='mkw'>"+"Looking for creator and whale sells…"+"</span>";
+  if(d==="err") return "";
+  return [["cr","Creator",n("cr")],["la","Launch buyers",n("la")],["wb","Whales",n("wb")],["tu","You",null]].map(function(x){
+    return "<button type='button' class='mkc' data-mk='"+x[0]+"' aria-pressed='"+MK.on[x[0]]+"'><i style='background:"+MKCOL[x[0]]+"'></i>"+esc(x[1])+(x[2]!=null?" <b>"+x[2]+"</b>":"")+"</button>"; }).join("")+
+    "<button type='button' class='mkq' data-mkq>"+"What does each mark mean?"+"</button>";
+}
+function mkHelpHtml(){
+  return "<ul class='mkh' hidden><li><i style='background:"+MKCOL.cr+"'></i><span><b>"+"Creator"+"</b>: "+"the wallet that created the token sells (big red arrow)."+"</span></li>"+
+    "<li><i style='background:"+MKCOL.la+"'></i><span><b>"+"Launch buyers"+"</b>: "+"those who bought in the first block sell. “×3” = three in the same candle."+"</span></li>"+
+    "<li><i style='background:"+MKCOL.wb+"'></i><span><b>"+"Whales"+"</b>: "+"buys (below) or sells (above) worth more than 2% of the liquidity (and at least $500), or by the 10 biggest holders if you opened “Whales”."+"</span></li>"+
+    "<li><i style='background:"+MKCOL.tu+"'></i><span><b>"+"You"+"</b>: "+"when you scanned it."+"</span></li></ul>";
+}
+// lo que pasó: tres cifras y la lista en orden; pulsar una fila lleva la gráfica a esa vela
+function mkStory(r){
+  var box=$("#mkstory"); if(!box) return;
+  var d=MK.data[r.mint];
+  if(!d||d==="loading"||d==="err"||!d.ev.length){ box.innerHTML=d&&d.ev&&!d.ev.length?"<p class='mks'>"+"In the latest trades we see no sells by the creator or the launch buyers, and no whale trades."+" "+esc(mkSrc(d))+"</p>":""; return; }
+  var cifras=[];
+  if(d.crPct!=null&&d.crSells) cifras.push("<div><b>"+d.crPct+" %</b><span>"+"of their bag the creator has sold"+(d.crSells>1?", "+"in {n} sells".replace("{n}",d.crSells):"")+"</span></div>");
+  else if(d.crSells) cifras.push("<div><b>"+d.crSells+"</b><span>"+(d.crSells===1?"sell by the creator":"sells by the creator")+"</span></div>");
+  if(d.laTotal) cifras.push("<div><b>"+"{a} of {b}".replace("{a}",d.laSold).replace("{b}",d.laTotal)+"</b><span>"+"launch buyers have sold"+"</span></div>");
+  var wb=d.ev.filter(function(e){ return e.k==="wb"; }), wbS=wb.filter(function(e){ return e.sell; }).length;
+  if(wb.length) cifras.push("<div><b>"+(wb.length-wbS)+" / "+wbS+"</b><span>"+"whale buys / sells"+"</span></div>");
+  var list=d.ev.slice().reverse().slice(0,40);
+  box.innerHTML="<h3 class='mkt'>"+"What happened"+"</h3><p class='mks'>"+"The buys and sells that matter, newest first. These are on-chain facts, not accusations."+"</p>"+
+    (cifras.length?"<div class='mksum'>"+cifras.join("")+"</div>":"")+
+    "<ul class='mktl'>"+list.map(function(e){ return "<li data-mkts='"+e.ts+"'><time>"+esc(ftime(e.ts))+"</time><i style='background:"+MKCOL[e.k]+"'></i><span>"+esc(mkLine(e))+" <small>"+esc(short(e.w))+"</small></span>"+
+      "<a href='https://solscan.io/tx/"+esc(e.tx)+"' target='_blank' rel='noopener'>Solscan ↗</a></li>"; }).join("")+"</ul>"+
+    (d.ev.length>40?"<p class='mks'>"+"Showing the 40 most recent."+"</p>":"")+
+    "<p class='mks'>"+esc(mkSrc(d))+"</p>";
+}
+function mkSrc(d){ return "GeckoTerminal trades (the last {n}{desde}) and the SolFlag registry.".replace("{n}",d&&d.n||300).replace("{desde}",d&&d.from?", since {f}".replace("{f}",fdate(d.from)+" "+ftime(d.from)):""); }
+// repintar marcas, interruptores y «Lo que pasó» (al llegar los datos o al pulsar un interruptor)
+function mkPaint(){
+  var r=state.token; if(!r) return;
+  document.querySelectorAll(".mkrow").forEach(function(el){
+    if(el.classList.contains("mkrow-b")){ el.innerHTML=mkChipsHtml(r.mint).replace(/<button type='button' class='mkq'[\s\S]*$/,""); return; }
+    var help=el.querySelector(".mkh"), open=help&&!help.hidden; el.innerHTML=mkChipsHtml(r.mint)+mkHelpHtml(); if(open) el.querySelector(".mkh").hidden=false; });
+  if(state.lwcS) mkSet(state.lwcS.series,state.lwcS.times,r,state.lwcS.step,state.lwcS.tz);
+  if(GX.ch&&GX.r===r) mkSet(GX.ch._main,GX.ch._T,r,GX.ch._step,new Date().getTimezoneOffset()*60);
+  mkStory(r);
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest&&e.target.closest("[data-mk]");
+  if(b){ var k=b.getAttribute("data-mk"); MK.on[k]=!MK.on[k]; mkSave(); mkPaint(); return; }
+  if(e.target.closest&&e.target.closest("[data-mkq]")){ var row=e.target.closest(".mkrow"), h=row&&row.querySelector(".mkh"); if(h) h.hidden=!h.hidden; return; }
+  var li=e.target.closest&&e.target.closest("[data-mkts]");
+  if(li&&!e.target.closest("a")&&state.lwc&&state.lwcS){   // a esa vela, en la pequeña
+    var t=Math.floor(+li.getAttribute("data-mkts")/1000)-state.lwcS.tz, T=state.lwcS.times, k=T.length-1; while(k>0&&T[k]>t) k--;
+    state.lwc.timeScale().setVisibleLogicalRange({from:k-30,to:k+30});
+    var pc=$("#t-chart"); if(pc) pc.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+});
 /* ---------- eventos ---------- */
 document.addEventListener("click",function(ev){
   var ctf=ev.target.closest&&ev.target.closest("[data-ctf]");
