@@ -10,6 +10,8 @@
 // wallet, token, con, spam, hoy, cancelado, helius, sol, dex) are deliberately not here.
 
 export const CODE = [
+  // el blog tiene versión inglesa (15/11)
+  ['<a href="https://solflag.com/blog/">Blog · Avances</a>', '<a href="https://solflag.com/en/blog/">Blog · Updates</a>'],
   // portada 11/11: cifras del registro en formato inglés
   ['return (a<b&&v>99.9?99.9:v).toFixed(1).replace(".",",")+" %"; }', 'return (a<b&&v>99.9?99.9:v).toFixed(1)+"%"; }'],
   ['dm?"desde el "+(+dm[2])+"/"+(+dm[1]):""', 'dm?"since "+(+dm[1])+"/"+(+dm[2]):""'],
@@ -263,7 +265,6 @@ export const TEXT = {
   "Activa desde el ": "Active since ",
   "No sale en otros lanzamientos registrados.": "Not seen in other registered launches.",
   // ---------- SolFlag: cabecera, portada y pie (oct 2026) ----------
-  "Blog · Avances": "Blog · Updates (Spanish)",
   "Creado por": "Created by",
   "Sin revisar todavía": "Not checked yet",
   "No aplica: mercado de más de 7 días": "Not applicable: market older than 7 days",
