@@ -73,7 +73,7 @@ const T = {
     motNada: "Su creador no tiene más lanzamientos en nuestra base.",
     descNivel: (nv, d24) => "Riesgo " + nv.toLowerCase() + " al lanzarse" + (d24 == null ? "" : d24 ? ", murió en 24 h" : ", seguía vivo a las 24 h"),
     descHoy: (v) => "Capitalización hoy " + v, descFin: "Quién lo lanzó, quién lo financió y quién compró primero, en la ficha de SolFlag.",
-    titulo: " · Ficha del token · SolFlag",
+    titulo: " · Quién lo lanzó y quién lo tiene · SolFlag",
     estados: { nada: "sin datos", vivo: "con mercado hoy", muerto: "muerto en 24 h", seco: "sin liquidez hoy", vivo24: "vivo a las 24 h", espera: "esperando las 24 h" },
     sinLogo: "sin logo", dir: "Dirección", lanz: "Lanzamiento", plat: "Plataforma", dex: "DEX", estado: "Estado", consultas: "Consultas en SolFlag",
     chCara: "Cara conocida", chCreador: "Creador en serie", chFin: "Financiador en serie", chRep: (n) => (n === 1 ? "Un comprador repetidor" : n + " compradores repetidores"),
@@ -118,7 +118,7 @@ const T = {
     motNada: "Its creator has no other launches in our database.",
     descNivel: (nv, d24) => nv.charAt(0) + nv.slice(1).toLowerCase() + " risk at launch" + (d24 == null ? "" : d24 ? ", died within 24 h" : ", still alive at 24 h"),
     descHoy: (v) => "Market cap today " + v, descFin: "Who launched it, who funded it and who bought first, in its SolFlag file.",
-    titulo: " · Token file · SolFlag",
+    titulo: " · Who launched it and who holds it · SolFlag",
     estados: { nada: "no data", vivo: "trading today", muerto: "dead within 24 h", seco: "no liquidity today", vivo24: "alive at 24 h", espera: "waiting for 24 h" },
     sinLogo: "no logo", dir: "Address", lanz: "Launch", plat: "Platform", dex: "DEX", estado: "Status", consultas: "Lookups on SolFlag",
     chCara: "Known face", chCreador: "Serial creator", chFin: "Serial funder", chRep: (n) => (n === 1 ? "One repeat buyer" : n + " repeat buyers"),
@@ -355,7 +355,7 @@ export function pagina(m, d, mk, reg, now, lang) {
 
   return '<!doctype html><html lang="' + L + '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
     "<title>" + esc(title) + '</title><meta name="description" content="' + esc(desc) + '"><link rel="canonical" href="' + url + '">' +
-    '<link rel="alternate" hreflang="es" href="' + fichaUrl(m, "es") + '"><link rel="alternate" hreflang="en" href="' + fichaUrl(m, "en") + '"><link rel="alternate" hreflang="x-default" href="' + fichaUrl(m, "es") + '">' +
+    '<link rel="alternate" hreflang="es" href="' + fichaUrl(m, "es") + '"><link rel="alternate" hreflang="en" href="' + fichaUrl(m, "en") + '"><link rel="alternate" hreflang="x-default" href="' + fichaUrl(m, "en") + '">' +
     '<meta property="og:type" content="website"><meta property="og:site_name" content="SolFlag"><meta property="og:locale" content="' + (L === "en" ? "en_US" : "es_ES") + '"><meta property="og:title" content="' + esc(title) + '">' +
     '<meta property="og:description" content="' + esc(desc) + '"><meta property="og:url" content="' + url + '"><meta property="og:image" content="' + esc(img) + '">' +
     '<meta name="twitter:card" content="' + (mk && mk.image ? "summary" : "summary_large_image") + '"><meta name="twitter:site" content="@solflagTeam">' +
@@ -389,7 +389,11 @@ const HTML_HEAD = { "content-type": "text/html; charset=utf-8", "x-content-type-
 const page = (body, status, ttl) => new Response(body, { status: status, headers: Object.assign({}, HTML_HEAD, { "cache-control": ttl ? "public, max-age=" + ttl : "no-store" }) });
 
 export async function sitemap(db) {
-  const rows = await all(db, "SELECT m, t FROM lanz ORDER BY t DESC LIMIT " + SITEMAP_MAX, []);
+  // Solo las fichas que alguien puede buscar (15/11): las de tokens vivos a las 24 h o que pasaron de 100.000 $, las recién
+  // lanzadas con liquidez de verdad aún sin resultado y las que ha pedido la gente. Unas 28.000 de tokens muertos, casi
+  // iguales, hacían que Google no guardara ninguna; siguen funcionando para quien llegue por un enlace
+  const rows = await all(db, "SELECT m, t FROM lanz WHERE dead24 = 0 OR mc24 >= 100000 OR (dead24 IS NULL AND liq >= 10000) " +
+    "UNION SELECT m, t1 AS t FROM pedidos ORDER BY t DESC LIMIT " + SITEMAP_MAX, []);
   const alt = (m) => '<xhtml:link rel="alternate" hreflang="es" href="' + fichaUrl(m, "es") + '"/><xhtml:link rel="alternate" hreflang="en" href="' + fichaUrl(m, "en") + '"/>';
   return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n' +
     rows.map((r) => "<url><loc>" + fichaUrl(r.m, "es") + "</loc><lastmod>" + new Date(r.t).toISOString().slice(0, 10) + "</lastmod>" + alt(r.m) + "</url>").join("\n") + "\n</urlset>\n";

@@ -36,7 +36,7 @@ test("ficha completa: quién está detrás (pagó y creó juntos), compradores, 
   const { status, body, h } = await get("/" + M1, { [M1]: [pair(M1)] });
   assert.equal(status, 200);
   assert.match(h.get("content-type"), /text\/html/);
-  assert.match(body, /<title>Slignal Coin \(\$SLIGNAL\) · Ficha del token · SolFlag<\/title>/);
+  assert.match(body, /<title>Slignal Coin \(\$SLIGNAL\) · Quién lo lanzó y quién lo tiene · SolFlag<\/title>/);
   assert.match(body, /<link rel="canonical" href="https:\/\/token\.solflag\.com\/Mint1111/);
   assert.match(body, /property="og:image" content="https:\/\/img\.example\/x\.png"/);
   assert.match(body, /RIESGO ALTO/);
@@ -85,8 +85,10 @@ test("no encontrado y dirección no válida: 404 sin indexar", async () => {
 test("sitemap, robots y la raíz", async () => {
   const s = await get("/sitemap.xml");
   assert.equal(s.status, 200);
-  assert.equal((s.body.match(/<loc>/g) || []).length, 3);
-  assert.match(s.body, /<loc>https:\/\/token\.solflag\.com\/Mint3333/);
+  // solo las que alguien puede buscar: M1 (la pidió la gente); M2 murió y M3 no tiene liquidez
+  assert.equal((s.body.match(/<loc>/g) || []).length, 1);
+  assert.match(s.body, /<loc>https:\/\/token\.solflag\.com\/Mint1111/);
+  assert.doesNotMatch(s.body, /Mint3333/);
   const r = await get("/robots.txt");
   assert.match(r.body, /Sitemap: https:\/\/token\.solflag\.com\/sitemap\.xml/);
   const root = await ficha(new Request("https://token.solflag.com/"), env, fakeFetch({}));
@@ -116,7 +118,7 @@ test("ficha en inglés: /en/<mint> con textos y números en inglés y enlaces a 
   const { status, body } = await get("/en/" + M1, { [M1]: [pair(M1)] });
   assert.equal(status, 200);
   assert.match(body, /<html lang="en">/);
-  assert.match(body, /<title>Slignal Coin \(\$SLIGNAL\) · Token file · SolFlag<\/title>/);
+  assert.match(body, /<title>Slignal Coin \(\$SLIGNAL\) · Who launched it and who holds it · SolFlag<\/title>/);
   assert.match(body, /HIGH RISK/);
   assert.match(body, /<b>Paid and created<\/b>/);
   assert.match(body, /Its creator has launched 2 more tokens: of the 1 that already turned 24 h, 1 died\./);
@@ -135,7 +137,7 @@ test("la ficha en español enlaza a su versión en inglés; el sitemap lleva las
   assert.match(body, />EN<\/a>/);
   const s = await get("/sitemap.xml");
   assert.match(s.body, /xmlns:xhtml=/);
-  assert.match(s.body, /<xhtml:link rel="alternate" hreflang="en" href="https:\/\/token\.solflag\.com\/en\/Mint3333/);
+  assert.match(s.body, /<xhtml:link rel="alternate" hreflang="en" href="https:\/\/token\.solflag\.com\/en\/Mint1111/);
   const nf = await get("/en/" + NADA, {});
   assert.equal(nf.status, 404);
   assert.match(nf.body, /We couldn't find this token/);

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://solflag.com/sitemap.xml
+Sitemap: https://token.solflag.com/sitemap.xml
