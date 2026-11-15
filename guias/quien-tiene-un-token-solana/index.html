@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cómo ver quién tiene un token de Solana (y si las ballenas son de verdad) · SolFlag</title>
+<meta name="description" content="Cómo saber quién tiene un token de Solana: las mayores cuentas, a quién pertenecen, qué es un pool o un exchange y cómo ver si varias ballenas son la misma persona.">
+<meta property="og:title" content="Cómo ver quién tiene un token de Solana (y si las ballenas son de verdad) · SolFlag">
+<meta property="og:description" content="Cómo saber quién tiene un token de Solana: las mayores cuentas, a quién pertenecen, qué es un pool o un exchange y cómo ver si varias ballenas son la misma persona.">
+<meta property="og:url" content="https://solflag.com/guias/quien-tiene-un-token-solana/">
+<meta property="og:image" content="https://solflag.com/og.png?v=2">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@solflagTeam">
+<link rel="canonical" href="https://solflag.com/guias/quien-tiene-un-token-solana/">
+<link rel="alternate" hreflang="es" href="https://solflag.com/guias/quien-tiene-un-token-solana/">
+<link rel="alternate" hreflang="en" href="https://solflag.com/en/guides/who-holds-a-solana-token/">
+<link rel="alternate" hreflang="x-default" href="https://solflag.com/en/guides/who-holds-a-solana-token/">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Cómo ver quién tiene un token de Solana", "description": "Cómo saber quién tiene un token de Solana: las mayores cuentas, a quién pertenecen, qué es un pool o un exchange y cómo ver si varias ballenas son la misma persona.", "inLanguage": "es", "url": "https://solflag.com/guias/quien-tiene-un-token-solana/", "datePublished": "2026-11-15", "dateModified": "2026-11-15", "author": {"@type": "Organization", "name": "SolFlag", "url": "https://solflag.com/"}, "publisher": {"@type": "Organization", "name": "SolFlag", "logo": {"@type": "ImageObject", "url": "https://solflag.com/marca/apple-touch-icon.png"}}}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "¿Por qué el mayor holder suele ser un pool?", "acceptedAnswer": {"@type": "Answer", "text": "Porque el pool de liquidez guarda los tokens que se compran y se venden en ese mercado. No es una persona y no va a vender por su cuenta, por eso no cuenta como ballena."}}, {"@type": "Question", "name": "¿Una wallet con mucho siempre es mala señal?", "acceptedAnswer": {"@type": "Answer", "text": "No siempre: puede ser un exchange, un custodio o la tesorería de un emisor. Pero en una memecoin, una persona con más del 30 % puede hundir el precio con una sola venta."}}, {"@type": "Question", "name": "¿Cómo sé si varias wallets son de la misma persona?", "acceptedAnswer": {"@type": "Answer", "text": "Mira quién les dio el primer SOL. Si varias de las mayores lo recibieron de la misma wallet, probablemente son del mismo dueño o equipo. Es una pista que conviene comprobar en Solscan antes de sacar conclusiones."}}, {"@type": "Question", "name": "¿Esto es consejo financiero?", "acceptedAnswer": {"@type": "Answer", "text": "No. SolFlag explica lo que se ve en la cadena; no recomienda comprar ni vender."}}]}]}</script>
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+/* Mismo aspecto que solflag.com: lila oscuro, turquesa pastel y titulares con serifa */
+:root{--bg:#0e0926;--card:rgba(24,17,62,.96);--line:rgba(196,181,253,.3);--fg:#f1eeff;--muted:#c9c1ea;--soft:#ddd7f5;--kick:#8ec5cf;--accent:#7ab8c4;--alto:#ff6b6b;--bajo:#4ade80;--medio:#fbbf24;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--fg);font:17px/1.65 Manrope,'Segoe UI',system-ui,sans-serif;background:radial-gradient(1100px 720px at 88% -8%,rgba(139,92,246,.38),transparent 62%),radial-gradient(900px 640px at -12% 30%,rgba(192,38,211,.16),transparent 60%),linear-gradient(180deg,#140d33 0%,#0e0926 45%,#0a061c 100%) fixed;background-color:var(--bg);padding:0 16px 64px}
+a{color:var(--kick)}
+a:hover{color:#c3e2e7}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:780px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22)}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo svg,.logo .ico{width:42px;height:42px;flex:none}
+.wm{display:inline-block;font-family:Unbounded,'Arial Black',sans-serif;font-weight:700;line-height:1.15;letter-spacing:-.03em;background:linear-gradient(90deg,#7fd0dc,#9fb4f2 50%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));font-size:25px}
+.back{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:700;text-decoration:none}
+.back:hover{color:#140e31;filter:brightness(1.06)}
+.intro{padding:52px 0 18px}
+.kick{margin:0;color:var(--kick);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+h1{font:800 clamp(2.4rem,6vw,3.6rem)/1.05 Fraunces,Georgia,serif;margin:14px 0 0;color:#f7f4ff;text-wrap:balance}
+.intro p{color:var(--soft);font-size:1.08rem;margin:16px 0 0;max-width:600px}
+.toc{display:flex;flex-direction:column;gap:2px;margin:28px 0 0;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:20px}
+.toc a{display:flex;gap:14px;padding:8px 0;text-decoration:none;color:var(--fg)}
+.toc a:hover b{color:var(--kick)}
+.toc time{color:var(--muted);font-size:.88rem;flex:none;width:92px;padding-top:2px}
+article{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:32px;scroll-margin-top:16px}
+article time{color:var(--muted);font-size:.9rem}
+article h2{font:700 clamp(1.6rem,4vw,2.2rem)/1.15 Fraunces,Georgia,serif;margin:8px 0 14px;color:#f7f4ff;text-wrap:balance}
+article h3{font-size:1.1rem;margin:24px 0 6px}
+article p{margin:0 0 14px;color:var(--soft)}
+article ul{margin:0 0 14px;padding-left:22px;color:var(--soft)}
+article li{margin:6px 0}
+article b{color:#fff}
+article p.nota{border-left:3px solid var(--medio);background:rgba(251,191,36,.08);border-radius:0 12px 12px 0;padding:10px 14px;font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.tags span{border:1px solid #5e4bb0;border-radius:999px;padding:3px 12px;font-size:.8rem;color:#ece8fd}
+.fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.fig div{background:#1d1550;border:1px solid #3a2c7a;border-radius:16px;padding:14px 16px}
+.fig b{display:block;font:800 1.8rem/1.1 Fraunces,Georgia,serif}
+.fig span{color:var(--muted);font-size:.88rem}
+.share{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;padding-top:16px;border-top:1px solid rgba(196,181,253,.22);font-size:.92rem}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid rgba(196,181,253,.22);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;color:var(--muted);font-size:.92rem}
+footer .wm{font-size:17px}
+footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
+@media (max-width:620px){
+  body{font-size:16px}
+  .logo svg,.logo .ico{width:36px;height:36px}.wm{font-size:21px}
+  article{padding:22px 20px}
+  .toc time{width:78px}
+}
+</style>
+
+<style>
+.lang{margin:18px 0 0;font-size:.95rem}
+.upd{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+.fig div.k b{color:var(--kick)}
+article table{width:100%;border-collapse:collapse;margin:4px 0 14px;font-size:.93rem}
+article td,article th{text-align:left;vertical-align:top;padding:8px 8px;border-top:1px solid rgba(196,181,253,.22);color:var(--soft)}
+article th{color:var(--kick);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;border-top:0}
+article td.n,article th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+article tr.base td{background:rgba(122,184,196,.1);color:#fff;font-weight:600}
+article tr.few td{opacity:.6}
+article code{font-size:.8rem;color:var(--muted);word-break:break-all}
+.pill{display:inline-block;border-radius:999px;padding:1px 9px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.pill.HIGH{background:rgba(255,107,107,.18);color:var(--alto)}.pill.MEDIUM{background:rgba(251,191,36,.16);color:var(--medio)}
+.pill.LOW{background:rgba(74,222,128,.16);color:var(--bajo)}.pill.x{background:rgba(196,181,253,.16);color:var(--muted)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mono{font-family:ui-monospace,Consolas,monospace}
+.dl{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px;padding:0;list-style:none}
+.dl a{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid #5e4bb0;border-radius:12px;text-decoration:none;font-size:.9rem}
+.dl small{color:var(--muted);margin-left:6px}
+dl.fmt{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:0 0 14px;font-size:.93rem}
+dl.fmt dt{font-family:ui-monospace,Consolas,monospace;color:#fff}
+dl.fmt dd{margin:0;color:var(--soft)}
+#err{display:none}
+@media (max-width:520px){article table{font-size:.8rem} article td,article th{padding:7px 4px} article th,article th.n{white-space:normal;font-size:.62rem;letter-spacing:.04em} .hide-s{display:none} .pill{font-size:.68rem;padding:1px 6px} article{padding:20px 14px} dl.fmt{grid-template-columns:1fr} dl.fmt dd{margin-bottom:6px}}
+@media (max-width:360px){#alive code{display:none} article code{font-size:.66rem} article td,article th{padding:6px 3px}}
+</style>
+<link href="/paginas.css?v=20261111c" rel="stylesheet">
+<link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
+<style>
+/* Guías (15/11): mismo aspecto que «Cómo funciona»; pasos numerados y una llamada al escáner al final */
+.paso{display:flex;gap:14px;align-items:baseline}.paso span{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(122,184,196,.16);color:var(--kick);font-weight:800}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:8px}
+.cta a.go{display:inline-flex;align-items:center;min-height:46px;padding:0 20px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:800;text-decoration:none}
+.stats4{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:22px 0 0}
+.stats4 div{border:1px solid var(--line);border-radius:16px;padding:14px 16px}.stats4 b{display:block;font:700 1.7rem/1.1 Fraunces,Georgia,serif;color:#f7f4ff}.stats4 span{color:var(--muted);font-size:.88rem}
+@media (max-width:620px){.stats4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="/" title="SolFlag">
+    <img class="ico" src="/marca/solflag-icono.svg?v=1" alt="" width="44" height="44">
+    <span class="wm" translate="no">Solflag</span>
+  </a>
+  <nav class="pnav" aria-label="Secciones"><a href="/?v=escaner">Escáner</a><a href="/?v=lista">Mi lista</a><a href="/?v=confluencia">Confluencia</a><a href="/acciones/">Acciones</a><a class="pbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a></nav>
+  <a class="plang" href="/en/guides/who-holds-a-solana-token/" hreflang="en" title="English version">EN</a>
+</header>
+<section class="intro"><p class="kick">Guía</p><h1>Cómo ver quién tiene un token de Solana</h1><p>La lista de mayores holders de un explorador engaña: muchas de esas cuentas no son personas. Un pool de liquidez, un programa o un exchange aparecen arriba sin ser ballenas, y una sola persona puede esconderse repartida en varias wallets. Así se separa una cosa de otra.</p></section>
+<article><div class="paso"><span>1</span><h2>Mira las mayores cuentas, no el nombre</h2></div>
+<p>En Solscan, la pestaña «Holders» del token enseña las cuentas con más saldo. Cuidado: cada línea es una <b>cuenta de token</b>, no una wallet. Hay que mirar su dueño («Owner») para saber de quién es.</p>
+<p>Las 20 mayores bastan para ver el reparto: si ahí no hay nadie con mucho, el resto tampoco lo tiene.</p></article>
+
+<article><div class="paso"><span>2</span><h2>Separa lo que no es una persona</h2></div>
+<ul><li><b>Pools de liquidez y programas</b> (Raydium, Meteora, Orca, la curva de Pump.fun…): guardan los tokens del mercado, no van a vender por su cuenta.</li>
+<li><b>Exchanges con nombre:</b> es el dinero de sus usuarios. Se enseñan, pero no cuentan como ballena.</li>
+<li><b>Cuentas muy activas</b> (cientos de movimientos en pocas horas): suelen ser bots, exchanges o creadores de mercado. No se esconden si tienen mucho: tener el 10 % o más ya es un riesgo, sea quien sea.</li>
+<li><b>Creadores de mercado con nombre</b> (Wintermute, DWF Labs, con dirección publicada): sí cuentan, porque pueden vender mucho de golpe.</li></ul></article>
+
+<article><div class="paso"><span>3</span><h2>Cuánto es demasiado</h2></div>
+<p>Con lo que queda (las que parecen personas):</p>
+<ul><li><b>Preocupante:</b> una sola wallet con más del 15 % o las 10 mayores con más del 50 %.</li>
+<li><b>Muy concentrado:</b> una sola wallet con más del 30 % o las 10 mayores con más del 70 %.</li></ul>
+<p>Un ejemplo real del 15/11: en $STONK, 16 de las 20 mayores cuentas parecen personas y suman el 24,5 % del supply; la mayor tiene el 5,4 %. Está repartido.</p>
+<p class="nota">En dólares digitales y tokens de acciones las grandes wallets son la tesorería del emisor, custodios y exchanges: PYUSD tenía el 56 % en una sola y es normal.</p></article>
+
+<article><div class="paso"><span>4</span><h2>¿Varias ballenas son la misma persona?</h2></div>
+<p>Una forma de parecer más repartido de lo que es: una persona crea varias wallets nuevas y les manda SOL desde la misma. Para verlo, mira quién pagó la <b>primera transacción</b> de cada una de las grandes. Si varias comparten ese origen, pueden ser la misma persona o el mismo equipo.</p>
+<p>Es una pista, no una prueba: si el origen es un exchange o una cuenta con mucho movimiento, de ahí recibe dinero mucha gente sin relación entre sí, y no cuenta.</p></article>
+
+<article><div class="paso"><span>5</span><h2>Mira quién compró al nacer</h2></div>
+<p>Hay wallets que compran en los primeros bloques de muchos lanzamientos. Están en el 84 % de los lanzamientos, así que tenerlas no dice nada del token. Lo que importa es si <b>siguen teniendo tokens para vender</b>: eso se ve si aparecen entre las mayores.</p></article>
+
+<article><h2>Todo esto, en un clic</h2>
+<p>En SolFlag, el apartado <b>Ballenas</b> de cada token hace estos pasos por ti: separa pools, programas y exchanges, marca las cuentas muy activas, agrupa las wallets que comparten financiador y te dice qué parte del supply tienen las personas. Gratis y sin conectar tu wallet.</p>
+<div class="cta"><a class="go" href="/?v=escaner">Ver las ballenas de un token →</a><a href="/como-funciona/">Cómo funciona</a></div></article>
+<article><h2>Preguntas frecuentes</h2><h3>¿Por qué el mayor holder suele ser un pool?</h3><p>Porque el pool de liquidez guarda los tokens que se compran y se venden en ese mercado. No es una persona y no va a vender por su cuenta, por eso no cuenta como ballena.</p><h3>¿Una wallet con mucho siempre es mala señal?</h3><p>No siempre: puede ser un exchange, un custodio o la tesorería de un emisor. Pero en una memecoin, una persona con más del 30 % puede hundir el precio con una sola venta.</p><h3>¿Cómo sé si varias wallets son de la misma persona?</h3><p>Mira quién les dio el primer SOL. Si varias de las mayores lo recibieron de la misma wallet, probablemente son del mismo dueño o equipo. Es una pista que conviene comprobar en Solscan antes de sacar conclusiones.</p><h3>¿Esto es consejo financiero?</h3><p>No. SolFlag explica lo que se ve en la cadena; no recomienda comprar ni vender.</p></article>
+<footer>
+  <span class="wm" translate="no">Solflag</span>
+  <a href="/">Escáner</a>
+  <a href="/acciones/">Acciones</a>
+  <a href="/blog/">Blog</a>
+  <a href="/acierto/">Datos y acierto</a>
+  <a href="/como-funciona/">Cómo funciona</a>
+  <a href="/guias/">Guías</a>
+  <a href="/privacidad/">Privacidad</a>
+  <a href="/terminos/">Términos</a>
+  <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
+  <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
+  <p>SolFlag es una herramienta orientativa, no consejo financiero.</p>
+</footer>
+</div>
+<script src="/fondo.js?v=20261111d" defer></script>
+</body>
+</html>

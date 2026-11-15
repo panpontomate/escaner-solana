@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to check if a Solana token is safe before you buy · SolFlag</title>
+<meta name="description" content="Five checks before buying a Solana token: who controls it, who holds it, whether you can sell, who is behind it and what it depends on. With data from thousands of launches.">
+<meta property="og:title" content="How to check if a Solana token is safe before you buy · SolFlag">
+<meta property="og:description" content="Five checks before buying a Solana token: who controls it, who holds it, whether you can sell, who is behind it and what it depends on. With data from thousands of launches.">
+<meta property="og:url" content="https://solflag.com/en/guides/is-a-solana-token-safe/">
+<meta property="og:image" content="https://solflag.com/og-en.png?v=2">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@solflagTeam">
+<link rel="canonical" href="https://solflag.com/en/guides/is-a-solana-token-safe/">
+<link rel="alternate" hreflang="es" href="https://solflag.com/guias/token-solana-seguro/">
+<link rel="alternate" hreflang="en" href="https://solflag.com/en/guides/is-a-solana-token-safe/">
+<link rel="alternate" hreflang="x-default" href="https://solflag.com/en/guides/is-a-solana-token-safe/">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "How to check if a Solana token is safe before you buy", "description": "Five checks before buying a Solana token: who controls it, who holds it, whether you can sell, who is behind it and what it depends on. With data from thousands of launches.", "inLanguage": "en", "url": "https://solflag.com/en/guides/is-a-solana-token-safe/", "datePublished": "2026-11-15", "dateModified": "2026-11-15", "author": {"@type": "Organization", "name": "SolFlag", "url": "https://solflag.com/"}, "publisher": {"@type": "Organization", "name": "SolFlag", "logo": {"@type": "ImageObject", "url": "https://solflag.com/marca/apple-touch-icon.png"}}}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is a green token safe?", "acceptedAnswer": {"@type": "Answer", "text": "There are no guarantees. On SolFlag, green means the checks found no warning and the token has 7 days or more of market. A green token can fall and a red one can rise: the level tells you whether there are signs that someone could take your money."}}, {"@type": "Question", "name": "Does locked liquidity make a token safe?", "acceptedAnswer": {"@type": "Answer", "text": "It helps, but it isn't enough. With locked liquidity the creator can't empty the pool, but they can still hold almost all of the supply, mint more if the mint authority is still active, or launch an identical token tomorrow."}}, {"@type": "Question", "name": "How do I know it is the right address?", "acceptedAnswer": {"@type": "Answer", "text": "Copy the address from the project's official website or socials, never from a token search by name. There are copies with the same name and the same ticker; the only thing that can't be copied is the address."}}, {"@type": "Question", "name": "Is this financial advice?", "acceptedAnswer": {"@type": "Answer", "text": "No. SolFlag is a guidance tool that explains what can be seen on-chain; it doesn't recommend buying or selling anything."}}]}]}</script>
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+/* Mismo aspecto que solflag.com: lila oscuro, turquesa pastel y titulares con serifa */
+:root{--bg:#0e0926;--card:rgba(24,17,62,.96);--line:rgba(196,181,253,.3);--fg:#f1eeff;--muted:#c9c1ea;--soft:#ddd7f5;--kick:#8ec5cf;--accent:#7ab8c4;--alto:#ff6b6b;--bajo:#4ade80;--medio:#fbbf24;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--fg);font:17px/1.65 Manrope,'Segoe UI',system-ui,sans-serif;background:radial-gradient(1100px 720px at 88% -8%,rgba(139,92,246,.38),transparent 62%),radial-gradient(900px 640px at -12% 30%,rgba(192,38,211,.16),transparent 60%),linear-gradient(180deg,#140d33 0%,#0e0926 45%,#0a061c 100%) fixed;background-color:var(--bg);padding:0 16px 64px}
+a{color:var(--kick)}
+a:hover{color:#c3e2e7}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:780px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22)}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo svg,.logo .ico{width:42px;height:42px;flex:none}
+.wm{display:inline-block;font-family:Unbounded,'Arial Black',sans-serif;font-weight:700;line-height:1.15;letter-spacing:-.03em;background:linear-gradient(90deg,#7fd0dc,#9fb4f2 50%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));font-size:25px}
+.back{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:700;text-decoration:none}
+.back:hover{color:#140e31;filter:brightness(1.06)}
+.intro{padding:52px 0 18px}
+.kick{margin:0;color:var(--kick);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+h1{font:800 clamp(2.4rem,6vw,3.6rem)/1.05 Fraunces,Georgia,serif;margin:14px 0 0;color:#f7f4ff;text-wrap:balance}
+.intro p{color:var(--soft);font-size:1.08rem;margin:16px 0 0;max-width:600px}
+.toc{display:flex;flex-direction:column;gap:2px;margin:28px 0 0;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:20px}
+.toc a{display:flex;gap:14px;padding:8px 0;text-decoration:none;color:var(--fg)}
+.toc a:hover b{color:var(--kick)}
+.toc time{color:var(--muted);font-size:.88rem;flex:none;width:92px;padding-top:2px}
+article{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:32px;scroll-margin-top:16px}
+article time{color:var(--muted);font-size:.9rem}
+article h2{font:700 clamp(1.6rem,4vw,2.2rem)/1.15 Fraunces,Georgia,serif;margin:8px 0 14px;color:#f7f4ff;text-wrap:balance}
+article h3{font-size:1.1rem;margin:24px 0 6px}
+article p{margin:0 0 14px;color:var(--soft)}
+article ul{margin:0 0 14px;padding-left:22px;color:var(--soft)}
+article li{margin:6px 0}
+article b{color:#fff}
+article p.nota{border-left:3px solid var(--medio);background:rgba(251,191,36,.08);border-radius:0 12px 12px 0;padding:10px 14px;font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.tags span{border:1px solid #5e4bb0;border-radius:999px;padding:3px 12px;font-size:.8rem;color:#ece8fd}
+.fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.fig div{background:#1d1550;border:1px solid #3a2c7a;border-radius:16px;padding:14px 16px}
+.fig b{display:block;font:800 1.8rem/1.1 Fraunces,Georgia,serif}
+.fig span{color:var(--muted);font-size:.88rem}
+.share{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;padding-top:16px;border-top:1px solid rgba(196,181,253,.22);font-size:.92rem}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid rgba(196,181,253,.22);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;color:var(--muted);font-size:.92rem}
+footer .wm{font-size:17px}
+footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
+@media (max-width:620px){
+  body{font-size:16px}
+  .logo svg,.logo .ico{width:36px;height:36px}.wm{font-size:21px}
+  article{padding:22px 20px}
+  .toc time{width:78px}
+}
+</style>
+
+<style>
+.lang{margin:18px 0 0;font-size:.95rem}
+.upd{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+.fig div.k b{color:var(--kick)}
+article table{width:100%;border-collapse:collapse;margin:4px 0 14px;font-size:.93rem}
+article td,article th{text-align:left;vertical-align:top;padding:8px 8px;border-top:1px solid rgba(196,181,253,.22);color:var(--soft)}
+article th{color:var(--kick);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;border-top:0}
+article td.n,article th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+article tr.base td{background:rgba(122,184,196,.1);color:#fff;font-weight:600}
+article tr.few td{opacity:.6}
+article code{font-size:.8rem;color:var(--muted);word-break:break-all}
+.pill{display:inline-block;border-radius:999px;padding:1px 9px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.pill.HIGH{background:rgba(255,107,107,.18);color:var(--alto)}.pill.MEDIUM{background:rgba(251,191,36,.16);color:var(--medio)}
+.pill.LOW{background:rgba(74,222,128,.16);color:var(--bajo)}.pill.x{background:rgba(196,181,253,.16);color:var(--muted)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mono{font-family:ui-monospace,Consolas,monospace}
+.dl{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px;padding:0;list-style:none}
+.dl a{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid #5e4bb0;border-radius:12px;text-decoration:none;font-size:.9rem}
+.dl small{color:var(--muted);margin-left:6px}
+dl.fmt{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:0 0 14px;font-size:.93rem}
+dl.fmt dt{font-family:ui-monospace,Consolas,monospace;color:#fff}
+dl.fmt dd{margin:0;color:var(--soft)}
+#err{display:none}
+@media (max-width:520px){article table{font-size:.8rem} article td,article th{padding:7px 4px} article th,article th.n{white-space:normal;font-size:.62rem;letter-spacing:.04em} .hide-s{display:none} .pill{font-size:.68rem;padding:1px 6px} article{padding:20px 14px} dl.fmt{grid-template-columns:1fr} dl.fmt dd{margin-bottom:6px}}
+@media (max-width:360px){#alive code{display:none} article code{font-size:.66rem} article td,article th{padding:6px 3px}}
+</style>
+<link href="/paginas.css?v=20261111c" rel="stylesheet">
+<link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
+<style>
+/* Guías (15/11): mismo aspecto que «Cómo funciona»; pasos numerados y una llamada al escáner al final */
+.paso{display:flex;gap:14px;align-items:baseline}.paso span{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(122,184,196,.16);color:var(--kick);font-weight:800}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:8px}
+.cta a.go{display:inline-flex;align-items:center;min-height:46px;padding:0 20px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:800;text-decoration:none}
+.stats4{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:22px 0 0}
+.stats4 div{border:1px solid var(--line);border-radius:16px;padding:14px 16px}.stats4 b{display:block;font:700 1.7rem/1.1 Fraunces,Georgia,serif;color:#f7f4ff}.stats4 span{color:var(--muted);font-size:.88rem}
+@media (max-width:620px){.stats4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="/en/" title="SolFlag">
+    <img class="ico" src="/marca/solflag-icono.svg?v=1" alt="" width="44" height="44">
+    <span class="wm" translate="no">Solflag</span>
+  </a>
+  <nav class="pnav" aria-label="Sections"><a href="/en/?v=escaner">Scanner</a><a href="/en/?v=lista">My list</a><a href="/en/?v=confluencia">Confluence</a><a href="/en/stocks/">Stocks</a><a class="pbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Telegram bot</a></nav>
+  <a class="plang" href="/guias/token-solana-seguro/" hreflang="es" title="Versión en español">ES</a>
+</header>
+<section class="intro"><p class="kick">Guide</p><h1>How to check if a Solana token is safe before you buy</h1><p>Thousands of tokens launch on Solana every day and almost all of them end badly. Before you buy, there are five things you can check on-chain. None of them tells you whether a token will go up; they tell you whether someone can take your money.</p>
+<div class="stats4"><div><b>99%</b><span>of new tokens die in their first week (SolFlag registry)</span></div><div><b>86%</b><span>never reach a $10,000 market cap</span></div><div><b>&lt; 2 in 100</b><span>Pump.fun tokens ever graduate</span></div></div></section>
+<article><div class="paso"><span>1</span><h2>Can someone change the rules?</h2></div>
+<p>First, find out whether anyone can touch the token after you buy. It is written in the token's account (on Solscan, «Mint Authority» and «Freeze Authority»).</p>
+<ul><li><b>They can mint more</b> (the mint authority is still active and belongs to a person): they can dilute your share to zero in a second.</li>
+<li><b>They can freeze</b> (the freeze authority is active): they can stop you from selling. Digital dollars carry it by law; in a memecoin it makes no sense.</li>
+<li><b>It charges a fee to move</b> or has Token-2022 extensions that change what you can do with your balance (transfer hook, frozen by default, non-transferable).</li></ul>
+<p class="nota">If the mint authority is active and belongs to a person, you don't need to look any further: that person decides what yours is worth.</p></article>
+
+<article><div class="paso"><span>2</span><h2>Who holds it?</h2></div>
+<p>Look at how much the largest wallets hold. One person with a lot can crash the price with a single sale.</p>
+<ul><li><b>Worrying:</b> a single wallet with more than 15% or the top 10 with more than 50%.</li>
+<li><b>Very concentrated:</b> a single wallet with more than 30% or the top 10 with more than 70%.</li></ul>
+<p>Before counting, trace every big account to its owner: a liquidity pool, a program or an exchange is not a person about to sell. And check whether several of the big ones got their SOL from the same wallet: it may be one person split up to look more decentralised than it is.</p></article>
+
+<article><div class="paso"><span>3</span><h2>Will you be able to sell?</h2></div>
+<p>A price is not enough: there has to be real money on the other side so you can get out.</p>
+<ul><li><b>Low liquidity:</b> under $50,000 is already delicate, and under $10,000 selling a normal amount moves the price a lot.</li>
+<li><b>Inflated liquidity:</b> when the real side of the pool (SOL, USDC or USDT) is less than 5% of what is shown. We saw a token showing $12.9M with $52 of real money behind it.</li>
+<li><b>Unlocked liquidity</b> in a market younger than 90 days: the creator can take the money out of the pool.</li>
+<li><b>Inflated volume:</b> when 80% or more of the volume comes from wallets that buy and sell the same amounts, the activity is fake.</li></ul></article>
+
+<article><div class="paso"><span>4</span><h2>Who is behind it?</h2></div>
+<p>One token doesn't show much; what its launcher did before does.</p>
+<ul><li><b>Serial launches:</b> whoever paid for its creation launched 2 or more tokens in 24 hours. In 100 Pump.fun tokens, one wallet launched 7 copies of the same name in 10 minutes.</li>
+<li><b>Track record:</b> how many of their previous tokens never took off. If 80% of 3 or more went nowhere, this one probably won't either.</li>
+<li><b>Copies:</b> the same ticker as a famous token (USDC, SOL…) with a different address, or the same name as an older one with a bigger market. Always check the address, not the name.</li></ul></article>
+
+<article><div class="paso"><span>5</span><h2>What does it depend on?</h2></div>
+<p>Some tokens are worth what someone's promise is worth: Circle's dollar, the share an issuer holds in custody or the bridge that keeps the original. That's not bad, but you should know it: if the issuer or the bridge fails, so does the token. Check that the address is the one the issuer publishes on its official site, never one from an aggregator.</p>
+<p class="nota">If it is still on the Pump.fun curve: in our registry (8,767 tokens) fewer than 2 in 100 graduate and, of those that do, 9 in 10 die within a day. Graduating is not doing well.</p></article>
+
+<article><h2>Do it in ten seconds</h2>
+<p>SolFlag checks all of this for you: paste the address and it tells you what it found, with numbers and the reason for every warning. Free, no sign-up and no wallet connection. Every rule, with its threshold and why, is in <a href="/en/how-it-works/">How it works</a>, and how often it gets it right, mistakes included, in <a href="/en/accuracy/">Data and accuracy</a>.</p>
+<div class="cta"><a class="go" href="/en/?v=escaner">Check a token →</a><a href="/en/how-it-works/">How the level is decided</a></div></article>
+<article><h2>Frequently asked questions</h2><h3>Is a green token safe?</h3><p>There are no guarantees. On SolFlag, green means the checks found no warning and the token has 7 days or more of market. A green token can fall and a red one can rise: the level tells you whether there are signs that someone could take your money.</p><h3>Does locked liquidity make a token safe?</h3><p>It helps, but it isn't enough. With locked liquidity the creator can't empty the pool, but they can still hold almost all of the supply, mint more if the mint authority is still active, or launch an identical token tomorrow.</p><h3>How do I know it is the right address?</h3><p>Copy the address from the project's official website or socials, never from a token search by name. There are copies with the same name and the same ticker; the only thing that can't be copied is the address.</p><h3>Is this financial advice?</h3><p>No. SolFlag is a guidance tool that explains what can be seen on-chain; it doesn't recommend buying or selling anything.</p></article>
+<footer>
+  <span class="wm" translate="no">Solflag</span>
+  <a href="/en/">Scanner</a>
+  <a href="/en/stocks/">Stocks</a>
+  <a href="/en/blog/">Blog</a>
+  <a href="/en/accuracy/">Data and accuracy</a>
+  <a href="/en/how-it-works/">How it works</a>
+  <a href="/en/guides/">Guides</a>
+  <a href="/en/privacy/">Privacy</a>
+  <a href="/en/terms/">Terms</a>
+  <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Open source</a>
+  <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
+  <p>SolFlag is a guidance tool, not financial advice.</p>
+</footer>
+</div>
+<script src="/fondo.js?v=20261111d" defer></script>
+</body>
+</html>

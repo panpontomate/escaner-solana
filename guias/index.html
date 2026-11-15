@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guías de Solana: tokens, ballenas y rug pulls · SolFlag</title>
+<meta name="description" content="Guías cortas y con datos para revisar un token de Solana antes de comprar: si es seguro, quién lo tiene y cómo se detecta un rug pull.">
+<meta property="og:title" content="Guías de Solana: tokens, ballenas y rug pulls · SolFlag">
+<meta property="og:description" content="Guías cortas y con datos para revisar un token de Solana antes de comprar: si es seguro, quién lo tiene y cómo se detecta un rug pull.">
+<meta property="og:url" content="https://solflag.com/guias/">
+<meta property="og:image" content="https://solflag.com/og.png?v=2">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@solflagTeam">
+<link rel="canonical" href="https://solflag.com/guias/">
+<link rel="alternate" hreflang="es" href="https://solflag.com/guias/">
+<link rel="alternate" hreflang="en" href="https://solflag.com/en/guides/">
+<link rel="alternate" hreflang="x-default" href="https://solflag.com/en/guides/">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CollectionPage", "name": "Guías para revisar un token de Solana", "description": "Guías cortas y con datos para revisar un token de Solana antes de comprar: si es seguro, quién lo tiene y cómo se detecta un rug pull.", "inLanguage": "es", "url": "https://solflag.com/guias/"}</script>
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<style>
+/* Mismo aspecto que solflag.com: lila oscuro, turquesa pastel y titulares con serifa */
+:root{--bg:#0e0926;--card:rgba(24,17,62,.96);--line:rgba(196,181,253,.3);--fg:#f1eeff;--muted:#c9c1ea;--soft:#ddd7f5;--kick:#8ec5cf;--accent:#7ab8c4;--alto:#ff6b6b;--bajo:#4ade80;--medio:#fbbf24;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;color:var(--fg);font:17px/1.65 Manrope,'Segoe UI',system-ui,sans-serif;background:radial-gradient(1100px 720px at 88% -8%,rgba(139,92,246,.38),transparent 62%),radial-gradient(900px 640px at -12% 30%,rgba(192,38,211,.16),transparent 60%),linear-gradient(180deg,#140d33 0%,#0e0926 45%,#0a061c 100%) fixed;background-color:var(--bg);padding:0 16px 64px}
+a{color:var(--kick)}
+a:hover{color:#c3e2e7}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:780px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px 20px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid rgba(196,181,253,.22)}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo svg,.logo .ico{width:42px;height:42px;flex:none}
+.wm{display:inline-block;font-family:Unbounded,'Arial Black',sans-serif;font-weight:700;line-height:1.15;letter-spacing:-.03em;background:linear-gradient(90deg,#7fd0dc,#9fb4f2 50%,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));mask-image:linear-gradient(90deg,#000 55%,rgba(0,0,0,.3));font-size:25px}
+.back{margin-left:auto;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:700;text-decoration:none}
+.back:hover{color:#140e31;filter:brightness(1.06)}
+.intro{padding:52px 0 18px}
+.kick{margin:0;color:var(--kick);font-size:.8rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+h1{font:800 clamp(2.4rem,6vw,3.6rem)/1.05 Fraunces,Georgia,serif;margin:14px 0 0;color:#f7f4ff;text-wrap:balance}
+.intro p{color:var(--soft);font-size:1.08rem;margin:16px 0 0;max-width:600px}
+.toc{display:flex;flex-direction:column;gap:2px;margin:28px 0 0;padding:16px 20px;background:var(--card);border:1px solid var(--line);border-radius:20px}
+.toc a{display:flex;gap:14px;padding:8px 0;text-decoration:none;color:var(--fg)}
+.toc a:hover b{color:var(--kick)}
+.toc time{color:var(--muted);font-size:.88rem;flex:none;width:92px;padding-top:2px}
+article{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:32px;scroll-margin-top:16px}
+article time{color:var(--muted);font-size:.9rem}
+article h2{font:700 clamp(1.6rem,4vw,2.2rem)/1.15 Fraunces,Georgia,serif;margin:8px 0 14px;color:#f7f4ff;text-wrap:balance}
+article h3{font-size:1.1rem;margin:24px 0 6px}
+article p{margin:0 0 14px;color:var(--soft)}
+article ul{margin:0 0 14px;padding-left:22px;color:var(--soft)}
+article li{margin:6px 0}
+article b{color:#fff}
+article p.nota{border-left:3px solid var(--medio);background:rgba(251,191,36,.08);border-radius:0 12px 12px 0;padding:10px 14px;font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.tags span{border:1px solid #5e4bb0;border-radius:999px;padding:3px 12px;font-size:.8rem;color:#ece8fd}
+.fig{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.fig div{background:#1d1550;border:1px solid #3a2c7a;border-radius:16px;padding:14px 16px}
+.fig b{display:block;font:800 1.8rem/1.1 Fraunces,Georgia,serif}
+.fig span{color:var(--muted);font-size:.88rem}
+.share{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;padding-top:16px;border-top:1px solid rgba(196,181,253,.22);font-size:.92rem}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid rgba(196,181,253,.22);display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;color:var(--muted);font-size:.92rem}
+footer .wm{font-size:17px}
+footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
+@media (max-width:620px){
+  body{font-size:16px}
+  .logo svg,.logo .ico{width:36px;height:36px}.wm{font-size:21px}
+  article{padding:22px 20px}
+  .toc time{width:78px}
+}
+</style>
+
+<style>
+.lang{margin:18px 0 0;font-size:.95rem}
+.upd{color:var(--muted);font-size:.9rem;margin:10px 0 0}
+.fig div.k b{color:var(--kick)}
+article table{width:100%;border-collapse:collapse;margin:4px 0 14px;font-size:.93rem}
+article td,article th{text-align:left;vertical-align:top;padding:8px 8px;border-top:1px solid rgba(196,181,253,.22);color:var(--soft)}
+article th{color:var(--kick);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;border-top:0}
+article td.n,article th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+article tr.base td{background:rgba(122,184,196,.1);color:#fff;font-weight:600}
+article tr.few td{opacity:.6}
+article code{font-size:.8rem;color:var(--muted);word-break:break-all}
+.pill{display:inline-block;border-radius:999px;padding:1px 9px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.pill.HIGH{background:rgba(255,107,107,.18);color:var(--alto)}.pill.MEDIUM{background:rgba(251,191,36,.16);color:var(--medio)}
+.pill.LOW{background:rgba(74,222,128,.16);color:var(--bajo)}.pill.x{background:rgba(196,181,253,.16);color:var(--muted)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mono{font-family:ui-monospace,Consolas,monospace}
+.dl{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px;padding:0;list-style:none}
+.dl a{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid #5e4bb0;border-radius:12px;text-decoration:none;font-size:.9rem}
+.dl small{color:var(--muted);margin-left:6px}
+dl.fmt{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:0 0 14px;font-size:.93rem}
+dl.fmt dt{font-family:ui-monospace,Consolas,monospace;color:#fff}
+dl.fmt dd{margin:0;color:var(--soft)}
+#err{display:none}
+@media (max-width:520px){article table{font-size:.8rem} article td,article th{padding:7px 4px} article th,article th.n{white-space:normal;font-size:.62rem;letter-spacing:.04em} .hide-s{display:none} .pill{font-size:.68rem;padding:1px 6px} article{padding:20px 14px} dl.fmt{grid-template-columns:1fr} dl.fmt dd{margin-bottom:6px}}
+@media (max-width:360px){#alive code{display:none} article code{font-size:.66rem} article td,article th{padding:6px 3px}}
+</style>
+<link href="/paginas.css?v=20261111c" rel="stylesheet">
+<link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
+<style>
+/* Guías (15/11): mismo aspecto que «Cómo funciona»; pasos numerados y una llamada al escáner al final */
+.paso{display:flex;gap:14px;align-items:baseline}.paso span{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(122,184,196,.16);color:var(--kick);font-weight:800}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:8px}
+.cta a.go{display:inline-flex;align-items:center;min-height:46px;padding:0 20px;border-radius:14px;background:var(--accent);color:#140e31;font-weight:800;text-decoration:none}
+.stats4{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:22px 0 0}
+.stats4 div{border:1px solid var(--line);border-radius:16px;padding:14px 16px}.stats4 b{display:block;font:700 1.7rem/1.1 Fraunces,Georgia,serif;color:#f7f4ff}.stats4 span{color:var(--muted);font-size:.88rem}
+@media (max-width:620px){.stats4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="/" title="SolFlag">
+    <img class="ico" src="/marca/solflag-icono.svg?v=1" alt="" width="44" height="44">
+    <span class="wm" translate="no">Solflag</span>
+  </a>
+  <nav class="pnav" aria-label="Secciones"><a href="/?v=escaner">Escáner</a><a href="/?v=lista">Mi lista</a><a href="/?v=confluencia">Confluencia</a><a href="/acciones/">Acciones</a><a class="pbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a></nav>
+  <a class="plang" href="/en/guides/" hreflang="en" title="English version">EN</a>
+</header>
+<section class="intro"><p class="kick">Guías</p><h1>Guías para revisar un token de Solana</h1><p>Cortas, con los números de miles de lanzamientos y sin humo.</p></section>
+<article><h2><a href="/guias/token-solana-seguro/" style="color:inherit;text-decoration:none">Cómo saber si un token de Solana es seguro antes de comprarlo</a></h2><p>Cinco comprobaciones antes de comprar un token de Solana: quién lo controla, quién lo tiene, si puedes vender, quién está detrás y de quién depende. Con datos de miles de lanzamientos.</p><div class="cta"><a class="go" href="/guias/token-solana-seguro/">Leer la guía →</a></div></article>
+<article><h2><a href="/guias/quien-tiene-un-token-solana/" style="color:inherit;text-decoration:none">Cómo ver quién tiene un token de Solana</a></h2><p>Cómo saber quién tiene un token de Solana: las mayores cuentas, a quién pertenecen, qué es un pool o un exchange y cómo ver si varias ballenas son la misma persona.</p><div class="cta"><a class="go" href="/guias/quien-tiene-un-token-solana/">Leer la guía →</a></div></article>
+<article><h2><a href="/guias/rug-pull-solana/" style="color:inherit;text-decoration:none">Qué es un rug pull en Solana y cómo detectarlo</a></h2><p>Las formas más comunes de rug pull en Solana (sacar la liquidez, crear más tokens, vender todo, congelar, lanzar en serie) y la señal que deja cada una antes de que pase.</p><div class="cta"><a class="go" href="/guias/rug-pull-solana/">Leer la guía →</a></div></article>
+<footer>
+  <span class="wm" translate="no">Solflag</span>
+  <a href="/">Escáner</a>
+  <a href="/acciones/">Acciones</a>
+  <a href="/blog/">Blog</a>
+  <a href="/acierto/">Datos y acierto</a>
+  <a href="/como-funciona/">Cómo funciona</a>
+  <a href="/guias/">Guías</a>
+  <a href="/privacidad/">Privacidad</a>
+  <a href="/terminos/">Términos</a>
+  <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
+  <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
+  <p>SolFlag es una herramienta orientativa, no consejo financiero.</p>
+</footer>
+</div>
+<script src="/fondo.js?v=20261111d" defer></script>
+</body>
+</html>

@@ -72,6 +72,7 @@ export const CODE = [
   ['<a href="/acierto/#licencia">', '<a href="/en/accuracy/#license">'],
   // «Cómo funciona» (14/11/2026): pie, portada y enlaces de cada semáforo
   ['<a href="/como-funciona/">Cómo funciona</a>', '<a href="/en/how-it-works/">How it works</a>'],
+  ['<a href="/guias/">Guías</a>', '<a href="/en/guides/">Guides</a>'],
   ['<p class="syn"><a href="/acierto/">Ver datos y acierto →</a> · <a href="/como-funciona/">Cómo funciona cada bandera →</a></p>', '<p class="syn"><a href="/en/accuracy/">See data and accuracy →</a> · <a href="/en/how-it-works/">How each flag works →</a></p>'],
   ['var LACIERTO="/acierto/", LHOW="/como-funciona/"', 'var LACIERTO="/en/accuracy/", LHOW="/en/how-it-works/"'],
   // los cinco niveles (14/11/2026): «nivel» bajo el anillo y en el sello (la palabra sola es también el ancla #nivel)
