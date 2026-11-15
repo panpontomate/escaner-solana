@@ -76,7 +76,7 @@ export function ficha(pairs, mint) {
 
 async function dexscreener(fetchFn, cache, mint) {
   for (let n = 0; n < 2; n++) {
-    const j = await fetchFn("https://api.dexscreener.com/token-pairs/v1/solana/" + mint).then((r) => r.ok ? r.json() : null).catch(() => null);
+    const j = await fetchFn("https://api.dexscreener.com/token-pairs/v1/solana/" + mint, { headers: { "user-agent": "SolFlag/1.0 (+https://solflag.com)" } }).then((r) => r.ok ? r.json() : null).catch(() => null);
     if (Array.isArray(j)) { await guardar(cache, "dex/" + mint, j, DEX_OK_S); return j; }
   }
   return (await guardado(cache, "dex/" + mint)) || [];
@@ -86,7 +86,9 @@ async function coingecko(env, fetchFn, cache, mint) {
   const g = await guardado(cache, "cg/" + mint);
   if (g) return g;
   const url = "https://api.coingecko.com/api/v3/coins/solana/contract/" + mint + "?localization=false&tickers=true&market_data=false&community_data=false&developer_data=false";
-  const r = await fetchFn(url, env.COINGECKO_KEY ? { headers: { "x-cg-demo-api-key": env.COINGECKO_KEY } } : undefined).catch(() => null);
+  const h = { "user-agent": "SolFlag/1.0 (+https://solflag.com)", accept: "application/json" };
+  if (env.COINGECKO_KEY) h["x-cg-demo-api-key"] = env.COINGECKO_KEY;
+  const r = await fetchFn(url, { headers: h }).catch(() => null);
   if (r && r.status === 404) { const v = { tickers: [] }; await guardar(cache, "cg/" + mint, v, CG_S); return v; }   // no lo tiene: no cotiza en exchanges
   const j = r && r.ok ? await r.json().catch(() => null) : null;
   if (!j) return null;   // límite o fallo: sin guardar, se reintenta en la próxima petición
