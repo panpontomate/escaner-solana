@@ -1338,7 +1338,7 @@ body.scanp #form .eyebrow{margin-bottom:8px}
 .cq-row .ir{min-height:32px;padding:0 12px;display:inline-flex;align-items:center;border:1px solid var(--accent);border-radius:999px;color:var(--accent);font-weight:700;font-size:.8rem;white-space:nowrap}
 .cq-tag{display:inline-block;white-space:nowrap;margin-top:3px;font-size:.66rem;font-weight:800;letter-spacing:.08em;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
 .cq-tag.no{color:var(--bajo);border-color:var(--bajo)}.cq-tag.si{color:var(--medio);border-color:var(--medio)}.cq-tag.lim{color:var(--accent);border-color:var(--accent)}
-.cq-tag.mica{color:#c4b5fd;border-color:#8b5cf6}.cq-tag.av{color:var(--alto);border-color:var(--alto)}
+.cq-tag.mica{color:#c4b5fd;border-color:#8b5cf6}.cq-tag.cq-aviso{color:var(--alto);border-color:var(--alto)}
 .cq-stop{margin:12px 0 0;padding:10px 14px;border:1px solid var(--alto);border-radius:12px;background:var(--alto-bg);font-size:.9rem}
 .cq-all{display:inline-block;margin-top:14px;color:var(--accent);font-weight:700}
 .cq-good{color:var(--bajo)}.cq-mid{color:var(--medio)}.cq-bad{color:var(--alto)}
@@ -4050,7 +4050,7 @@ function cqId(x){
     x.id==="obligatoria"?"<a class='cq-tag si' href='"+esc(x.src)+"' target='_blank' rel='noopener'>PIDE IDENTIDAD ↗</a>":
     x.id==="limite"?"<a class='cq-tag lim' href='"+esc(x.src)+"' target='_blank' rel='noopener' title='Sin identidad: "+esc(x.lim||"")+"'>SIN IDENTIDAD HASTA UN TOPE ↗</a>":"";
   if(x.mica) t+=" <span class='cq-tag mica' title='"+esc(x.mica[0]+" · "+x.mica[1])+"'>MiCA ✓</span>";
-  else if(x.aviso) t+=" <a class='cq-tag av' href='"+esc(x.aviso[2])+"' target='_blank' rel='noopener'>AVISO "+esc(x.aviso[0].split(" ")[0])+" ↗</a>";
+  else if(x.aviso) t+=" <a class='cq-tag cq-aviso' href='"+esc(x.aviso[2])+"' target='_blank' rel='noopener'>AVISO "+esc(x.aviso[0].split(" ")[0])+" ↗</a>";
   return t;
 }
 // sin enlaces para comprar: rojo (trampa) y naranja (peligro), y los antiguos alto y spam
