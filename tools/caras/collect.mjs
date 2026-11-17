@@ -19,6 +19,7 @@ import { emptyBase, observe, classify, mergeAporte, pruneBase, publishBase, equi
 import { regEntry, regDue, regResolve, regRecheck, regRejudge, regPrune, regPublish, regFill, regMissing, dayOf, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
 import { puntos, elegir } from "./prioridad.mjs";
+import { elegirAvisos, textoAviso, resumenDia, enviar as enviarRadar } from "./radar.mjs";
 import { emptyQueue, queueLaunch, queueBuyers, buyerCandidates, trimQueue, d1Config, flush, pedidosPendientes, marcarPedidos, pedidoLaunch, PEDIDOS_MAX, fromHelius, HELIUS_LIMIT, sinPagador } from "./plano.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -269,6 +270,7 @@ for (const c of cand) {
 }
 log.filtro = { espera: Object.keys(state.espera).length - cand.length, mirados: cand.length, analizados: Object.keys(sel).length,
   conGranja: cand.filter((c) => c.p <= -4).length };
+const radarNuevos = [];                                    // analizados en esta ejecución: candidatos del radar
 for (const c of cand) {
   const m = c.mint, t = state.tokens[m], w = state.espera[m], elegido = sel[m];
   delete state.espera[m];
@@ -294,6 +296,7 @@ for (const c of cand) {
   state.reg[m].sel = elegido;                               // por qué se analizó: prio, azar o grupo
   if (state.reg[m].liq) t.liq = state.reg[m].liq;           // la liquidez del análisis, si la hay, es la buena
   log.registro++;
+  radarNuevos.push(state.reg[m]);
   if (D1) queueLaunch(state.planoQ, { m, t: t.t, liq: t.liq, lvl: state.reg[m].l, tr: state.reg[m].tr });
 }
 
@@ -379,6 +382,24 @@ if (log.sinRugCheck && process.env.GITHUB_ACTIONS) console.log((log.rcCaido ? ":
   if (w.msg && TG && CHAT) {
     try { await fetch("https://api.telegram.org/bot" + TG + "/sendMessage", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ chat_id: CHAT, text: w.msg }) }); }
     catch (e) { log.errores++; }
+  }
+}
+
+// Radar: avisos en t.me/SolFlagRadar (radar.mjs) y resumen del día a las 21:00 de Madrid. Con RADAR_PRUEBA=1 solo
+// escribe en el log lo que enviaría
+{
+  const TOK = process.env.RADAR_TELEGRAM_TOKEN, CHAT = process.env.RADAR_TELEGRAM_CHAT || "@SolFlagRadar";
+  const prueba = process.env.RADAR_PRUEBA === "1";
+  if (TOK || prueba) {
+    state.radar = state.radar || {};
+    const msgs = elegirAvisos(radarNuevos, state.tokens, knownFaces, state.radar, Date.now()).map((x) => textoAviso(x, Date.now()));
+    const res = resumenDia(state.reg, state.radar, Date.now());
+    if (res) msgs.push(res);
+    for (const msg of msgs) {
+      if (prueba) { console.log("RADAR (prueba):\n" + msg.text + "\n"); continue; }
+      try { await enviarRadar(TOK, CHAT, msg); log.radar = (log.radar || 0) + 1; await sleep(1500); }
+      catch (e) { log.radarFallo = (log.radarFallo || 0) + 1; console.log("::warning::Radar: " + e.message); }
+    }
   }
 }
 

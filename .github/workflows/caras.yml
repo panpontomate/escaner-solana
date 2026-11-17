@@ -56,6 +56,8 @@ jobs:
           # aviso si RugCheck deja de responder (el mismo bot de avisos que usa el vigilante)
           AVISO_TELEGRAM_TOKEN: ${{ secrets.AVISO_TELEGRAM_TOKEN }}
           AVISO_TELEGRAM_CHAT: ${{ secrets.AVISO_TELEGRAM_CHAT }}
+          # radar público t.me/SolFlagRadar (tools/caras/radar.mjs): publica @SolFlagBot, solo sendMessage
+          RADAR_TELEGRAM_TOKEN: ${{ secrets.RADAR_TELEGRAM_TOKEN }}
         run: node tools/caras/collect.mjs
       # Mapa del momento de la página Escáner (datos/momento.json): una vez por hora, con su propio motor. Si falla,
       # se queda el anterior y el resto del recolector sigue igual
