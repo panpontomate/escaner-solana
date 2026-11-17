@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { caraMala, elegirAvisos, textoAviso, resumenDia, madrid, esc, MAX_HORA } from "./radar.mjs";
+import { caraMala, elegirAvisos, textoAviso, resumenDia, seguimientos, madrid, esc, MAX_HORA } from "./radar.mjs";
 
 const H = 3600e3;
 const NOW = Date.UTC(2026, 10, 15, 19, 0);   // 20:00 en Madrid
@@ -58,6 +58,31 @@ test("resumenDia: una vez al día desde las 21:00 de Madrid", () => {
   assert.match(r.text, /<b>1<\/b> were launched/);
   assert.match(r.text, /Only <b>1<\/b> got a yellow/);
   assert.equal(resumenDia(reg, st, NOW + 2 * H), null);         // ya enviado hoy
+});
+
+test("seguimientos: contesta al aviso a las 24 h, muerto o vivo, y solo una vez", () => {
+  const st = { enviados: [
+    { m: "MUERTO", at: NOW, s: "XCAT", done: 26, dead: 25, id: 11 },
+    { m: "VIVO", at: NOW, s: "OK", done: 5, dead: 4, id: 12 },
+    { m: "ESPERA", at: NOW, s: "W", done: 3, dead: 3, id: 13 },
+    { m: "VIEJO", at: NOW },
+  ] };
+  const reg = { MUERTO: { h24: { dead: true, mc: 4200 } }, VIVO: { h24: { dead: false, mc: 250000 } }, ESPERA: {},
+    VIEJO: { rug: true, h24: { dead: true, mc: 0 } } };
+  const out = seguimientos(st, reg, NOW + 24 * H);
+  assert.equal(out.length, 3);
+  assert.match(out[0].text, /24 h later: \$XCAT is dead/);
+  assert.match(out[0].text, /25 dead tokens out of 26/);
+  assert.match(out[0].text, /market cap \$4\.2k, under \$10k/);
+  assert.equal(out[0].reply, 11);
+  assert.match(out[1].text, /\$OK is still alive/);
+  assert.match(out[1].text, /\$250\.0k/);
+  assert.match(out[2].text, /launched by a known face/);   // aviso sin cifras guardadas
+  assert.match(out[2].text, /flagged as a rug/);
+  assert.equal(seguimientos(st, reg, NOW + 25 * H).length, 0); // ya contestados
+  // el resumen del día cuenta los avisos ya resueltos
+  const r = resumenDia({ a: { a: NOW + 24 * H + 2 * H, cara: "bad", tr: "RED" } }, st, NOW + 24 * H + 2 * H);
+  assert.match(r.text, /<b>2 of 3<\/b> are dead/);
 });
 
 test("madrid y esc", () => {

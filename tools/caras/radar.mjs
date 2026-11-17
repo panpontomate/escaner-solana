@@ -8,6 +8,7 @@ export const LIQ_MIN = 2000;
 export const MAX_HORA = 3;
 export const WALLET_H = 6;
 export const RESUMEN_H = 21;
+export const GUARDA_H = 72;        // horas que se recuerda cada aviso (seguimiento a 24 h y resumen)
 const H = 3600e3;
 
 const ROLES = [
@@ -40,7 +41,8 @@ export function caraMala(t, faces) {
 
 // Avisos que tocan en esta ejecución. e = entradas del registro recién analizadas; st = state.radar (se modifica)
 export function elegirAvisos(entradas, tokens, faces, st, now) {
-  st.enviados = (st.enviados || []).filter((x) => now - x.at < 24 * H);
+  // se guardan GUARDA_H horas: hacen falta para el seguimiento a 24 h (el registro resuelve a las 24 h del lanzamiento)
+  st.enviados = (st.enviados || []).filter((x) => now - x.at < GUARDA_H * H);
   const cand = [];
   entradas.forEach(function (e) {
     if (!e || !e.m || (e.liq || 0) < LIQ_MIN) return;
@@ -53,7 +55,8 @@ export function elegirAvisos(entradas, tokens, faces, st, now) {
   for (const x of cand) {
     if (st.enviados.filter((s) => now - s.at < H).length >= MAX_HORA) break;
     if (st.enviados.some((s) => s.w === x.c.addr && now - s.at < WALLET_H * H)) continue;
-    st.enviados.push({ m: x.e.m, w: x.c.addr, at: now });
+    x.reg = { m: x.e.m, w: x.c.addr, at: now, s: x.e.s, done: x.c.done, dead: x.c.dead };
+    st.enviados.push(x.reg);
     out.push(x);
   }
   return out;
@@ -84,6 +87,32 @@ export function textoAviso(x, now) {
   };
 }
 
+// Seguimiento a 24 h (mejora A, 17/11): cuando el registro ya tiene el resultado a 24 h de un token avisado, se
+// contesta a su aviso con lo que pasó, muriera o no. reg = state.reg. Devuelve los mensajes (con reply al aviso)
+export function seguimientos(st, reg, now) {
+  const out = [];
+  (st.enviados || []).forEach(function (r) {
+    if (r.seg) return;
+    const e = reg[r.m], h = e && e.h24;
+    if (!h) return;
+    r.seg = { at: now, dead: !!h.dead, mc: Math.round(h.mc || 0) };
+    const sym = r.s ? "$" + esc(r.s) : corto(r.m);
+    // los avisos de antes del 17/11 (tarde) no guardaban la cifra de la cara
+    const quien = r.done ? "Flagged yesterday: launched by a wallet with " + mil(r.dead) + " dead tokens out of " + mil(r.done) + "."
+      : "Flagged yesterday: launched by a known face.";
+    let l;
+    if (h.dead) {
+      const por = e.rug ? "flagged as a rug" : h.pull ? "liquidity pulled" : h.dry ? "liquidity dried up" : "market cap " + usd(h.mc || 0) + ", under $10k";
+      l = ["📉 <b>24 h later: " + sym + " is dead</b>", "", quien, "Today: " + por + ".", "", "<code>" + r.m + "</code>"];
+    } else {
+      l = ["📈 <b>24 h later: " + sym + " is still alive</b>", "", quien, "Today: market cap " + usd(h.mc || 0) + ".",
+        "A known face usually means a dead token. Not always.", "", "<code>" + r.m + "</code>"];
+    }
+    out.push({ text: l.join("\n"), reply: r.id });
+  });
+  return out;
+}
+
 // Fecha y hora de Madrid
 export function madrid(now) {
   const p = {};
@@ -101,18 +130,25 @@ export function resumenDia(reg, st, now) {
   st.resumen = m.dia;
   const caras = hoy.filter((e) => e.cara === "bad").length;
   const buenos = hoy.filter((e) => e.tr === "YELLOW" || e.tr === "GREEN" || e.tr === "DIAMOND").length;
-  return { text: ["📋 <b>Today on Solana launches</b>", "",
+  // avisos cuyo resultado a 24 h llegó en las últimas 24 h
+  const seg = (st.enviados || []).filter((r) => r.seg && now - r.seg.at < 24 * H);
+  const l = ["📋 <b>Today on Solana launches</b>", "",
     "We analysed <b>" + mil(hoy.length) + "</b> new tokens.",
     "<b>" + mil(caras) + "</b> were launched by wallets with a long trail of dead tokens.",
-    (buenos ? "Only <b>" + mil(buenos) + "</b> got a yellow level or better." : "None got a yellow level or better."), "",
-    "Paste any token to @SolFlagBot for a second opinion."].join("\n") };
+    (buenos ? "Only <b>" + mil(buenos) + "</b> got a yellow level or better." : "None got a yellow level or better.")];
+  if (seg.length) l.push("", "Our alerts that turned 24 h old today: <b>" + mil(seg.filter((r) => r.seg.dead).length) + " of " + mil(seg.length) + "</b> are dead.");
+  l.push("", "Paste any token to @SolFlagBot for a second opinion.");
+  return { text: l.join("\n") };
 }
 
 export async function enviar(token, chat, msg) {
   const body = { chat_id: chat, text: msg.text, parse_mode: "HTML", disable_web_page_preview: true };
   if (msg.botones) body.reply_markup = { inline_keyboard: msg.botones };
+  // si el aviso original ya no existe, el seguimiento sale igual (sin cita)
+  if (msg.reply) body.reply_parameters = { message_id: msg.reply, allow_sending_without_reply: true };
   const r = await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
   const j = await r.json().catch(() => ({}));
   if (!j.ok) throw new Error("Telegram: " + (j.description || r.status));
+  return j.result && j.result.message_id;
 }

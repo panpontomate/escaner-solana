@@ -19,7 +19,7 @@ import { emptyBase, observe, classify, mergeAporte, pruneBase, publishBase, equi
 import { regEntry, regDue, regResolve, regRecheck, regRejudge, regPrune, regPublish, regFill, regMissing, dayOf, daySummary, mergeDay } from "./registro.mjs";
 import { createClient, analyzeToken } from "solana-risk-engine";
 import { puntos, elegir } from "./prioridad.mjs";
-import { elegirAvisos, textoAviso, resumenDia, enviar as enviarRadar } from "./radar.mjs";
+import { elegirAvisos, textoAviso, resumenDia, seguimientos, enviar as enviarRadar } from "./radar.mjs";
 import { emptyQueue, queueLaunch, queueBuyers, buyerCandidates, trimQueue, d1Config, flush, pedidosPendientes, marcarPedidos, pedidoLaunch, PEDIDOS_MAX, fromHelius, HELIUS_LIMIT, sinPagador } from "./plano.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -392,12 +392,20 @@ if (log.sinRugCheck && process.env.GITHUB_ACTIONS) console.log((log.rcCaido ? ":
   const prueba = process.env.RADAR_PRUEBA === "1";
   if (TOK || prueba) {
     state.radar = state.radar || {};
-    const msgs = elegirAvisos(radarNuevos, state.tokens, knownFaces, state.radar, Date.now()).map((x) => textoAviso(x, Date.now()));
+    // primero los seguimientos a 24 h (contestan a su aviso), luego los avisos nuevos y, a las 21:00, el resumen
+    const msgs = seguimientos(state.radar, state.reg, Date.now());
+    elegirAvisos(radarNuevos, state.tokens, knownFaces, state.radar, Date.now()).forEach(function (x) {
+      const msg = textoAviso(x, Date.now()); msg.reg = x.reg; msgs.push(msg);
+    });
     const res = resumenDia(state.reg, state.radar, Date.now());
     if (res) msgs.push(res);
     for (const msg of msgs) {
       if (prueba) { console.log("RADAR (prueba):\n" + msg.text + "\n"); continue; }
-      try { await enviarRadar(TOK, CHAT, msg); log.radar = (log.radar || 0) + 1; await sleep(1500); }
+      try {
+        const id = await enviarRadar(TOK, CHAT, msg);
+        if (msg.reg && id) msg.reg.id = id;                // para contestar a este aviso a las 24 h
+        log.radar = (log.radar || 0) + 1; await sleep(1500);
+      }
       catch (e) { log.radarFallo = (log.radarFallo || 0) + 1; console.log("::warning::Radar: " + e.message); }
     }
   }
