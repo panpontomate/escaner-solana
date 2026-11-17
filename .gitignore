@@ -14,3 +14,7 @@ tools/momento/node_modules/
 **/.env
 
 .impeccable/
+
+# solo en local: ficha de producto de impeccable y el estudio de ganadoras (datos en bruto, ~9 MB)
+/PRODUCT.md
+tools/estudio/
