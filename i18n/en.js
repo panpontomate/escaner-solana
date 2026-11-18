@@ -76,7 +76,6 @@ export const CODE = [
   ['<p class="syn"><a href="/acierto/">Ver datos y acierto →</a> · <a href="/como-funciona/">Cómo funciona cada bandera →</a></p>', '<p class="syn"><a href="/en/accuracy/">See data and accuracy →</a> · <a href="/en/how-it-works/">How each flag works →</a></p>'],
   ['var LACIERTO="/acierto/", LHOW="/como-funciona/"', 'var LACIERTO="/en/accuracy/", LHOW="/en/how-it-works/"'],
   // los cinco niveles (14/11/2026): «nivel» bajo el anillo y en el sello (la palabra sola es también el ancla #nivel)
-  ['(TIERS5.indexOf(r.lvl)>=0?"nivel":"riesgo")', '(TIERS5.indexOf(r.lvl)>=0?"tier":"risk")'],
   ['TIERS5.indexOf(r.lvl)>=0?"nivel":"";', 'TIERS5.indexOf(r.lvl)>=0?"tier":"";'],
   // cuadro de la curva de Pump.fun (14/11/2026)
   ['" minuto":" minutos")+" ("', '" minute":" minutes")+" ("'],
@@ -301,12 +300,7 @@ export const TEXT = {
   "Volumen 24 h": "24h volume",
   "Edad": "Age",
   "<div class='tgrid'><div class='tcol'><p class='kick'>Las 5 banderas</p><h3 class='tgt'>Por qué sale así</h3>": "<div class='tgrid'><div class='tcol'><p class='kick'>The 5 flags</p><h3 class='tgt'>Why it scores this way</h3>",
-  "No se pudo cargar el radar ahora mismo.": "The radar could not load right now.",
   "Buscando los últimos lanzamientos…": "Looking for the latest launches…",
-  "Revisando ": "Checking ",
-  " tokens recién lanzados…": " freshly launched tokens…",
-  "Revisados los ": "Checked the ",
-  " últimos lanzamientos, ": " latest launches, ",
   "SolFlag · Escáner de riesgo de Solana": "SolFlag · Solana risk scanner",
   "Pega cualquier token o wallet de Solana y mira sus red flags: control del creador, concentración, liquidez y lanzamiento. Gratis, sin registro y de código abierto.": "Paste any Solana token or wallet and see its red flags: creator control, concentration, liquidity and launch. Free, no sign-up and open source.",
   "SolFlag, ir a la portada": "SolFlag, go to the home page",
@@ -663,9 +657,6 @@ export const TEXT = {
   " alertas fuertes": " strong alerts",
   " aviso": " warning",
   " avisos": " warnings",
-  " sin comprobar": " not checked",
-  "<div class='ringbox'><svg class='ring' viewBox='0 0 130 130' role='img' aria-label='Nivel de riesgo ": "<div class='ringbox'><svg class='ring' viewBox='0 0 130 130' role='img' aria-label='Risk level ",
-  "Sin alertas": "No alerts",
   "Es una copia de ": "It is a copy of ",
   " con otra dirección: no es ": " with another address: it is not ",
   " y su precio no tiene nada que ver con el suyo. No lo compres pensando que es el original, y si lo tienes, no entres en webs que aparezcan a su nombre para «cambiarlo» o «reclamarlo».": " and its price has nothing to do with the real one. Do not buy it thinking it is the original, and if you hold it, do not visit websites under its name to “swap” or “claim” it.",
@@ -749,9 +740,6 @@ export const TEXT = {
   "' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button></div>": "' title='Everything around this token, full screen'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button></div>",
   "' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span><span class='tmsub'> · todo lo que rodea a este token</span></button>": "' title='Everything around this token, full screen'><span class='ic'>✦</span><span class='lb'>On-chain Map</span><span class='tmsub'> · everything around this token</span></button>",
   "' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button>": "' title='Everything around this token, full screen'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button>",
-  "Persona": "Person",
-  "Exchange o plataforma": "Exchange or platform",
-  "Bot o trader muy activo": "Bot or very active trader",
   "Pool o programa": "Pool or program",
   "Preparando el mapa…": "Preparing the map…",
   "menos de 1 día": "under 1 day",
@@ -1304,7 +1292,6 @@ export const TEXT = {
   " · Mín. ": " · Low ",
 
   // ---------- launch buys (bundles) ----------
-  "<div class='lights' style='margin-bottom:10px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>": "<div class='lights' style='margin-bottom:10px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Launch buys</b><span>Checking who bought in the first second…</span></div></div></div>",
   "<i class='ld'></i><div style='min-width:0;flex:1'><b>Compras en el lanzamiento</b><span>": "<i class='ld'></i><div style='min-width:0;flex:1'><b>Launch buys</b><span>",
   " Sube a ": " Raised to ",
 
