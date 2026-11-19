@@ -1080,6 +1080,7 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
 .ml-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .ml-wgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
 .ml-w{background:rgba(14,9,38,.55);border:1px solid rgba(196,181,253,.2);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ml-w[data-analyze]{cursor:pointer;transition:border-color .15s}.ml-w[data-analyze]:hover{border-color:rgba(142,197,207,.5)}
 .ml-wtop{display:flex;align-items:center;gap:12px;min-width:0}
 .ml-wtop .cf-ava{width:40px;height:40px;font-size:.8rem}
 .ml-wtop .t{flex:1;min-width:0;line-height:1.2;display:flex;flex-direction:column}
@@ -2262,7 +2263,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
   <div id="landing">
     <div class="seam"><canvas data-seam="1" aria-hidden="true"></canvas></div>
     <section class="lblk" id="hot">
-      <div class="sec-head"><h2>Tokens calientes<span class="thin">ahora mismo.</span></h2><p>Lo que más se mueve en Solana, con su nivel de riesgo al lado. Antes de entrar, mira las banderas.</p></div>
+      <div class="sec-head"><h2>Tokens en tendencia<span class="thin">ahora mismo.</span></h2><p>Lo que más se mueve en Solana, con su nivel de riesgo al lado. Antes de entrar, mira las banderas.</p></div>
       <div class="term">
         <div class="cats" role="group" aria-label="Lista de tokens"><button type="button" class="cat" data-hot="t" aria-pressed="true">En tendencia <small id="hotnt"></small></button><button type="button" class="cat" data-hot="n" aria-pressed="false">Recién lanzados <small id="hotnn"></small></button></div>
         <div class="hrows" id="hotrows"><p class="hint">Cargando la tendencia…</p></div>
@@ -2270,7 +2271,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
       <p class="syn" id="hotsrc"></p>
     </section>
     <section class="lblk" id="hotw" hidden style="padding-top:20px">
-      <div class="sec-head"><h2>Billeteras calientes<span class="thin">de hoy.</span></h2><p>Las que más lanzan, compran o financian en las últimas 24 horas según nuestro registro. Son datos, no acusaciones.</p></div>
+      <div class="sec-head"><h2>Las wallets<span class="thin">del día.</span></h2><p>Las que más lanzan, compran o financian en las últimas 24 horas según nuestro registro. Son datos, no acusaciones.</p></div>
       <div class="wal" id="hotwl"></div>
       <p class="syn">Fuente: registro de SolFlag (las últimas 24 h). Sin exchanges conocidos. Pulsa una para analizarla. ¿Un dato mal? <a href="mailto:solflag.team@gmail.com">Escríbenos</a>.</p>
     </section>
@@ -2592,7 +2593,7 @@ function mlRow(t){
 }
 function mlWallet(e){
   var a=e.addr, on=inCart(a);
-  return "<div class='ml-w'><div class='ml-wtop'>"+cfAva(a)+"<span class='t'><a href='#' data-analyze='"+esc(a)+"' title='Abrir el análisis de esta wallet'>"+esc(e.name||short(a))+"</a>"+
+  return "<div class='ml-w' data-analyze='"+esc(a)+"' title='Abrir el análisis de esta wallet'><div class='ml-wtop'>"+cfAva(a)+"<span class='t'><a href='#' data-analyze='"+esc(a)+"' title='Abrir el análisis de esta wallet'>"+esc(e.name||short(a))+"</a>"+
       "<span>"+(e.name?esc(short(a)):"sin nombre")+"</span></span>"+cfPnlBadge(e.pnl&&e.pnl.st?e.pnl:null)+"</div>"+
     (e.ts?"<div class='ml-wst'><div><b>"+usd(e.total||0)+"</b><span>en tokens</span></div><div><b>"+(e.n||0)+"</b><span>tokens</span></div>"+
       "<div"+(e.alto?" class='r'":"")+"><b>"+(e.alto||0)+"</b><span>en rojo</span></div></div>":"<p class='hint' style='margin:0'>Todavía sin analizar</p>")+
@@ -7178,8 +7179,11 @@ document.addEventListener("click",function(ev){
   }
   var wf=ev.target.closest&&ev.target.closest("[data-wfl]");
   if(wf){ var wb=wf.closest(".tok").querySelector(".wfl"); wb.hidden=!wb.hidden; wf.setAttribute("aria-expanded",String(!wb.hidden)); wf.lastChild.textContent=wb.hidden?"▾":"▴"; return; }
+  // abre el análisis: botones, filas y tarjetas con data-analyze y los enlaces «#» con data-analyze (antes esos enlaces
+  // solo subían la página, p. ej. el nombre de una wallet en Mi lista). Otros botones o enlaces dentro de una tarjeta no.
   var an=ev.target.closest&&ev.target.closest("[data-analyze]");
-  if(an&&!ev.target.closest("a")){ ev.preventDefault(); setMode("W"); $("#wallet").value=an.getAttribute("data-analyze"); analyze(); }
+  var ctl=an&&ev.target.closest("a,button,summary,details,input,select,label");
+  if(an&&(!ctl||ctl===an||ctl.contains(an))&&!(ctl&&ctl.tagName==="A"&&ctl.getAttribute("href")!=="#")){ ev.preventDefault(); setMode("W"); $("#wallet").value=an.getAttribute("data-analyze"); analyze(); }
 });
 document.addEventListener("keydown",function(ev){
   var r=ev.target.closest&&ev.target.closest("[role='button'][data-analyze]");
