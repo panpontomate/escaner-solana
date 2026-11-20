@@ -80,7 +80,9 @@ export const CODE = [
   // cuadro de la curva de Pump.fun (14/11/2026)
   ['" minuto":" minutos")+" ("', '" minute":" minutes")+" ("'],
   // pestaña de acciones tokenizadas (12/11/2026)
-  ['<a class="tab tlink" href="/acciones/">', '<a class="tab tlink" href="/en/stocks/">']
+  ['<a class="tab tlink" href="/acciones/">', '<a class="tab tlink" href="/en/stocks/">'],
+  // pestaña del ecosistema (20/11/2026)
+  ['<a class="tab tlink" href="/ecosistema/">', '<a class="tab tlink" href="/en/ecosystem/">']
 ];
 
 export const TEXT = {
@@ -139,6 +141,7 @@ export const TEXT = {
   "Lo emite ": "Issued by ",
   "<a href='/acciones/'>Ver todas las acciones tokenizadas →</a></p>": "<a href='/en/stocks/'>See all tokenized stocks →</a></p>",
   "Acciones": "Stocks",
+  "Ecosistema": "Ecosystem",
   // portada y resultado nuevos (11/11)
   "exchange: guarda fondos de sus usuarios": "exchange: it holds its users funds",
   "</b>Valor en tokens</span></div>": "</b>Value in tokens</span></div>",

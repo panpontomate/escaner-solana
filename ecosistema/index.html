@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ecosistema de Solana: uso real de cada proyecto · SolFlag</title>
+<meta name="description" content="Todo Solana por apartados (memes, activos tokenizados, DeFi, juegos, IA, apps y bots) y cada proyecto medido por su uso real: comisiones, dinero en circulación o valor tokenizado. Con y sin token. Datos de cada día.">
+<meta property="og:title" content="Sigue el uso, no el ruido · SolFlag">
+<meta property="og:description" content="Los proyectos de Solana medidos por su uso real, con y sin token. Datos de cada día.">
+<meta property="og:url" content="https://solflag.com/ecosistema/">
+<meta property="og:image" content="https://solflag.com/og.png?v=2">
+<link rel="canonical" href="https://solflag.com/ecosistema/">
+<link rel="alternate" hreflang="es" href="https://solflag.com/ecosistema/">
+<link rel="alternate" hreflang="en" href="https://solflag.com/en/ecosystem/">
+<link rel="alternate" hreflang="x-default" href="https://solflag.com/en/ecosystem/">
+<script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link rel="icon" href="/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="icon" href="/marca/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/marca/apple-touch-icon.png">
+<link href="/ecosistema/eco.css?v=1" rel="stylesheet">
+</head>
+<body>
+<canvas class="sky" id="sky" aria-hidden="true"></canvas>
+<div class="wrap">
+<header>
+  <a class="logo" href="/" title="SolFlag">
+    <img class="ico" src="/marca/solflag-icono.svg?v=1" alt="" width="44" height="44">
+    <span class="wm" translate="no">Solflag</span>
+  </a>
+  <nav class="pnav" aria-label="Secciones"><a href="/?v=escaner">Escáner</a><a href="/?v=lista">Mi lista</a><a href="/?v=confluencia">Confluencia</a><a href="/ecosistema/" aria-current="page">Ecosistema</a><a href="/acciones/">Acciones</a><a class="pbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a></nav>
+  <a class="plang" href="/en/ecosystem/" hreflang="en" title="English version">EN</a>
+</header>
+
+<main>
+  <section class="hero">
+    <div>
+      <div class="kick">Ecosistema · Solana</div>
+      <h1>Sigue el uso, no el ruido.</h1>
+      <p><b>Todo Solana por apartados, y cada proyecto medido por su uso real.</b> Comisiones que cobra, dinero en circulación o valor tokenizado, según el grupo. Con token y sin token, y los que acaban de sacarlo.</p>
+    </div>
+    <div class="mk" id="mk"></div>
+  </section>
+
+  <div class="aps" id="aps"></div>
+  <p class="apdesc" id="apdesc"></p>
+
+  <div class="tabs">
+    <button class="on" data-k="todos">Todos <em id="nTodos"></em></button>
+    <button data-k="con">Con token <em id="nCon"></em></button>
+    <button data-k="sin">Sin token <em id="nSin"></em></button>
+    <button data-k="nuevo" id="tNuevo" hidden>Acaba de sacar token <em id="nNuevo"></em></button>
+  </div>
+
+  <div class="bar" id="bar">
+    <div class="chips" id="chips"></div>
+    <div class="sort" id="sort">
+      <button class="on" data-s="m">Uso</button>
+      <button data-s="rel">Frente al mercado</button>
+      <button data-s="anios">Vale × ingresos</button>
+      <button data-s="tit">Titulares</button>
+    </div>
+  </div>
+  <div id="lista"><div class="tbl"><div class="estado">Cargando…</div></div></div>
+
+  <p class="note">«Uso» es la medida de cada grupo: las comisiones que cobra en 30 días; en stablecoins, cuánto hay en circulación en Solana; en activos reales, el valor tokenizado (en Solana, o el total de todas sus cadenas para Ondo, Securitize y Remora, como indica cada fila; el de xStocks se calcula en Solana: lo emitido menos lo que guardan las cuentas del emisor). En memes, IA y juegos sin comisiones, la capitalización de su token. «Frente al mercado»: cuánto cambió en 30 días comparado con todo su mercado en Solana (comisiones: <span id="mkF"></span>; stablecoins: <span id="mkC"></span>); en el resto saldrá de nuestro propio histórico diario cuando lleve un mes. «Titulares» y «traders»: cuántas wallets tienen el token y cuántas operaron en 24 h; «orgánicos» son los compradores que Jupiter no ve como bots. «Vale × ingresos»: cuántas veces vale su token lo que ingresa el protocolo en un año.</p>
+
+  <div class="how">
+    <div><b>De dónde salen los datos</b>DefiLlama: comisiones, ingresos, dinero depositado y stablecoins en Solana. CoinGecko: precios y capitalización. Jupiter: titulares y traders. La cadena (Helius): el valor de xStocks en Solana. Se actualiza cada día.</div>
+    <div><b>Los 10 primeros de cada grupo</b>No los 50 que más cobran de todo Solana: así un grupo pequeño (oráculos, juegos, puentes) no se queda fuera por ser pequeño.</div>
+    <div><b>Cuando un proyecto saca token</b>Si un proyecto que salía sin token aparece con token, pasa a «Acaba de sacar token». Suelen salir copias con el mismo nombre: comprueba la dirección en su web oficial y pásala por el escáner.</div>
+    <div><b>No es consejo de inversión</b>Son datos de uso. Que un proyecto se use mucho no dice si su token va a subir.</div>
+  </div>
+  <p class="note">Datos del <span id="fecha">—</span>. Powered by CoinGecko. ¿Algún proyecto mal clasificado o con un dato que no cuadra? Escríbenos a <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>.</p>
+</main>
+</div>
+<footer class="wrap">
+  <span class="wm" translate="no">Solflag</span>
+  <a href="/">Escáner</a>
+  <a href="/ecosistema/">Ecosistema</a>
+  <a href="/acciones/">Acciones</a>
+  <a href="/blog/">Blog</a>
+  <a href="/acierto/">Datos y acierto</a>
+  <a href="/como-funciona/">Cómo funciona</a>
+  <a href="/privacidad/">Privacidad</a>
+  <a href="/terminos/">Términos</a>
+  <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
+  <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
+  <p>Datos: DefiLlama, CoinGecko (Powered by CoinGecko) y Jupiter. SolFlag es una herramienta orientativa, no consejo financiero.</p>
+</footer>
+<script src="/ecosistema/eco.js?v=1" defer></script>
+<script>
+// cielo de estrellas detrás de toda la página (igual que /acciones/)
+(function(){ const cv = document.getElementById("sky"), x = cv.getContext("2d");
+  function paint(){ const D = Math.min(2, devicePixelRatio || 1), W = innerWidth, H = innerHeight; cv.width = W*D; cv.height = H*D; x.setTransform(D,0,0,D,0,0);
+    let s = 7; const r = () => (s = s*16807 % 2147483647) / 2147483647;
+    for (let i = 0; i < W*H/2600; i++){ const a = .12 + r()*.55, z = r() < .06 ? 1.8 : 1.1; x.fillStyle = (r() < .12 ? "rgba(170,200,255," : "rgba(241,238,255,") + a + ")"; x.fillRect(r()*W, r()*H, z, z); } }
+  paint(); addEventListener("resize", paint); })();
+</script>
+<script src="/puntos.js?v=20261111b" defer></script>
+</body>
+</html>

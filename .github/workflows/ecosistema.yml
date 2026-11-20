@@ -1,0 +1,57 @@
+# Página Ecosistema (solflag.com/ecosistema/): una vez al día recoge el uso de los proyectos de Solana (DefiLlama,
+# CoinGecko, Jupiter y, para xStocks, la cadena con Helius) y publica datos/ecosistema.json en la rama "datos".
+# La memoria diaria (datos/ecosistema-historial.json) va en la misma rama: con ella salen el cambio a 30 días donde
+# la fuente no lo da y «Acaba de sacar token». Si algo falla, no se sube nada y la web sigue con los datos de ayer.
+name: ecosistema
+on:
+  schedule:
+    - cron: "40 6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: ecosistema
+  cancel-in-progress: false
+jobs:
+  datos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      cambios: ${{ steps.pub.outputs.cambios }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          ref: datos
+          path: _pub
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Recoger los datos del ecosistema
+        env:
+          SOLANA_RPC: ${{ secrets.SOLANA_RPC }}
+          COINGECKO_KEY: ${{ secrets.COINGECKO_KEY }}
+          OUT_DIR: _pub/datos
+        run: node tools/ecosistema/datos.mjs
+      - name: Subir a la rama datos
+        id: pub
+        working-directory: _pub
+        run: |
+          git add datos/ecosistema.json datos/ecosistema-historial.json
+          git diff --cached --quiet && exit 0
+          git config user.name "solflag-ecosistema"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "ecosistema: datos del día"
+          git pull --rebase -q && git push -q || { sleep 15; git pull --rebase -q && git push -q; }
+          echo "cambios=1" >> "$GITHUB_OUTPUT"
+  pages:
+    needs: datos
+    if: needs.datos.outputs.cambios == '1'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/pages.yml
