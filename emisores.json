@@ -1784,6 +1784,39 @@
         "2R1N2gJibQEZJVe2b1hzutGUQ2sCAAQcyv9sCQQGfwg8",
         "DZDiU8T6FkmPFZV155LZukgEjXnGnQuW7xcDEEi1pU4p"
       ]
+    },
+    {
+      "name": "Ethena",
+      "fuente": "https://docs.ethena.fi/technical-design/key-addresses (USDe en Solana). Clave de emisión: cuenta de un programa (puente entre cadenas); sin clave de congelar. Comprobado en la cadena el 20/11/2026. Reservas: https://app.ethena.fi/dashboards/transparency",
+      "mints": {
+        "DEkqHyPN7GMRJ5cArtQFAWefqbZb33Hyf6s5iCwjEonT": "https://docs.ethena.fi/technical-design/key-addresses"
+      },
+      "keys": [
+        "4x3oQtX4MhjTKGBeXDZbtTSLZ9cUWo5waN2UChAuthtS"
+      ]
+    },
+    {
+      "name": "World Liberty Financial (BitGo)",
+      "fuente": "https://docs.worldlibertyfinancial.com/usd1-token/contract-addresses (USD1 en Solana; lo emite BitGo). Emisión: multifirma de token BQh6…ftpwK; congelar: 84ss…kh71. Comprobado en la cadena el 20/11/2026. Informes mensuales: https://docs.worldlibertyfinancial.com/usd1-token/attestation-reports",
+      "mints": {
+        "USD1ttGY1N17NEEHLmELoaybftRBUSErhqYiQzvEmuB": "https://docs.worldlibertyfinancial.com/usd1-token/contract-addresses"
+      },
+      "keys": [
+        "BQh68x9D7TDqgJUXiJX1BsD1eR7kkV978owqwBEftpwK",
+        "84ssq8Ud2WRzxVCuEmPa9xLPBUt4odmB8wuE8svZkh71"
+      ]
+    },
+    {
+      "name": "Solstice",
+      "fuente": "https://docs.solstice.finance/solstice-for-builders/smart-contracts (USX y eUSX en Solana). Claves: cuentas de sus programas USXyiSTs… y eUSXyKoZ…. Comprobado en la cadena el 20/11/2026. Reservas: https://docs.solstice.finance/legal-documents/attestations-and-proof-of-solvency",
+      "mints": {
+        "6FrrzDk5mQARGc1TDYoyVnSyRdds1t4PbtohCD6p3tgG": "https://docs.solstice.finance/solstice-for-builders/smart-contracts",
+        "3ThdFZQKM6kRyVGLG48kaPg5TRMhYMKY1iCRa9xop1WC": "https://docs.solstice.finance/solstice-for-builders/smart-contracts"
+      },
+      "keys": [
+        "Ze3CQhTMi6KMU3nWZQUegA2JpeFd2eMx1Y2Gswqnto4",
+        "2aHdm37djj4c21ztMRBmmo4my6RtzN5Nn58Y39rpWbRM"
+      ]
     }
   ]
 }
