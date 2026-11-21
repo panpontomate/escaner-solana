@@ -2195,6 +2195,17 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 .mksum b{display:block;font:300 1.7rem/1.05 var(--f-display)}
 .mksum span{display:block;margin-top:4px;font-size:.84rem;color:var(--muted)}
 .mktl{list-style:none;margin:0;padding:0}
+.mkall{margin:10px 0 2px}
+#t-hold .mkstory{margin:4px 0 18px}
+/* tira de Dato (maqueta web/escaner-meme.html, 21/11) */
+.dato{margin-top:16px;display:grid;grid-template-columns:auto 1fr;column-gap:18px;align-items:center;border-left:3px solid var(--ac,#7ab8c4);border-radius:4px 14px 14px 4px;padding:14px 18px;background:linear-gradient(120deg,var(--acb,rgba(122,184,196,.1)),rgba(255,255,255,.015) 75%)}
+.dato .kick{grid-column:1/-1;margin:0 0 6px;color:var(--ac,#7ab8c4);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase}
+.dato>b{white-space:nowrap;font:500 2.25rem/1.05 var(--f-display);color:var(--ac,#7ab8c4);letter-spacing:-.02em}
+.dato p{margin:0;font-size:.88rem;line-height:1.5;color:#e6e0ff}
+.dato .dl{grid-column:1/-1;margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.dato .dl div{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:10px;background:rgba(5,4,13,.45);font-size:.75rem;color:var(--muted)}
+.dato .dl b{order:-1;font:600 1.06rem var(--f-mono);color:#f1eeff}
+@media (max-width:560px){ .dato{grid-template-columns:1fr} .dato>b{font-size:1.9rem;white-space:normal} .dato p{margin-top:4px} }
 .mktl li{display:grid;grid-template-columns:52px 12px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-size:.88rem;cursor:pointer}
 .mktl li:hover{background:rgba(255,255,255,.02)}
 .mktl time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.82rem}
@@ -4201,7 +4212,7 @@ function tokenDetail(r){
       "<button type='button' data-tgo='t-who'>Who is behind</button>"+
       (r.emisor?"":"<button type='button' data-tgo='t-hold'>Whales</button>")+"</nav>"+
     "<div class='tc2'><section class='card tdc' id='t-chart'><p class='kick tdk'>Chart</p><h2>Price and what happened <small>in $, with the markers</small></h2>"+
-      (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("No market: there is no price to draw.")+"</div>")+histHtml(r)+"<div class='mkstory' id='mkstory'></div></section></div>"+
+      (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("No market: there is no price to draw.")+"</div>")+histHtml(r)+(r.emisor?"<div class='mkstory' id='mkstory'></div>":"")+"</section></div>"+
     apBlockHtml(r)+
     "<section class='card tdc' id='t-quote'><p class='kick tdk'>Where it trades</p><h2>Getting in and out <small>where it costs you least</small></h2>"+
       "<div id='quotebox'><p class='hint'>Looking for where it trades…</p></div></section>"+
@@ -4210,6 +4221,7 @@ function tokenDetail(r){
       "<div id='whobox'><p class='hint'>Looking in the SolFlag registry…</p></div>"+
       "<p class='wsrc'>Facts from the SolFlag registry (since 29 Oct 2026): who paid for, created and funded each launch and how it ended after 24 h. Data, not accusations. Something wrong? <a href='mailto:solflag.team@gmail.com'>Write to us</a>.</p></section>"+
     (r.emisor?"":"<section class='card tdc hcompact' id='t-hold'><h2>Whales <small>the accounts holding the most</small></h2>"+
+      "<div class='mkstory' id='mkstory'></div>"+
       "<div class='tlazy' id='thlazy'><span>See who holds the most of this token: people, exchanges, pools and groups that share a funder.</span><button type='button' class='btn small' data-hold='"+esc(r.mint)+"'>See the whales</button></div>"+
       "<button type='button' class='btn small hfull' id='hfull' hidden>See all whales →</button></section>")+
     "<div class='pie-ci'><span>!</span><p><b>SolFlag gives data, not investment advice.</b> Nothing on this page is a recommendation to buy, sell or hold any token. The tier and the flags sum up what we see on chain and in public sources right now, and they can change. Always check for yourself and never put in money you cannot afford to lose.</p></div>";
@@ -7363,24 +7375,42 @@ function mkHelpHtml(){
     "<li><i style='background:"+MKCOL.tu+"'></i><span><b>"+"You"+"</b>: "+"when you scanned it."+"</span></li></ul>";
 }
 // lo que pasó: tres cifras y la lista en orden; pulsar una fila lleva la gráfica a esa vela
+// 21/11 (maqueta web/escaner-meme.html): vive en el apartado de Ballenas; las 6 más recientes y «Ver las N»,
+// y debajo la tira de Dato: rotación (volumen 24 h / liquidez) y el resumen de compras y ventas
+function mkRot(x){ return (x<10?Math.round(x*10)/10:Math.round(x)).toLocaleString("en-US"); }
+function mkDato(r,d){
+  var p=r.par||{}, v=Number(p.volume&&p.volume.h24)||0, l=Number(p.liquidity&&p.liquidity.usd)||0;
+  if(!(v>0&&l>0)) return "";
+  var x=v/l, t=x<0.5?"In 24 h far less was traded than the liquidity ({v} against {l}): little movement."
+    :x<3?"In 24 h about as much was traded as the liquidity ({v} against {l}): a calm pace."
+    :x<20?"In 24 h {x} times its liquidity was traded ({v} on {l}): a lot of movement for the depth it has."
+    :"In 24 h {x} times its liquidity was traded ({v} on {l}). That much movement is speculation: many people getting in and out at once.";
+  t=t.replace("{x}",mkRot(x)).replace("{v}",usdShort(v)).replace("{l}",usdShort(l));
+  if(l<10000&&x>=3) t+=" "+"With so little depth, every big sell sinks the price.";
+  var dl=[];
+  if(d&&d.ev&&d.ev.length){
+    var sum=function(a){ return a.length+(a.length?" · "+usd(a.reduce(function(s,e){ return s+(e.usd||0); },0)):""); };
+    dl.push(["Whale buys",sum(d.ev.filter(function(e){ return e.k==="wb"&&!e.sell; }))]);
+    dl.push(["Sells (whales, creator and first buyers)",sum(d.ev.filter(function(e){ return e.sell; }))]);
+    if(d.crPct!=null&&d.crSells) dl.push(["of their bag the creator has sold",d.crPct+" %"]);
+    else if(d.laTotal) dl.push(["launch buyers have sold","{a} of {b}".replace("{a}",d.laSold).replace("{b}",d.laTotal)]);
+  }
+  return "<div class='dato'><span class='kick'>"+"Fact"+"</span><b>×"+mkRot(x)+"</b><p>"+esc(t)+"</p>"+
+    (dl.length?"<div class='dl'>"+dl.map(function(z){ return "<div><span>"+esc(z[0])+"</span><b>"+esc(z[1])+"</b></div>"; }).join("")+"</div>":"")+"</div>";
+}
 function mkStory(r){
   var box=$("#mkstory"); if(!box) return;
   var d=MK.data[r.mint];
-  if(!d||d==="loading"||d==="err"||!d.ev.length){ box.innerHTML=d&&d.ev&&!d.ev.length?"<p class='mks'>"+"In the latest trades we see no sells by the creator or the launch buyers, and no whale trades."+" "+esc(mkSrc(d))+"</p>":""; return; }
-  var cifras=[];
-  if(d.crPct!=null&&d.crSells) cifras.push("<div><b>"+d.crPct+" %</b><span>"+"of their bag the creator has sold"+(d.crSells>1?", "+"in {n} sells".replace("{n}",d.crSells):"")+"</span></div>");
-  else if(d.crSells) cifras.push("<div><b>"+d.crSells+"</b><span>"+(d.crSells===1?"sell by the creator":"sells by the creator")+"</span></div>");
-  if(d.laTotal) cifras.push("<div><b>"+"{a} of {b}".replace("{a}",d.laSold).replace("{b}",d.laTotal)+"</b><span>"+"launch buyers have sold"+"</span></div>");
-  var wb=d.ev.filter(function(e){ return e.k==="wb"; }), wbS=wb.filter(function(e){ return e.sell; }).length;
-  if(wb.length) cifras.push("<div><b>"+(wb.length-wbS)+" / "+wbS+"</b><span>"+"whale buys / sells"+"</span></div>");
-  var list=d.ev.slice().reverse().slice(0,40);
+  if(!d||d==="loading"||d==="err"){ box.innerHTML=""; return; }
+  if(!d.ev.length){ box.innerHTML="<h3 class='mkt'>"+"What happened"+"</h3><p class='mks'>"+"In the latest trades we see no sells by the creator or the launch buyers, and no whale trades."+" "+esc(mkSrc(d))+"</p>"+mkDato(r,d); return; }
+  var todo=MK.all===r.mint, list=d.ev.slice().reverse().slice(0,todo?40:6);
   box.innerHTML="<h3 class='mkt'>"+"What happened"+"</h3><p class='mks'>"+"The buys and sells that matter, newest first. These are on-chain facts, not accusations."+"</p>"+
-    (cifras.length?"<div class='mksum'>"+cifras.join("")+"</div>":"")+
     "<ul class='mktl'>"+list.map(function(e){ var pre=r.par&&r.par.pairCreatedAt&&!/^pump-?fun$/i.test(r.par.dexId||"")&&e.ts<r.par.pairCreatedAt-60000;   // antes de que existiera este pool
       return "<li data-mkts='"+e.ts+"'><time>"+esc(ftime(e.ts))+"</time><i style='background:"+MKCOL[e.k]+"'></i><span>"+esc(mkLine(e,pre))+" <small>"+esc(short(e.w))+"</small></span>"+
       "<a href='https://solscan.io/tx/"+esc(e.tx)+"' target='_blank' rel='noopener'>Solscan ↗</a></li>"; }).join("")+"</ul>"+
-    (d.ev.length>40?"<p class='mks'>"+"Showing the 40 most recent."+"</p>":"")+
-    "<p class='mks'>"+esc(mkSrc(d))+"</p>";
+    (!todo&&d.ev.length>6?"<button type='button' class='btn small mkall' data-mkall>"+"See all {n}".replace("{n}",Math.min(40,d.ev.length))+"</button>":"")+
+    (todo&&d.ev.length>40?"<p class='mks'>"+"Showing the 40 most recent."+"</p>":"")+
+    "<p class='mks'>"+esc(mkSrc(d))+"</p>"+mkDato(r,d);
 }
 function mkSrc(d){ return "GeckoTerminal trades (the last {n}{desde}) and the SolFlag registry.".replace("{n}",d&&d.n||300).replace("{desde}",d&&d.from?", since {f}".replace("{f}",fdate(d.from)+" "+ftime(d.from)):"")+
   (d&&d.hel?" "+(d.helCr&&d.hel===1?"For the creator, their whole history with this token (Helius).":d.helCr?"For the creator and {n} launch buyers, their whole history with this token (Helius).":"For {n} launch buyers, their whole history with this token (Helius).").replace("{n}",d.hel-(d.helCr?1:0)):""); }
@@ -7398,6 +7428,7 @@ document.addEventListener("click",function(e){
   var b=e.target.closest&&e.target.closest("[data-mk]");
   if(b){ var k=b.getAttribute("data-mk"); MK.on[k]=!MK.on[k]; mkSave(); mkPaint(); return; }
   if(e.target.closest&&e.target.closest("[data-mkq]")){ var row=e.target.closest(".mkrow"), h=row&&row.querySelector(".mkh"); if(h) h.hidden=!h.hidden; return; }
+  if(e.target.closest&&e.target.closest("[data-mkall]")){ if(state.token){ MK.all=state.token.mint; mkStory(state.token); } return; }
   var li=e.target.closest&&e.target.closest("[data-mkts]");
   if(li&&!e.target.closest("a")&&state.lwc&&state.lwcS){   // a esa vela, en la pequeña
     var t=Math.floor(+li.getAttribute("data-mkts")/1000)-state.lwcS.tz, T=state.lwcS.times, k=T.length-1; while(k>0&&T[k]>t) k--;

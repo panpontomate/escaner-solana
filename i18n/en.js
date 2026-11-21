@@ -10,6 +10,8 @@
 // wallet, token, con, spam, hoy, cancelado, helius, sol, dex) are deliberately not here.
 
 export const CODE = [
+  // rotación de la tira de Dato en Ballenas (21/11)
+  ['function mkRot(x){ return (x<10?Math.round(x*10)/10:Math.round(x)).toLocaleString("de-DE"); }', 'function mkRot(x){ return (x<10?Math.round(x*10)/10:Math.round(x)).toLocaleString("en-US"); }'],
   // puntos por apartado (21/11): números y orden de palabras en inglés
   ["if(d.que&&d.que.es) return d.que.es;", "if(d.que&&d.que.en) return d.que.en;"],
   ["function apVale(x){ return x.toLocaleString(\"es-ES\",{maximumFractionDigits:1}); }", "function apVale(x){ return x.toLocaleString(\"en-US\",{maximumFractionDigits:1}); }"],
@@ -1229,13 +1231,19 @@ export const TEXT = {
   "cuando lo analizaste.": "when you scanned it.",
   "En las últimas operaciones no vemos ventas del creador ni de los compradores del lanzamiento, ni operaciones de ballenas.": "In the latest trades we see no sells by the creator or the launch buyers, and no whale trades.",
   "de lo suyo ha vendido el creador": "of their bag the creator has sold",
-  "en {n} veces": "in {n} sells",
-  "venta del creador": "sell by the creator",
-  "ventas del creador": "sells by the creator",
   "{a} de {b}": "{a} of {b}",
   "compradores del lanzamiento han vendido": "launch buyers have sold",
-  "compras / ventas de ballenas": "whale buys / sells",
   "Lo que pasó": "What happened",
+  // «Lo que pasó» en Ballenas con la tira de Dato (21/11)
+  "Ver las {n}": "See all {n}",
+  "Dato": "Fact",
+  "Compras de ballenas": "Whale buys",
+  "Ventas (ballenas, creador y primeros)": "Sells (whales, creator and first buyers)",
+  "En 24 h se negoció mucho menos de lo que hay de liquidez ({v} frente a {l}): poco movimiento.": "In 24 h far less was traded than the liquidity ({v} against {l}): little movement.",
+  "En 24 h se negoció más o menos lo que hay de liquidez ({v} frente a {l}): un ritmo tranquilo.": "In 24 h about as much was traded as the liquidity ({v} against {l}): a calm pace.",
+  "En 24 h se negoció {x} veces su liquidez ({v} sobre {l}): mucho movimiento para el fondo que tiene.": "In 24 h {x} times its liquidity was traded ({v} on {l}): a lot of movement for the depth it has.",
+  "En 24 h se negoció {x} veces su liquidez ({v} sobre {l}). Tanto movimiento es especulación: entra y sale mucha gente a la vez.": "In 24 h {x} times its liquidity was traded ({v} on {l}). That much movement is speculation: many people getting in and out at once.",
+  "Con tan poco fondo, cada venta grande hunde el precio.": "With so little depth, every big sell sinks the price.",
   "Las ventas y compras que importan, de la más reciente a la más antigua. Son hechos de la cadena, no acusaciones.": "The buys and sells that matter, newest first. These are on-chain facts, not accusations.",
   "Se enseñan las 40 más recientes.": "Showing the 40 most recent.",
   "Operaciones de GeckoTerminal (las últimas {n}{desde}) y registro de SolFlag.": "GeckoTerminal trades (the last {n}{desde}) and the SolFlag registry.",

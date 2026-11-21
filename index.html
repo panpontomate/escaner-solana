@@ -2195,6 +2195,17 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 .mksum b{display:block;font:300 1.7rem/1.05 var(--f-display)}
 .mksum span{display:block;margin-top:4px;font-size:.84rem;color:var(--muted)}
 .mktl{list-style:none;margin:0;padding:0}
+.mkall{margin:10px 0 2px}
+#t-hold .mkstory{margin:4px 0 18px}
+/* tira de Dato (maqueta web/escaner-meme.html, 21/11) */
+.dato{margin-top:16px;display:grid;grid-template-columns:auto 1fr;column-gap:18px;align-items:center;border-left:3px solid var(--ac,#7ab8c4);border-radius:4px 14px 14px 4px;padding:14px 18px;background:linear-gradient(120deg,var(--acb,rgba(122,184,196,.1)),rgba(255,255,255,.015) 75%)}
+.dato .kick{grid-column:1/-1;margin:0 0 6px;color:var(--ac,#7ab8c4);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase}
+.dato>b{white-space:nowrap;font:500 2.25rem/1.05 var(--f-display);color:var(--ac,#7ab8c4);letter-spacing:-.02em}
+.dato p{margin:0;font-size:.88rem;line-height:1.5;color:#e6e0ff}
+.dato .dl{grid-column:1/-1;margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.dato .dl div{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:10px;background:rgba(5,4,13,.45);font-size:.75rem;color:var(--muted)}
+.dato .dl b{order:-1;font:600 1.06rem var(--f-mono);color:#f1eeff}
+@media (max-width:560px){ .dato{grid-template-columns:1fr} .dato>b{font-size:1.9rem;white-space:normal} .dato p{margin-top:4px} }
 .mktl li{display:grid;grid-template-columns:52px 12px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-size:.88rem;cursor:pointer}
 .mktl li:hover{background:rgba(255,255,255,.02)}
 .mktl time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.82rem}
@@ -4201,7 +4212,7 @@ function tokenDetail(r){
       "<button type='button' data-tgo='t-who'>Quién está detrás</button>"+
       (r.emisor?"":"<button type='button' data-tgo='t-hold'>Ballenas</button>")+"</nav>"+
     "<div class='tc2'><section class='card tdc' id='t-chart'><p class='kick tdk'>Gráfica</p><h2>Precio y lo que pasó <small>en $, con las marcas</small></h2>"+
-      (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("Sin mercado: no hay precio que dibujar.")+"</div>")+histHtml(r)+"<div class='mkstory' id='mkstory'></div></section></div>"+
+      (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("Sin mercado: no hay precio que dibujar.")+"</div>")+histHtml(r)+(r.emisor?"<div class='mkstory' id='mkstory'></div>":"")+"</section></div>"+
     apBlockHtml(r)+
     "<section class='card tdc' id='t-quote'><p class='kick tdk'>Dónde cotiza</p><h2>Entrar y salir <small>dónde te cuesta menos</small></h2>"+
       "<div id='quotebox'><p class='hint'>Buscando dónde se negocia…</p></div></section>"+
@@ -4210,6 +4221,7 @@ function tokenDetail(r){
       "<div id='whobox'><p class='hint'>Buscando en el registro de SolFlag…</p></div>"+
       "<p class='wsrc'>Hechos del registro de SolFlag (desde el 29/10/2026): quién pagó, creó y financió cada lanzamiento y cómo acabó a las 24 h. Son datos, no acusaciones. ¿Un dato mal? <a href='mailto:solflag.team@gmail.com'>Escríbenos</a>.</p></section>"+
     (r.emisor?"":"<section class='card tdc hcompact' id='t-hold'><h2>Ballenas <small>las cuentas con más saldo</small></h2>"+
+      "<div class='mkstory' id='mkstory'></div>"+
       "<div class='tlazy' id='thlazy'><span>Mira quién tiene más de este token: personas, exchanges, pools y grupos que comparten financiador.</span><button type='button' class='btn small' data-hold='"+esc(r.mint)+"'>Ver las ballenas</button></div>"+
       "<button type='button' class='btn small hfull' id='hfull' hidden>Ver todas las ballenas →</button></section>")+
     "<div class='pie-ci'><span>!</span><p><b>SolFlag da datos, no consejos de inversión.</b> Nada de esta página es una recomendación para comprar, vender o mantener ningún token. El nivel y las banderas resumen lo que vemos en la cadena y en fuentes públicas en este momento, y pueden cambiar. Comprueba siempre por tu cuenta y no pongas dinero que no puedas permitirte perder.</p></div>";
@@ -7363,24 +7375,42 @@ function mkHelpHtml(){
     "<li><i style='background:"+MKCOL.tu+"'></i><span><b>"+"Tú"+"</b>: "+"cuando lo analizaste."+"</span></li></ul>";
 }
 // lo que pasó: tres cifras y la lista en orden; pulsar una fila lleva la gráfica a esa vela
+// 21/11 (maqueta web/escaner-meme.html): vive en el apartado de Ballenas; las 6 más recientes y «Ver las N»,
+// y debajo la tira de Dato: rotación (volumen 24 h / liquidez) y el resumen de compras y ventas
+function mkRot(x){ return (x<10?Math.round(x*10)/10:Math.round(x)).toLocaleString("de-DE"); }
+function mkDato(r,d){
+  var p=r.par||{}, v=Number(p.volume&&p.volume.h24)||0, l=Number(p.liquidity&&p.liquidity.usd)||0;
+  if(!(v>0&&l>0)) return "";
+  var x=v/l, t=x<0.5?"En 24 h se negoció mucho menos de lo que hay de liquidez ({v} frente a {l}): poco movimiento."
+    :x<3?"En 24 h se negoció más o menos lo que hay de liquidez ({v} frente a {l}): un ritmo tranquilo."
+    :x<20?"En 24 h se negoció {x} veces su liquidez ({v} sobre {l}): mucho movimiento para el fondo que tiene."
+    :"En 24 h se negoció {x} veces su liquidez ({v} sobre {l}). Tanto movimiento es especulación: entra y sale mucha gente a la vez.";
+  t=t.replace("{x}",mkRot(x)).replace("{v}",usdShort(v)).replace("{l}",usdShort(l));
+  if(l<10000&&x>=3) t+=" "+"Con tan poco fondo, cada venta grande hunde el precio.";
+  var dl=[];
+  if(d&&d.ev&&d.ev.length){
+    var sum=function(a){ return a.length+(a.length?" · "+usd(a.reduce(function(s,e){ return s+(e.usd||0); },0)):""); };
+    dl.push(["Compras de ballenas",sum(d.ev.filter(function(e){ return e.k==="wb"&&!e.sell; }))]);
+    dl.push(["Ventas (ballenas, creador y primeros)",sum(d.ev.filter(function(e){ return e.sell; }))]);
+    if(d.crPct!=null&&d.crSells) dl.push(["de lo suyo ha vendido el creador",d.crPct+" %"]);
+    else if(d.laTotal) dl.push(["compradores del lanzamiento han vendido","{a} de {b}".replace("{a}",d.laSold).replace("{b}",d.laTotal)]);
+  }
+  return "<div class='dato'><span class='kick'>"+"Dato"+"</span><b>×"+mkRot(x)+"</b><p>"+esc(t)+"</p>"+
+    (dl.length?"<div class='dl'>"+dl.map(function(z){ return "<div><span>"+esc(z[0])+"</span><b>"+esc(z[1])+"</b></div>"; }).join("")+"</div>":"")+"</div>";
+}
 function mkStory(r){
   var box=$("#mkstory"); if(!box) return;
   var d=MK.data[r.mint];
-  if(!d||d==="loading"||d==="err"||!d.ev.length){ box.innerHTML=d&&d.ev&&!d.ev.length?"<p class='mks'>"+"En las últimas operaciones no vemos ventas del creador ni de los compradores del lanzamiento, ni operaciones de ballenas."+" "+esc(mkSrc(d))+"</p>":""; return; }
-  var cifras=[];
-  if(d.crPct!=null&&d.crSells) cifras.push("<div><b>"+d.crPct+" %</b><span>"+"de lo suyo ha vendido el creador"+(d.crSells>1?", "+"en {n} veces".replace("{n}",d.crSells):"")+"</span></div>");
-  else if(d.crSells) cifras.push("<div><b>"+d.crSells+"</b><span>"+(d.crSells===1?"venta del creador":"ventas del creador")+"</span></div>");
-  if(d.laTotal) cifras.push("<div><b>"+"{a} de {b}".replace("{a}",d.laSold).replace("{b}",d.laTotal)+"</b><span>"+"compradores del lanzamiento han vendido"+"</span></div>");
-  var wb=d.ev.filter(function(e){ return e.k==="wb"; }), wbS=wb.filter(function(e){ return e.sell; }).length;
-  if(wb.length) cifras.push("<div><b>"+(wb.length-wbS)+" / "+wbS+"</b><span>"+"compras / ventas de ballenas"+"</span></div>");
-  var list=d.ev.slice().reverse().slice(0,40);
+  if(!d||d==="loading"||d==="err"){ box.innerHTML=""; return; }
+  if(!d.ev.length){ box.innerHTML="<h3 class='mkt'>"+"Lo que pasó"+"</h3><p class='mks'>"+"En las últimas operaciones no vemos ventas del creador ni de los compradores del lanzamiento, ni operaciones de ballenas."+" "+esc(mkSrc(d))+"</p>"+mkDato(r,d); return; }
+  var todo=MK.all===r.mint, list=d.ev.slice().reverse().slice(0,todo?40:6);
   box.innerHTML="<h3 class='mkt'>"+"Lo que pasó"+"</h3><p class='mks'>"+"Las ventas y compras que importan, de la más reciente a la más antigua. Son hechos de la cadena, no acusaciones."+"</p>"+
-    (cifras.length?"<div class='mksum'>"+cifras.join("")+"</div>":"")+
     "<ul class='mktl'>"+list.map(function(e){ var pre=r.par&&r.par.pairCreatedAt&&!/^pump-?fun$/i.test(r.par.dexId||"")&&e.ts<r.par.pairCreatedAt-60000;   // antes de que existiera este pool
       return "<li data-mkts='"+e.ts+"'><time>"+esc(ftime(e.ts))+"</time><i style='background:"+MKCOL[e.k]+"'></i><span>"+esc(mkLine(e,pre))+" <small>"+esc(short(e.w))+"</small></span>"+
       "<a href='https://solscan.io/tx/"+esc(e.tx)+"' target='_blank' rel='noopener'>Solscan ↗</a></li>"; }).join("")+"</ul>"+
-    (d.ev.length>40?"<p class='mks'>"+"Se enseñan las 40 más recientes."+"</p>":"")+
-    "<p class='mks'>"+esc(mkSrc(d))+"</p>";
+    (!todo&&d.ev.length>6?"<button type='button' class='btn small mkall' data-mkall>"+"Ver las {n}".replace("{n}",Math.min(40,d.ev.length))+"</button>":"")+
+    (todo&&d.ev.length>40?"<p class='mks'>"+"Se enseñan las 40 más recientes."+"</p>":"")+
+    "<p class='mks'>"+esc(mkSrc(d))+"</p>"+mkDato(r,d);
 }
 function mkSrc(d){ return "Operaciones de GeckoTerminal (las últimas {n}{desde}) y registro de SolFlag.".replace("{n}",d&&d.n||300).replace("{desde}",d&&d.from?", desde el {f}".replace("{f}",fdate(d.from)+" "+ftime(d.from)):"")+
   (d&&d.hel?" "+(d.helCr&&d.hel===1?"Del creador, toda su historia con este token (Helius).":d.helCr?"Del creador y de {n} compradores del lanzamiento, toda su historia con este token (Helius).":"De {n} compradores del lanzamiento, toda su historia con este token (Helius).").replace("{n}",d.hel-(d.helCr?1:0)):""); }
@@ -7398,6 +7428,7 @@ document.addEventListener("click",function(e){
   var b=e.target.closest&&e.target.closest("[data-mk]");
   if(b){ var k=b.getAttribute("data-mk"); MK.on[k]=!MK.on[k]; mkSave(); mkPaint(); return; }
   if(e.target.closest&&e.target.closest("[data-mkq]")){ var row=e.target.closest(".mkrow"), h=row&&row.querySelector(".mkh"); if(h) h.hidden=!h.hidden; return; }
+  if(e.target.closest&&e.target.closest("[data-mkall]")){ if(state.token){ MK.all=state.token.mint; mkStory(state.token); } return; }
   var li=e.target.closest&&e.target.closest("[data-mkts]");
   if(li&&!e.target.closest("a")&&state.lwc&&state.lwcS){   // a esa vela, en la pequeña
     var t=Math.floor(+li.getAttribute("data-mkts")/1000)-state.lwcS.tz, T=state.lwcS.times, k=T.length-1; while(k>0&&T[k]>t) k--;
