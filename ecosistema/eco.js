@@ -210,11 +210,60 @@
       `<div class="mz-que"><div class="top"><b>${MZ.queH}</b><span>${MZ.queS}</span></div><ul>${MZ.queL.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
   }
 
+  // ---------- IA (21/11, maqueta maquetas/escaner/ecosistema-ia.html): agentes y proyectos, con código y señal ----------
+  const IA = EN ? {
+    dato: (a, b) => `AI tokens show no public code or haven't touched it in over 6 months. Without code there is no way to check the agent or product exists: only the name is left.`,
+    ag: ["AI agents,", "the ones that claim to act on-chain on their own"], pr: ["AI projects,", "networks, data and compute for AI"],
+    th: ["Project", "Worth · 24 h", "Holders", "Traders 24 h", "Code", "Signal"],
+    sinCod: "No public code", cod1: "Changed 1 day ago", codN: (n) => `Changed ${n} days ago`, codP: (n) => `${n} days without changes`,
+    bots: (v) => `Worth ${v} and mostly traded by bots`, pocos: (v, n) => `Worth ${v} and ${n} people traded it yesterday`,
+    bloq: (b, l) => `${b}% still locked${l ? ", releases " + l + "% this month" : ""}`, vivo: (p) => `Live code and ${p}% organic buyers`,
+    src: "Market cap: CoinGecko. Holders and traders: Jupiter (organic = buyers that don't look like bots). Code: GitHub linked from CoinGecko (last change). Unlocks: Streamflow. Today's data; not recommendations.",
+    queH: "What we check in an AI token", queS: "Many are memes under another name:", queL: ["Does the agent really act on-chain?", "Who is behind it and their track record", "Who holds it", "Can you sell?", "Promises with no timeline"],
+  } : {
+    dato: (a, b) => `tokens de IA no enseñan código público o lo tienen parado hace más de 6 meses. Sin código no se puede comprobar que el agente o el producto existan: solo queda el nombre.`,
+    ag: ["Agentes de IA,", "los que dicen actuar solos en la cadena"], pr: ["Proyectos de IA,", "redes, datos y cómputo para IA"],
+    th: ["Proyecto", "Vale · 24 h", "Titulares", "Traders 24 h", "Código", "Señal"],
+    sinCod: "Sin código público", cod1: "Cambiado hace 1 día", codN: (n) => `Cambiado hace ${n} días`, codP: (n) => `${n} días sin cambios`,
+    bots: (v) => `Vale ${v} y casi todo lo mueven bots`, pocos: (v, n) => `Vale ${v} y lo movieron ${n} personas ayer`,
+    bloq: (b, l) => `${b} % aún bloqueado${l ? ", suelta " + l + " % este mes" : ""}`, vivo: (p) => `Código vivo y ${p} % de compradores orgánicos`,
+    src: "Capitalización: CoinGecko. Titulares y traders: Jupiter (orgánicos = compradores que no parecen bots). Código: GitHub enlazado desde CoinGecko (último cambio). Desbloqueos: Streamflow. Datos del día; no son recomendaciones.",
+    queH: "Qué miramos en un token de IA", queS: "Muchos son memes con otro nombre:", queL: ["¿El agente opera de verdad en la cadena?", "Quién está detrás y su historial", "Quién lo tiene", "¿Puedes vender?", "Promesas sin calendario"],
+  };
+  let PERF = null, perfPide = null;
+  function iaVista() {
+    if (!PERF && !perfPide) perfPide = fetch("/datos/perfiles.json", { cache: "no-cache" }).then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { PERF = (j && j.t) || {}; if (ap === "IA") pinta(); });
+    const P = PERF || {};
+    const rs = D.rows.filter((r) => r.ap === "IA").map((r) => { const p = (r.mint && P[r.mint]) || {}; return Object.assign({}, r, { cod: p.cod || null, dl: p.dl || null, cap: r.mcap || r.m }); }).sort((a, b) => (b.cap || 0) - (a.cap || 0));
+    const num = (n, d) => n.toLocaleString(EN ? "en-US" : "es-ES", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0, useGrouping: "always" });
+    const href = (r) => /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(r.mint || "") ? (EN ? "/en/" : "/") + "?token=" + r.mint : null;
+    const cod = (r) => { if (!PERF) return '<span class="mz-na">…</span>'; if (!r.cod || r.cod.dias == null) return `<span class="mz-cod s">${IA.sinCod}</span>`;
+      const t = r.cod.dias <= 1 ? IA.cod1 : r.cod.dias <= 30 ? IA.codN(r.cod.dias) : IA.codP(r.cod.dias);
+      return `<span class="mz-cod ${r.cod.dias <= 30 ? "v" : "p"}"><a href="${esc(r.cod.url)}" target="_blank" rel="noopener">${t} ↗</a></span>`; };
+    const senal = (r) => {
+      if (r.trad >= 50 && r.org != null && r.org / r.trad < 0.05) return `<span class="mz-sen mz-r">${IA.bots(fm(r.cap))}</span>`;
+      if (r.trad != null && r.trad < 50 && r.cap >= 1e6) return `<span class="mz-sen mz-r">${IA.pocos(fm(r.cap), r.trad)}</span>`;
+      if (r.dl && r.dl.bloq >= 20) return `<span class="mz-sen mz-a">${IA.bloq(num(r.dl.bloq), r.dl.lib >= 0.1 ? num(r.dl.lib, 1) : "")}</span>`;
+      if (r.cod && r.cod.dias != null && r.cod.dias <= 30 && r.org != null && r.trad && r.org / r.trad >= 0.05) return `<span class="mz-sen mz-v">${IA.vivo(num(r.org / r.trad * 100))}</span>`;
+      return "<span></span>"; };
+    const fila = (r, i) => { const h = href(r), n = `${esc(r.n)}${r.sym ? ` <small>${esc(r.sym)}</small>` : ""}`;
+      return `<div class="mz-t mz-ia"><span class="mz-i">${i + 1}</span>${av(r)}<span class="mz-n"><b>${h ? `<a href="${h}">${n}</a>` : n}</b></span>` +
+        `<span class="mz-x">${fm(r.cap)}<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span></small></span>` +
+        `<span class="mz-x mz-m mz-tit">${r.tit != null ? fk(r.tit) : "—"}<small>${r.titC != null && Math.abs(r.titC) >= 0.0005 ? `<span class="${r.titC >= 0 ? "up" : "dn"}">${pc1(r.titC)}</span>` : "&nbsp;"}</small></span>` +
+        `<span class="mz-x">${r.trad != null ? fk(r.trad) : "—"}<small>${r.org != null ? MZ.org(r.org) : "&nbsp;"}</small></span><span class="mz-codc">${cod(r)}</span>${PERF ? senal(r) : "<span></span>"}</div>`; };
+    const tabla = (t, l) => l.length ? `<section class="mz-card"><h2>${t[0]} <small>${t[1]}</small></h2><div class="mz-t mz-ia mz-h"><span></span><span></span><span>${IA.th[0]}</span><span>${IA.th[1]}</span><span class="mz-tit">${IA.th[2]}</span><span>${IA.th[3]}</span><span class="mz-codc">${IA.th[4]}</span><span>${IA.th[5]}</span></div>${l.map(fila).join("")}</section>` : "";
+    const np = rs.filter((r) => !r.cod || r.cod.dias == null || r.cod.dias > 180).length;
+    $("#lista").innerHTML = (PERF ? `<div class="mz-dato"><span class="mz-k">${EN ? "Fact" : "Dato"}</span><b>${np} ${EN ? "of" : "de"} ${rs.length}</b><p>${IA.dato()}</p></div>` : "") +
+      tabla(IA.ag, rs.filter((r) => r.gr === "Agentes de IA")) + tabla(IA.pr, rs.filter((r) => r.gr !== "Agentes de IA")) +
+      `<p class="mz-src">${IA.src}</p><div class="mz-que"><div class="top"><b>${IA.queH}</b><span>${IA.queS}</span></div><ul>${IA.queL.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
+  }
+
   function pinta() {
     cabecera();
     // Activos tokenizados (21/11): la vista completa, la misma que /acciones/ (acciones/activos.js)
     const rwa = ap === "Activos tokenizados" && window.SFActivos;
-    document.querySelector(".tabs").style.display = rwa || ap === "Meme" ? "none" : "";
+    document.querySelector(".tabs").style.display = rwa || ap === "Meme" || ap === "IA" ? "none" : "";
+    if (ap === "IA" && tipo !== "nuevo") { $("#bar").style.display = "none"; $("#lista").classList.remove("sfa"); iaVista(); return; }
     if (ap === "Meme" && tipo !== "nuevo") { $("#bar").style.display = "none"; $("#lista").classList.remove("sfa"); memeVista(); return; }
     if (rwa) {
       $("#bar").style.display = "none";
