@@ -345,9 +345,18 @@ async function hacerPerfiles(sel) {
   }
   // Desbloqueos de Streamflow (% del supply que se libera en 30 días y lo que sigue bloqueado): solo proyectos y solo
   // con el RPC de Helius (getProgramAccounts es pesado para el RPC público)
-  if (RPC_HELIUS) for (const [mint, e] of Object.entries(t)) {
+  // contratos de Streamflow de un token (null si el RPC falla; el error va al log una vez)
+  let errDl = false;
+  const streamflow = (mint) => j(RPC_HELIUS, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getProgramAccounts", params: ["strmRqUCoQUgGUan5YhzUZa6KqdzwX5L6FpUxfmKg5m", { encoding: "base64", filters: [{ memcmp: { offset: 177, bytes: mint } }] }] }) })
+    .then((x) => { if (x.error && !errDl) { errDl = true; console.log("desbloqueos: el RPC contesta", JSON.stringify(x.error).slice(0, 200)); } return x.result || null; })
+    .catch((x) => { if (!errDl) { errDl = true; console.log("desbloqueos:", x.message.replace(/api-key=[^&\s]+/, "api-key=***")); } return null; });
+  // prueba de control: Kamino tiene contratos en Streamflow; si no salen, el RPC no sirve para esto y el dato queda «aún no lo tenemos»
+  const control = RPC_HELIUS ? await streamflow("KMNo3nJsBXfcpJTVhZcXLW7RmTwTt4GVFE7suUBo9sS") : null;
+  const dlOk = !!(control && control.length);
+  if (RPC_HELIUS && !dlOk) console.log("desbloqueos: la prueba de control (Kamino) no encuentra contratos; no se guardan desbloqueos hoy");
+  if (dlOk) for (const [mint, e] of Object.entries(t)) {
     if (e.ap === "meme" || e.ap === "rwa") continue;
-    const acc = await j(RPC_HELIUS, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getProgramAccounts", params: ["strmRqUCoQUgGUan5YhzUZa6KqdzwX5L6FpUxfmKg5m", { encoding: "base64", filters: [{ memcmp: { offset: 177, bytes: mint } }] }] }) }).then((x) => x.result).catch(() => null);
+    const acc = await streamflow(mint);
     await espera(150);
     if (!acc) continue;
     if (!acc.length) { e.dl = null; continue; }
