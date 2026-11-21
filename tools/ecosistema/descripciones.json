@@ -91,18 +91,18 @@
  },
  "6GmAFSYs4gk3FDao5FzzySQpPZaWsa4rUJHacpMpUNgx": {
   "n": "StonkFun",
-  "es": "Lanzadera de tokens en Solana. CoinGecko la tiene como lanzadera, sin más descripción.",
-  "en": "A token launchpad on Solana. CoinGecko lists it as a launchpad, with no further description."
+  "es": "Lanzadera de Solana para crear tokens ligados a memes, acciones, divisas, materias primas y más. STONK es su token; su web no explica para qué sirve.",
+  "en": "A Solana launchpad for creating tokens tied to memes, stocks, currencies, commodities and more. STONK is its token; its website does not explain what it is for."
  },
  "MukLDtJ8Cx9DxLbeyLRSWPSposTMWuwHANbuaudpump": {
   "n": "OTC",
-  "es": "Token de OTC Desks, un proyecto de Solana nacido en Pump.fun que dice dar acceso a acciones, empresas antes de salir a bolsa y rendimiento.",
-  "en": "The token of OTC Desks, a Solana project born on Pump.fun that says it offers access to stocks, pre-IPO companies and yield."
+  "es": "OTC Desks se presenta como un protocolo que lanza productos en Solana y reparte parte de lo que ganan entre los dueños de sus «desks» (NFT). Su web no explica qué papel tiene el token OTC, que nació en Pump.fun.",
+  "en": "OTC Desks presents itself as a protocol that launches products on Solana and shares part of what they earn with the owners of its desks (NFTs). Its website does not explain the role of the OTC token, which was born on Pump.fun."
  },
  "31k88G5Mq7ptbRDf3AM13HAq6wRQHXHikR8hik7wPygk": {
   "n": "Graphite Protocol",
-  "es": "Proyecto de Solana con herramientas para creadores de contenido (Creator Suite). CoinGecko lo clasifica como infraestructura.",
-  "en": "A Solana project with tools for content creators (Creator Suite). CoinGecko classifies it as infrastructure."
+  "es": "Proyecto de Solana con herramientas para creadores de contenido (Creator Suite), según CoinGecko. No tiene una web propia que podamos comprobar.",
+  "en": "A Solana project with tools for content creators (Creator Suite), according to CoinGecko. It has no website of its own that we can check."
  },
  "BZFYNPeQAEW3HWQ4DNsTVahC1n4ZjTgn6jB2nnBbB96W": {
   "n": "Sapling",
@@ -146,8 +146,8 @@
  },
  "1xdtu7y3LkkrVCAbm5KGKfYzq1qgKhxxk5AaJBqpump": {
   "n": "Mansory",
-  "es": "Token que CoinGecko asocia a Mansory, la empresa alemana que personaliza coches de lujo. Nació en Pump.fun.",
-  "en": "A token CoinGecko links to Mansory, the German company that customizes luxury cars. It was born on Pump.fun."
+  "es": "Token que se presenta como el oficial de Mansory, la empresa alemana que personaliza coches de lujo: da descuentos, sorteos y eventos VIP a quien lo bloquea. No lo hemos podido confirmar con la propia empresa. Nació en Pump.fun.",
+  "en": "A token that presents itself as the official one of Mansory, the German company that customizes luxury cars: it gives discounts, raffles and VIP events to those who lock it. We have not been able to confirm this with the company itself. It was born on Pump.fun."
  },
  "STREAMribRwybYpMmSYoCsQUdr6MZNXEqHgm7p1gu9M": {
   "n": "Streamflow",
@@ -196,8 +196,8 @@
  },
  "9gaCDFUN1Kvz1YfocbcowtzZq8PCebdfgT5AmJz5yEVY": {
   "n": "Tree News",
-  "es": "Token de Tree News, un servicio de noticias rápidas para traders: da acceso a un nivel de suscripción. CoinGecko asocia este token a Tree Capital; lo estamos comprobando.",
-  "en": "The Tree News token, a fast news service for traders: it unlocks a subscription tier. CoinGecko links this token to Tree Capital; we are checking it."
+  "es": "Token de Tree News, un servicio de noticias de cripto al instante para traders (listados en exchanges, la SEC, juicios, macro). Llega a Solana desde otra cadena a través de Wormhole.",
+  "en": "The token of Tree News, an instant crypto news service for traders (exchange listings, SEC filings, court cases, macro). It reaches Solana from another chain through Wormhole."
  },
  "61V8vBaqAGMpgDQi4JcAwo1dmBGHsyhzodcPqnEVpump": {
   "n": "AI Rig Complex",
@@ -211,8 +211,8 @@
  },
  "6HHzBVkxtoz86Bjy2duaUw77hVfJzQkuoLizWeEMBLEM": {
   "n": "Emblem Vault",
-  "es": "Proyecto de agentes de IA para operar en DeFi (DeFAI). CoinGecko no tiene más descripción.",
-  "en": "An AI agents project for trading in DeFi (DeFAI). CoinGecko has no further description."
+  "es": "Plataforma con IA para crear, lanzar, hacer staking y operar con cripto, según su web. No explica qué papel tiene su token.",
+  "en": "An AI platform to build, launch, stake and trade crypto, according to its website. It does not explain the role of its token."
  },
  "3iQL8BFS2vE7mww4ehAqQHAsbmRNCrPxizWAT2Zfyr9y": {
   "n": "Virtuals Protocol",
@@ -231,8 +231,8 @@
  },
  "HuAXPyDWDaMYFKuwQHpqL1oPnj93zdzWmtvFGzCeCUa7": {
   "n": "Nullmask",
-  "es": "Protocolo de privacidad en Solana. CoinGecko no tiene más descripción.",
-  "en": "A privacy protocol on Solana. CoinGecko has no further description."
+  "es": "Protocolo de privacidad en Solana: dice hacer privada cualquier wallet y cualquier transacción con un clic. Su web no explica para qué sirve el token.",
+  "en": "A privacy protocol on Solana: it says it makes any wallet and any transaction private in one click. Its website does not explain what the token is for."
  },
  "HgTGdc29D5bDMrDvsCLnorxz899VyDj7ZN7FPa6vpump": {
   "n": "Veil",
@@ -301,8 +301,8 @@
  },
  "6FhVPctYg363pQbs4iSvqyHe2cJzfsvFD96gePy6pump": {
   "n": "Exfil.fun",
-  "es": "Juego de Solana alrededor del trading de memecoins. Su token nació en Pump.fun.",
-  "en": "A Solana game built around memecoin trading. Its token was born on Pump.fun."
+  "es": "App de trading de memecoins en Solana, con forma de juego. Cobra solo en las operaciones con ganancias: un tercio de la comisión vuelve al trader en EXFIL y otro tercio recompra y quema EXFIL. Nació en Pump.fun.",
+  "en": "A memecoin trading app on Solana, shaped like a game. It only charges on winning trades: a third of the fee goes back to the trader in EXFIL and another third buys back and burns EXFIL. It was born on Pump.fun."
  },
  "3VW31dwix6k2EdzhDgZ2zB15J7FbHYQwAUqXgktRcJEX": {
   "n": "SOLPUMP",
@@ -311,8 +311,8 @@
  },
  "Tqj8yFmagrg7oorpQkVGYR52r96RFTamvWfth9bpump": {
   "n": "Kintara",
-  "es": "Juego de Solana cuyo token nació en Pump.fun. CoinGecko no tiene más descripción.",
-  "en": "A Solana game whose token was born on Pump.fun. CoinGecko has no further description."
+  "es": "Token de Kintara, un juego MMO isométrico; su web aún no tiene más información. Nació en Pump.fun.",
+  "en": "The token of Kintara, an isometric MMO game; its website has no further information yet. It was born on Pump.fun."
  },
  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": {
   "n": "USD Coin",
@@ -436,8 +436,8 @@
  },
  "1zJX5gRnjLgmTpq5sVwkq69mNDQkCemqoasyjaPW6jm": {
   "n": "Kled AI",
-  "es": "Mercado de datos para IA: la gente sube fotos, vídeos y otros datos propios y cobra cuando se usan para entrenar modelos.",
-  "en": "A data marketplace for AI: people upload their own photos, videos and other data and get paid when they are used to train models."
+  "es": "Mercado de datos para IA: la gente sube fotos, vídeos y otros datos propios y cobra cuando se usan para entrenar modelos. Su web no explica para qué sirve el token.",
+  "en": "A data marketplace for AI: people upload their own photos, videos and other data and get paid when they are used to train models. Its website does not explain what the token is for."
  },
  "739dnZEG4yaBWFsY8L8ZwrfhGG6dhtCSercW8Umspump": {
   "n": "clawpump.tech",
