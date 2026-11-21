@@ -3661,6 +3661,8 @@ async function analyze(){
   state.cancel=false; state.wallet=wallet; state.filter="TODOS";
   store("esc.rpc",$("#rpc").value.trim()); store("esc.dust",$("#dust").checked?"1":"0"); store("esc.wallet",wallet);
 
+  // 21/11: la barra de progreso puede estar dentro de Ballenas del token (whalesHere) y se ocultaba con él: a su sitio
+  whalesHome();
   $("#go").disabled=true; $("#results").hidden=true; state.shown.W=false; $("#progress").hidden=false;
   try{
     setProgress("Comprobando la dirección…",0.01);
