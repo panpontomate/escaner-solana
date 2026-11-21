@@ -129,7 +129,7 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem;color:#c9c1ea}
 .mz-h>span{text-align:right}.mz-h>span:nth-child(3),.mz-h>span:last-child{text-align:left}
 .mz-i{color:var(--mut2);font-size:.75rem}
 .mz-n{min-width:0}.mz-n b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
-.mz-n b a{color:inherit;text-decoration:none}.mz-n b a:hover{color:var(--tq)}
+.mz-n b a{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(122,184,196,.55)}.mz-n b a:hover{color:var(--tq);border-bottom-color:var(--tq)}
 .mz-n b small{color:var(--mut2);font-size:.72rem;margin-left:4px;font-weight:600}
 .mz-n>small{display:block;color:var(--mut2);font-size:.74rem;margin-top:-2px}
 .mz-x{text-align:right;font:600 .86rem "IBM Plex Mono",monospace;white-space:nowrap}
