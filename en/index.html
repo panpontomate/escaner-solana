@@ -1600,6 +1600,21 @@ body.landing #adv{margin-top:10px}
 .ap-dato b{white-space:nowrap;font:500 2rem/1.05 Fraunces,Georgia,serif;color:var(--ac,#7ab8c4)}
 .ap-dato p{margin:0;font-size:.9rem;color:#e6e0ff}
 @media(max-width:700px){.ap-dato{grid-template-columns:1fr}.ap-dato b{white-space:normal;font-size:1.7rem}.ap-dato p{margin-top:4px}}
+/* 21/11 (el usuario: «es muy grande y el dólar se baja»): las cifras en una tira sin cajas y sin partir; todo más bajo */
+#t-ap .ap-tiles{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0;margin-top:10px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 0}
+#t-ap .ap-tiles div{border:0;border-left:1px solid var(--line);border-radius:0;padding:4px 14px;background:none}
+#t-ap .ap-tiles div:first-child{border-left:0;padding-left:0}
+#t-ap .ap-tiles b{white-space:nowrap;font-size:1.08rem}
+#t-ap .ap-tiles small{display:block;font-size:.74rem;line-height:1.3}
+#t-ap .ap-dato{margin-top:12px;padding:10px 16px}
+#t-ap .ap-dato b{font-size:1.65rem}
+#t-ap .ap-k{margin:12px 0 2px}
+#t-ap .ap-partes div{padding:4px 0;font-size:.82rem}
+#t-ap .ap-partes i{height:6px}
+#t-ap .ap-vale{margin-top:10px;padding:8px 12px;display:flex;align-items:baseline;gap:10px}
+#t-ap .ap-vale b{display:inline;font-size:1.05rem;white-space:nowrap}
+#t-ap .ap-hk{font-size:.84rem}
+@media(max-width:700px){ #t-ap .ap-tiles{grid-template-columns:1fr 1fr;row-gap:6px} #t-ap .ap-tiles div{border-left:0;padding:4px 8px 4px 0} #t-ap .ap-vale{display:block} }
 .bp-h{display:flex;align-items:flex-start;gap:12px}.bp-h .tgt{margin-right:auto}
 .bp-amp{flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--line2);background:none;color:var(--kick);font-size:16px;cursor:pointer}
 .bp{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 16px}
