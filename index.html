@@ -1654,6 +1654,25 @@ body.landing #adv{margin-top:10px}
   .cq2-row{grid-template-columns:22px 1fr auto;grid-template-areas:"pos nm cs" "pos br br" "pos ir ir";gap:6px 10px;padding:12px 8px}
   .cq2-pos{grid-area:pos;align-self:start}.cq2-nm{grid-area:nm}.cq2-cs{grid-area:cs;align-self:start}.cq2-br{grid-area:br;height:8px}.cq2-row .ir{grid-area:ir;justify-self:start}
   .cq-amts{width:100%;display:flex}.cq-amts button{flex:1}}
+/* Dónde cotiza más compacto (21/11, el usuario: «es gigante, un poco más comprimido»): mismo contenido, menos alto */
+#t-quote{position:relative}
+#t-quote .cq2-hero{margin-top:10px;padding:10px 16px;gap:16px;border-radius:12px}
+#t-quote .cq2-lado small{font-size:.64rem}
+#t-quote .cq2-lado b{font-size:1.55rem}
+#t-quote .cq2-tira{height:8px}
+#t-quote .cq2-flecha span{margin-top:4px;font-size:.78rem}
+#t-quote .cq2-k{margin:12px 0 4px}
+#t-quote .cq2-row{padding:6px 10px}
+#t-quote .cq2-nm small{display:inline}
+#t-quote .cq2-tags{display:inline-flex;margin:0 0 0 6px;vertical-align:1px}
+#t-quote .cq2-tags .cq-tag{margin-top:0;font-size:.6rem;padding:1px 6px}
+#t-quote .cq2-br{height:6px}
+#t-quote .cq2-cs{font-size:.92rem}
+#t-quote .cq2-pools{margin-top:8px;font-size:.76rem}
+#t-quote .cq-all{margin-top:6px;font-size:.88rem}
+#t-quote .wsrc{font-size:.72rem;margin-top:6px}
+@media(max-width:700px){ #t-quote .cq2-row{grid-template-areas:"pos nm cs" "pos br ir";padding:8px 6px;row-gap:4px} #t-quote .cq2-row .ir{justify-self:end;font-size:.8rem} #t-quote .cq2-br{align-self:center} #t-quote .cq2-hero{padding:10px 12px;gap:8px 12px} }
+@media(min-width:701px){ #t-quote .cq2-top{position:absolute;top:18px;right:22px} #t-quote .cq-amts button{min-height:30px;padding:0 11px;font-size:.8rem} }
 .pie-ci{display:flex;gap:14px;align-items:flex-start;margin:22px 0 6px;padding:16px 18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.02)}
 .pie-ci>span{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--medio);color:var(--medio);font-weight:700}
 .pie-ci p{margin:0;font-size:.86rem;line-height:1.55;color:var(--muted)}.pie-ci b{color:#f1eeff}
