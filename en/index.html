@@ -4955,8 +4955,7 @@ function sapActivos(){
   var una=fs.filter(function(f){ return f.liq>=20000; }).map(ci).join("");
   var fila=function(f){ return "<button type='button' class='sac' data-try='"+esc(f.mint)+"'>"+sapSq(f.accion,"#3b3b6d")+"<span class='sn1'><b>"+esc(f.tok)+"</b><em class='sem "+esc(f.emisor||"")+"'>"+esc(f.emisor||"")+"</em><small>"+esc(f.nombre||f.accion)+"</small></span><span class='sx'>"+sapN(f.precio,2)+" $</span><span class='sx m sliq'>"+sapN(f.real,2)+" $</span><span class='sc'>"+sapPrima(f)+"</span><span class='sx m sliq'>"+sapM(f.liq)+"</span></button>"; };
   // 21/11: sin la cinta de las acciones (con la de «En verde ahora» encima había dos cintas seguidas)
-  return 
-    (dol.length?"<div class='sdol'><div class='stot'><span class='kick'>"+"Digital dollars on Solana"+"</span><b>"+sapN(tot/1e6,0)+" M$</b><span>"+"with a verified issuer"+"</span></div>"+
+  return (dol.length?"<div class='sdol'><div class='stot'><span class='kick'>"+"Digital dollars on Solana"+"</span><b>"+sapN(tot/1e6,0)+" M$</b><span>"+"with a verified issuer"+"</span></div>"+
       "<div class='sds'>"+dol.map(function(d){ return "<div class='sd'>"+sapSq(d.tok,SAP_DCOL[d.tok])+"<b>"+sapN(d.valor/1e6,0)+" M$</b><em>"+esc(d.tok)+" · "+esc(d.emisor)+" · "+sapN(d.valor/tot*100,d.valor/tot<0.1?1:0)+" %</em></div>"; }).join("")+"</div>"+
       "<div class='semp'>"+"The issuer can…"+" <span>"+"all:"+"<i>"+"mint"+"</i><i>"+"freeze"+"</i></span><span>"+"PYUSD and USDG, also:"+"<i class='c2'>"+"move your tokens"+"</i><i class='c2'>"+"charge a fee"+"</i></span></div></div>":"")+
     "<section class='card smov'><div class='shd2'><h2>What the token is worth, <small>and what the stock is worth</small></h2><span class='sbol"+(ab?" on":"")+"'><i></i><span>"+(ab?"<b>US market open</b> · prices under 15 min old":"<b>Market closed</b> · the token can drift from the stock")+"</span></span></div>"+
