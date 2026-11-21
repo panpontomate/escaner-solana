@@ -110,3 +110,9 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem;color:#c9c1ea}
 .estado{padding:40px 16px;text-align:center;color:var(--mut)}
 .row.h .num{font:inherit}
 .pc{font-size:12px;white-space:nowrap}
+/* partes de una empresa (Pump.fun, 21/11) */
+.partes{display:flex;flex-wrap:wrap;gap:6px 18px;padding:0 16px 12px 66px;margin-top:-4px;font-size:12px;color:var(--mut2)}
+.partes .pk{font:700 10.5px Manrope;letter-spacing:.12em;text-transform:uppercase;color:var(--mut2)}
+.partes b{color:var(--txt,#f1eeff);font-weight:600}
+.partes em{font-style:normal}
+@media (max-width:760px){.partes{padding:0 14px 12px}}

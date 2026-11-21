@@ -280,6 +280,21 @@ if (sel.length < 100) throw new Error("Solo " + sel.length + " filas: algo ha fa
 //    y que no está en la cadena. Una entrada por dirección; si varias filas comparten token (Pump.fun: lanzadera,
 //    PumpSwap, Terminal, app), se suman como UNA empresa. Campos: ver scoreProfile en solana-risk-engine/src/perfil.js
 const perfiles = await hacerPerfiles(sel).catch((e) => { console.log("perfiles:", e.message); return null; });
+// 8) Una empresa con varias partes se ve como UNA fila (21/11, decisión del usuario): Pump.fun va en Apps y bots con
+//    sus partes debajo. Se hace después de los perfiles, que ya las suman por su cuenta a partir de las filas sueltas.
+const NOMBRE_EMPRESA = { "parent#pump": "Pump.fun" };
+for (const pid of SEPARAR) {
+  const ps = sel.filter((r) => r.pid === pid); if (ps.length < 2) continue;
+  const conTok = ps.find((r) => r.mint) || ps.find((r) => r.tok) || ps[0], padre = PADRE[pid] || {};
+  const m = ps.reduce((s, r) => s + r.m, 0), m60 = ps.reduce((s, r) => s + (r.c != null && r.c > -1 ? r.m / (1 + r.c) : 0), 0);
+  const suma = (k) => ps.reduce((s, r) => s + (r[k] || 0), 0) || null;
+  const una = { ...conTok, n: NOMBRE_EMPRESA[pid] || padre.name || conTok.n, ap: "Apps y bots", gr: "Apps de trading", apc: "apps", med: "fees",
+    m, c: m60 > 0 ? m / m60 - 1 : null, r30: suma("r30"), tvl: suma("tvl"), logo: logo(padre.logo) || conTok.logo,
+    partes: ps.slice().sort((a, b) => b.m - a.m).map((r) => ({ n: r.n, gr: r.gr, m: Math.round(r.m), c: r.c })) };
+  delete una.nuevo;
+  sel.splice(sel.indexOf(ps[0]), 0, una);
+  for (const r of ps) sel.splice(sel.indexOf(r), 1);
+}
 for (const r of sel) { delete r.ids; delete r.pid; }
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(HIST, JSON.stringify(hist));

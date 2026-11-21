@@ -40,7 +40,7 @@
     "Privacidad": "Privacy", "Pagos": "Payments", "Herramientas": "Tools" } : {};
   const T = EN ? {
     todos: "All", med: { fees: "fees, 30 d", circ: "circulating on Solana", valor: "tokenized value", token: "token market cap" },
-    todasCad: " · all its chains", enSol: " · on Solana", vsMes: " vs prev. month", volumen: " volume 24 h", comis: " in fees",
+    todasCad: " · all its chains", enSol: " · on Solana", vsMes: " vs prev. month", volumen: " volume 24 h", comis: " in fees", partes: "Its parts", parte30: " fees, 30 d",
     depos: " deposited", tit: " holders", h24: " 24 h", trad: (t, o) => `${t} traders 24 h · ${o} organic`, cap: " market cap",
     sinTok: "No token", vale: "Analyze ›", frente: "vs the market", sinHist: "No history yet",
     head: ["#", "Project", "Usage", "Revenue 30 d", "Price · 24 h", "Value × revenue", "vs the market"], valeT: "How many times its token is worth what the protocol earns in a year",
@@ -54,7 +54,7 @@
     error: "Couldn't load the data. Try again in a moment.",
   } : {
     todos: "Todos", med: { fees: "comisiones 30 d", circ: "en circulación en Solana", valor: "valor tokenizado", token: "capitalización del token" },
-    todasCad: " · todas sus cadenas", enSol: " · en Solana", vsMes: " vs mes ant.", volumen: " de volumen 24 h", comis: " de comisiones",
+    todasCad: " · todas sus cadenas", enSol: " · en Solana", vsMes: " vs mes ant.", volumen: " de volumen 24 h", comis: " de comisiones", partes: "Sus partes", parte30: " de comisiones, 30 d",
     depos: " depositados", tit: " titulares", h24: " 24 h", trad: (t, o) => `${t} traders 24 h · ${o} orgánicos`, cap: " de capitalización",
     sinTok: "Sin token", vale: "Analizar ›", frente: "frente al mercado", sinHist: "Aún sin histórico",
     head: ["#", "Proyecto", "Uso", "Ingresos 30 d", "Precio · 24 h", "Vale × ingresos", "Frente al mercado"], valeT: "Cuántas veces vale su token lo que ingresa el protocolo en un año",
@@ -121,7 +121,12 @@
       <span class="num vol">${precio}</span>
       <span class="num vol">${r.anios == null ? "—" : "×" + dec(r.anios, 1)}</span>
       <span class="rel"><span class="num ${r.rel >= 0 ? "up" : "dn"}" title="${r.rel == null && r.med !== "fees" && r.med !== "circ" ? T.sinHist : ""}">${pc(r.rel)}</span>${bar}<small>${T.frente}</small></span>
-      ${ir}</div>`;
+      ${ir}</div>${partes(r)}`;
+  }
+  // una empresa con varias partes (Pump.fun, 21/11): una fila y debajo lo que cobra cada parte
+  function partes(r) {
+    if (!r.partes || r.partes.length < 2) return "";
+    return `<div class="partes"><span class="pk">${T.partes}</span>${r.partes.map((p) => `<span><b>${esc(p.n)}</b> ${esc(grNom(p.gr))} · ${fm(p.m)}${T.parte30}${p.c == null ? "" : ` <em class="${p.c >= 0 ? "up" : "dn"}">${pc(p.c)}</em>`}</span>`).join("")}</div>`;
   }
   const ordena = (rs) => rs.sort((a, b) => orden === "anios" ? (a.anios ?? 1e18) - (b.anios ?? 1e18) : (b[orden] ?? -1e18) - (a[orden] ?? -1e18));
 
