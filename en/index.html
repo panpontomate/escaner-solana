@@ -1937,11 +1937,11 @@ body.scanp #form .row .btn{border-radius:999px}
 #sapbox .smr,#sapbox .sdf,#sapbox .sjg,#sapbox .sac{box-sizing:border-box;min-width:0}
 #sapbox .smr{display:grid;grid-template-columns:18px 22px minmax(0,1fr) auto 58px;gap:9px;align-items:center;width:100%;height:38px;border-top:1px solid var(--sl);font-size:.88rem;padding:0 2px}
 #sapbox .smr .sapav,#sapbox .smr img,#sapbox .sdf .sapav,#sapbox .sdf img,#sapbox .sjg .sapav,#sapbox .sjg img{width:22px;height:22px;border-radius:6px;font-size:9px}
-.si{color:var(--sm2);font-size:.75rem}
+.sri{color:var(--sm2);font-size:.75rem}
 .sn1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .sn1 small{color:var(--sm2);font-size:.74rem;margin-left:5px}
-.st{font:600 .84rem "IBM Plex Mono",monospace;text-align:right}
-.st small{font:500 .72rem Manrope,sans-serif;color:var(--sm2);margin-left:4px}
+.stt{font:600 .84rem "IBM Plex Mono",monospace;text-align:right}
+.stt small{font:500 .72rem Manrope,sans-serif;color:var(--sm2);margin-left:4px}
 .sp{text-align:right;font-size:.82rem}
 .ssrc{margin:10px 0 0;font-size:.76rem;color:var(--sm2)}
 .ssrc a,.smas a{color:var(--stq);text-decoration:none}
@@ -1969,9 +1969,9 @@ body.scanp #form .row .btn{border-radius:999px}
 #sapbox .h{min-height:30px;cursor:default;font:700 10.5px Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--sm2);border-top:0;margin-top:8px}
 #sapbox .h:hover{background:none}
 #sapbox .h>span{text-align:right}#sapbox .h>span:nth-child(2),#sapbox .sjg.h>span:last-child,#sapbox .sdf.h>span:last-child{text-align:left}#sapbox .sac.h .sc{text-align:center}
-.sn{min-width:0}.sn b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
-.sn small{display:block;color:var(--sm2);font-size:.72rem;margin-top:-2px}
-.sn .ss{display:inline;margin-left:4px}
+.snm{min-width:0}.snm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.snm small{display:block;color:var(--sm2);font-size:.72rem;margin-top:-2px}
+.snm .ss{display:inline;margin-left:4px}
 .sx{text-align:right;font:600 .84rem "IBM Plex Mono",monospace;white-space:nowrap}
 .sx small{display:block;font:500 .7rem Manrope,sans-serif;color:var(--sm2);margin-top:-2px}
 .sx.m{color:var(--sm)}
@@ -2007,9 +2007,9 @@ body.scanp #form .row .btn{border-radius:999px}
 .sd .ssq{grid-row:span 2}
 .sd b{font:600 .88rem "IBM Plex Mono",monospace}
 .sd em{font-style:normal;font-size:.74rem;color:var(--sm2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.scan{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--sm)}
-.scan i{font:700 .7rem Manrope,sans-serif;font-style:normal;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.06);color:#d8d2f5;margin-left:4px}
-.scan i.c2{background:rgba(251,191,36,.12);color:var(--sama)}
+.semp{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--sm)}
+.semp i{font:700 .7rem Manrope,sans-serif;font-style:normal;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.06);color:#d8d2f5;margin-left:4px}
+.semp i.c2{background:rgba(251,191,36,.12);color:var(--sama)}
 .shd2{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 14px}
 .shd2 h2 small{font:500 1.15rem Fraunces,serif!important;margin:0!important;color:#f1eeff!important}
 .sbol{display:inline-flex;align-items:center;gap:7px;font-size:.76rem;color:var(--sm);border:1px solid rgba(196,181,253,.3);border-radius:999px;padding:3px 10px}
@@ -2049,7 +2049,7 @@ body.scanp #form .row .btn{border-radius:999px}
   .smas{flex-wrap:wrap}
   .spt{grid-column:2/-1}
 }
-@media (max-width:380px){ .sit button{flex-basis:62%} #sapbox .smr{grid-template-columns:22px minmax(0,1fr) auto 52px}.si{display:none} }
+@media (max-width:380px){ .sit button{flex-basis:62%} #sapbox .smr{grid-template-columns:22px minmax(0,1fr) auto 52px}.sri{display:none} }
 /* Mi lista y Confluencia: titular en dos tonos y tarjetas más ligeras */
 .ml-h1,.cf-h1{letter-spacing:-.02em;line-height:1.02}
 .ml-h1 em,.cf-h1 em{display:block;font-style:normal;font-weight:300;color:#e6e0ff;-webkit-text-fill-color:#e6e0ff;background:none}
@@ -4859,7 +4859,7 @@ function sapRows(c){
 function sapN(x,d){ return x.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:true}); }
 function sapM(n){ return n>=1e6?"$"+sapN(n/1e6,1)+"M":n>=1e3?"$"+sapN(n/1e3,0)+"k":"$"+sapN(n||0,0); }
 function sapC(x){ return x==null?"":"<small>"+sapPct(x)+"</small>"; }
-function sapNm(r){ return "<span class='sn'><b>"+esc(r.n)+(r.sym&&r.tok!==false?" <small class='ss'>"+esc(r.sym)+"</small>":"")+"</b><small>"+esc(sapGr(r.gr))+"</small></span>"; }
+function sapNm(r){ return "<span class='snm'><b>"+esc(r.n)+(r.sym&&r.tok!==false?" <small class='ss'>"+esc(r.sym)+"</small>":"")+"</b><small>"+esc(sapGr(r.gr))+"</small></span>"; }
 var SAP_GR={"Memecoins":"Memecoins","Lanzaderas":"Launchpads","Activos reales":"Real-world assets","Stablecoins":"Stablecoins","DEX":"DEX","Préstamos":"Lending","Staking":"Staking","Puentes":"Bridges","Agregadores":"Aggregators","MEV":"MEV","Liquidity":"Liquidity","Derivados":"Derivatives","Oráculos":"Oracles","Rendimiento":"Yield","Predicciones":"Predictions","Cartas físicas":"Physical cards","Minería con juego":"Gamified mining","Games":"Games","Azar":"Luck games","Agentes de IA":"AI agents","Proyectos de IA":"AI projects","Apps de trading":"Trading apps","Bots de Telegram":"Telegram bots","Wallets":"Wallets","Datos":"Data","DePIN":"DePIN","Privacidad":"Privacy","Pagos":"Payments","Social":"Social","Herramientas":"Tools"};
 function sapGr(g){ return SAP_GR[g]||g; }
 function sapVx(r){ return r.mcap&&r.r30>=100?r.mcap/(r.r30*12):null; }
@@ -4881,10 +4881,10 @@ function sapFuente(c){
     ia:"Code: GitHub linked from CoinGecko (last change). Holders and traders: Jupiter (organic = buyers that don't look like bots). Unlocks: Streamflow. Today's data; not recommendations.",
     apps:"Fees and what reaches the token: DefiLlama. Official token: CoinGecko and DefiLlama. Today's data; not recommendations.",
     otros:"Revenue and what reaches the token: DefiLlama. Market cap: CoinGecko. Traders: Jupiter. Today's data; not recommendations."}[c];
-  return "<p class='ssrc'>"+esc(t)+" "+(c==="rwa"?"":"<a href='"+SAP_ECO+"'>"+"See the whole section in Ecosystem →"+"</a> · ")+"<a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a></p>";
+  return "<p class='ssrc'>"+esc(t)+" "+(c==="rwa"?"":"<a href='"+SAP_ECO+"?ap="+c+"'>"+"See the whole section in Ecosystem →"+"</a> · ")+"<a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a></p>";
 }
 function sapDato(big,txt){ return "<div class='sdato'><span class='kick'>"+"Fact"+"</span><b>"+esc(big)+"</b><p>"+esc(txt)+"</p></div>"; }
-function sapMas(txt,link,href){ return "<div class='smas'><span>"+esc(txt)+"</span><a href='"+(href||SAP_ECO)+"'>"+esc(link)+"</a></div>"; }
+function sapMas(txt,link,href){ return "<div class='smas'><span>"+esc(txt)+"</span><a href='"+(href||SAP_ECO+"?ap="+SAP.cur)+"'>"+esc(link)+"</a></div>"; }
 function sapOrg(r){ return r.org!=null?sapN(r.org,0)+" "+(r.org===1?"organic":"organic"):"&nbsp;"; }
 function sapTr(r){ return r.trad==null?"—":sapN(r.trad,0); }
 function sapTit(r){ return r.tit==null?"—":r.tit>=1e4?sapN(r.tit/1e3,0)+"k":sapN(r.tit/1e3,1)+"k"; }
@@ -4895,7 +4895,7 @@ function sapMeme(){
   var rs=sapRows("meme").filter(function(r){ return SAP_MINT.test(r.mint||"")&&r.gr!=="Lanzaderas"; });
   var big=rs.slice().sort(function(a,b){ return (b.m||0)-(a.m||0); });
   var mov=rs.filter(function(r){ return r.trad!=null; }).sort(function(a,b){ return b.trad-a.trad; }).slice(0,10), mi=Math.ceil(mov.length/2);
-  var fila=function(r,i){ return "<button type='button' class='smr'"+sapTry(r)+"><span class='si'>"+(i+1)+"</span>"+sapAv(r)+"<span class='sn1'>"+esc(r.n)+"<small>"+esc(r.sym||"")+"</small></span><span class='st'>"+sapN(r.trad,0)+"<small>"+"traders"+"</small></span><span class='sp'>"+sapPct(r.c24)+"</span></button>"; };
+  var fila=function(r,i){ return "<button type='button' class='smr'"+sapTry(r)+"><span class='sri'>"+(i+1)+"</span>"+sapAv(r)+"<span class='sn1'>"+esc(r.n)+"<small>"+esc(r.sym||"")+"</small></span><span class='stt'>"+sapN(r.trad,0)+"<small>"+"traders"+"</small></span><span class='sp'>"+sapPct(r.c24)+"</span></button>"; };
   return sapMay("meme",big,function(r){ return r.m; },["the largest","with their token on Solana, by market cap"])+
     "<section class='card smov'><h2>Most active today <small>by traders in 24 h</small></h2>"+
     (mov.length?"<div class='srs'><div>"+mov.slice(0,mi).map(fila).join("")+"</div><div>"+mov.slice(mi).map(function(r,i){ return fila(r,i+mi); }).join("")+"</div></div>":"<p class='hint'>No tokens with data in this section yet.</p>")+"</section>";
@@ -4917,7 +4917,7 @@ function sapActivos(){
   return (una?"<div class='scin'><div class='stk'>"+una+una+"</div></div>":"")+
     (dol.length?"<div class='sdol'><div class='stot'><span class='kick'>"+"Digital dollars on Solana"+"</span><b>"+sapN(tot/1e6,0)+" M$</b><span>"+"with a verified issuer"+"</span></div>"+
       "<div class='sds'>"+dol.map(function(d){ return "<div class='sd'>"+sapSq(d.tok,SAP_DCOL[d.tok])+"<b>"+sapN(d.valor/1e6,0)+" M$</b><em>"+esc(d.tok)+" · "+esc(d.emisor)+" · "+sapN(d.valor/tot*100,d.valor/tot<0.1?1:0)+" %</em></div>"; }).join("")+"</div>"+
-      "<div class='scan'>"+"The issuer can…"+" <span>"+"all:"+"<i>"+"mint"+"</i><i>"+"freeze"+"</i></span><span>"+"PYUSD and USDG, also:"+"<i class='c2'>"+"move your tokens"+"</i><i class='c2'>"+"charge a fee"+"</i></span></div></div>":"")+
+      "<div class='semp'>"+"The issuer can…"+" <span>"+"all:"+"<i>"+"mint"+"</i><i>"+"freeze"+"</i></span><span>"+"PYUSD and USDG, also:"+"<i class='c2'>"+"move your tokens"+"</i><i class='c2'>"+"charge a fee"+"</i></span></div></div>":"")+
     "<section class='card smov'><div class='shd2'><h2>What the token is worth, <small>and what the stock is worth</small></h2><span class='sbol"+(ab?" on":"")+"'><i></i><span>"+(ab?"<b>US market open</b> · prices under 15 min old":"<b>Market closed</b> · the token can drift from the stock")+"</span></span></div>"+
     "<div class='sac h'><span></span><span>"+"Token"+"</span><span>"+"Token price"+"</span><span class='sliq'>"+"On the market"+"</span><span class='sc'>"+"Gap"+"</span><span class='sliq'>"+"Liquidity"+"</span></div>"+
     fs.slice(0,10).map(fila).join("")+

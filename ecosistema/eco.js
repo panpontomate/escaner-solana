@@ -76,6 +76,10 @@
   const av = (r) => /^https:\/\//.test(r.logo || "") ? `<img src="${esc(r.logo)}" alt="" loading="lazy" width="28" height="28" data-i="${ini(r)}">` : `<span class="av">${ini(r)}</span>`;
 
   let D, ap = "Todos", tipo = "todos", grupo = "Todos", orden = "m";
+  // ?ap=defi (desde el Escáner, 21/11): abre directamente ese apartado
+  const AP_COD = { meme: "Meme", rwa: "Activos tokenizados", defi: "DeFi", juegos: "Juegos", ia: "IA", apps: "Apps y bots", otros: "Otros" };
+  const apUrl = AP_COD[new URLSearchParams(location.search).get("ap")];
+  if (apUrl) ap = apUrl;
   const enTipo = (r) => tipo === "todos" || (tipo === "nuevo" ? !!r.nuevo : (tipo === "con") === r.tok);
   const deAp = () => D.rows.filter((r) => ap === "Todos" || r.ap === ap);
 
@@ -170,6 +174,7 @@
     $("#sort").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; orden = b.dataset.s; [...$("#sort").children].forEach((x) => x.classList.toggle("on", x === b)); pinta(); };
     $(".tabs").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; [...document.querySelectorAll(".tabs button")].forEach((x) => x.classList.toggle("on", x === b)); tipo = b.dataset.k; pinta(); };
     pinta();
+    if (apUrl) window.scrollTo({ top: document.getElementById("aps").offsetTop - 90 });
   }
   fetch("/datos/ecosistema.json", { cache: "no-cache" }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(arrancar).catch(() => { $("#lista").innerHTML = `<div class="tbl"><div class="estado">${T.error}</div></div>`; });
