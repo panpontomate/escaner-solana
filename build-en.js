@@ -78,7 +78,9 @@ html = parts.join("");
 
 // Anything that still reads as Spanish is a missing translation (the internal keys below are expected)
 const KEYS = new Set(["SIN DATOS", "SIN MERCADO", "ALTO", "MEDIO", "BAJO", "TODOS", "TOKENIZADO", "PUENTEADO", "CREADOR", "ABIERTO",
-  "programa", "activa", "cancelado", "helius", "dex", "sol", "con", "spam", "wallet", "token", "hoy", "es", "esc.lista", "esc.conf"]);
+  "programa", "activa", "cancelado", "helius", "dex", "sol", "con", "spam", "wallet", "token", "hoy", "es", "esc.lista", "esc.conf",
+  // nombres de grupo tal como vienen en datos/ecosistema.json: en inglés los traduce SAP_GR (21/11)
+  "Préstamos", "Oráculos", "Cartas físicas", "Minería con juego", "Agentes de IA", "Proyectos de IA", "Apps de trading", "Bots de Telegram"]);
 const SPANISH = /[áéíóúñ¿¡]|\b(de|del|que|las|los|una|para|por|sin|con|más|pulsa|riesgo|wallets? que|aún|todavía|también)\b/i;
 const left = new Set();
 for (const p of html.split(/(<script\b[^>]*>[\s\S]*?<\/script>)/)) {

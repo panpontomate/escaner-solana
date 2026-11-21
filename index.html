@@ -1910,29 +1910,146 @@ body.scanp #form .row .btn{border-radius:999px}
 .sapbar .seg[aria-pressed="true"]{background:#7ab8c4;border-color:#7ab8c4;color:#0b1720}
 #sapbox{margin-bottom:16px;display:grid;gap:16px}
 #sapbox[hidden],#scanpage .live2[hidden]{display:none}
-.sapcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:10px}
-.sapc{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;text-align:left;border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.025);color:inherit;font:inherit;cursor:pointer}
-.sapc:hover,.sapr:hover{background:rgba(139,92,246,.08)}
-.sapc .sapav,.sapc img{margin-bottom:6px}
-.sapc b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sapc small{color:var(--muted);font-size:.78rem}
-.sapv{font:600 1.05rem "IBM Plex Mono",monospace;margin-top:4px}
-.sapgrid{display:grid;gap:16px}
-@media (min-width:900px){ .sapgrid{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);align-items:start} }
-.saprows{border-top:1px solid var(--line);margin-top:10px}
-.sapr{display:grid;grid-template-columns:22px 32px minmax(0,1fr) auto 64px;gap:10px;align-items:center;width:100%;padding:9px 4px;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
-.sapi{color:var(--muted);font-size:.8rem}
-.sapn{min-width:0}.sapn b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sapn small,.sapt small{display:block;color:var(--muted);font-size:.75rem}
-.sapt{font:600 .9rem "IBM Plex Mono",monospace;text-align:right}
-.sapp{text-align:right;font-size:.85rem}
 .sapav,.sapc img,.sapr img{width:32px;height:32px;border-radius:9px;background:#1b1538;flex:none}
 .sapav{display:grid;place-items:center;font:800 11px Manrope,sans-serif;color:#8ec5cf}
 .sapup{color:#4ade80}.sapdn{color:#ff6b6b}
-.sapwhat ul{margin:10px 0 0;padding-left:18px}.sapwhat li{margin:4px 0}
-.sapwhat p{color:var(--muted);margin:6px 0 0}
-.sapwhat .sapnota{font-size:.82rem;border-top:1px solid var(--line);padding-top:10px;margin-top:12px}
-@media (max-width:520px){ .sapr{grid-template-columns:32px minmax(0,1fr) auto 56px}.sapi{display:none} .sapcards{grid-template-columns:repeat(2,minmax(0,1fr))} .sapc{padding:10px} .sapv{font-size:.92rem} }
+/* apartados compactos (21/11/2026, maqueta maquetas/escaner/apartado-compacto.html) */
+#sapbox{display:block;--sl:rgba(196,181,253,.14);--sm:#a99fd6;--sm2:#8f86bb;--stq:#7ab8c4;--sver:#4ade80;--srojo:#ff6b6b;--sama:#fbbf24}
+#sapbox .kick{font:800 11px Manrope,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--stq)}
+#sapbox .mono{font-family:"IBM Plex Mono",monospace}
+#sapbox h2 small{font:600 .8rem Manrope,sans-serif;color:var(--sm);margin-left:6px;letter-spacing:0}
+#sapbox .sapav,#sapbox img{width:26px;height:26px;border-radius:8px;flex:none;object-fit:cover;margin:0}
+#sapbox button{font:inherit;color:inherit;text-align:left;cursor:pointer;background:none;border:0}
+#sapbox button:hover{background:rgba(139,92,246,.06)}
+.smay{border-top:1px solid var(--sl);border-bottom:1px solid var(--sl);padding:10px 0 12px;margin-bottom:16px}
+.shd{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.shd>span:last-child{font-size:12.5px;color:var(--sm2)}
+.sit{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.sit button{display:grid;grid-template-columns:26px minmax(0,1fr);column-gap:9px;align-items:center;padding:4px 12px;border-left:1px solid var(--sl)!important;min-width:0}
+.sit button:first-child{border-left:0!important;padding-left:0}
+.sit .sapav,.sit img{grid-row:span 2}
+.sit b{font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sit i{font-style:normal;font-size:.8rem;color:var(--sm)}
+.sit i .mono{color:#f1eeff;font-weight:600;font-size:.84rem}
+.smov{padding:16px 20px}
+.srs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;margin-top:10px}
+.srs>div{min-width:0}
+#sapbox .smr,#sapbox .sdf,#sapbox .sjg,#sapbox .sac{box-sizing:border-box;min-width:0}
+#sapbox .smr{display:grid;grid-template-columns:18px 22px minmax(0,1fr) auto 58px;gap:9px;align-items:center;width:100%;height:38px;border-top:1px solid var(--sl);font-size:.88rem;padding:0 2px}
+#sapbox .smr .sapav,#sapbox .smr img,#sapbox .sdf .sapav,#sapbox .sdf img,#sapbox .sjg .sapav,#sapbox .sjg img{width:22px;height:22px;border-radius:6px;font-size:9px}
+.si{color:var(--sm2);font-size:.75rem}
+.sn1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.sn1 small{color:var(--sm2);font-size:.74rem;margin-left:5px}
+.st{font:600 .84rem "IBM Plex Mono",monospace;text-align:right}
+.st small{font:500 .72rem Manrope,sans-serif;color:var(--sm2);margin-left:4px}
+.sp{text-align:right;font-size:.82rem}
+.ssrc{margin:10px 0 0;font-size:.76rem;color:var(--sm2)}
+.ssrc a,.smas a{color:var(--stq);text-decoration:none}
+.smas{display:flex;justify-content:space-between;align-items:center;gap:8px 14px;margin-top:10px;font-size:.8rem;color:var(--sm2)}
+.smas a{font-weight:700}
+.sque{margin:18px 0 0;border-left:3px solid var(--stq);border-radius:4px 14px 14px 4px;padding:13px 18px;background:linear-gradient(120deg,rgba(122,184,196,.1),rgba(255,255,255,.015) 75%)}
+.sque .top{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.sque .top b{font:600 1.02rem Fraunces,serif}
+.sque .top span{font-size:.84rem;color:var(--sm)}
+.sque ul{list-style:none;margin:9px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.sque li{font-size:.82rem;padding:4px 10px;border-radius:999px;background:rgba(5,4,13,.45);border:1px solid var(--sl)}
+.sque p{margin:9px 0 0;font-size:.76rem;color:var(--sm2)}
+#sapfin{--sl:rgba(196,181,253,.14);--sm:#a99fd6;--sm2:#8f86bb;--stq:#7ab8c4}
+#sapfin[hidden]{display:none}
+#sapfin .sque{margin-top:0}
+.sdato{margin-top:18px;display:grid;grid-template-columns:auto 1fr;column-gap:18px;align-items:center;border-left:3px solid var(--stq);border-radius:4px 14px 14px 4px;padding:13px 18px;background:linear-gradient(120deg,rgba(122,184,196,.1),rgba(255,255,255,.015) 75%)}
+.sdato .kick{grid-column:1/-1;margin:0 0 4px}
+.sdato>b{font:500 2.1rem/1.05 Fraunces,serif;color:var(--stq);white-space:nowrap}
+.sdato p{margin:0;font-size:.86rem;line-height:1.5;color:#e6e0ff}
+/* filas de tabla (DeFi y Apps: sdf; Juegos, IA y Otros: sjg; Activos: sac) */
+#sapbox .sdf,#sapbox .sjg,#sapbox .sac{display:grid;gap:10px;align-items:center;width:100%;min-height:42px;padding:5px 2px;border-top:1px solid var(--sl);font-size:.86rem}
+#sapbox .sdf{grid-template-columns:22px minmax(0,1.4fr) 1.15fr 1fr 1fr .8fr 92px}
+#sapbox .sjg{grid-template-columns:22px minmax(0,1.3fr) .8fr .8fr 1fr .9fr minmax(0,1.5fr)}
+#sapbox .sac{grid-template-columns:24px minmax(0,1.3fr) 1fr 1fr 82px 1fr}
+#sapbox .h{min-height:30px;cursor:default;font:700 10.5px Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--sm2);border-top:0;margin-top:8px}
+#sapbox .h:hover{background:none}
+#sapbox .h>span{text-align:right}#sapbox .h>span:nth-child(2),#sapbox .sjg.h>span:last-child,#sapbox .sdf.h>span:last-child{text-align:left}#sapbox .sac.h .sc{text-align:center}
+.sn{min-width:0}.sn b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.sn small{display:block;color:var(--sm2);font-size:.72rem;margin-top:-2px}
+.sn .ss{display:inline;margin-left:4px}
+.sx{text-align:right;font:600 .84rem "IBM Plex Mono",monospace;white-space:nowrap}
+.sx small{display:block;font:500 .7rem Manrope,sans-serif;color:var(--sm2);margin-top:-2px}
+.sx.m{color:var(--sm)}
+.sna{color:var(--sm2);font-weight:400;font-family:Manrope,sans-serif}
+.sc{text-align:center}
+.smk{display:flex;gap:4px;flex-wrap:wrap}
+.smk i{font:700 .66rem Manrope,sans-serif;font-style:normal;padding:1px 6px;border-radius:6px;white-space:nowrap}
+.smk .ok{color:var(--sver);background:rgba(74,222,128,.1)}.smk .no{color:var(--srojo);background:rgba(255,107,107,.1)}.smk .wa{color:var(--sama);background:rgba(251,191,36,.1)}
+.ssen{font:600 .74rem Manrope,sans-serif;padding:3px 8px;border-radius:7px;line-height:1.25}
+.ssen.no{color:var(--srojo);background:rgba(255,107,107,.1)}.ssen.wa{color:var(--sama);background:rgba(251,191,36,.1)}.ssen.ok{color:var(--sver);background:rgba(74,222,128,.1)}
+.scod{font:600 .74rem Manrope,sans-serif;white-space:nowrap}.scod.v{color:var(--sver)}.scod.p{color:var(--sama)}.scod.s{color:var(--sm2);font-weight:500}
+.stk0{font:700 .72rem Manrope,sans-serif;color:var(--sama);background:rgba(251,191,36,.1);padding:2px 7px;border-radius:6px;white-space:nowrap}
+.spt{grid-column:2/-1;font-size:.74rem;color:var(--sm2);margin-top:-2px}.spt b{color:var(--sm);font-weight:600}
+/* Activos tokenizados */
+.ssq{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:7px;font:800 8px Manrope,sans-serif;color:#fff;flex:none}
+.spill{display:inline-block;font:700 .74rem "IBM Plex Mono",monospace;padding:2px 7px;border-radius:999px;border:1px solid}
+.spill.ok{color:var(--sver);border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.08)}
+.spill.wa{color:var(--sama);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
+.spill.no{color:var(--srojo);border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.08)}
+.spill.gr{color:var(--sm2);border-color:rgba(196,181,253,.3)}
+.scin{overflow:hidden;border-top:1px solid var(--sl);border-bottom:1px solid var(--sl);margin-bottom:16px;padding:9px 0;-webkit-mask:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.scin .stk{display:flex;gap:26px;width:max-content;animation:scin 120s linear infinite}
+.scin:hover .stk{animation-play-state:paused}
+@keyframes scin{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){ .scin .stk{animation:none} }
+.sci{display:flex;align-items:center;gap:8px;font-size:.84rem;white-space:nowrap}
+.sci .mono{font-weight:600}
+.sdol{margin:0 0 16px;padding:2px 0 14px;border-bottom:1px solid var(--sl);display:grid;grid-template-columns:auto 1fr;gap:6px 22px;align-items:center}
+.stot b{display:block;font:600 2rem/1 Fraunces,serif}
+.stot span:last-child{font-size:.76rem;color:var(--sm2)}
+.sds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 16px}
+.sd{display:grid;grid-template-columns:24px minmax(0,1fr);column-gap:8px;align-items:center;padding:5px 0;font-size:.82rem}
+.sd .ssq{grid-row:span 2}
+.sd b{font:600 .88rem "IBM Plex Mono",monospace}
+.sd em{font-style:normal;font-size:.74rem;color:var(--sm2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scan{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--sm)}
+.scan i{font:700 .7rem Manrope,sans-serif;font-style:normal;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.06);color:#d8d2f5;margin-left:4px}
+.scan i.c2{background:rgba(251,191,36,.12);color:var(--sama)}
+.shd2{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 14px}
+.shd2 h2 small{font:500 1.15rem Fraunces,serif!important;margin:0!important;color:#f1eeff!important}
+.sbol{display:inline-flex;align-items:center;gap:7px;font-size:.76rem;color:var(--sm);border:1px solid rgba(196,181,253,.3);border-radius:999px;padding:3px 10px}
+.sbol i{width:7px;height:7px;border-radius:50%;background:var(--sm2);flex:none}.sbol.on i{background:var(--sver)}
+.sac .sn1 b{font-weight:700}
+.semi{margin-top:18px;border-left:3px solid var(--sama);border-radius:4px 14px 14px 4px;padding:13px 18px;background:linear-gradient(120deg,rgba(251,191,36,.08),rgba(255,255,255,.015) 75%)}
+.semi .top b{font:600 1.02rem Fraunces,serif}
+.semi .top span{font-size:.84rem;color:var(--sm);margin-left:10px}
+.semi .tres{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:10px}
+.semi .tres div{font-size:.8rem;color:var(--sm)}
+.semi .tres .kick{display:block;margin-bottom:5px;color:var(--sama);font-size:10.5px}
+.semi .tres p{margin:0 0 4px}.semi .tres p b{color:#f1eeff;font-weight:600}
+.semi .ojo{margin:10px 0 0;font-size:.76rem;color:var(--sm2)}
+/* Meme: debajo solo la tendencia y lo recién lanzado, a dos columnas; al final, qué miramos */
+#scanpage.sapap #sdatos,#scanpage.sapmeme #smmap,#scanpage.sapmeme #srecent,#scanpage.sapmeme #sdatos,#scanpage.sapmeme .lbase{display:none!important}
+#scanpage.sapmeme #strows>:nth-child(n+7){display:none}
+@media (min-width:900px){ body.scanp #scanpage.sapmeme .live2{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-areas:"tr fr"} }
+@media (max-width:760px){
+  .sit{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .sit button{flex:0 0 46%;scroll-snap-align:start}
+  .srs{grid-template-columns:minmax(0,1fr)}
+  .smov{padding:14px}
+  #sapbox .sdf{grid-template-columns:22px minmax(0,1fr) 70px 70px;gap:8px}
+  #sapbox .sdf .sx{font-size:.8rem}
+  .slq,.stvl,.svx,.smk{display:none!important}
+  #sapbox .sjg{grid-template-columns:22px minmax(0,1fr) 66px 88px;gap:8px;row-gap:4px}
+  .stit,.scob{display:none}
+  #sapbox .sjg .ssen{grid-column:2/-1;justify-self:start}
+  #sapbox .sjg.h>span:last-child{display:none}
+  #sapbox .sia .scob{display:block;grid-column:2/-1}
+  .scod{white-space:normal}
+  #sapbox .sac{grid-template-columns:24px minmax(0,1fr) auto 74px}
+  .sliq{display:none}
+  .sdol{grid-template-columns:1fr}.sds{grid-template-columns:1fr 1fr}
+  .semi .tres{grid-template-columns:1fr}
+  .sdato{grid-template-columns:1fr}
+  .smas{flex-wrap:wrap}
+  .spt{grid-column:2/-1}
+}
+@media (max-width:380px){ .sit button{flex-basis:62%} #sapbox .smr{grid-template-columns:22px minmax(0,1fr) auto 52px}.si{display:none} }
 /* Mi lista y Confluencia: titular en dos tonos y tarjetas más ligeras */
 .ml-h1,.cf-h1{letter-spacing:-.02em;line-height:1.02}
 .ml-h1 em,.cf-h1 em{display:block;font-style:normal;font-weight:300;color:#e6e0ff;-webkit-text-fill-color:#e6e0ff;background:none}
@@ -2259,7 +2376,6 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
       <button type="button" class="tab" id="tabN" role="tab" aria-selected="false" hidden><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg><span class="tl-lg">Tokens nuevos</span><span class="tl-sm">Nuevos</span></button>
       <button type="button" class="tab" id="tabL" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Mi lista <span id="lcount"></span></span></button>
       <button type="button" class="tab" id="tabC" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg><span>Confluencia <span id="ccount"></span></span></button>
-      <a class="tab tlink" href="/acciones/"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M6 16l4-5 3 3 5-7"/><path d="M15 7h3v3"/></svg><span>Acciones</span></a>
     </div>
     <a class="botlink" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a>
     <a class="lang" href="https://solflag.com/en/" hreflang="en" title="English version">EN</a>
@@ -2375,20 +2491,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
     <div class="cinta" id="scinta" hidden aria-label="Tokens en verde y lo último que has visto"><div class="ctrack" id="sctrack"></div></div>
     <p class="cdisc" id="scdisc" hidden>«En verde» = pasó los chequeos al analizarlo. No es una recomendación de compra.</p>
     <div class="sapbar" id="sapbar" role="group" aria-label="Apartados"><button type="button" class="seg" data-sap="todos" aria-pressed="true">Todos</button><button type="button" class="seg" data-sap="meme" aria-pressed="false">Meme</button><button type="button" class="seg" data-sap="rwa" aria-pressed="false">Activos tokenizados</button><button type="button" class="seg" data-sap="defi" aria-pressed="false">DeFi</button><button type="button" class="seg" data-sap="juegos" aria-pressed="false">Juegos</button><button type="button" class="seg" data-sap="ia" aria-pressed="false">IA</button><button type="button" class="seg" data-sap="apps" aria-pressed="false">Apps y bots</button><button type="button" class="seg" data-sap="otros" aria-pressed="false">Otros</button></div>
-    <div id="sapbox" hidden>
-      <section class="card" id="sapbig">
-        <div class="lhd"><h2 id="saph"></h2></div>
-        <div class="sapcards" id="sapcards"></div>
-      </section>
-      <div class="sapgrid">
-        <section class="card" id="sapmov">
-          <div class="lhd"><h2>Lo que más se mueve hoy <small>por traders en 24 h</small></h2></div>
-          <div class="saprows" id="saprows"></div>
-          <p class="lsrc" id="sapsrc"></p>
-        </section>
-        <section class="card sapwhat" id="sapwhat"></section>
-      </div>
-    </div>
+    <div id="sapbox" hidden></div>
     <div class="live2">
       <section class="card" id="strend">
         <div class="lhd"><h2>🔥 En tendencia ahora <small>Solana · por actividad</small></h2>
@@ -2414,6 +2517,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
     <section class="card" id="srecent" hidden><h2>Tus últimas búsquedas <small>en este navegador</small></h2><div class="rc-list" id="srclist"></div></section>
     </div>
 
+    <div id="sapfin" hidden></div>
     <section class="card" id="sdatos" hidden><h2>Cómo lo hemos hecho hasta ahora <small>registro de SolFlag</small></h2><p id="sdtxt"></p></section>
   </div>
 
@@ -4707,7 +4811,7 @@ function paintFresh(keepAnim){
    «Todos» = lo de siempre. En un apartado: sus mayores y lo que más se mueve hoy, de datos/ecosistema.json (los mismos
    datos que la página Ecosistema, una vez al día), y qué miramos en él. En Meme siguen debajo la tendencia y lo recién lanzado.
    Pendiente: chequeos propios de cada apartado (hoy el análisis usa las mismas banderas para todos). */
-var SAP={cur:"todos",d:null,carga:false};
+var SAP={cur:"todos",d:null,p:null,a:null,carga:false};
 var SAP_ECO="/ecosistema/";
 var SAP_MINT=/^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 var SAP_NOM={meme:"Meme",rwa:"Activos tokenizados",defi:"DeFi",juegos:"Juegos",ia:"IA",apps:"Apps y bots",otros:"Otros"};
@@ -4722,10 +4826,10 @@ var SAP_QUE={
   otros:["Qué miramos en el resto","DePIN, pagos, privacidad y herramientas:",["Si el token es el oficial del proyecto","Uso real del proyecto","Quién lo tiene","¿Puedes vender y cuánto te cuesta?"]]
 };
 function sapCargar(){
-  if(SAP.d||SAP.carga) return; SAP.carga=true;
-  fetch("/datos/ecosistema.json",{cache:"no-cache"}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function(d){ SAP.d=d; sapPinta(); })
-    .catch(function(){ SAP.carga=false; $("#sapcards").innerHTML="<p class='hint'>No se pudieron cargar los datos. Prueba de nuevo en un momento.</p>"; });
+  if((SAP.d&&SAP.p)||SAP.carga) return; SAP.carga=true;
+  Promise.all([fetch("/datos/ecosistema.json",{cache:"no-cache"}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }),perfilesData()])
+    .then(function(x){ SAP.d=x[0]; SAP.p=x[1]||{}; sapPinta(); })
+    .catch(function(){ SAP.carga=false; $("#sapbox").innerHTML="<p class='hint'>No se pudieron cargar los datos. Prueba de nuevo en un momento.</p>"; });
 }
 function sapPct(x){ if(x==null||Math.abs(x)<0.0005) return ""; return "<span class='"+(x>=0?"sapup":"sapdn")+"'>"+(x>0?"+":"")+fmtPct(x*100)+"</span>"; }
 function sapAv(r){
@@ -4733,29 +4837,194 @@ function sapAv(r){
   return /^https:\/\//.test(r.logo||"")?"<img src='"+esc(r.logo)+"' alt='' loading='lazy' width='32' height='32' data-sapi='"+i+"'>":"<span class='sapav'>"+i+"</span>";
 }
 function sapPinta(){
-  var c=SAP.cur;
+  var c=SAP.cur, sp=$("#scanpage");
   [].forEach.call(document.querySelectorAll("#sapbar [data-sap]"),function(b){ b.setAttribute("aria-pressed",String(b.getAttribute("data-sap")===c)); });
   $("#sapbox").hidden=c==="todos";
   var live=document.querySelector("#scanpage .live2"); if(live) live.hidden=!(c==="todos"||c==="meme");
+  // 21/11 (maqueta maquetas/escaner/apartado-compacto.html): en Meme, debajo solo la tendencia y lo recién lanzado; y al final, qué miramos
+  if(sp){ sp.classList.toggle("sapmeme",c==="meme"); sp.classList.toggle("sapap",c!=="todos"); }
+  var fin=$("#sapfin"); if(fin){ fin.hidden=c!=="meme"; fin.innerHTML=c==="meme"?sapQue("meme",true)+sapFuente("meme"):""; }
   if(c==="todos") return;
+  if(!SAP.d||!SAP.p){ $("#sapbox").innerHTML="<p class='hint'>Cargando…</p>"; sapCargar(); return; }
+  if(c==="rwa"&&!SAP.a){ $("#sapbox").innerHTML="<p class='hint'>Cargando…</p>"; accionesData().then(function(j){ SAP.a=j||{filas:[],dolares:[]}; if(SAP.cur==="rwa") sapPinta(); }); return; }
+  var h=c==="meme"?sapMeme():c==="rwa"?sapActivos():c==="defi"?sapDefi():c==="juegos"?sapJuegos():c==="ia"?sapIA():c==="apps"?sapApps():sapOtros();
+  $("#sapbox").innerHTML=h;
+}
+// filas del Ecosistema de un apartado, con lo de perfiles.json (lo que llega al token, auditorías, hackeos, desbloqueos, código)
+function sapRows(c){
+  return SAP.d.rows.filter(function(r){ return r.apc===c; }).map(function(r){
+    var e=(r.mint&&SAP.p[r.mint])||{}, o={}; for(var k in r) o[k]=r[k];
+    o.h30=e.h30||null; o.aud=e.aud||0; o.hk=e.hk?e.hk.length:0; o.dl=e.dl||null; o.cod=e.cod||null; return o; });
+}
+function sapN(x,d){ return x.toLocaleString("de-DE",{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:true}); }
+function sapM(n){ return n>=1e6?sapN(n/1e6,1)+" M$":n>=1e3?sapN(n/1e3,0)+" k$":sapN(n||0,0)+" $"; }
+function sapC(x){ return x==null?"":"<small>"+sapPct(x)+"</small>"; }
+function sapNm(r){ return "<span class='sn'><b>"+esc(r.n)+(r.sym&&r.tok!==false?" <small class='ss'>"+esc(r.sym)+"</small>":"")+"</b><small>"+esc(sapGr(r.gr))+"</small></span>"; }
+var SAP_GR={};
+function sapGr(g){ return SAP_GR[g]||g; }
+function sapVx(r){ return r.mcap&&r.r30>=100?r.mcap/(r.r30*12):null; }
+function sapMay(c,rs,val,lbl){
+  return "<section class='smay'><div class='shd'><span class='kick'>"+esc(SAP_NOM[c])+" · "+esc(lbl[0])+"</span><span>"+esc(lbl[1])+"</span></div><div class='sit'>"+
+    rs.slice(0,5).map(function(r){ return "<button type='button'"+(SAP_MINT.test(r.mint||"")?" data-try='"+esc(r.mint)+"'":"")+">"+sapAv(r)+"<b>"+esc(r.n)+"</b><i><span class='mono'>"+sapM(val(r))+"</span> "+
+      (r.tok===false?"<span class='stk0'>"+"sin token"+"</span>":sapPct(r.c24))+"</i></button>"; }).join("")+"</div></section>";
+}
+function sapQue(c,nota){
   var q=SAP_QUE[c];
-  $("#sapwhat").innerHTML="<h2>"+esc(q[0])+"</h2><p>"+esc(q[1])+"</p><ul>"+q[2].map(function(x){ return "<li>"+esc(x)+"</li>"; }).join("")+"</ul>"+
-    "<p class='sapnota'>Hoy el análisis usa las mismas banderas en todos los apartados. Los chequeos propios de cada uno están en camino.</p>";
-  $("#saph").innerHTML=esc(SAP_NOM[c])+" <small>los mayores, con su token en Solana</small>";
-  if(!SAP.d){ $("#sapcards").innerHTML="<p class='hint'>Cargando…</p>"; $("#saprows").innerHTML=""; $("#sapsrc").innerHTML=""; sapCargar(); return; }
-  var rs=SAP.d.rows.filter(function(r){ return r.apc===c&&SAP_MINT.test(r.mint||""); });
-  var vacio="<p class='hint'>Aún no hay tokens de este apartado con datos.</p>";
-  var big=rs.slice().sort(function(a,b){ return (b.m||0)-(a.m||0); }).slice(0,5);
-  $("#sapcards").innerHTML=big.length?big.map(function(r){
-    return "<button type='button' class='sapc' data-try='"+esc(r.mint)+"'>"+sapAv(r)+"<b>"+esc(r.n)+"</b><small>"+esc(r.sym||"")+"</small>"+
-      "<span class='sapv'>"+usdShort(r.m||0)+"</span><small>"+esc(SAP_MED[r.med]||"")+"</small>"+sapPct(r.c24)+"</button>";
-  }).join(""):vacio;
-  var mov=rs.filter(function(r){ return r.trad!=null; }).sort(function(a,b){ return b.trad-a.trad; }).slice(0,10);
-  $("#saprows").innerHTML=mov.length?mov.map(function(r,i){
-    return "<button type='button' class='sapr' data-try='"+esc(r.mint)+"'><span class='sapi'>"+(i+1)+"</span>"+sapAv(r)+
-      "<span class='sapn'><b>"+esc(r.n)+"</b><small>"+esc(r.sym||"")+"</small></span><span class='sapt'>"+Number(r.trad).toLocaleString("de-DE")+"<small>traders</small></span><span class='sapp'>"+sapPct(r.c24)+"</span></button>";
-  }).join(""):vacio;
-  $("#sapsrc").innerHTML="Datos del día: DefiLlama, CoinGecko y Jupiter. Que se mueva no es una recomendación de compra. <a href='"+SAP_ECO+"'>Ver el apartado entero en Ecosistema →</a> · <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a>";
+  return "<div class='sque'><div class='top'><b>"+esc(q[0])+"</b><span>"+esc(q[1])+"</span></div><ul>"+q[2].map(function(x){ return "<li>"+esc(x)+"</li>"; }).join("")+"</ul>"+
+    (nota?"<p>"+"Hoy el análisis usa las mismas banderas en todos los apartados. Los chequeos propios de cada uno están en camino."+"</p>":"")+"</div>";
+}
+function sapFuente(c){
+  var t={meme:"Datos del día: DefiLlama, CoinGecko y Jupiter. Que se mueva no es una recomendación de compra.",
+    rwa:"Solo tokens cuyas claves son las del emisor. Precio del token: DexScreener (dólares: Jupiter). Precio de la acción: Twelve Data. Son datos, no recomendaciones.",
+    defi:"Comisiones, ingresos y lo que llega al token: DefiLlama. Desbloqueos: Streamflow. Datos del día; no son recomendaciones.",
+    juegos:"Capitalización: CoinGecko. Titulares y traders: Jupiter (orgánicos = compradores que no parecen bots). Lo que cobra: DefiLlama. Datos del día; no son recomendaciones.",
+    ia:"Código: GitHub enlazado desde CoinGecko (último cambio). Titulares y traders: Jupiter (orgánicos = compradores que no parecen bots). Desbloqueos: Streamflow. Datos del día; no son recomendaciones.",
+    apps:"Comisiones y lo que llega al token: DefiLlama. Token oficial: CoinGecko y DefiLlama. Datos del día; no son recomendaciones.",
+    otros:"Ingresos y lo que llega al token: DefiLlama. Capitalización: CoinGecko. Traders: Jupiter. Datos del día; no son recomendaciones."}[c];
+  return "<p class='ssrc'>"+esc(t)+" "+(c==="rwa"?"":"<a href='"+SAP_ECO+"'>"+"Ver el apartado entero en Ecosistema →"+"</a> · ")+"<a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a></p>";
+}
+function sapDato(big,txt){ return "<div class='sdato'><span class='kick'>"+"Dato"+"</span><b>"+esc(big)+"</b><p>"+esc(txt)+"</p></div>"; }
+function sapMas(txt,link,href){ return "<div class='smas'><span>"+esc(txt)+"</span><a href='"+(href||SAP_ECO)+"'>"+esc(link)+"</a></div>"; }
+function sapOrg(r){ return r.org!=null?sapN(r.org,0)+" "+(r.org===1?"orgánico":"orgánicos"):"&nbsp;"; }
+function sapTr(r){ return r.trad==null?"—":sapN(r.trad,0); }
+function sapTit(r){ return r.tit==null?"—":r.tit>=1e4?sapN(r.tit/1e3,0)+" mil":sapN(r.tit/1e3,1)+" mil"; }
+function sapTry(r){ return SAP_MINT.test(r.mint||"")?" data-try='"+esc(r.mint)+"'":""; }
+
+// Meme: los mayores, lo que más se mueve (solo memecoins: las lanzaderas van en Ecosistema)
+function sapMeme(){
+  var rs=sapRows("meme").filter(function(r){ return SAP_MINT.test(r.mint||"")&&r.gr!=="Lanzaderas"; });
+  var big=rs.slice().sort(function(a,b){ return (b.m||0)-(a.m||0); });
+  var mov=rs.filter(function(r){ return r.trad!=null; }).sort(function(a,b){ return b.trad-a.trad; }).slice(0,10), mi=Math.ceil(mov.length/2);
+  var fila=function(r,i){ return "<button type='button' class='smr'"+sapTry(r)+"><span class='si'>"+(i+1)+"</span>"+sapAv(r)+"<span class='sn1'>"+esc(r.n)+"<small>"+esc(r.sym||"")+"</small></span><span class='st'>"+sapN(r.trad,0)+"<small>"+"traders"+"</small></span><span class='sp'>"+sapPct(r.c24)+"</span></button>"; };
+  return sapMay("meme",big,function(r){ return r.m; },["los mayores","con su token en Solana, por capitalización"])+
+    "<section class='card smov'><h2>Lo que más se mueve hoy <small>por traders en 24 h</small></h2>"+
+    (mov.length?"<div class='srs'><div>"+mov.slice(0,mi).map(fila).join("")+"</div><div>"+mov.slice(mi).map(function(r,i){ return fila(r,i+mi); }).join("")+"</div></div>":"<p class='hint'>Aún no hay tokens de este apartado con datos.</p>")+"</section>";
+}
+// Activos tokenizados: lo de la página Acciones (api/acciones), compacto
+var SAP_DCOL={USDC:"#2775ca",USDT:"#26a17b",PYUSD:"#0e3d8c",USDG:"#1d1d1f",EURC:"#2775ca",USDY:"#1f2a44"};
+function sapSq(t,col){ return "<span class='ssq' style='background:"+(col||"#333")+"'>"+esc(String(t).slice(0,4))+"</span>"; }
+function sapPrima(f){
+  if(f.prima==null) return "<span class='spill gr'>—</span>";
+  var k=f.liq<20000?"gr":Math.abs(f.prima)<1?"ok":Math.abs(f.prima)<3?"wa":"no";
+  return "<span class='spill "+k+"'>"+(f.prima>0?"+":"")+sapN(f.prima,2)+" %</span>";
+}
+function sapActivos(){
+  var A=SAP.a, fs=(A.filas||[]).slice().sort(function(a,b){ return b.liq-a.liq; }), dol=(A.dolares||[]).filter(function(d){ return d.enSolana; });
+  var tot=dol.reduce(function(s,d){ return s+(d.valor||0); },0), ab=A.bolsa==="abierta";
+  var ci=function(f){ return "<span class='sci'>"+sapSq(f.accion,"#3b3b6d")+"<b>"+esc(f.tok)+"</b><span class='mono'>"+sapN(f.precio,2)+" $</span>"+sapPrima(f)+"</span>"; };
+  var una=fs.filter(function(f){ return f.liq>=20000; }).map(ci).join("");
+  var fila=function(f){ return "<button type='button' class='sac' data-try='"+esc(f.mint)+"'>"+sapSq(f.accion,"#3b3b6d")+"<span class='sn1'><b>"+esc(f.tok)+"</b><small>"+esc(f.accion)+"</small></span><span class='sx'>"+sapN(f.precio,2)+" $</span><span class='sx m sliq'>"+sapN(f.real,2)+" $</span><span class='sc'>"+sapPrima(f)+"</span><span class='sx m sliq'>"+sapM(f.liq)+"</span></button>"; };
+  return (una?"<div class='scin'><div class='stk'>"+una+una+"</div></div>":"")+
+    (dol.length?"<div class='sdol'><div class='stot'><span class='kick'>"+"Dólares digitales en Solana"+"</span><b>"+sapN(tot/1e6,0)+" M$</b><span>"+"con emisor comprobado"+"</span></div>"+
+      "<div class='sds'>"+dol.map(function(d){ return "<div class='sd'>"+sapSq(d.tok,SAP_DCOL[d.tok])+"<b>"+sapN(d.valor/1e6,0)+" M$</b><em>"+esc(d.tok)+" · "+esc(d.emisor)+" · "+sapN(d.valor/tot*100,d.valor/tot<0.1?1:0)+" %</em></div>"; }).join("")+"</div>"+
+      "<div class='scan'>"+"El emisor puede…"+" <span>"+"todos:"+"<i>"+"crear"+"</i><i>"+"congelar"+"</i></span><span>"+"PYUSD y USDG, además:"+"<i class='c2'>"+"mover tus tokens"+"</i><i class='c2'>"+"poner comisión"+"</i></span></div></div>":"")+
+    "<section class='card smov'><div class='shd2'><h2>Lo que vale el token, <small>y lo que vale la acción</small></h2><span class='sbol"+(ab?" on":"")+"'><i></i><span>"+(ab?"<b>Bolsa de EE. UU. abierta</b> · precios de hace menos de 15 min":"<b>Bolsa cerrada</b> · el token puede despegarse de la acción")+"</span></span></div>"+
+    "<div class='sac h'><span></span><span>"+"Token"+"</span><span>"+"Precio token"+"</span><span class='sliq'>"+"En bolsa"+"</span><span class='sc'>"+"Diferencia"+"</span><span class='sliq'>"+"Liquidez"+"</span></div>"+
+    fs.slice(0,10).map(fila).join("")+
+    sapMas("Las 10 con más liquidez de {n} acciones oficiales".replace("{n}",fs.length),"Ver las {n} en Acciones →".replace("{n}",fs.length),"/acciones/")+
+    "<div class='semi'><div class='top'><b>"+"Qué puede hacer el emisor con tus tokens"+"</b><span>"+"la letra pequeña"+"</span></div><div class='tres'>"+
+      "<div><span class='kick'>"+"xStocks · acciones"+"</span><p><b>"+"Mover o quemar tus tokens sin tu firma"+"</b> "+"(delegado permanente)"+"</p><p><b>"+"Pausar todos los envíos"+"</b> · "+"hoy no está pausado"+"</p><p><b>"+"Ajusta por splits y dividendos"+"</b> "+"con un multiplicador"+"</p></div>"+
+      "<div><span class='kick'>"+"Ondo · acciones"+"</span><p><b>"+"No puede mover tus tokens"+"</b> "+"(sin delegado permanente)"+"</p><p><b>"+"Pausar todos los envíos"+"</b> · "+"hoy no está pausado"+"</p><p><b>"+"Poco mercado en Solana:"+"</b> "+"su precio puede no seguir a la acción"+"</p></div>"+
+      "<div><span class='kick'>"+"Dólares digitales"+"</span><p><b>"+"Todos pueden congelar tu cuenta"+"</b> "+"por orden judicial o sanciones"+"</p><p><b>"+"PYUSD y USDG pueden mover tus tokens"+"</b> "+"y cobrar comisión (hoy 0 %)"+"</p><p><b>"+"Claves comprobadas cada mañana"+"</b></p></div></div>"+
+      "<p class='ojo'>"+"Desde la cadena no se ve si la acción o el dinero real existen detrás del token: eso depende del emisor, su custodio y sus informes de reservas."+"</p></div>"+
+    sapQue("rwa")+sapFuente("rwa")+"</section>";
+}
+// DeFi: lo que cobra y a quién le llega
+function sapDefi(){
+  var todos=sapRows("defi"), rs=todos.filter(function(r){ return r.tok&&r.m>0; }).sort(function(a,b){ return b.m-a.m; });
+  var fT=todos.reduce(function(s,r){ return s+(r.m||0); },0), hT=todos.reduce(function(s,r){ return s+(r.h30||0); },0), cien=fT?Math.round(hT/fT*100):0;
+  var mk=function(r){ return (r.aud?"<i class='ok'>"+"auditado"+"</i>":"")+(r.hk?"<i class='no'>"+(r.hk===1?"1 hackeo":"{n} hackeos".replace("{n}",r.hk))+"</i>":"")+(r.dl&&r.dl.lib>=0.5?"<i class='wa'>"+"desbloquea {n} %".replace("{n}",sapN(r.dl.lib,1))+"</i>":""); };
+  var fila=function(r){ var p=r.h30?r.h30/r.m:0, vx=sapVx(r);
+    return "<button type='button' class='sdf'"+sapTry(r)+">"+sapAv(r)+sapNm(r)+"<span class='sx'>"+sapM(r.m)+sapC(r.c)+"</span>"+
+      "<span class='sx'>"+(r.h30?sapM(r.h30)+"<small class='sapup'>"+(p<0.01?"<1":Math.round(p*100))+" %<span class='slq'> "+"de lo que cobra"+"</span></small>":"<span class='sna'>"+"nada"+"</span>")+"</span>"+
+      "<span class='sx m stvl'>"+(r.tvl?sapM(r.tvl):"—")+"</span><span class='sx m svx'>"+(vx?"×"+sapN(vx,1):"—")+"</span><span class='smk'>"+mk(r)+"</span></button>"; };
+  return sapMay("defi",rs,function(r){ return r.m; },["los mayores","con su token en Solana, por comisiones de 30 días"])+
+    "<section class='card smov'><h2>Lo que cobra y a quién le llega <small>comisiones de 30 días</small></h2>"+
+    "<div class='sdf h'><span></span><span>"+"Proyecto"+"</span><span>"+"Cobra"+"<span class='slq'> · "+"vs mes ant."+"</span></span><span>"+"Al "+"<span class='slq'>"+"que tiene el "+"</span>"+"token"+"</span><span class='stvl'>"+"Depositado"+"</span><span class='svx'>"+"Vale × ingresos"+"</span><span class='smk'>"+"Señales"+"</span></div>"+
+    rs.slice(0,10).map(fila).join("")+
+    sapMas("Los 10 que más cobran de {n} proyectos DeFi con token en Solana".replace("{n}",rs.length),"Ver todo DeFi en Ecosistema →")+
+    sapDato("{a} de 100 $".replace("{a}",cien),"De cada 100 $ que cobra DeFi en Solana, solo {a} $ llegan a los que tienen el token (recompras o reparto). Este mes: {h} de {f}. El resto se lo queda el protocolo o va a quien pone la liquidez.".replace("{a}",cien).replace("{h}",sapM(hT)).replace("{f}",sapM(fT)))+
+    sapQue("defi")+sapFuente("defi")+"</section>";
+}
+// Juegos: lo que vale frente a la gente que lo mueve, y si cobra algo en la cadena
+function sapJuegos(){
+  var rs=sapRows("juegos").filter(function(r){ return r.tok&&SAP_MINT.test(r.mint||"")&&r.mcap>0; }).sort(function(a,b){ return b.mcap-a.mcap; });
+  var cobra=function(r){ return r.med==="fees"&&r.m>0?r.m:0; }, sin=rs.filter(function(r){ return !cobra(r); }).length;
+  var sen=function(r){
+    if(cobra(r)&&r.h30/cobra(r)>=0.5) return "<span class='ssen ok'>"+"Devuelve el {n} % de lo que cobra al token".replace("{n}",Math.round(r.h30/cobra(r)*100))+"</span>";
+    if(r.trad!=null&&r.trad<20&&r.mcap>=1e6) return "<span class='ssen no'>"+(r.trad===1?"Vale {v} y lo movió 1 persona ayer":"Vale {v} y lo movieron {n} personas ayer").replace("{v}",sapM(r.mcap)).replace("{n}",r.trad)+"</span>";
+    if(r.orgScore!=null&&r.orgScore<30&&r.trad>=20) return "<span class='ssen wa'>"+"Casi todo lo mueven bots"+"</span>";
+    if(!cobra(r)) return "<span class='ssen wa'>"+"No cobra nada en la cadena"+"</span>";
+    return "<span></span>"; };
+  var fila=function(r){ return "<button type='button' class='sjg'"+sapTry(r)+">"+sapAv(r)+sapNm(r)+"<span class='sx'>"+sapM(r.mcap)+sapC(r.c24)+"</span><span class='sx m stit'>"+sapTit(r)+"</span>"+
+    "<span class='sx'>"+sapTr(r)+"<small>"+sapOrg(r)+"</small></span><span class='sx scob'>"+(cobra(r)?sapM(cobra(r))+sapC(r.c):"<span class='sna'>"+"nada"+"</span>")+"</span>"+sen(r)+"</button>"; };
+  return sapMay("juegos",rs,function(r){ return r.mcap; },["los mayores","con su token en Solana, por capitalización"])+
+    "<section class='card smov'><h2>¿Hay gente jugando de verdad? <small>lo que vale frente a quién lo mueve</small></h2>"+
+    "<div class='sjg h'><span></span><span>"+"Juego"+"</span><span>"+"Vale · 24 h"+"</span><span class='stit'>"+"Titulares"+"</span><span>"+"Traders 24 h"+"</span><span class='scob'>"+"Cobra en 30 d"+"</span><span>"+"Señal"+"</span></div>"+
+    rs.slice(0,10).map(fila).join("")+
+    sapMas("Los 10 que más valen de {n} juegos con token en Solana".replace("{n}",rs.length),"Ver todos los juegos en Ecosistema →")+
+    sapDato("{a} de {b}".replace("{a}",sin).replace("{b}",rs.length),"juegos con token no cobran nada en la cadena: no hay dinero entrando, así que su precio depende solo de que alguien compre el token. Los que sí cobran (cartas físicas, minería con juego) se pueden comprobar.")+
+    sapQue("juegos")+sapFuente("juegos")+"</section>";
+}
+// IA: código público y si se mueve, gente real y desbloqueos
+function sapIA(){
+  var rs=sapRows("ia").filter(function(r){ return r.tok&&SAP_MINT.test(r.mint||"")&&r.mcap>0; }).sort(function(a,b){ return b.mcap-a.mcap; });
+  var par=rs.filter(function(r){ return !r.cod||r.cod.dias==null||r.cod.dias>180; }).length;
+  var cod=function(r){ return !r.cod||r.cod.dias==null?"<span class='scod s'>"+"Sin código público"+"</span>":r.cod.dias<=30?"<span class='scod v'>"+(r.cod.dias<=1?"Cambiado hace 1 día":"Cambiado hace {n} días".replace("{n}",r.cod.dias))+"</span>":"<span class='scod p'>"+"{n} días sin cambios".replace("{n}",r.cod.dias)+"</span>"; };
+  var sen=function(r){
+    if(r.trad>=50&&r.org!=null&&r.org/r.trad<0.05) return "<span class='ssen no'>"+"Vale {v} y casi todo lo mueven bots".replace("{v}",sapM(r.mcap))+"</span>";
+    if(r.trad!=null&&r.trad<20&&r.mcap>=1e6) return "<span class='ssen no'>"+"Vale {v} y lo movieron {n} personas ayer".replace("{v}",sapM(r.mcap)).replace("{n}",r.trad)+"</span>";
+    if(r.dl&&r.dl.bloq>=20) return "<span class='ssen wa'>"+"{b} % aún bloqueado".replace("{b}",sapN(r.dl.bloq,0))+(r.dl.lib>=0.1?", "+"suelta {n} % este mes".replace("{n}",sapN(r.dl.lib,1)):"")+"</span>";
+    return "<span></span>"; };
+  var fila=function(r){ return "<button type='button' class='sjg sia'"+sapTry(r)+">"+sapAv(r)+sapNm(r)+"<span class='sx'>"+sapM(r.mcap)+sapC(r.c24)+"</span><span class='sx m stit'>"+sapTit(r)+"</span>"+
+    "<span class='sx'>"+sapTr(r)+"<small>"+sapOrg(r)+"</small></span><span class='scob'>"+cod(r)+"</span>"+sen(r)+"</button>"; };
+  return sapMay("ia",rs,function(r){ return r.mcap; },["los mayores","con su token en Solana, por capitalización"])+
+    "<section class='card smov'><h2>¿Hay algo detrás del nombre? <small>código, gente real y desbloqueos</small></h2>"+
+    "<div class='sjg h'><span></span><span>"+"Proyecto"+"</span><span>"+"Vale · 24 h"+"</span><span class='stit'>"+"Titulares"+"</span><span>"+"Traders 24 h"+"</span><span class='scob' style='text-align:left'>"+"Código"+"</span><span>"+"Señal"+"</span></div>"+
+    rs.slice(0,10).map(fila).join("")+
+    sapMas("Los 10 que más valen de {n} tokens de IA en Solana".replace("{n}",rs.length),"Ver toda la IA en Ecosistema →")+
+    sapDato("{a} de {b}".replace("{a}",par).replace("{b}",rs.length),"tokens de IA no enseñan código público o lo tienen parado hace más de 6 meses. Sin código no se puede comprobar que el agente o el producto existan: solo queda el nombre.")+
+    sapQue("ia")+sapFuente("ia")+"</section>";
+}
+// Apps y bots: las que más cobran, y si tienen token (casi ninguna)
+function sapApps(){
+  var rs=sapRows("apps").filter(function(r){ return r.m>0; }).sort(function(a,b){ return b.m-a.m; }), top=rs.slice(0,10);
+  var sin=top.filter(function(r){ return !r.tok; }), ej=sin.slice(0,3).map(function(r){ return r.n; }).join(", ");
+  top.forEach(function(r){ if(!r.tok) r.tok=false; });
+  var fila=function(r){ var vx=sapVx(r);
+    return "<button type='button' class='sdf'"+sapTry(r)+">"+sapAv(r)+sapNm(r)+"<span class='sx'>"+sapM(r.m)+sapC(r.c)+"</span>"+
+      "<span class='sx'>"+(r.tok?(r.mcap?sapM(r.mcap)+"<small>"+"vale el token"+"</small>":"<span class='sna'>"+"con token"+"</span>"):"<span class='stk0'>"+"Sin token"+"</span>")+"</span>"+
+      "<span class='sx m stvl'>"+(r.h30?sapM(r.h30)+"<small class='sapup'>"+Math.round(r.h30/r.m*100)+" %<span class='slq'> "+"de lo que cobra"+"</span></small>":r.tok?"<span class='sna'>"+"nada"+"</span>":"—")+"</span>"+
+      "<span class='sx m svx'>"+(vx?"×"+sapN(vx,1):"—")+"</span><span class='smk'>"+(r.tok?"":"<i class='wa'>"+"Ojo con copias"+"</i>")+"</span>"+
+      (r.partes?"<span class='spt'>"+"Suma de sus partes:"+" "+r.partes.map(function(p){ return "<b>"+esc(p.n)+"</b> "+sapM(p.m); }).join(" · ")+"</span>":"")+"</button>"; };
+  return sapMay("apps",rs,function(r){ return r.m; },["las que más cobran","comisiones de 30 días, con token o sin él"])+
+    "<section class='card smov'><h2>¿Tiene token de verdad? <small>las apps que más cobran</small></h2>"+
+    "<div class='sdf h'><span></span><span>"+"App"+"</span><span>"+"Cobra"+"<span class='slq'> · "+"vs mes ant."+"</span></span><span>"+"Su token"+"</span><span class='stvl'>"+"Al token"+"</span><span class='svx'>"+"Vale × ingresos"+"</span><span class='smk'>"+"Ojo"+"</span></div>"+
+    top.map(fila).join("")+
+    sapMas("Las 10 que más cobran de {n} apps y bots de Solana".replace("{n}",rs.length),"Ver todas en Ecosistema →")+
+    sapDato("{a} de {b}".replace("{a}",sin.length).replace("{b}",top.length),"apps de las que más cobran no tienen token oficial que conozcamos ({e}…). Si ves un token con su nombre, compruébalo en su web antes de comprar: los nombres conocidos son el disfraz favorito de las copias.".replace("{e}",ej))+
+    sapQue("apps")+sapFuente("apps")+"</section>";
+}
+// Otros (DePIN, privacidad, pagos, herramientas): lo que vale frente a lo que cobra
+function sapOtros(){
+  var rs=sapRows("otros").filter(function(r){ return r.tok&&SAP_MINT.test(r.mint||"")&&r.mcap>0; }).sort(function(a,b){ return b.mcap-a.mcap; }), top=rs.slice(0,10);
+  var caros=rs.filter(function(r){ return !(r.r30>=100)||sapVx(r)>50; }).length;
+  var sen=function(r){ var vx=sapVx(r);
+    if(!(r.r30>=100)) return "<span class='ssen no'>"+"Vale {v} y no cobra nada".replace("{v}",sapM(r.mcap))+"</span>";
+    if(r.h30&&r.h30/r.r30>=0.5) return "<span class='ssen ok'>"+"Devuelve el {n} % al token".replace("{n}",Math.round(Math.min(1,r.h30/r.r30)*100))+"</span>";
+    if(vx>50) return "<span class='ssen wa'>"+"Vale {n} años de lo que ingresa".replace("{n}",sapN(vx,0))+"</span>";
+    if(r.trad!=null&&r.trad<30) return "<span class='ssen wa'>"+"Lo movieron {n} personas ayer".replace("{n}",r.trad)+"</span>";
+    return "<span></span>"; };
+  var fila=function(r){ var vx=sapVx(r);
+    return "<button type='button' class='sjg'"+sapTry(r)+">"+sapAv(r)+sapNm(r)+"<span class='sx'>"+sapM(r.mcap)+sapC(r.c24)+"</span><span class='sx m stit'>"+(r.r30>=100?sapM(r.r30):"<span class='sna'>"+"nada"+"</span>")+"</span>"+
+      "<span class='sx'>"+(vx?"×"+sapN(vx,vx<10?1:0):"—")+"<small>"+(r.h30?sapM(r.h30)+" "+"al token":"&nbsp;")+"</small></span><span class='sx m scob'>"+sapTr(r)+"<small>"+sapOrg(r)+"</small></span>"+sen(r)+"</button>"; };
+  return sapMay("otros",rs,function(r){ return r.mcap; },["los mayores","DePIN, privacidad, pagos y herramientas, por capitalización"])+
+    "<section class='card smov'><h2>Lo que vale frente a lo que cobra <small>ingresos de 30 días</small></h2>"+
+    "<div class='sjg h'><span></span><span>"+"Proyecto"+"</span><span>"+"Vale · 24 h"+"</span><span class='stit'>"+"Ingresa 30 d"+"</span><span>"+"Vale × ingresos"+"</span><span class='scob'>"+"Traders 24 h"+"</span><span>"+"Señal"+"</span></div>"+
+    top.map(fila).join("")+
+    sapMas("Los {n} que más valen, con token en Solana".replace("{n}",top.length),"Ver todo en Ecosistema →")+
+    sapDato("{a} de {b}".replace("{a}",caros).replace("{b}",rs.length),"valen más de 50 años de lo que ingresan, o no ingresan nada. No es malo por sí solo (muchos aún están creciendo), pero quiere decir que el precio va por delante del uso.")+
+    sapQue("otros")+sapFuente("otros")+"</section>";
 }
 document.addEventListener("click",function(ev){ var b=ev.target.closest&&ev.target.closest("[data-sap]"); if(b){ SAP.cur=b.getAttribute("data-sap"); sapPinta(); } });
 // logo que no carga: sus iniciales
