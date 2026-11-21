@@ -9,6 +9,7 @@
 //   GET  /api/ventas/<mint>?w=<w1,w2…>&desde=<unix>   compras y ventas de ese token de hasta 5 wallets desde que nació
 //                                  (Helius), para las marcas de la gráfica; 30 min en la caché
 //   GET  /api/logo/<mint>         el logo del token (getAsset de Helius), una semana en la caché
+//   GET  /api/lanzaderas          por plataforma: tokens que vimos nacer y cuántos murieron a las 24 h (registro)
 //   GET  /api/acciones            activos tokenizados (lista diaria) frente al precio real: prima, bolsa abierta, liquidez (acciones.js)
 //   GET  /api/cotiza/<mint>        dónde se negocia: pools de la cadena y exchanges con comisión, identidad y MiCA (cotiza.js)
 //   GET  /api/top/<mint>           mayores cuentas del token (Helius, 2 min en caché, 30/min por conexión)
@@ -79,6 +80,15 @@ export async function token(db, m) {
 
 // Portada: las últimas 24 h. Devuelve TOP de cada lista (la web quita después los exchanges conocidos).
 // spark: lanzamientos (o compras) en 8 tramos de 3 h, del más antiguo al más reciente
+// Lanzaderas (21/11): del registro, cuántos tokens vimos nacer en cada plataforma y cuántos estaban muertos a las 24 h.
+// Lo usa Ecosistema › Meme. «con» = los que ya tienen resultado a 24 h (los de hoy aún no).
+export async function lanzaderas(db) {
+  const rows = await all(db, "SELECT plat, COUNT(*) AS n, SUM(dead24 IS NOT NULL) AS con, SUM(dead24 = 1) AS muertos, MIN(t) AS desde FROM lanz GROUP BY plat", []);
+  const plats = {}; let n = 0, con = 0, muertos = 0, desde = Infinity;
+  rows.forEach((r) => { const k = r.plat || "unknown"; const p = plats[k] || (plats[k] = { n: 0, con: 0, muertos: 0 });
+    p.n += r.n || 0; p.con += r.con || 0; p.muertos += r.muertos || 0; n += r.n || 0; con += r.con || 0; muertos += r.muertos || 0; if (r.desde && r.desde < desde) desde = r.desde; });
+  return { v: 1, desde: isFinite(desde) ? desde : null, total: { n, con, muertos }, plats };
+}
 export const TOP = 12, DAY = 86400000, SLOT = 10800000;
 export async function portada(db, now) {
   // ph(n, k): marcadores ?k … ?(k+n-1) para un IN
@@ -216,6 +226,9 @@ export async function handle(req, env) {
   const p = new URL(req.url).pathname.replace(/\/+$/, "").split("/");
   if (req.method === "POST" && p.length === 4 && p[1] === "api" && p[2] === "visto") return visto(req, env, p[3]);
   if (req.method !== "GET") return fail(405, "only GET");
+  if (p.length === 3 && p[1] === "api" && p[2] === "lanzaderas") {
+    try { const res = json(await lanzaderas(env.DB)); res.headers.set("cache-control", "public, max-age=21600"); return res; } catch (e) { return fail(503, "database unavailable"); }
+  }
   if (p.length === 3 && p[1] === "api" && p[2] === "portada") {
     try { return json(await portada(env.DB, Date.now())); } catch (e) { return fail(503, "database unavailable"); }
   }

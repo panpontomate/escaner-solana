@@ -143,6 +143,18 @@ test("errors are never cached", async () => {
   assert.match((await get("/api/portada")).h.get("cache-control"), /max-age=300/);
 });
 
+test("lanzaderas: suma por plataforma, sin plataforma va a unknown, y el total", async () => {
+  const { lanzaderas } = await import("./worker.js");
+  const db = { prepare: () => ({ bind: () => ({ all: async () => ({ results: [
+    { plat: "pump_fun", n: 10, con: 8, muertos: 7, desde: 2000 }, { plat: null, n: 2, con: 2, muertos: 2, desde: 1000 }, { plat: "unknown", n: 1, con: 1, muertos: 0, desde: 3000 }] }) }),
+    all: async () => ({ results: [] }) }) };
+  const r = await lanzaderas(db);
+  assert.deepEqual(r.plats.pump_fun, { n: 10, con: 8, muertos: 7 });
+  assert.deepEqual(r.plats.unknown, { n: 3, con: 3, muertos: 2 });
+  assert.deepEqual(r.total, { n: 13, con: 11, muertos: 9 });
+  assert.equal(r.desde, 1000);
+});
+
 test("acciones: lista diaria, precios de Jupiter (token y acción) y pools solo contra USDC/USDT/SOL", async () => {
   const { acciones, LISTA_URL } = await import("./acciones.js");
   const M = "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re";

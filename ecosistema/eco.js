@@ -142,11 +142,80 @@
       ${r.mint ? `<a class="btn" href="${EN ? "/en/" : "/"}?token=${esc(r.mint)}">${T.vale}</a>` : ""}</div>`).join("")}</div>`;
   }
 
+  // ---------- Meme (21/11, maqueta maquetas/escaner/ecosistema-meme.html): lanzaderas con nuestro registro y memecoins con señal ----------
+  const MZ = EN ? {
+    datoK: "SolFlag registry", dato: (p, n, d, v) => `of the ${n} new tokens we saw being born since ${d} were dead after 24 h. Only ${v} were still alive. Before buying something newborn, check who is behind it.`,
+    lzH: "Launchpads,", lzS: "where they are born and how many survive", lzTh: ["Launchpad", "Earns 30 d", "Its token", "Born", "Alive after 24 h"],
+    parte: "part of Pump.fun (shown whole in Apps and bots)", cadena: "on-chain: ", nuevo: "new", sinTok: "No token", conTok: "has a token", noReg: "Not in our registry yet",
+    vivos: (v, n) => `${v} of ${n} alive`,
+    lzSrc: (d) => `Fees: DefiLlama (30 days, vs the previous month; “new” if it barely earned last month). Born and alive after 24 h: SolFlag registry since ${d}, with the launches our collector sees (a sample, not all). “Alive” = still has money in it and trading after 24 h.`,
+    mmH: "Memecoins,", mmS: "who really trades them", mmTh: ["Memecoin", "Worth · 24 h", "Volume 24 h", "Holders", "Traders 24 h", "Signal"],
+    org: (n) => n === 1 ? "1 organic" : n + " organic",
+    bots: (t, o) => `${t} traders and ${o === 0 ? "no organic ones" : o === 1 ? "1 organic" : o + " organic"}: mostly bots`, poco: (t) => `Little trading: ${t} traders yesterday`,
+    gana: (x) => `Gaining holders: ${x} in 24 h`, orgP: (x) => `${x}% organic buyers`,
+    mmSrc: "The 10 most valuable memecoins born on Solana. Market cap and volume: CoinGecko. Holders and traders: Jupiter (organic = buyers that don't look like bots). Being very active is not a buy recommendation.",
+    queH: "What we check in a meme", queS: "The usual flags:", queL: ["Can they mint more or freeze you?", "Who holds it (pools excluded)", "Can you sell, and what does it cost?", "Who launched it and their track record", "What it depends on (the Pump.fun curve)"],
+    notas: { raydium_launchlab: "Raydium LaunchLab, used by BONK.fun and others", meteora_dbc: "Meteora's curve, used by Bags and others" },
+  } : {
+    datoK: "Dato del registro de SolFlag", dato: (p, n, d, v) => `de los ${n} tokens nuevos que vimos nacer desde el ${d} estaban muertos a las 24 h. Solo ${v} seguían con vida. Antes de comprar algo recién nacido, mira quién está detrás.`,
+    lzH: "Lanzaderas,", lzS: "dónde nacen y cuántas sobreviven", lzTh: ["Lanzadera", "Cobra 30 d", "Su token", "Nacieron", "Vivos a las 24 h"],
+    parte: "parte de Pump.fun (va entera en Apps y bots)", cadena: "en la cadena: ", nuevo: "nuevo", sinTok: "Sin token", conTok: "con token", noReg: "Aún no lo registramos",
+    vivos: (v, n) => `${v} de ${n} vivos`,
+    lzSrc: (d) => `Comisiones: DefiLlama (30 días, frente al mes anterior; «nuevo» si el mes anterior casi no cobró). Nacieron y vivos a las 24 h: registro de SolFlag desde el ${d}, con los lanzamientos que ve nuestro recolector (una muestra, no todos). «Vivo» = sigue con dinero dentro y movimiento a las 24 h.`,
+    mmH: "Memecoins,", mmS: "quién las mueve de verdad", mmTh: ["Memecoin", "Vale · 24 h", "Volumen 24 h", "Titulares", "Traders 24 h", "Señal"],
+    org: (n) => n === 1 ? "1 orgánico" : n + " orgánicos",
+    bots: (t, o) => `${t} traders y ${o === 0 ? "ninguno orgánico" : o === 1 ? "1 orgánico" : o + " orgánicos"}: casi todo bots`, poco: (t) => `Poco movimiento: ${t} traders ayer`,
+    gana: (x) => `Gana titulares: ${x} en 24 h`, orgP: (x) => `${x} % de compradores orgánicos`,
+    mmSrc: "Las 10 memecoins nacidas en Solana que más valen. Capitalización y volumen: CoinGecko. Titulares y traders: Jupiter (orgánicos = compradores que no parecen bots). Que se mueva mucho no es una recomendación de compra.",
+    queH: "Qué miramos en una meme", queS: "Las banderas de siempre:", queL: ["¿Pueden crear más o congelarte?", "Quién lo tiene (sin contar pools)", "¿Puedes vender y cuánto te cuesta?", "Quién lo lanzó y su historial", "De qué depende (la curva de Pump.fun)"],
+    notas: { raydium_launchlab: "LaunchLab de Raydium, que usan BONK.fun y otras", meteora_dbc: "curva de Meteora, que usan Bags y otras" },
+  };
+  // lanzadera de DefiLlama → plataforma en nuestro registro (launchpad.platform de RugCheck)
+  const PLAT = { "Pump.fun": "pump_fun", "BONK.fun": "raydium_launchlab", "Bags": "meteora_dbc", "StonkFun": "stonk_fun", "Rapid Launch": "rapidlaunch" };
+  let REG = null, regPide = null;
+  const num = (n, d) => n.toLocaleString(EN ? "en-US" : "es-ES", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0, useGrouping: "always" });
+  const tok = (r) => /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(r.mint || "") ? (EN ? "/en/" : "/") + "?token=" + r.mint : null;
+  function memeVista() {
+    if (!REG && !regPide) regPide = fetch("https://api.solflag.com/api/lanzaderas").then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { REG = j || {}; if (ap === "Meme") pinta(); });
+    const rs = D.rows.filter((r) => r.ap === "Meme");
+    const memes = rs.filter((r) => r.gr === "Memecoins").sort((a, b) => (b.m || 0) - (a.m || 0));
+    const lz = rs.filter((r) => r.gr === "Lanzaderas").map((r) => Object.assign({}, r));
+    const pump = D.rows.find((r) => r.n === "Pump.fun" && r.partes), pp = pump && pump.partes.find((p) => p.gr === "Lanzaderas");
+    if (pp) lz.push(Object.assign({}, pump, { n: "Pump.fun", m: pp.m, c: pp.c, parte: true }));
+    lz.sort((a, b) => (b.m || 0) - (a.m || 0));
+    const reg = REG && REG.plats, tot = REG && REG.total, desde = REG && REG.desde ? new Date(REG.desde).toLocaleDateString(EN ? "en-GB" : "es-ES", { day: "numeric", month: EN ? "short" : "numeric" }) : "";
+    const cambio = (c) => c == null ? "" : c > 5 ? `<span class="mz-nuevo">${MZ.nuevo}</span>` : `<span class="${c >= 0 ? "up" : "dn"}">${pc1(c) || pc(c)}</span>`;
+    const nom = (r, extra) => { const h = tok(r); const n = `${esc(r.n)}${r.sym && r.tok !== false ? ` <small>${esc(r.sym)}</small>` : ""}`; return `<span class="mz-n"><b>${h ? `<a href="${h}">${n}</a>` : n}</b>${extra != null ? `<small>${extra}</small>` : ""}</span>`; };
+    const lzFila = (r, i) => { const k = PLAT[r.n], g = reg && k && reg[k], v = g ? g.con - g.muertos : 0;
+      const sub = r.parte ? MZ.parte : k && MZ.notas[k] ? MZ.cadena + MZ.notas[k] : "";
+      return `<div class="mz-t mz-lz"><span class="mz-i">${i + 1}</span>${av(r)}${nom(r, esc(sub))}<span class="mz-x">${fm(r.m)}<small>${cambio(r.c)}</small></span>` +
+        `<span class="mz-x mz-m mz-tok">${r.tok ? (r.mcap ? fm(r.mcap) + `<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span></small>` : MZ.conTok) : `<span class="mz-sin">${MZ.sinTok}</span>`}</span>` +
+        `<span class="mz-x mz-m mz-nac">${g ? num(g.n) : "—"}</span>` +
+        (g && g.con ? `<span class="mz-viv"><b>${num(v / g.con * 100, 1)}${sp}%</b><small>${MZ.vivos(num(v), num(g.con))}</small></span>` : `<span class="mz-na">${reg ? MZ.noReg : "…"}</span>`) + "</div>"; };
+    const senal = (r) => {
+      if (r.trad >= 50 && r.org != null && r.org / r.trad < 0.02) return `<span class="mz-sen mz-r">${MZ.bots(num(r.trad), r.org)}</span>`;
+      if (r.trad != null && r.trad < 100) return `<span class="mz-sen mz-a">${MZ.poco(r.trad)}</span>`;
+      if (r.titC != null && r.titC >= 0.001) return `<span class="mz-sen mz-v">${MZ.gana(pc1(r.titC))}</span>`;
+      if (r.org != null && r.trad && r.org / r.trad >= 0.03) return `<span class="mz-sen mz-v">${MZ.orgP(num(r.org / r.trad * 100))}</span>`;
+      return "<span></span>"; };
+    const mmFila = (r, i) => `<div class="mz-t mz-mm"><span class="mz-i">${i + 1}</span>${av(r)}${nom(r)}<span class="mz-x">${fm(r.m)}<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span></small></span>` +
+      `<span class="mz-x mz-m mz-vol">${r.vol ? fm(r.vol) : "—"}</span><span class="mz-x mz-m mz-tit">${r.tit != null ? fk(r.tit) : "—"}<small>${r.titC != null && Math.abs(r.titC) >= 0.0005 ? `<span class="${r.titC >= 0 ? "up" : "dn"}">${pc1(r.titC)}</span>` : "&nbsp;"}</small></span>` +
+      `<span class="mz-x">${r.trad != null ? fk(r.trad) : "—"}<small>${r.org != null ? MZ.org(r.org) : "&nbsp;"}</small></span>${senal(r)}</div>`;
+    $("#lista").innerHTML =
+      (tot && tot.con ? `<div class="mz-dato"><span class="mz-k">${MZ.datoK}</span><b>${num(tot.muertos / tot.con * 100, 1)}${sp}%</b><p>${MZ.dato(0, num(tot.con), desde, num(tot.con - tot.muertos))}</p></div>` : "") +
+      `<section class="mz-card"><h2>${MZ.lzH} <small>${MZ.lzS}</small></h2><div class="mz-t mz-lz mz-h"><span></span><span></span><span>${MZ.lzTh[0]}</span><span>${MZ.lzTh[1]}</span><span class="mz-tok">${MZ.lzTh[2]}</span><span class="mz-nac">${MZ.lzTh[3]}</span><span>${MZ.lzTh[4]}</span></div>` +
+        lz.map(lzFila).join("") + `<p class="mz-src">${MZ.lzSrc(desde || "30/10")}</p></section>` +
+      `<section class="mz-card"><h2>${MZ.mmH} <small>${MZ.mmS}</small></h2><div class="mz-t mz-mm mz-h"><span></span><span></span><span>${MZ.mmTh[0]}</span><span>${MZ.mmTh[1]}</span><span class="mz-vol">${MZ.mmTh[2]}</span><span class="mz-tit">${MZ.mmTh[3]}</span><span>${MZ.mmTh[4]}</span><span>${MZ.mmTh[5]}</span></div>` +
+        memes.map(mmFila).join("") + `<p class="mz-src">${MZ.mmSrc}</p></section>` +
+      `<div class="mz-que"><div class="top"><b>${MZ.queH}</b><span>${MZ.queS}</span></div><ul>${MZ.queL.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
+  }
+
   function pinta() {
     cabecera();
     // Activos tokenizados (21/11): la vista completa, la misma que /acciones/ (acciones/activos.js)
     const rwa = ap === "Activos tokenizados" && window.SFActivos;
-    document.querySelector(".tabs").style.display = rwa ? "none" : "";
+    document.querySelector(".tabs").style.display = rwa || ap === "Meme" ? "none" : "";
+    if (ap === "Meme" && tipo !== "nuevo") { $("#bar").style.display = "none"; $("#lista").classList.remove("sfa"); memeVista(); return; }
     if (rwa) {
       $("#bar").style.display = "none";
       const reales = D.rows.filter((r) => r.ap === ap && r.gr === "Activos reales" && !/mansory/i.test(r.n)).sort((a, b) => (b.m || 0) - (a.m || 0));
