@@ -75,7 +75,7 @@
   const ini = (r) => esc((r.sym || r.n).slice(0, 2).toUpperCase());
   const av = (r) => /^https:\/\//.test(r.logo || "") ? `<img src="${esc(r.logo)}" alt="" loading="lazy" width="28" height="28" data-i="${ini(r)}">` : `<span class="av">${ini(r)}</span>`;
 
-  let D, ap = "Todos", tipo = "todos", grupo = "Todos", orden = "m";
+  let D, ap = "Todos", tipo = "todos", grupo = "Todos", orden = "m", nRwa = null;
   // ?ap=defi (desde el Escáner, 21/11): abre directamente ese apartado
   const AP_COD = { meme: "Meme", rwa: "Activos tokenizados", defi: "DeFi", juegos: "Juegos", ia: "IA", apps: "Apps y bots", otros: "Otros" };
   const apUrl = AP_COD[new URLSearchParams(location.search).get("ap")];
@@ -86,7 +86,9 @@
   function cabecera() {
     const rs = deAp();
     $("#aps").innerHTML = ["Todos", ...AP.map((a) => a[0])].map((a) => {
-      const n = a === "Todos" ? D.rows.length : D.rows.filter((r) => r.ap === a).length;
+      // Activos tokenizados: lo que enseña la vista completa (activos, dólares y otros activos reales), cuando ya ha cargado
+      const rwaFilas = D.rows.filter((r) => r.ap === "Activos tokenizados").length;
+      const n = a === "Todos" ? D.rows.length + (nRwa != null ? nRwa - rwaFilas : 0) : a === "Activos tokenizados" && nRwa != null ? nRwa : D.rows.filter((r) => r.ap === a).length;
       return n ? `<button class="${a === ap ? "on" : ""}" data-a="${esc(a)}">${esc(a === "Todos" ? T.todos : apNom(a))}<em>${n}</em></button>` : "";
     }).join("");
     const d = AP.find((a) => a[0] === ap);
@@ -148,7 +150,7 @@
     if (rwa) {
       $("#bar").style.display = "none";
       const reales = D.rows.filter((r) => r.ap === ap && r.gr === "Activos reales" && !/mansory/i.test(r.n)).sort((a, b) => (b.m || 0) - (a.m || 0));
-      window.SFActivos.pinta($("#lista"), { en: EN, reales });
+      window.SFActivos.pinta($("#lista"), { en: EN, reales, alContar: (n) => { if (nRwa !== n) { nRwa = n; cabecera(); } } });
       return;
     }
     $("#lista").classList.remove("sfa");
@@ -178,6 +180,8 @@
       r.anios = r.tok && r.mcap && r.r30 ? r.mcap / (r.r30 * 12) : null;
     });
     $("#fecha").textContent = T.fecha(new Date(D.fecha));
+    // el número de Activos tokenizados, desde el principio (lo que enseña su vista completa)
+    if (window.SFActivos) window.SFActivos.datos().then((j) => { if (!j || !Array.isArray(j.filas)) return; const reales = D.rows.filter((r) => r.ap === "Activos tokenizados" && r.gr === "Activos reales" && !/mansory/i.test(r.n)).length; nRwa = j.filas.filter((f) => f.precio != null).length + (j.dolares || []).filter((d) => d.enSolana && d.valor).length + reales; cabecera(); });
     $("#mkF").textContent = pc(D.mercado.fees); $("#mkC").textContent = pc(D.mercado.circ);
     $("#aps").onclick = (e) => { const b = e.target.closest("button"); if (b) elegirAp(b.dataset.a); };
     $("#lista").onclick = (e) => { const b = e.target.closest(".cab button"); if (b) { elegirAp(b.dataset.a); window.scrollTo({ top: $("#aps").offsetTop - 90, behavior: "smooth" }); } };

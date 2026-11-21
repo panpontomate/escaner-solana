@@ -1979,9 +1979,9 @@ body.scanp #form .row .btn{border-radius:999px}
 .sc{text-align:center}
 .smk{display:flex;gap:4px;flex-wrap:wrap}
 .smk i{font:700 .66rem Manrope,sans-serif;font-style:normal;padding:1px 6px;border-radius:6px;white-space:nowrap}
-.smk .ok{color:var(--sver);background:rgba(74,222,128,.1)}.smk .no{color:var(--srojo);background:rgba(255,107,107,.1)}.smk .wa{color:var(--sama);background:rgba(251,191,36,.1)}
+.smk .ok{color:var(--sver);background:rgba(74,222,128,.1)}.smk .no{color:var(--srojo);background:rgba(255,107,107,.1)}.smk .amb{color:var(--sama);background:rgba(251,191,36,.1)}
 .ssen{font:600 .74rem Manrope,sans-serif;padding:3px 8px;border-radius:7px;line-height:1.25}
-.ssen.no{color:var(--srojo);background:rgba(255,107,107,.1)}.ssen.wa{color:var(--sama);background:rgba(251,191,36,.1)}.ssen.ok{color:var(--sver);background:rgba(74,222,128,.1)}
+.ssen.no{color:var(--srojo);background:rgba(255,107,107,.1)}.ssen.amb{color:var(--sama);background:rgba(251,191,36,.1)}.ssen.ok{color:var(--sver);background:rgba(74,222,128,.1)}
 .scod{font:600 .74rem Manrope,sans-serif;white-space:nowrap}.scod.v{color:var(--sver)}.scod.p{color:var(--sama)}.scod.s{color:var(--sm2);font-weight:500}
 .stk0{font:700 .72rem Manrope,sans-serif;color:var(--sama);background:rgba(251,191,36,.1);padding:2px 7px;border-radius:6px;white-space:nowrap}
 .spt{grid-column:2/-1;font-size:.74rem;color:var(--sm2);margin-top:-2px}.spt b{color:var(--sm);font-weight:600}
@@ -1989,7 +1989,7 @@ body.scanp #form .row .btn{border-radius:999px}
 .ssq{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:7px;font:800 8px Manrope,sans-serif;color:#fff;flex:none}
 .spill{display:inline-block;font:700 .74rem "IBM Plex Mono",monospace;padding:2px 7px;border-radius:999px;border:1px solid}
 .spill.ok{color:var(--sver);border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.08)}
-.spill.wa{color:var(--sama);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
+.spill.amb{color:var(--sama);border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
 .spill.no{color:var(--srojo);border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.08)}
 .spill.gr{color:var(--sm2);border-color:rgba(196,181,253,.3)}
 .scin{overflow:hidden;border-top:1px solid var(--sl);border-bottom:1px solid var(--sl);margin-bottom:16px;padding:9px 0;-webkit-mask:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
@@ -4060,7 +4060,7 @@ function renderToken(noScroll){
 var accMem={t:0,j:null};
 function accionesData(){
   if(accMem.j&&Date.now()-accMem.t<300000) return Promise.resolve(accMem.j);
-  return fetch("https://api.solflag.com/api/acciones?v=2").then(function(x){ return x.ok?x.json():null; })
+  return fetch("https://api.solflag.com/api/acciones?v=3").then(function(x){ return x.ok?x.json():null; })
     .then(function(j){ if(j&&j.filas){ accMem.j=j; accMem.t=Date.now(); } return j; }).catch(function(){ return null; });
 }
 function stockVs(mint){
@@ -4911,7 +4911,7 @@ var SAP_DCOL={USDC:"#2775ca",USDT:"#26a17b",PYUSD:"#0e3d8c",USDG:"#1d1d1f",EURC:
 function sapSq(t,col){ return "<span class='ssq' style='background:"+(col||"#333")+"'>"+esc(String(t).slice(0,4))+"</span>"; }
 function sapPrima(f){
   if(f.prima==null) return "<span class='spill gr'>—</span>";
-  var k=f.liq<20000?"gr":Math.abs(f.prima)<1?"ok":Math.abs(f.prima)<3?"wa":"no";
+  var k=f.liq<20000?"gr":Math.abs(f.prima)<1?"ok":Math.abs(f.prima)<3?"amb":"no";
   return "<span class='spill "+k+"'>"+(f.prima>0?"+":"")+sapN(f.prima,2)+" %</span>";
 }
 function sapActivos(){
@@ -4940,7 +4940,7 @@ function sapActivos(){
 function sapDefi(){
   var todos=sapRows("defi"), rs=todos.filter(function(r){ return r.tok&&r.m>0; }).sort(function(a,b){ return b.m-a.m; });
   var fT=todos.reduce(function(s,r){ return s+(r.m||0); },0), hT=todos.reduce(function(s,r){ return s+(r.h30||0); },0), cien=fT?Math.round(hT/fT*100):0;
-  var mk=function(r){ return (r.aud?"<i class='ok'>"+"audited"+"</i>":"")+(r.hk?"<i class='no'>"+(r.hk===1?"1 hack":"{n} hacks".replace("{n}",r.hk))+"</i>":"")+(r.dl&&r.dl.lib>=0.5?"<i class='wa'>"+"unlocks {n}%".replace("{n}",sapN(r.dl.lib,1))+"</i>":""); };
+  var mk=function(r){ return (r.aud?"<i class='ok'>"+"audited"+"</i>":"")+(r.hk?"<i class='no'>"+(r.hk===1?"1 hack":"{n} hacks".replace("{n}",r.hk))+"</i>":"")+(r.dl&&r.dl.lib>=0.5?"<i class='amb'>"+"unlocks {n}%".replace("{n}",sapN(r.dl.lib,1))+"</i>":""); };
   var fila=function(r){ var p=r.h30?r.h30/r.m:0, vx=sapVx(r);
     return "<button type='button' class='sdf'"+sapTry(r)+">"+sapAv(r)+sapNm(r)+"<span class='sx'>"+sapM(r.m)+sapC(r.c)+"</span>"+
       "<span class='sx'>"+(r.h30?sapM(r.h30)+"<small class='sapup'>"+(p<0.01?"<1":Math.round(p*100))+" %<span class='slq'> "+"of what it earns"+"</span></small>":"<span class='sna'>"+"nothing"+"</span>")+"</span>"+
@@ -4960,8 +4960,8 @@ function sapJuegos(){
   var sen=function(r){
     if(cobra(r)&&r.h30/cobra(r)>=0.5) return "<span class='ssen ok'>"+"Returns {n}% of what it earns to the token".replace("{n}",Math.round(r.h30/cobra(r)*100))+"</span>";
     if(r.trad!=null&&r.trad<20&&r.mcap>=1e6) return "<span class='ssen no'>"+(r.trad===1?"Worth {v} and 1 person traded it yesterday":"Worth {v} and {n} people traded it yesterday").replace("{v}",sapM(r.mcap)).replace("{n}",r.trad)+"</span>";
-    if(r.orgScore!=null&&r.orgScore<30&&r.trad>=20) return "<span class='ssen wa'>"+"Mostly traded by bots"+"</span>";
-    if(!cobra(r)) return "<span class='ssen wa'>"+"Earns nothing on-chain"+"</span>";
+    if(r.orgScore!=null&&r.orgScore<30&&r.trad>=20) return "<span class='ssen amb'>"+"Mostly traded by bots"+"</span>";
+    if(!cobra(r)) return "<span class='ssen amb'>"+"Earns nothing on-chain"+"</span>";
     return "<span></span>"; };
   var fila=function(r){ return "<button type='button' class='sjg'"+sapTry(r)+">"+sapAv(r)+sapNm(r)+"<span class='sx'>"+sapM(r.mcap)+sapC(r.c24)+"</span><span class='sx m stit'>"+sapTit(r)+"</span>"+
     "<span class='sx'>"+sapTr(r)+"<small>"+sapOrg(r)+"</small></span><span class='sx scob'>"+(cobra(r)?sapM(cobra(r))+sapC(r.c):"<span class='sna'>"+"nothing"+"</span>")+"</span>"+sen(r)+"</button>"; };
@@ -4981,7 +4981,7 @@ function sapIA(){
   var sen=function(r){
     if(r.trad>=50&&r.org!=null&&r.org/r.trad<0.05) return "<span class='ssen no'>"+"Worth {v} and mostly traded by bots".replace("{v}",sapM(r.mcap))+"</span>";
     if(r.trad!=null&&r.trad<20&&r.mcap>=1e6) return "<span class='ssen no'>"+"Worth {v} and {n} people traded it yesterday".replace("{v}",sapM(r.mcap)).replace("{n}",r.trad)+"</span>";
-    if(r.dl&&r.dl.bloq>=20) return "<span class='ssen wa'>"+"{b}% still locked".replace("{b}",sapN(r.dl.bloq,0))+(r.dl.lib>=0.1?", "+"releases {n}% this month".replace("{n}",sapN(r.dl.lib,1)):"")+"</span>";
+    if(r.dl&&r.dl.bloq>=20) return "<span class='ssen amb'>"+"{b}% still locked".replace("{b}",sapN(r.dl.bloq,0))+(r.dl.lib>=0.1?", "+"releases {n}% this month".replace("{n}",sapN(r.dl.lib,1)):"")+"</span>";
     return "<span></span>"; };
   var fila=function(r){ return "<button type='button' class='sjg sia'"+sapTry(r)+">"+sapAv(r)+sapNm(r)+"<span class='sx'>"+sapM(r.mcap)+sapC(r.c24)+"</span><span class='sx m stit'>"+sapTit(r)+"</span>"+
     "<span class='sx'>"+sapTr(r)+"<small>"+sapOrg(r)+"</small></span><span class='scob'>"+cod(r)+"</span>"+sen(r)+"</button>"; };
@@ -5002,7 +5002,7 @@ function sapApps(){
     return "<button type='button' class='sdf'"+sapTry(r)+">"+sapAv(r)+sapNm(r)+"<span class='sx'>"+sapM(r.m)+sapC(r.c)+"</span>"+
       "<span class='sx'>"+(r.tok?(r.mcap?sapM(r.mcap)+"<small>"+"token value"+"</small>":"<span class='sna'>"+"has a token"+"</span>"):"<span class='stk0'>"+"No token"+"</span>")+"</span>"+
       "<span class='sx m stvl'>"+(r.h30?sapM(r.h30)+"<small class='sapup'>"+Math.round(r.h30/r.m*100)+" %<span class='slq'> "+"of what it earns"+"</span></small>":r.tok?"<span class='sna'>"+"nothing"+"</span>":"—")+"</span>"+
-      "<span class='sx m svx'>"+(vx?"×"+sapN(vx,1):"—")+"</span><span class='smk'>"+(r.tok?"":"<i class='wa'>"+"Beware of copies"+"</i>")+"</span>"+
+      "<span class='sx m svx'>"+(vx?"×"+sapN(vx,1):"—")+"</span><span class='smk'>"+(r.tok?"":"<i class='amb'>"+"Beware of copies"+"</i>")+"</span>"+
       (r.partes?"<span class='spt'>"+"Sum of its parts:"+" "+r.partes.map(function(p){ return "<b>"+esc(p.n)+"</b> "+sapM(p.m); }).join(" · ")+"</span>":"")+"</button>"; };
   return sapMay("apps",rs,function(r){ return r.m; },["the top earners","30-day fees, with or without a token"])+
     "<section class='card smov'><h2>Does it really have a token? <small>the apps that earn the most</small></h2>"+
@@ -5019,8 +5019,8 @@ function sapOtros(){
   var sen=function(r){ var vx=sapVx(r);
     if(!(r.r30>=100)) return "<span class='ssen no'>"+"Worth {v} and earns nothing".replace("{v}",sapM(r.mcap))+"</span>";
     if(r.h30&&r.h30/r.r30>=0.5) return "<span class='ssen ok'>"+"Returns {n}% to the token".replace("{n}",Math.round(Math.min(1,r.h30/r.r30)*100))+"</span>";
-    if(vx>50) return "<span class='ssen wa'>"+"Worth {n} years of its revenue".replace("{n}",sapN(vx,0))+"</span>";
-    if(r.trad!=null&&r.trad<30) return "<span class='ssen wa'>"+"{n} people traded it yesterday".replace("{n}",r.trad)+"</span>";
+    if(vx>50) return "<span class='ssen amb'>"+"Worth {n} years of its revenue".replace("{n}",sapN(vx,0))+"</span>";
+    if(r.trad!=null&&r.trad<30) return "<span class='ssen amb'>"+"{n} people traded it yesterday".replace("{n}",r.trad)+"</span>";
     return "<span></span>"; };
   var fila=function(r){ var vx=sapVx(r);
     return "<button type='button' class='sjg'"+sapTry(r)+">"+sapAv(r)+sapNm(r)+"<span class='sx'>"+sapM(r.mcap)+sapC(r.c24)+"</span><span class='sx m stit'>"+(r.r30>=100?sapM(r.r30):"<span class='sna'>"+"nothing"+"</span>")+"</span>"+

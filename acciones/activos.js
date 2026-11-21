@@ -4,7 +4,7 @@
    Datos: https://api.solflag.com/api/acciones?v=2 (tools/api/acciones.js: lista diaria de emisores comprobados con
    ≥10 k$ de liquidez, precios de Jupiter). «Qué puede hacer el emisor» va en una ventana (botón Información). */
 (function () {
-  const API = "https://api.solflag.com/api/acciones?v=2";
+  const API = "https://api.solflag.com/api/acciones?v=3";   // v3: saltar la respuesta de 14 guardada en navegadores (21/11)
   const ES = {
     bolsaA: "<b>Bolsa de EE. UU. abierta</b> · precios de hace menos de 15 min", bolsaC: "<b>Bolsa cerrada</b> · el token puede despegarse de la acción",
     dol: "Dólares digitales,", dolS: "con su letra pequeña", hoy: "En Solana hoy", comp: "con emisor comprobado",
@@ -212,7 +212,10 @@
     (mem || (mem = fetch(API).then((r) => r.ok ? r.json() : null).catch(() => null))).then((j) => {
       if (!j || !Array.isArray(j.filas)) { mem = null; box.innerHTML = '<p class="src">' + T.error + "</p>"; return; }
       A = j; todo();
+      if (opts.alContar) opts.alContar(j.filas.filter((f) => f.precio != null).length + (j.dolares || []).filter((x) => x.enSolana && x.valor).length + (opts.reales || []).length);
     });
   }
-  window.SFActivos = { pinta: pinta };
+  // los datos de la API (la misma petición que usa la vista), para contar sin pintar
+  function datos() { return mem || (mem = fetch(API).then((r) => r.ok ? r.json() : null).catch(() => null)); }
+  window.SFActivos = { pinta: pinta, datos: datos };
 })();
