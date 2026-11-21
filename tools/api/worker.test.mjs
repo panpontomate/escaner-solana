@@ -143,34 +143,49 @@ test("errors are never cached", async () => {
   assert.match((await get("/api/portada")).h.get("cache-control"), /max-age=300/);
 });
 
-test("acciones: prima frente a la acción real, con caché y como mucho LOTE acciones por petición", async () => {
-  const { acciones, ACCIONES, LOTE } = await import("./acciones.js");
+test("acciones: lista diaria, precios de Jupiter (token y acción) y pools solo contra USDC/USDT/SOL", async () => {
+  const { acciones, LISTA_URL } = await import("./acciones.js");
+  const M = "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re";
   const calls = [];
   const fakeFetch = async (url) => {
     calls.push(url);
-    if (url.includes("twelvedata")) {
-      const syms = new URL(url).searchParams.get("symbol").split(",");
-      const body = {}; syms.forEach((s) => { body[s] = { close: "100", is_market_open: false, timestamp: 1 }; });
-      return new Response(JSON.stringify(syms.length === 1 ? body[syms[0]] : body));
-    }
-    return new Response(JSON.stringify([{ baseToken: { address: ACCIONES[0][3] }, priceUsd: "101", liquidity: { usd: 5000 }, volume: { h24: 10 } }]));
+    if (url === LISTA_URL) return new Response(JSON.stringify({ filas: [{ mint: M, tok: "GLDx", accion: "GLD", nombre: "Gold", emisor: "xStocks", cat: "mat" }] }));
+    if (url.includes("jup.ag")) return new Response(JSON.stringify({ [M]: { usdPrice: 101, stockData: { price: 100 } } }));
+    if (url.includes("dexscreener")) return new Response(JSON.stringify([
+      { baseToken: { address: M }, quoteToken: { symbol: "ORE" }, priceUsd: "50", liquidity: { usd: 900000 }, volume: { h24: 1 } },
+      { baseToken: { address: M }, quoteToken: { symbol: "USDC" }, priceUsd: "101", liquidity: { usd: 113000 }, volume: { h24: 7 } }]));
+    return new Response("{}");
   };
-  const store = new Map();
-  const cache = { match: async (k) => store.has(k) ? new Response(store.get(k)) : undefined, put: async (k, r) => { store.set(k, await r.text()); } };
-  const r = await acciones({ TWELVE_DATA_KEY: "k" }, { fetch: fakeFetch, cache });
-  const td = calls.filter((u) => u.includes("twelvedata"));
-  assert.equal(td.length, 1);
-  assert.equal(new URL(td[0]).searchParams.get("symbol").split(",").length, LOTE);
+  const r = await acciones({}, { fetch: fakeFetch, cache: null, ahora: Date.UTC(2026, 10, 21, 15, 0) });   // sábado
+  assert.equal(r.v, 2);
   assert.equal(r.filas[0].prima, 1);          // 101 frente a 100
+  assert.equal(r.filas[0].liq, 113000);       // el pool contra ORE no cuenta
+  assert.equal(r.filas[0].cat, "mat");
   assert.equal(r.bolsa, "cerrada");
-  // la segunda petición usa lo guardado y pide solo las que faltan
-  calls.length = 0;
-  await acciones({ TWELVE_DATA_KEY: "k" }, { fetch: fakeFetch, cache });
-  const td2 = calls.filter((u) => u.includes("twelvedata"));
-  assert.ok(!new URL(td2[0]).searchParams.get("symbol").split(",").includes("TSLA"));
-  // sin clave: filas sin precio real, sin romperse
-  const sin = await acciones({}, { fetch: fakeFetch, cache: null });
-  assert.equal(sin.filas[0].real, null);
+  assert.ok(!calls.some((u) => u.includes("twelvedata")));
+  // sin lista diaria: la de respaldo
+  const sin = await acciones({}, { fetch: async (u) => u === LISTA_URL ? new Response("no", { status: 404 }) : fakeFetch(u), cache: null });
+  assert.ok(sin.filas.length >= 10);
+});
+
+test("acciones: clasificar token (emisor corto, ticker de la acción, categoría) y bolsa abierta en hora de Nueva York", async () => {
+  const { clasificar, bolsaAbierta, hacerLista } = await import("./acciones.js");
+  assert.deepEqual(clasificar("xStocks (Backed)", "TSLAx", "Tesla xStock"), { tok: "TSLAx", accion: "TSLA", nombre: "Tesla", emisor: "xStocks", cat: "acc" });
+  assert.equal(clasificar("Backpack Securities", "USO", "United States Oil Fund, LP - Backpack Securities").cat, "mat");
+  assert.equal(clasificar("Backpack Securities", "SPY", "SPDR - Backpack").cat, "fon");
+  assert.equal(clasificar("Ondo", "AAPLon", "Apple (Ondo Tokenized)").accion, "AAPL");
+  assert.equal(bolsaAbierta(Date.UTC(2026, 10, 20, 15, 0)), true);    // viernes 10:00 en Nueva York
+  assert.equal(bolsaAbierta(Date.UTC(2026, 10, 20, 22, 0)), false);   // viernes 17:00
+  assert.equal(bolsaAbierta(Date.UTC(2026, 10, 21, 15, 0)), false);   // sábado
+  // la lista: solo emisores de acciones, con 10 k$ o más contra USDC/SOL, de más a menos liquidez
+  const em = [{ name: "xStocks (Backed)", mints: { A: 1, B: 1 } }, { name: "Backpack Securities", mints: { C: 1 } }, { name: "Circle", mints: { D: 1 } }];
+  const dex = async () => new Response(JSON.stringify([
+    { baseToken: { address: "A", symbol: "TSLAx", name: "Tesla xStock" }, quoteToken: { symbol: "USDC" }, liquidity: { usd: 20000 } },
+    { baseToken: { address: "B", symbol: "MUx", name: "Micron xStock" }, quoteToken: { symbol: "USDC" }, liquidity: { usd: 500 } },
+    { baseToken: { address: "C", symbol: "MU", name: "Micron - Backpack Securities" }, quoteToken: { symbol: "SOL" }, liquidity: { usd: 90000 } }]));
+  const l = await hacerLista(em, dex, async () => {});
+  assert.deepEqual(l.map((x) => x.tok), ["MU", "TSLAx"]);
+  assert.equal(l[0].emisor, "Backpack");
 });
 
 test("acciones: el multiplicador de split se aplica desde su fecha", async () => {

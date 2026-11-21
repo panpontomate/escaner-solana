@@ -1704,7 +1704,6 @@ export const TEXT = {
   // apartados compactos del Escáner (21/11)
   "Hoy el análisis usa las mismas banderas en todos los apartados. Los chequeos propios de cada uno están en camino.": "For now the analysis uses the same flags in every section. Section-specific checks are on the way.",
   "Datos del día: DefiLlama, CoinGecko y Jupiter. Que se mueva no es una recomendación de compra.": "Today's data: DefiLlama, CoinGecko and Jupiter. Being active is not a buy recommendation.",
-  "Solo tokens cuyas claves son las del emisor. Precio del token: DexScreener (dólares: Jupiter). Precio de la acción: Twelve Data. Son datos, no recomendaciones.": "Only tokens whose keys are the issuer's. Token price: DexScreener (dollars: Jupiter). Stock price: Twelve Data. Data, not recommendations.",
   "Comisiones, ingresos y lo que llega al token: DefiLlama. Desbloqueos: Streamflow. Datos del día; no son recomendaciones.": "Fees, revenue and what reaches the token: DefiLlama. Unlocks: Streamflow. Today's data; not recommendations.",
   "Capitalización: CoinGecko. Titulares y traders: Jupiter (orgánicos = compradores que no parecen bots). Lo que cobra: DefiLlama. Datos del día; no son recomendaciones.": "Market cap: CoinGecko. Holders and traders: Jupiter (organic = buyers that don't look like bots). What it earns: DefiLlama. Today's data; not recommendations.",
   "Código: GitHub enlazado desde CoinGecko (último cambio). Titulares y traders: Jupiter (orgánicos = compradores que no parecen bots). Desbloqueos: Streamflow. Datos del día; no son recomendaciones.": "Code: GitHub linked from CoinGecko (last change). Holders and traders: Jupiter (organic = buyers that don't look like bots). Unlocks: Streamflow. Today's data; not recommendations.",
@@ -1731,8 +1730,6 @@ export const TEXT = {
   "Precio token": "Token price",
   "En bolsa": "On the market",
   "Diferencia": "Gap",
-  "Las 10 con más liquidez de {n} acciones oficiales": "The 10 most liquid of {n} official stocks",
-  "Ver las {n} en Acciones →": "See all {n} in Stocks →",
   "Qué puede hacer el emisor con tus tokens": "What the issuer can do with your tokens",
   "la letra pequeña": "the fine print",
   "xStocks · acciones": "xStocks · stocks",
@@ -1826,4 +1823,10 @@ export const TEXT = {
   "mover tus tokens": "move your tokens",
   "al token": "to the token",
   " mil": "k",
+  "Los 10 con más liquidez de {n} activos de emisores comprobados": "The 10 most liquid of {n} assets from verified issuers",
+  "Ver los {n} activos →": "See all {n} assets →",
+  "Backpack · acciones": "Backpack · stocks",
+  "Puede añadir una regla a cada envío": "Can add a rule to every transfer",
+  "hoy ninguna": "none today",
+  "Solo tokens de emisores comprobados con al menos 10 k$ de liquidez. Precio del token y de la acción: Jupiter (con la bolsa cerrada, el último precio fuera de horario). Liquidez: DexScreener. Son datos, no recomendaciones.": "Only tokens from verified issuers with at least $10k of liquidity. Token and stock price: Jupiter (with the market closed, the last after-hours price). Liquidity: DexScreener. Data, not recommendations.",
 };

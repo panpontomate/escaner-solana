@@ -9,7 +9,7 @@
 //   GET  /api/ventas/<mint>?w=<w1,w2…>&desde=<unix>   compras y ventas de ese token de hasta 5 wallets desde que nació
 //                                  (Helius), para las marcas de la gráfica; 30 min en la caché
 //   GET  /api/logo/<mint>         el logo del token (getAsset de Helius), una semana en la caché
-//   GET  /api/acciones            acciones tokenizadas frente a la acción real: prima, bolsa abierta, liquidez (acciones.js)
+//   GET  /api/acciones            activos tokenizados (lista diaria) frente al precio real: prima, bolsa abierta, liquidez (acciones.js)
 //   GET  /api/cotiza/<mint>        dónde se negocia: pools de la cadena y exchanges con comisión, identidad y MiCA (cotiza.js)
 //   GET  /api/top/<mint>           mayores cuentas del token (Helius, 2 min en caché, 30/min por conexión)
 //   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
@@ -261,7 +261,7 @@ export async function handle(req, env) {
     try {
       const a = await acciones(env), res = json(a);
       // si falta algún precio, que no se quede 5 min en la caché
-      if (a.filas.some((f) => f.precio === null || f.real === null) || (a.dolares || []).some((d) => d.valor === null)) res.headers.set("cache-control", "public, max-age=60");
+      if (a.filas.filter((f) => f.precio === null).length > 3 || (a.dolares || []).some((d) => d.valor === null)) res.headers.set("cache-control", "public, max-age=60");
       return res;
     } catch (e) { return fail(503, "prices unavailable"); }
   }

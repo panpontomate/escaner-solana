@@ -2018,7 +2018,11 @@ body.scanp #form .row .btn{border-radius:999px}
 .semi{margin-top:18px;border-left:3px solid var(--sama);border-radius:4px 14px 14px 4px;padding:13px 18px;background:linear-gradient(120deg,rgba(251,191,36,.08),rgba(255,255,255,.015) 75%)}
 .semi .top b{font:600 1.02rem Fraunces,serif}
 .semi .top span{font-size:.84rem;color:var(--sm);margin-left:10px}
-.semi .tres{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:10px}
+.semi .tres{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:10px}
+@media (max-width:1000px){ .semi .tres{grid-template-columns:1fr 1fr} }
+.sem{font:700 .64rem Manrope,sans-serif;font-style:normal;padding:1px 5px;border-radius:5px;margin-left:6px;vertical-align:1px}
+.sem.xStocks{color:#8ec5cf;background:rgba(122,184,196,.14)}.sem.Backpack{color:#f0abfc;background:rgba(240,171,252,.14)}.sem.Ondo{color:#fbbf24;background:rgba(251,191,36,.14)}
+.sac .sn1 b{display:inline}.sac .sn1 small{display:block}
 .semi .tres div{font-size:.8rem;color:var(--sm)}
 .semi .tres .kick{display:block;margin-bottom:5px;color:var(--sama);font-size:10.5px}
 .semi .tres p{margin:0 0 4px}.semi .tres p b{color:#f1eeff;font-weight:600}
@@ -4054,7 +4058,7 @@ function renderToken(noScroll){
 var accMem={t:0,j:null};
 function accionesData(){
   if(accMem.j&&Date.now()-accMem.t<300000) return Promise.resolve(accMem.j);
-  return fetch("https://api.solflag.com/api/acciones").then(function(x){ return x.ok?x.json():null; })
+  return fetch("https://api.solflag.com/api/acciones?v=2").then(function(x){ return x.ok?x.json():null; })
     .then(function(j){ if(j&&j.filas){ accMem.j=j; accMem.t=Date.now(); } return j; }).catch(function(){ return null; });
 }
 function stockVs(mint){
@@ -4875,7 +4879,7 @@ function sapQue(c,nota){
 }
 function sapFuente(c){
   var t={meme:"Datos del día: DefiLlama, CoinGecko y Jupiter. Que se mueva no es una recomendación de compra.",
-    rwa:"Solo tokens cuyas claves son las del emisor. Precio del token: DexScreener (dólares: Jupiter). Precio de la acción: Twelve Data. Son datos, no recomendaciones.",
+    rwa:"Solo tokens de emisores comprobados con al menos 10 k$ de liquidez. Precio del token y de la acción: Jupiter (con la bolsa cerrada, el último precio fuera de horario). Liquidez: DexScreener. Son datos, no recomendaciones.",
     defi:"Comisiones, ingresos y lo que llega al token: DefiLlama. Desbloqueos: Streamflow. Datos del día; no son recomendaciones.",
     juegos:"Capitalización: CoinGecko. Titulares y traders: Jupiter (orgánicos = compradores que no parecen bots). Lo que cobra: DefiLlama. Datos del día; no son recomendaciones.",
     ia:"Código: GitHub enlazado desde CoinGecko (último cambio). Titulares y traders: Jupiter (orgánicos = compradores que no parecen bots). Desbloqueos: Streamflow. Datos del día; no son recomendaciones.",
@@ -4909,11 +4913,11 @@ function sapPrima(f){
   return "<span class='spill "+k+"'>"+(f.prima>0?"+":"")+sapN(f.prima,2)+" %</span>";
 }
 function sapActivos(){
-  var A=SAP.a, fs=(A.filas||[]).slice().sort(function(a,b){ return b.liq-a.liq; }), dol=(A.dolares||[]).filter(function(d){ return d.enSolana; });
+  var A=SAP.a, fs=(A.filas||[]).filter(function(f){ return f.precio!=null; }).sort(function(a,b){ return b.liq-a.liq; }), dol=(A.dolares||[]).filter(function(d){ return d.enSolana; });
   var tot=dol.reduce(function(s,d){ return s+(d.valor||0); },0), ab=A.bolsa==="abierta";
   var ci=function(f){ return "<span class='sci'>"+sapSq(f.accion,"#3b3b6d")+"<b>"+esc(f.tok)+"</b><span class='mono'>"+sapN(f.precio,2)+" $</span>"+sapPrima(f)+"</span>"; };
   var una=fs.filter(function(f){ return f.liq>=20000; }).map(ci).join("");
-  var fila=function(f){ return "<button type='button' class='sac' data-try='"+esc(f.mint)+"'>"+sapSq(f.accion,"#3b3b6d")+"<span class='sn1'><b>"+esc(f.tok)+"</b><small>"+esc(f.accion)+"</small></span><span class='sx'>"+sapN(f.precio,2)+" $</span><span class='sx m sliq'>"+sapN(f.real,2)+" $</span><span class='sc'>"+sapPrima(f)+"</span><span class='sx m sliq'>"+sapM(f.liq)+"</span></button>"; };
+  var fila=function(f){ return "<button type='button' class='sac' data-try='"+esc(f.mint)+"'>"+sapSq(f.accion,"#3b3b6d")+"<span class='sn1'><b>"+esc(f.tok)+"</b><em class='sem "+esc(f.emisor||"")+"'>"+esc(f.emisor||"")+"</em><small>"+esc(f.nombre||f.accion)+"</small></span><span class='sx'>"+sapN(f.precio,2)+" $</span><span class='sx m sliq'>"+sapN(f.real,2)+" $</span><span class='sc'>"+sapPrima(f)+"</span><span class='sx m sliq'>"+sapM(f.liq)+"</span></button>"; };
   return (una?"<div class='scin'><div class='stk'>"+una+una+"</div></div>":"")+
     (dol.length?"<div class='sdol'><div class='stot'><span class='kick'>"+"Dólares digitales en Solana"+"</span><b>"+sapN(tot/1e6,0)+" M$</b><span>"+"con emisor comprobado"+"</span></div>"+
       "<div class='sds'>"+dol.map(function(d){ return "<div class='sd'>"+sapSq(d.tok,SAP_DCOL[d.tok])+"<b>"+sapN(d.valor/1e6,0)+" M$</b><em>"+esc(d.tok)+" · "+esc(d.emisor)+" · "+sapN(d.valor/tot*100,d.valor/tot<0.1?1:0)+" %</em></div>"; }).join("")+"</div>"+
@@ -4921,9 +4925,10 @@ function sapActivos(){
     "<section class='card smov'><div class='shd2'><h2>Lo que vale el token, <small>y lo que vale la acción</small></h2><span class='sbol"+(ab?" on":"")+"'><i></i><span>"+(ab?"<b>Bolsa de EE. UU. abierta</b> · precios de hace menos de 15 min":"<b>Bolsa cerrada</b> · el token puede despegarse de la acción")+"</span></span></div>"+
     "<div class='sac h'><span></span><span>"+"Token"+"</span><span>"+"Precio token"+"</span><span class='sliq'>"+"En bolsa"+"</span><span class='sc'>"+"Diferencia"+"</span><span class='sliq'>"+"Liquidez"+"</span></div>"+
     fs.slice(0,10).map(fila).join("")+
-    sapMas("Las 10 con más liquidez de {n} acciones oficiales".replace("{n}",fs.length),"Ver las {n} en Acciones →".replace("{n}",fs.length),"/acciones/")+
+    sapMas("Los 10 con más liquidez de {n} activos de emisores comprobados".replace("{n}",fs.length),"Ver los {n} activos →".replace("{n}",fs.length),SAP_ECO+"?ap=rwa")+
     "<div class='semi'><div class='top'><b>"+"Qué puede hacer el emisor con tus tokens"+"</b><span>"+"la letra pequeña"+"</span></div><div class='tres'>"+
       "<div><span class='kick'>"+"xStocks · acciones"+"</span><p><b>"+"Mover o quemar tus tokens sin tu firma"+"</b> "+"(delegado permanente)"+"</p><p><b>"+"Pausar todos los envíos"+"</b> · "+"hoy no está pausado"+"</p><p><b>"+"Ajusta por splits y dividendos"+"</b> "+"con un multiplicador"+"</p></div>"+
+      "<div><span class='kick'>"+"Backpack · acciones"+"</span><p><b>"+"Mover o quemar tus tokens sin tu firma"+"</b> "+"(delegado permanente)"+"</p><p><b>"+"Pausar todos los envíos"+"</b> · "+"hoy no está pausado"+"</p><p><b>"+"Puede añadir una regla a cada envío"+"</b> · "+"hoy ninguna"+"</p></div>"+
       "<div><span class='kick'>"+"Ondo · acciones"+"</span><p><b>"+"No puede mover tus tokens"+"</b> "+"(sin delegado permanente)"+"</p><p><b>"+"Pausar todos los envíos"+"</b> · "+"hoy no está pausado"+"</p><p><b>"+"Poco mercado en Solana:"+"</b> "+"su precio puede no seguir a la acción"+"</p></div>"+
       "<div><span class='kick'>"+"Dólares digitales"+"</span><p><b>"+"Todos pueden congelar tu cuenta"+"</b> "+"por orden judicial o sanciones"+"</p><p><b>"+"PYUSD y USDG pueden mover tus tokens"+"</b> "+"y cobrar comisión (hoy 0 %)"+"</p><p><b>"+"Claves comprobadas cada mañana"+"</b></p></div></div>"+
       "<p class='ojo'>"+"Desde la cadena no se ve si la acción o el dinero real existen detrás del token: eso depende del emisor, su custodio y sus informes de reservas."+"</p></div>"+

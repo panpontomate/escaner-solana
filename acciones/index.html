@@ -138,7 +138,7 @@ tbody tr[data-m]{cursor:pointer}
   <nav class="pnav" aria-label="Secciones"><a href="/?v=escaner">Escáner</a><a href="/ecosistema/">Ecosistema</a><a href="/?v=lista">Mi lista</a><a href="/?v=confluencia">Confluencia</a><a class="pbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Bot de Telegram</a></nav>
   <a class="plang" href="/en/stocks/" hreflang="en" title="English version">EN</a>
 </header>
-<section class="hero">
+<section class="hero" style="grid-template-columns:1fr">
   <canvas class="neb" data-neb="hero" aria-hidden="true"></canvas>
   <div>
     <p class="k">ACCIONES Y DÓLARES EN SOLANA</p>
@@ -146,70 +146,10 @@ tbody tr[data-m]{cursor:pointer}
     <p class="lead">Tesla, Nvidia, el S&amp;P 500 o el oro como tokens que se mueven a cualquier hora. Antes de comprar, mira si es el oficial, si su precio cuadra con la bolsa y qué puede hacer el emisor con él.</p>
     <ul class="trust"><li>Solo tokens oficiales</li><li>Precio frente a la bolsa</li><li>Claves vigiladas cada día</li></ul>
   </div>
-  <div class="find">
-    <p class="t">Busca un activo</p>
-    <label for="q">Nombre, ticker o dirección</label>
-    <form id="buscar" autocomplete="off"><div class="box"><input id="q" placeholder="Tesla, NVDAx, SPY…" spellcheck="false"><button type="submit">Buscar</button></div></form>
-    <p class="hint" id="qhint" hidden></p>
-    <div class="try"><span>Prueba con</span><button type="button" class="tq"><b>TSLAx</b></button><button type="button" class="tq"><b>NVDAx</b></button><button type="button" class="tq"><b>SPYx</b></button><button type="button" class="tq"><b>USDC</b></button></div>
-  </div>
 </section>
 
-<div class="cinta" aria-label="Activos tokenizados en Solana"><div class="ctrack" id="cinta"></div></div>
+<div id="actv"></div>
 
-<section class="sec">
-  <div class="sh">
-    <div><p class="k">ACCIONES TOKENIZADAS</p><h2>Lo que vale el token, <span>y lo que vale la acción.</span></h2></div>
-    <div class="bolsa" id="bolsa"><i></i><span>Comprobando la bolsa…</span></div>
-  </div>
-  <div class="card"><table>
-    <thead><tr><th>Token</th><th class="r">Precio del token</th><th class="r hm">Acción en bolsa</th><th class="r">Diferencia</th><th class="r">Liquidez</th><th class="r hm">Volumen 24 h</th><th class="hm">Emisor</th></tr></thead>
-    <tbody id="acc"><tr><td colspan="7" class="s">Cargando precios…</td></tr></tbody>
-  </table>
-  <div class="pager" id="pager" hidden><span class="s" id="pinfo"></span><span><button id="prev">← Anterior</button><button id="next">Siguiente →</button></span></div></div>
-</section>
-
-<div class="seam"><canvas data-seam="2" aria-hidden="true"></canvas></div>
-<section class="sec" style="margin-top:0">
-  <div class="sh"><div><p class="k">DÓLARES Y FONDOS</p><h2>Dólares digitales, <span>con su letra pequeña.</span></h2></div></div>
-  <div class="stx">
-    <div class="tt"><span class="k">EN SOLANA HOY</span><b id="dtot">—</b><span class="s">en dólares y euros digitales<br>con emisor comprobado</span></div>
-    <div class="sf" id="dfig"></div>
-  </div>
-  <div class="card" style="margin-top:26px"><table>
-  <thead><tr><th>Token</th><th class="r">En Solana</th><th class="r">Precio</th><th>El emisor puede…</th><th class="hm">Claves</th><th class="hm">Reservas</th></tr></thead>
-  <tbody id="dol"><tr><td colspan="6" class="s">Cargando…</td></tr></tbody></table></div>
-</section>
-
-<div class="seam"><canvas data-seam="1" aria-hidden="true"></canvas></div>
-<section class="sec" style="margin-top:0">
-  <div class="sh"><div><p class="k">LA LETRA PEQUEÑA</p><h2>Qué puede hacer el emisor <span>con tus tokens.</span></h2></div></div>
-  <div class="cols">
-    <div class="card lp">
-      <p class="tag">XSTOCKS · ACCIONES</p>
-      <div class="fp"><span class="ic y">↔</span><div><b>Mover o quemar tus tokens sin tu firma</b><span>Tiene «delegado permanente».</span></div></div>
-      <div class="fp"><span class="ic y">⏸</span><div><b>Pausar todos los envíos</b><span>Hoy no está pausado.</span></div></div>
-      <div class="fp"><span class="ic p">×</span><div><b>Ajusta por splits y dividendos</b><span>Un multiplicador cambia cuánto vale cada token: Netflix ya va por 10 tras su split, y los dividendos se reinvierten (McDonald's, 1,02).</span></div></div>
-      <div class="fp"><span class="ic p">❄</span><div><b>Congelar tu cuenta y crear más</b><span>Como cualquier emisor regulado.</span></div></div>
-    </div>
-    <div class="card lp">
-      <p class="tag">ONDO · ACCIONES</p>
-      <div class="fp"><span class="ic g">✓</span><div><b>No puede mover tus tokens</b><span>Sin delegado permanente, a diferencia de xStocks.</span></div></div>
-      <div class="fp"><span class="ic y">⏸</span><div><b>Pausar todos los envíos</b><span>Hoy no está pausado.</span></div></div>
-      <div class="fp"><span class="ic p">×</span><div><b>Ajusta por splits y dividendos</b><span>El mismo sistema de multiplicador.</span></div></div>
-      <div class="fp"><span class="ic y">$</span><div><b>Poco mercado en Solana</b><span>Su precio aquí puede no seguir a la acción.</span></div></div>
-    </div>
-    <div class="card lp">
-      <p class="tag">DÓLARES DIGITALES</p>
-      <div class="fp"><span class="ic p">❄</span><div><b>Todos pueden congelar tu cuenta</b><span>Por orden judicial o sanciones.</span></div></div>
-      <div class="fp"><span class="ic y">↔</span><div><b>PYUSD y USDG pueden mover tus tokens</b><span>USDC y USDT no.</span></div></div>
-      <div class="fp"><span class="ic y">%</span><div><b>PYUSD y USDG pueden cobrar comisión</b><span>Hoy al 0 %. Te avisamos si cambia.</span></div></div>
-      <div class="fp"><span class="ic g">✓</span><div><b>Claves comprobadas cada mañana</b><span>Si cambian, pasan a ámbar hasta revisarlo.</span></div></div>
-    </div>
-  </div>
-  <div class="note">Desde la cadena no se ve si la acción o el dinero real existen detrás del token: eso depende del emisor, su custodio y sus informes de reservas.</div>
-  <p class="foot">Solo tokens cuyas claves son las del emisor. Precio del token: DexScreener. Precio de la acción: Twelve Data. Son datos, no recomendaciones.</p>
-</section>
 </div>
 <footer class="wrap">
   <span class="wm" translate="no">Solflag</span>
@@ -223,78 +163,10 @@ tbody tr[data-m]{cursor:pointer}
   <a href="/terminos/">Términos</a>
   <a href="https://github.com/panpontomate/solana-risk-engine" target="_blank" rel="noopener">Código abierto</a>
   <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>
-  <p>Precio del token: DexScreener. Precio de la acción: Twelve Data. SolFlag es una herramienta orientativa, no consejo financiero.</p>
+  <p>Precio del token y de la acción: Jupiter. Liquidez: DexScreener. SolFlag es una herramienta orientativa, no consejo financiero.</p>
 </footer>
-<script>
-const NOMBRE = { MCD: "McDonald's", GME: "GameStop", AVGO: "Broadcom", INTC: "Intel", TQQQ: "Nasdaq 100 ×3", PLTR: "Palantir", KO: "Coca-Cola", DFDV: "DeFi Development", "BRK.B": "Berkshire Hathaway", PEP: "PepsiCo", NFLX: "Netflix", ORCL: "Oracle", UNH: "UnitedHealth", XOM: "ExxonMobil", TSLA: "Tesla", NVDA: "Nvidia", AAPL: "Apple", SPY: "S&P 500", QQQ: "Nasdaq 100", MSTR: "Strategy", CRCL: "Circle", META: "Meta", GOOGL: "Alphabet", AMZN: "Amazon", COIN: "Coinbase", HOOD: "Robinhood", MSFT: "Microsoft", GLD: "Oro" };
-const COLOR = { MCD: "#da291c", GME: "#e4002b", AVGO: "#cc092f", INTC: "#0071c5", TQQQ: "#2a6fdb", PLTR: "#333", KO: "#f40009", DFDV: "#5b3fd1", "BRK.B": "#3b3b6d", PEP: "#004b93", NFLX: "#e50914", ORCL: "#c74634", UNH: "#002677", XOM: "#ed1b2f", TSLA: "#cc0000", NVDA: "#76b900", AAPL: "#555", SPY: "#1f3a93", QQQ: "#2a6fdb", MSTR: "#d9480f", CRCL: "#2775ca", META: "#0866ff", GOOGL: "#34a853", AMZN: "#ff9900", COIN: "#0052ff", HOOD: "#00c805", MSFT: "#00a4ef", GLD: "#c9a227" };
-const fx = (n, d) => n == null ? "—" : n.toLocaleString("es-ES", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always" });
-const usd = (n) => n == null ? "—" : n >= 1e6 ? fx(n / 1e6, 1) + " M$" : n >= 1e3 ? fx(n / 1e3, 0) + " k$" : fx(n, 0) + " $";
-const DCOL = { USDC: "#2775ca", USDT: "#26a17b", PYUSD: "#0e3d8c", USDG: "#1d1d1f", EURC: "#2775ca", USDY: "#1f2a44" };
-const PUEDE = { PYUSD: 1, USDG: 1 };
-const DSUB = { PYUSD: "Paxos · PayPal", EURC: "Circle · euro", USDY: "Ondo · rinde intereses" };
-const DPRECIO = { EURC: " <span class='s'>≈ 1 €</span>", USDY: " <span class='s'>sube con los intereses</span>" };
-const av = (f) => `<span class="av" style="background:${COLOR[f.accion] || "#333"}">${f.accion.slice(0, 4)}</span>`;
-function prima(f) {
-  if (f.prima == null) return '<span class="s">—</span>';
-  const c = f.liq < 20000 ? "gr" : Math.abs(f.prima) < 1 ? "ok" : Math.abs(f.prima) < 3 ? "wa" : "no";
-  return `<span class="pill ${c}">${f.prima > 0 ? "+" : ""}${fx(f.prima, 2)} %</span>`;
-}
-let todos = [];
-fetch("https://api.solflag.com/api/acciones", { cache: "no-cache" }).then((r) => r.json()).then((j) => {
-  const b = document.getElementById("bolsa");
-  b.classList.toggle("off", j.bolsa !== "abierta");
-  b.querySelector("span").innerHTML = j.bolsa === "abierta" ? "<b>Bolsa de EE. UU. abierta</b> · precios de hace menos de 15 min" : "<b>Bolsa de EE. UU. cerrada</b> · el token puede despegarse de la acción";
-  const filas = j.filas.slice().sort((a, b) => b.liq - a.liq);
-  const VER = 10;
-  const fila = (f) => `<tr data-m="${f.mint}">
-    <td><div class="tk">${av(f)}<div><b>${f.tok}</b><span>${NOMBRE[f.accion] || f.accion}</span></div></div></td>
-    <td class="num r">${fx(f.precio, 2)} $</td><td class="num r hm">${fx(f.real, 2)} $</td><td class="r">${prima(f)}</td>
-    <td class="num r">${f.liq < 20000 ? `<span class="pill wa">${usd(f.liq)}</span>` : usd(f.liq)}</td><td class="num r hm">${usd(f.vol24)}</td>
-    <td class="hm s">${f.emisor}</td></tr>`;
-  let pag = 0;
-  const pager = document.getElementById("pager"), prev = document.getElementById("prev"), next = document.getElementById("next");
-  function pinta() {
-    const ini = pag * VER, fin = Math.min(filas.length, ini + VER);
-    document.getElementById("acc").innerHTML = filas.slice(ini, fin).map(fila).join("");
-    document.getElementById("pinfo").textContent = (ini + 1) + "–" + fin + " de " + filas.length;
-    prev.hidden = pag === 0; next.hidden = fin >= filas.length;
-  }
-  if (filas.length > VER) pager.hidden = false;
-  prev.onclick = () => { pag--; pinta(); };
-  next.onclick = () => { pag++; pinta(); };
-  pinta();
-  const item = (f) => `<div class="ci">${av(f)}<span><b>${f.tok}</b><span class="n">${NOMBRE[f.accion] || f.accion}</span></span><span class="chain">SOLANA</span><span class="p">${fx(f.precio, 2)} $</span>${prima(f)}</div>`;
-  const dol = (j.dolares || []).filter((d) => d.enSolana);
-  const tot = dol.reduce((a, d) => a + (d.valor || 0), 0);
-  document.getElementById("dtot").textContent = tot ? fx(tot / 1e6, 0) + " M$" : "—";
-  document.getElementById("dfig").innerHTML = dol.map((d) => `<div><span class="av" style="background:${DCOL[d.tok]}">${d.tok.slice(0, 4)}</span><span><b>${fx((d.valor || 0) / 1e6, 0)} M$</b><em>${d.tok} · ${d.emisor} · ${fx(tot ? d.valor / tot * 100 : 0, tot && d.valor / tot < .01 ? 1 : 0)} %</em></span></div>`).join("");
-  document.getElementById("dol").innerHTML = dol.map((d) => `<tr data-m="${d.mint}">
-    <td><div class="tk"><span class="av" style="background:${DCOL[d.tok]}">${d.tok.slice(0, 4)}</span><div><b>${d.tok}</b><span>${DSUB[d.tok] || d.emisor}</span></div></div></td>
-    <td class="num r">${fx(d.enSolana / 1e6, d.enSolana < 1e8 ? 1 : 0)} M</td><td class="num r">${fx(d.precio, 4)} $${DPRECIO[d.tok] || ""}</td>
-    <td><div class="can"><i class="c1">crear</i><i class="c1">congelar</i>${PUEDE[d.tok] ? '<i class="c2">mover tus tokens</i><i class="c2">poner comisión</i>' : ""}</div></td>
-    <td class="hm"><span class="pill ok">vigiladas</span></td><td class="hm"><a href="${d.reservas}" target="_blank" rel="noopener">${new URL(d.reservas).hostname.replace("www.", "")} ↗</a></td></tr>`).join("");
-  const st = dol.filter((d) => d.tok !== "EURC").map((d) => `<div class="ci"><span class="av" style="background:${DCOL[d.tok]}">${d.tok.slice(0, 4)}</span><span><b>${d.tok}</b><span class="n">${d.emisor}</span></span><span class="chain">SOLANA</span><span class="p">${fx(d.precio, 4)} $</span></div>`).join("");
-  todos = filas.map((f) => ({ m: f.mint, k: [f.tok, f.accion, NOMBRE[f.accion] || ""] })).concat(dol.map((d) => ({ m: d.mint, k: [d.tok, d.emisor] })));
-  const una = filas.filter((f) => f.liq >= 20000).map(item).join("") + st;
-  document.getElementById("cinta").innerHTML = una + una;
-}).catch(() => { document.getElementById("acc").innerHTML = '<tr><td colspan="7" class="s">No se pudieron cargar los precios. Prueba a recargar en un momento.</td></tr>'; });
-// una fila lleva al análisis del token en el escáner
-document.addEventListener("click", (e) => { const tr = e.target.closest("tr[data-m]"); if (tr && !e.target.closest("a")) location.href = "/?token=" + tr.dataset.m; });
-// buscador: nombre, ticker o dirección
-const norm = (t) => String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9.]/g, "");
-function busca(q) {
-  const h = document.getElementById("qhint"); h.hidden = true;
-  q = q.trim(); if (!q) return;
-  if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(q)) { location.href = "/?token=" + q; return; }
-  const n = norm(q), hit = todos.find((t) => t.k.some((k) => norm(k) === n)) || todos.find((t) => t.k.some((k) => norm(k).startsWith(n)));
-  if (hit) { location.href = "/?token=" + hit.m; return; }
-  h.textContent = "No está en la lista de tokens oficiales. Si tienes su dirección, pégala aquí y la analizamos.";
-  h.hidden = false;
-}
-document.getElementById("buscar").addEventListener("submit", (e) => { e.preventDefault(); busca(document.getElementById("q").value); });
-document.querySelectorAll(".tq").forEach((b) => b.addEventListener("click", () => busca(b.textContent)));
-</script>
+<script src="/acciones/activos.js?v=1"></script>
+<script>SFActivos.pinta(document.getElementById("actv"), { en: false });</script>
 <script>
 // cielo de estrellas detrás de toda la página (como el de las nebulosas de la portada, pero fijo y en todo el alto)
 (function(){ const cv = document.getElementById("sky"), x = cv.getContext("2d");

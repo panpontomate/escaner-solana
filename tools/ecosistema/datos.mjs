@@ -11,6 +11,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { hacerLista } from "../api/acciones.js";
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const EMISORES = path.join(AQUI, "../../emisores.json");
@@ -301,6 +302,13 @@ fs.writeFileSync(HIST, JSON.stringify(hist));
 fs.writeFileSync(path.join(OUT, "ecosistema.json"), JSON.stringify(D));
 if (perfiles && Object.keys(perfiles.t).length >= 50) fs.writeFileSync(path.join(OUT, "perfiles.json"), JSON.stringify(perfiles));
 else console.log("perfiles.json no se escribe (pocos tokens): se queda el de ayer");
+// 9) Lista diaria de activos tokenizados (21/11): todos los tokens de los emisores comprobados de acciones (xStocks,
+//    Backpack, Ondo) con al menos 10 k$ de liquidez contra USDC/USDT/SOL. La lee /api/acciones. Si falla, se queda la de ayer.
+try {
+  const filas = await hacerLista(JSON.parse(fs.readFileSync(EMISORES, "utf8")).emisores);
+  if (filas.length >= 20) fs.writeFileSync(path.join(OUT, "acciones-lista.json"), JSON.stringify({ fecha: hoy.toISOString(), filas }));
+  console.log("acciones-lista:", filas.length, "activos");
+} catch (e) { console.log("acciones-lista:", e.message); }
 const cuenta = {};
 for (const r of sel) cuenta[r.ap + " · " + r.gr] = (cuenta[r.ap + " · " + r.gr] || 0) + 1;
 console.log(sel.length, "filas ·", sel.filter((r) => r.nuevo).length, "acaban de sacar token"); console.log(cuenta);

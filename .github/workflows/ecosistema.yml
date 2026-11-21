@@ -44,6 +44,7 @@ jobs:
         run: |
           git add datos/ecosistema.json datos/ecosistema-historial.json
           [ -f datos/perfiles.json ] && git add datos/perfiles.json
+          [ -f datos/acciones-lista.json ] && git add datos/acciones-lista.json
           git diff --cached --quiet && exit 0
           git config user.name "solflag-ecosistema"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

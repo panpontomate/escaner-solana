@@ -142,6 +142,17 @@
 
   function pinta() {
     cabecera();
+    // Activos tokenizados (21/11): la vista completa, la misma que /acciones/ (acciones/activos.js)
+    const rwa = ap === "Activos tokenizados" && window.SFActivos;
+    document.querySelector(".tabs").style.display = rwa ? "none" : "";
+    if (rwa) {
+      $("#bar").style.display = "none";
+      const reales = D.rows.filter((r) => r.ap === ap && r.gr === "Activos reales" && !/mansory/i.test(r.n)).sort((a, b) => (b.m || 0) - (a.m || 0));
+      window.SFActivos.pinta($("#lista"), { en: EN, reales });
+      return;
+    }
+    $("#lista").classList.remove("sfa");
+    if ($("#lista")._sfa) $("#lista")._sfa = { };
     $("#bar").style.display = ap === "Todos" || tipo === "nuevo" ? "none" : "";
     if (tipo === "nuevo") { const rs = deAp().filter((r) => r.nuevo).sort((a, b) => b.nuevo.localeCompare(a.nuevo)); $("#lista").innerHTML = rs.length ? tarjetas(rs) : `<div class="tbl"><div class="vacio">${T.ninguno}</div></div>`; return; }
     if (ap === "Todos") {
