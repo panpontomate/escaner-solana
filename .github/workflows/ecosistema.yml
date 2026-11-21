@@ -1,5 +1,6 @@
 # Página Ecosistema (solflag.com/ecosistema/): una vez al día recoge el uso de los proyectos de Solana (DefiLlama,
 # CoinGecko, Jupiter y, para xStocks, la cadena con Helius) y publica datos/ecosistema.json en la rama "datos".
+# Desde el 21/11 también datos/perfiles.json: lo que el Escáner necesita para los puntos por apartado (motor perfil.js).
 # La memoria diaria (datos/ecosistema-historial.json) va en la misma rama: con ella salen el cambio a 30 días donde
 # la fuente no lo da y «Acaba de sacar token». Si algo falla, no se sube nada y la web sigue con los datos de ayer.
 name: ecosistema
@@ -34,6 +35,7 @@ jobs:
         env:
           SOLANA_RPC: ${{ secrets.SOLANA_RPC }}
           COINGECKO_KEY: ${{ secrets.COINGECKO_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OUT_DIR: _pub/datos
         run: node tools/ecosistema/datos.mjs
       - name: Subir a la rama datos
@@ -41,6 +43,7 @@ jobs:
         working-directory: _pub
         run: |
           git add datos/ecosistema.json datos/ecosistema-historial.json
+          [ -f datos/perfiles.json ] && git add datos/perfiles.json
           git diff --cached --quiet && exit 0
           git config user.name "solflag-ecosistema"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

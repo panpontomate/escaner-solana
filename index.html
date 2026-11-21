@@ -1225,8 +1225,8 @@ body.om-open{overflow:hidden}
 .btn.tmap:hover{box-shadow:0 0 26px rgba(192,132,252,.38)}
 .btn.tmap .ic{font-size:1.1rem}
 /* con la pestaña On-chain Map son seis: en el móvil caben en una sola fila */
-@media (max-width:700px){ .brand .tabs,.tabs{grid-template-columns:repeat(4,minmax(0,1fr))} .brand .tab,.tab{font-size:.72rem;padding:8px 2px} }
-/* con la pestaña Acciones (12/11) son 4 visibles: caben en una fila a 320 px */
+@media (max-width:700px){ .brand .tabs,.tabs{grid-template-columns:repeat(5,minmax(0,1fr))} .brand .tab,.tab{font-size:.68rem;padding:8px 1px} }
+/* con Ecosistema (20/11) son 5 visibles: caben en una fila a 320 px */
 .tab[hidden]{display:none!important}
 /* ===== Buscador de la página Escáner: titular a la izquierda y buscador grande a la derecha (ordenador) */
 .scan-t2,.scan-sub,.scan-trust{display:none}
@@ -1294,9 +1294,11 @@ body.scanp #form .eyebrow{margin-bottom:8px}
 .tnav .tnv{display:inline-block}
 #t-chart{order:4}
 #results.tview #list{order:3}
+#t-ap{order:5;grid-column:1/-1}
 #t-quote{order:5}
 #t-who{order:5}
 #t-hold{order:6}
+.pie-ci{order:7;grid-column:1/-1}
 .tdc{scroll-margin-top:72px}
 .tdc h2{margin:0 0 12px;font-size:1.15rem}
 /* Dónde cotiza (14/11, maqueta maquetas\web\donde-cotiza.html): coste de entrar y salir, mejores sitios y enlace a todos */
@@ -1558,6 +1560,104 @@ body.landing #adv{margin-top:10px}
 .lhow:hover{text-decoration:underline}
 /* insignia de los cinco niveles (14/11): gran proyecto o recién nacido */
 .tbadge{display:inline-block;margin:10px 0 0;padding:6px 12px;border-radius:999px;font-size:.78rem;font-weight:700;letter-spacing:.04em;border:1px solid var(--line)}
+/* puntos por apartado (21/11, maquetas escaner-*.html): la barra en vez del sello y los chequeos de su apartado */
+.pbar{margin:16px 0 0;padding:16px 18px 12px;border:1px solid var(--line);border-radius:18px;background:rgba(14,10,36,.55)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.pb-que{margin:-4px 0 12px;font-size:.92rem;line-height:1.5;color:#e6e0ff;max-width:880px}
+.pb-ap{margin:0 0 10px;font-size:.9rem}.pb-ap .kick{margin-right:6px}.pb-ap small{color:var(--muted)}
+.pb-l1{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.pb-niv{font:700 1.9rem/1 Fraunces,Georgia,serif;color:var(--pc)}
+.pb-tot{font:700 1.9rem/1 "IBM Plex Mono",ui-monospace,monospace;color:var(--pc)}.pb-tot small{font:500 .85rem Manrope,system-ui,sans-serif;color:var(--muted)}
+.pb-sig{margin-left:auto;font-size:.85rem;color:var(--muted)}
+.pb-esc{position:relative;height:10px;margin:14px 0 6px;border-radius:999px;background:linear-gradient(90deg,var(--alto) 0 22.7%,var(--nar) 22.7% 45.4%,var(--medio) 45.4% 68.1%,var(--bajo) 68.1% 81.8%,var(--dia) 81.8% 100%);opacity:.9}
+.pb-esc i{position:absolute;top:50%;width:14px;height:26px;margin-left:-7px;transform:translateY(-50%);border-radius:7px;background:#fff;border:3px solid var(--pc);box-shadow:0 0 0 3px rgba(5,4,13,.7)}
+.pb-marcas{position:relative;height:14px;font-size:.72rem;color:var(--muted)}
+.pb-marcas span{position:absolute;transform:translateX(-50%)}
+.pb-marcas span:nth-child(1){left:0;transform:none}.pb-marcas span:nth-child(2){left:22.7%}.pb-marcas span:nth-child(3){left:45.4%}.pb-marcas span:nth-child(4){left:68.1%}.pb-marcas span:nth-child(5){left:81.8%}.pb-marcas span:nth-child(6){right:0;left:auto;transform:none}
+.pchecks{margin:12px 0 0;border:1px solid var(--line);border-radius:16px;padding:12px 16px}
+.pchecks summary{cursor:pointer;font-weight:700}.pchecks summary small{font-weight:500;color:var(--muted);margin-left:6px}
+.pchecks ul{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 18px}
+.pchecks li{display:grid;grid-template-columns:12px 1fr;gap:2px 10px;padding:8px 0;border-top:1px solid var(--line);font-size:.9rem}
+.pchecks li i{width:10px;height:10px;border-radius:50%;margin-top:5px;grid-row:1/3}
+.pchecks li span{color:var(--muted);font-size:.82rem}
+.pc-ley{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 0;font-size:.76rem;color:var(--muted)}
+.pc-ley span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:5px}
+.pc-nota{margin:8px 0 0;font-size:.76rem;color:var(--muted)}
+.ap-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px;margin-top:12px}
+.ap-tiles div{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.025)}
+.ap-tiles b{display:block;font:600 1.25rem "IBM Plex Mono",ui-monospace,monospace;color:var(--kick)}
+.ap-tiles small{color:var(--muted);font-size:.78rem}
+.ap-k{margin:16px 0 4px}
+.ap-partes div{display:grid;grid-template-columns:minmax(110px,1.2fr) 2fr auto;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:.86rem}
+.ap-partes i{display:block;height:8px;border-radius:999px;background:linear-gradient(90deg,var(--kick),#c4b5fd)}
+.ap-partes b{font:600 .86rem "IBM Plex Mono",ui-monospace,monospace;text-align:right;white-space:nowrap}
+.ap-vale{margin:14px 0 0;padding:12px 14px;border:1px dashed var(--line2);border-radius:14px;font-size:.84rem;color:var(--muted)}
+.ap-vale b{display:block;font:600 1.3rem "IBM Plex Mono",ui-monospace,monospace;color:#f1eeff}
+.ap-hk{margin:4px 0 0;padding-left:18px;font-size:.88rem}
+.ap-link{display:inline-block;margin-top:12px;font-weight:700}
+.ap-dato{margin-top:14px;display:grid;grid-template-columns:auto 1fr;column-gap:18px;align-items:center;border-left:3px solid var(--ac,#7ab8c4);border-radius:4px 14px 14px 4px;padding:14px 18px;background:linear-gradient(120deg,var(--acb,rgba(122,184,196,.1)),rgba(255,255,255,.015) 75%)}
+.ap-dato .kick{grid-column:1/-1;margin:0 0 6px;color:var(--ac,#7ab8c4)}
+.ap-dato b{white-space:nowrap;font:500 2rem/1.05 Fraunces,Georgia,serif;color:var(--ac,#7ab8c4)}
+.ap-dato p{margin:0;font-size:.9rem;color:#e6e0ff}
+@media(max-width:700px){.ap-dato{grid-template-columns:1fr}.ap-dato b{white-space:normal;font-size:1.7rem}.ap-dato p{margin-top:4px}}
+.bp-h{display:flex;align-items:flex-start;gap:12px}.bp-h .tgt{margin-right:auto}
+.bp-amp{flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--line2);background:none;color:var(--kick);font-size:16px;cursor:pointer}
+.bp{list-style:none;margin:12px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2px 16px}
+.bp li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-weight:700;font-size:.92rem}
+.bp li i{width:10px;height:10px;border-radius:50%;flex:none}
+.bp-ver{margin-top:12px}
+.bmodal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;background:rgba(5,4,13,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.bmodal[hidden]{display:none}
+.bm-caja{position:relative;width:min(780px,100%);max-height:88vh;overflow:auto;background:#0c0920;border:1px solid var(--line2);border-radius:22px;padding:22px 22px 18px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.bm-x{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:10px;border:1px solid var(--line2);background:none;color:inherit;font-size:16px;cursor:pointer}
+.bm-cks{display:grid;grid-template-columns:1fr 1fr;gap:2px 18px;margin-top:10px}
+.bm-cks div{display:grid;grid-template-columns:12px 1fr;gap:2px 10px;padding:9px 0;border-top:1px solid var(--line);font-size:.92rem}
+.bm-cks i{width:10px;height:10px;border-radius:50%;margin-top:5px;grid-row:1/3}
+.bm-cks span{color:var(--muted);font-size:.84rem}
+.bm-k{margin:18px 0 6px}
+@media(max-width:700px){.bp,.bm-cks{grid-template-columns:1fr}.bm-caja{padding:18px 16px}}
+/* diseño de las maquetas (21/11): cada bloque del detalle con su color de acento */
+#tdetail .tdc{position:relative;overflow:hidden;border-top:3px solid var(--ac,#7ab8c4)}
+#tdetail .tdc::before{content:"";position:absolute;inset:0 0 auto 0;height:150px;background:radial-gradient(ellipse at 0 0,var(--acb,rgba(122,184,196,.1)),transparent 70%);pointer-events:none}
+#t-chart,#t-ap{--ac:#7ab8c4;--acb:rgba(122,184,196,.12)}
+#t-quote{--ac:#c4b5fd;--acb:rgba(196,181,253,.12)}
+#t-who{--ac:#a78bfa;--acb:rgba(167,139,250,.12)}
+#t-hold{--ac:#f0abfc;--acb:rgba(240,171,252,.1)}
+#tdetail .tdk{color:var(--ac);display:flex;align-items:center;gap:8px;margin:0 0 4px}
+#tdetail .tdk::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--ac);transform:rotate(45deg)}
+#t-chart h2{background:linear-gradient(90deg,#9fd3dc,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+#t-chart h2 small{-webkit-text-fill-color:var(--muted)}
+.cq2-top{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}.cq2-top>div{margin-right:auto}
+.cq2-top .cq2-k,.cq2-top .cq2-sub{display:none}
+.cq2-hero{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;margin-top:14px;padding:18px 22px;border-radius:16px;background:rgba(5,4,13,.5);border:1px solid var(--line)}
+.cq2-hero>.hint{grid-column:1/-1}
+.cq2-lado small{display:block;color:var(--muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+.cq2-lado b{font:500 2.3rem/1.1 Fraunces,Georgia,serif;letter-spacing:-.02em}
+.cq2-lado:last-child{text-align:right}
+.cq2-tira{height:12px;border-radius:999px;background:rgba(255,107,107,.55);overflow:hidden}
+.cq2-tira i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#7ab8c4,#4ade80)}
+.cq2-flecha span{display:block;text-align:center;margin-top:8px;font-size:.82rem;color:var(--muted)}.cq2-flecha span b{color:#f1eeff}
+.cq2-comp{margin:12px 0 0;font-size:.92rem}
+.cq2-k{margin:18px 0 6px}
+.cq2-row{display:grid;grid-template-columns:26px minmax(180px,1.2fr) 1.6fr 92px auto;gap:12px;align-items:center;padding:11px 10px;border-top:1px solid var(--line);border-radius:10px}
+.cq2-row.top{background:linear-gradient(90deg,rgba(74,222,128,.10),transparent 70%);border-top-color:transparent}
+.cq2-pos{font:600 .86rem "IBM Plex Mono",ui-monospace,monospace;color:var(--muted);text-align:center}.cq2-row.top .cq2-pos{color:var(--bajo)}
+.cq2-nm{min-width:0}.cq2-nm b{display:block;font-size:.95rem}.cq2-nm small{color:var(--muted);font-size:.76rem}
+.cq2-nm em{font-style:normal;font-weight:700;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:1px 7px;margin-right:6px}
+.cq2-nm em.tc{color:#9fd3dc;border:1px solid rgba(122,184,196,.45)}.cq2-nm em.tx{color:#c4b5fd;border:1px solid rgba(196,181,253,.45)}
+.cq2-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.cq2-br{height:10px;border-radius:999px;background:rgba(255,255,255,.05);overflow:hidden}
+.cq2-br i{display:block;height:100%;border-radius:999px;background:var(--bajo)}.cq2-br i.cq-mid{background:var(--medio)}.cq2-br i.cq-bad{background:var(--alto)}
+.cq2-cs{font:600 1rem "IBM Plex Mono",ui-monospace,monospace;text-align:right;white-space:nowrap}
+.cq2-pools{margin:10px 0 0;font-size:.8rem;color:var(--muted)}
+@media(max-width:700px){.cq2-hero{grid-template-columns:1fr 1fr;padding:16px}.cq2-flecha{grid-column:1/-1;grid-row:2}.cq2-lado b{font-size:1.8rem}
+  .cq2-row{grid-template-columns:22px 1fr auto;grid-template-areas:"pos nm cs" "pos br br" "pos ir ir";gap:6px 10px;padding:12px 8px}
+  .cq2-pos{grid-area:pos;align-self:start}.cq2-nm{grid-area:nm}.cq2-cs{grid-area:cs;align-self:start}.cq2-br{grid-area:br;height:8px}.cq2-row .ir{grid-area:ir;justify-self:start}
+  .cq-amts{width:100%;display:flex}.cq-amts button{flex:1}}
+.pie-ci{display:flex;gap:14px;align-items:flex-start;margin:22px 0 6px;padding:16px 18px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.02)}
+.pie-ci>span{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--medio);color:var(--medio);font-weight:700}
+.pie-ci p{margin:0;font-size:.86rem;line-height:1.55;color:var(--muted)}.pie-ci b{color:#f1eeff}
+@media(max-width:700px){.pchecks ul{grid-template-columns:1fr}.pb-sig{margin-left:0;width:100%}.pb-niv{font-size:1.6rem}}
 .tb-dia{color:var(--dia);background:var(--dia-bg);border-color:var(--dia)}
 .tb-new{color:var(--medio);background:var(--medio-bg);border-color:var(--medio)}
 /* cuadro de la curva de Pump.fun (14/11): contexto bajo el nivel, no una señal */
@@ -1739,7 +1839,8 @@ a.stamp{text-decoration:none;cursor:pointer}a.stamp:hover{filter:brightness(1.15
   #results.tview:not(.wview) .tc2{grid-row:span 2}
   #results.tview:not(.wview) #list{align-self:start}
   #results.tview:not(.wview) #t-who{grid-column:1!important;order:3;align-self:start}
-  #results.tview:not(.wview) #t-quote,#results.tview:not(.wview) #t-hold{order:4}
+  #results.tview:not(.wview) #t-ap,#results.tview:not(.wview) #t-quote,#results.tview:not(.wview) #t-hold{order:4}
+  #results.tview:not(.wview) .pie-ci{order:5}
 }
 @media (max-width:960px){
   #results.tview:not(.wview) .stamp .st-new .st-k{font-size:1.3rem}
@@ -1787,7 +1888,7 @@ body:not(.landing):not(.scanp) #form .row .btn{min-height:40px;border-radius:999
 
 /* ---- fondo común (fondo.js, maqueta fondo-paginas-aprobado): esquinas lila y verde en Escáner, Mi lista y Confluencia.
    En la portada y en el resultado de un token no sale: allí va la nebulosa de puntos.js ---- */
-body.landing #fondo,body:has(#results.tview:not(.wview):not([hidden])) #fondo{display:none}
+body.landing #fondo{display:none}
 body:not(.landing) .hero>.neb{display:none}
 /* pestaña Escáner: buscador sin caja y listas en filas finas, como «Tokens calientes» */
 body.scanp .hero>.scan{background:none!important;border:0;box-shadow:none}
@@ -1803,6 +1904,35 @@ body.scanp #form .row .btn{border-radius:999px}
 #scanpage .tr:hover{background:rgba(139,92,246,.08)}
 #scanpage .rc{background:rgba(14,10,36,.35);border-color:var(--line)}
 #scanpage .lbase{background:rgba(122,184,196,.06)}
+/* apartados de la pestaña Escáner (20/11/2026, maqueta escaner-categorias-aprobado.html) */
+.sapbar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.sapbar .seg{border:1px solid var(--line2);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.9rem;color:#d8d2f5;background:rgba(255,255,255,.04);cursor:pointer}
+.sapbar .seg[aria-pressed="true"]{background:#7ab8c4;border-color:#7ab8c4;color:#0b1720}
+#sapbox{margin-bottom:16px;display:grid;gap:16px}
+#sapbox[hidden],#scanpage .live2[hidden]{display:none}
+.sapcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:10px}
+.sapc{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;text-align:left;border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.025);color:inherit;font:inherit;cursor:pointer}
+.sapc:hover,.sapr:hover{background:rgba(139,92,246,.08)}
+.sapc .sapav,.sapc img{margin-bottom:6px}
+.sapc b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sapc small{color:var(--muted);font-size:.78rem}
+.sapv{font:600 1.05rem "IBM Plex Mono",monospace;margin-top:4px}
+.sapgrid{display:grid;gap:16px}
+@media (min-width:900px){ .sapgrid{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);align-items:start} }
+.saprows{border-top:1px solid var(--line);margin-top:10px}
+.sapr{display:grid;grid-template-columns:22px 32px minmax(0,1fr) auto 64px;gap:10px;align-items:center;width:100%;padding:9px 4px;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.sapi{color:var(--muted);font-size:.8rem}
+.sapn{min-width:0}.sapn b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sapn small,.sapt small{display:block;color:var(--muted);font-size:.75rem}
+.sapt{font:600 .9rem "IBM Plex Mono",monospace;text-align:right}
+.sapp{text-align:right;font-size:.85rem}
+.sapav,.sapc img,.sapr img{width:32px;height:32px;border-radius:9px;background:#1b1538;flex:none}
+.sapav{display:grid;place-items:center;font:800 11px Manrope,sans-serif;color:#8ec5cf}
+.sapup{color:#4ade80}.sapdn{color:#ff6b6b}
+.sapwhat ul{margin:10px 0 0;padding-left:18px}.sapwhat li{margin:4px 0}
+.sapwhat p{color:var(--muted);margin:6px 0 0}
+.sapwhat .sapnota{font-size:.82rem;border-top:1px solid var(--line);padding-top:10px;margin-top:12px}
+@media (max-width:520px){ .sapr{grid-template-columns:32px minmax(0,1fr) auto 56px}.sapi{display:none} .sapcards{grid-template-columns:repeat(2,minmax(0,1fr))} .sapc{padding:10px} .sapv{font-size:.92rem} }
 /* Mi lista y Confluencia: titular en dos tonos y tarjetas más ligeras */
 .ml-h1,.cf-h1{letter-spacing:-.02em;line-height:1.02}
 .ml-h1 em,.cf-h1 em{display:block;font-style:normal;font-weight:300;color:#e6e0ff;-webkit-text-fill-color:#e6e0ff;background:none}
@@ -2233,6 +2363,21 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
   <div id="scanpage">
     <div class="cinta" id="scinta" hidden aria-label="Tokens en verde y lo último que has visto"><div class="ctrack" id="sctrack"></div></div>
     <p class="cdisc" id="scdisc" hidden>«En verde» = pasó los chequeos al analizarlo. No es una recomendación de compra.</p>
+    <div class="sapbar" id="sapbar" role="group" aria-label="Apartados"><button type="button" class="seg" data-sap="todos" aria-pressed="true">Todos</button><button type="button" class="seg" data-sap="meme" aria-pressed="false">Meme</button><button type="button" class="seg" data-sap="rwa" aria-pressed="false">Activos tokenizados</button><button type="button" class="seg" data-sap="defi" aria-pressed="false">DeFi</button><button type="button" class="seg" data-sap="juegos" aria-pressed="false">Juegos</button><button type="button" class="seg" data-sap="ia" aria-pressed="false">IA</button><button type="button" class="seg" data-sap="apps" aria-pressed="false">Apps y bots</button><button type="button" class="seg" data-sap="otros" aria-pressed="false">Otros</button></div>
+    <div id="sapbox" hidden>
+      <section class="card" id="sapbig">
+        <div class="lhd"><h2 id="saph"></h2></div>
+        <div class="sapcards" id="sapcards"></div>
+      </section>
+      <div class="sapgrid">
+        <section class="card" id="sapmov">
+          <div class="lhd"><h2>Lo que más se mueve hoy <small>por traders en 24 h</small></h2></div>
+          <div class="saprows" id="saprows"></div>
+          <p class="lsrc" id="sapsrc"></p>
+        </section>
+        <section class="card sapwhat" id="sapwhat"></section>
+      </div>
+    </div>
     <div class="live2">
       <section class="card" id="strend">
         <div class="lhd"><h2>🔥 En tendencia ahora <small>Solana · por actividad</small></h2>
@@ -2394,7 +2539,7 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
 </script>
 <script type="module">
 // el motor en un solo archivo (jsDelivr lo empaqueta): antes eran 22 archivos en dos tandas, ~0,9 s en un móvil
-import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.6.0/+esm";
+import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.7.0/+esm";
 window.__escOk=true;
 // Lista de emisores revisada (emisores.json): una rotación de claves aprobada no necesita otra versión del motor
 fetch("/emisores.json",{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j&&SRE.setIssuers) SRE.setIssuers(j.emisores); }).catch(function(){});
@@ -3221,15 +3366,20 @@ async function netBalances(mint,graph){
 }
 
 // Riesgo de un token con la forma de siempre: lvl ALTO/MEDIO..., semáforos {k:ctl|con|mkt|dep, s, t} y why en texto
-async function assess(mint,par,valor,unchecked,noConc,copies){
-  var r=await call(SRE.assess(client(),mint,par,{value:valor,marketUnknown:unchecked,skipConcentration:noConc,copies:!!copies}));
+async function assess(mint,par,valor,unchecked,noConc,copies,perfil){
+  var op={value:valor,marketUnknown:unchecked,skipConcentration:noConc,copies:!!copies};
+  // puntos por apartado (motor 0.7.0): en todas partes (token suelto, wallet, Mi lista, Confluencia, listas de la portada);
+  // el archivo del día se baja una sola vez. Sin entrada en el archivo: null (emisor conocido = activo tokenizado; lo demás, meme)
+  if(perfil===undefined){ var PF=await perfilesData(); perfil=PF[mint]||null; }
+  op.perfil=perfil;
+  var r=await call(SRE.assess(client(),mint,par,op));
   if(!r) return null;   // NFT
   var lights=r.lights?r.lights.map(function(l){ return {k:SRE_LK[l.k],s:l.s,t:SRE.explainLight(l,"es")}; }):null;
   var cl0=r.lights&&r.lights.filter(function(l){ return SRE_LK[l.k]==="ctl"; })[0];
   return {
     ctlAlt:cl0?ctlSinRC(cl0):null,
-    mint:r.mint, sym:r.sym, name:r.name, pts:r.pts, sev:r.sev, lvl:(r.lvl!=="SPAM"&&SRE_TIER[r.tier])||SRE_LV[r.lvl]||r.lvl,
-    tierCap:!!r.tierCap, tierCapUntil:r.tierCapUntil||null, tierBig:r.tierBig||null,
+    mint:r.mint, sym:r.sym, name:r.name, pts:r.pts, sev:r.sev, lvl:(r.perfil&&SRE_TIER[r.perfil.tier])||(r.lvl!=="SPAM"&&SRE_TIER[r.tier])||SRE_LV[r.lvl]||r.lvl,
+    perfil:r.perfil||null, pdat:perfil||null, tierCap:r.perfil?!!r.perfil.cap:!!r.tierCap, tierCapUntil:r.tierCapUntil||null, tierBig:r.tierBig||null,
     why:lights?lightsWhy(lights):r.reasons.map(function(x){ return SRE.describe(x,"es"); }),
     warn:[], lights:lights, type:SRE_TY[r.type]||null, valor:valor, par:r.pair, imp:r.impostor, img:r.img,
     cr:(r.creator&&r.creator.creator)||null,
@@ -3548,7 +3698,8 @@ async function checkToken(mint){
   if(!mkr.data[mint]&&!mkr.failed.length){ var gp=await gtPair(mint); if(gp) mkr.data[mint]=gp; }
   await fillLiquidity(mkr.data[mint]);
   setProgress("Revisando el token…",0.45);
-  var r=await assess(mint,mkr.data[mint]||null,0,mkr.failed.length>0,false,true);
+  var perf=await perfilesData();
+  var r=await assess(mint,mkr.data[mint]||null,0,mkr.failed.length>0,false,true,perf[mint]||null);
   if(!r){ showError("Esa dirección es un NFT, no un token. El escáner no revisa NFTs."); return; }
   setProgress("Listo",1);
   r.hist=histRecord(r); keepSnap(r);
@@ -3592,10 +3743,152 @@ function tierBadge(r){
     (r.tierCapUntil?". "+"Podrá salir verde a partir del "+esc(fdate(r.tierCapUntil))+" si sigue limpio":"")+"</p>";
   return "";
 }
+// ---------- Puntos por apartado (21/11): motor 0.7.0 (perfil.js) + datos diarios (/datos/perfiles.json) ----------
+// Cada token se mide con las reglas de su apartado (meme, activo tokenizado, DeFi, juego, IA, app, otros) sobre una base
+// de 50 y una barra hasta 110. En la web solo sale el COLOR de cada chequeo, no sus puntos (decisión del 20/11).
+var perfMem=null;
+function perfilesData(){
+  if(!perfMem) perfMem=fetch("/datos/perfiles.json",{cache:"no-cache"}).then(function(x){ return x.ok?x.json():null; })
+    .then(function(j){ return j&&j.t?j.t:{}; }).catch(function(){ return {}; });
+  return perfMem;
+}
+var AP_NOM={meme:"Meme",rwa:"Activo tokenizado",defi:"DeFi",juegos:"Juego",ia:"IA",apps:"App o bot",otros:"Otros"};
+var CK_NOM={copia:"¿Es una copia?",oficial:"Token oficial",claves:"Claves del emisor",precio:"Precio frente al real",reservas:"Reservas",
+  liquidez:"Liquidez",mover:"El emisor puede mover tokens",comision:"Comisión al transferir",uso:"Uso",control:"Control del creador",
+  reparto:"Quién lo tiene",wallet:"Una wallet grande",lp:"Liquidez bloqueada",volumen:"Volumen 24 h",edad:"Antigüedad",
+  creador:"Creador y su historial",codigo:"¿Siguen construyendo?",negocio:"¿El token gana con el negocio?",comisiones:"Comisiones",
+  tendencia:"Tendencia de las comisiones",ingresos:"Ingresos propios",depositos:"Depósitos",auditorias:"Auditorías",
+  traders:"Actividad real",organico:"Compradores reales",titulares:"Titulares",titularesC:"Titulares en 24 h",
+  crear:"Puede crear más",congelar:"Puede congelar",desbloqueos:"Desbloqueos",hackeo:"Hackeos"};
+var CK_COL={suma:"var(--bajo)",resta:"var(--medio)",grave:"var(--alto)",neutro:"var(--dia)",falta:"var(--muted)"};
+function perfPct(x){ return (Math.round(x*1000)/10).toLocaleString("es-ES",{maximumFractionDigits:1})+" %"; }
+function perfNum(n){ return Math.round(n).toLocaleString("de-DE"); }
+// el dato de cada chequeo, en una línea
+function ckDet(c){
+  var d=c.d;
+  if(c.col==="falta") return "Aún no lo tenemos";
+  if(d===null||d===undefined){
+    var T={control:c.p>0?"Nadie puede crear más ni congelar":c.p<=-25?"Puede congelar tu saldo":"Cobra o ejecuta código al transferir",
+      oficial:c.p>0?"Es el token del proyecto o de un emisor revisado":"Emisor que aún no hemos revisado",claves:c.p>0?"Sin cambios":"Han cambiado sin revisar",
+      crear:"Pueden crear más tokens",congelar:"Pueden congelar saldos",mover:"Puede mover o quemar tokens de cualquiera",
+      comision:"Puede cobrar una comisión al transferir",lp:"Solo una parte está bloqueada",creador:"Sus tokens anteriores siguen vivos",
+      uso:"Se usa mucho",copia:"Copia de otro token",edad:"Más de dos años",ingresos:"El proyecto se queda una parte"};
+    return T[c.k]||"";
+  }
+  switch(c.k){
+    case "liquidez": case "volumen": case "depositos": return usdShort(d);
+    case "comisiones": case "ingresos": return usdShort(d)+" en 30 días";
+    case "negocio": return d>0?usdShort(d)+" en 30 días":"Nada vuelve al token";
+    case "reparto": return "Las 10 mayores tienen el "+perfPct(d/100);
+    case "wallet": return "La mayor tiene el "+perfPct(d/100);
+    case "edad": return d>=365?(d/365).toLocaleString("es-ES",{maximumFractionDigits:1})+" años":Math.round(d)+" días";
+    case "tendencia": case "titularesC": case "precio": return (d>0?"+":"")+perfPct(d);
+    case "traders": return perfNum(d)+" wallets en 24 h";
+    case "organico": return Math.round(d)+" sobre 100";
+    case "titulares": return perfNum(d)+" wallets";
+    case "auditorias": return d+" en DefiLlama";
+    case "codigo": return "Último cambio hace "+d+" días";
+    case "desbloqueos": if(!d.lib&&!d.bloq) return "Nada bloqueado"; return "Se libera el "+perfPct(d.lib/100)+" en 30 días · bloqueado el "+perfPct(d.bloq/100);
+    case "hackeo": return d>0?usdShort(d)+" sin devolver en el último año":"Uno antiguo";
+  }
+  return "";
+}
+// La barra en vez del sello: nivel, puntos (como mucho 110), lo que le falta o su tope, y la escala con los cortes
+// Qué es el proyecto: la frase escrita a mano si la hay; si no, una automática con lo que sabemos de él
+function queEs(r){
+  var d=r.pdat||{}, p=r.perfil||{};
+  if(d.que&&d.que.es) return d.que.es;
+  var f=d.f30?" que cobra "+usdShort(d.f30)+" al mes":"", tv=d.tvl?" y tiene "+usdShort(d.tvl)+" depositados":"", tr=d.trad?" con "+perfNum(d.trad)+" wallets operando en 24 h":"";
+  switch(p.ap){
+    case "meme": return "Una memecoin: su valor depende solo de quién la compra. No hay producto, negocio ni emisor detrás.";
+    case "rwa": return "Un activo tokenizado: representa algo de fuera de la cadena (dólares, acciones, bonos…). Lo que importa es quién lo emite y si tiene reservas.";
+    case "defi": return "Un protocolo DeFi de Solana"+f+tv+".";
+    case "juegos": return "Un juego de Solana"+(tr||f)+".";
+    case "ia": return "Un proyecto de IA en Solana"+(tr||f)+".";
+    case "apps": return "Una app o bot de Solana"+f+".";
+  }
+  return "Un proyecto de Solana"+f+".";
+}
+function pbarHtml(r){
+  var p=r.perfil, L=LEVELS[r.lvl]||{}, col=LVCOL[r.lvl]||"var(--muted)", pts=Math.max(0,Math.min(110,p.pts)), pos=pts/110*100;
+  var sig=p.trap?"Tiene una trampa: rojo directo":p.dead?"Sin liquidez: muerto":p.cap?"Con menos de 7 días no pasa de amarillo":
+    p.floor?"Lista revisada a mano: como mínimo verde":r.lvl==="DIAMANTE"?"En nuestra lista revisada a mano":
+    p.lanz||p.ap==="meme"?(r.lvl==="VERDE"?"Verde es el tope de una meme":""):r.lvl==="VERDE"?"Diamante solo para la lista revisada a mano":"";
+  return "<div class='pbar' style='--pc:"+col+"'>"+
+    "<p class='pb-ap'><span class='kick'>Detectado como</span> <b>"+esc(AP_NOM[p.ap]||p.ap)+"</b>"+(p.lanz?" <small>· nació en una lanzadera: se mide como una meme</small>":"")+"</p>"+"<p class='pb-que'>"+esc(queEs(r))+"</p>"+
+    "<div class='pb-l1'><span class='sr'>"+esc(L.label||r.lvl)+"</span>"+(p.trap?"<span class='pb-tot'>"+"Trampa"+"</span>":"<span class='pb-tot'>"+pts+"<small> / 110 puntos</small></span>")+(sig?"<span class='pb-sig'>"+esc(sig)+"</span>":"")+"</div>"+
+    "<div class='pb-esc' role='img' aria-label='"+esc((L.label||"")+": "+pts+" de 110")+"'><i style='left:"+(p.trap?1.5:pos)+"%'></i></div>"+
+    "<div class='pb-marcas'><span>0</span><span>25</span><span>50</span><span>75</span><span>90</span><span>110</span></div></div>";
+}
+// El bloque propio de cada apartado (21/11): lo que hace de verdad el proyecto, con las cifras del archivo diario.
+// Solo sale lo que tenemos; las memes y los activos tokenizados tienen sus propios apartados (Quién está detrás, Frente a la acción real)
+var AP_TAB={defi:"Uso real",juegos:"Actividad",ia:"Proyecto",apps:"Negocio",otros:"Negocio"};
+var AP_H2={defi:"Uso real del protocolo",juegos:"¿Se juega de verdad?",ia:"El proyecto y su código",apps:"¿El token gana con el negocio?",otros:"¿El token gana con el negocio?"};
+function apBlockHtml(r){
+  var p=r.perfil, d=r.pdat; if(!p||!d||!AP_TAB[p.ap]||p.lanz) return "";
+  var t=[];
+  function tile(v,l){ t.push("<div><b>"+esc(v)+"</b><small>"+esc(l)+"</small></div>"); }
+  if(d.f30!=null) tile(usdShort(d.f30),"comisiones en 30 días");
+  if(d.r30) tile(usdShort(d.r30),"se queda el proyecto");
+  if(p.ap==="apps"||p.ap==="otros") tile(d.h30?usdShort(d.h30):"0 $","vuelve al token (recompras o quemas)");
+  if(d.tvl&&p.ap==="defi") tile(usdShort(d.tvl),"depositados");
+  if(d.trad!=null) tile(perfNum(d.trad),"wallets operaron en 24 h");
+  if(d.org!=null) tile(Math.round(d.org)+"/100","actividad orgánica (no bots)");
+  if(d.tit!=null) tile(perfNum(d.tit),"titulares");
+  if(d.cod&&d.cod.dias!=null) tile(d.cod.dias===0?"hoy":d.cod.dias+" d","último cambio en su código");
+  if(d.dl) tile(perfPct(d.dl.bloq/100),"aún bloqueado (Streamflow)");
+  if(!t.length) return "";
+  var partes="";
+  if(d.partes&&d.partes.length>1){
+    var mx=d.partes[0][1]||1;
+    partes="<p class='kick ap-k'>Sus partes · comisiones en 30 días</p><div class='ap-partes'>"+d.partes.map(function(x){ return "<div><span>"+esc(x[0])+"</span><i style='width:"+Math.max(1,x[1]/mx*100)+"%'></i><b>"+esc(usdShort(x[1]))+"</b></div>"; }).join("")+"</div>";
+  }
+  var vale=d.mcap&&d.r30>0?"<p class='ap-vale'><b>×"+apVale(d.mcap/(d.r30*12))+"</b> vale × ingresos: cuántas veces vale el token lo que el proyecto ingresa en un año. Es un dato, no cuenta para el nivel.</p>":"";
+  var hk=(d.hk||[]).filter(function(h){ return h.p>0; }).map(function(h){ return "<li>"+esc(fdate(h.d*1000))+" · "+esc(usdShort(h.p))+" sin devolver</li>"; }).join("");
+  // un dato que ayuda a leer las cifras: qué parte vuelve al token, o cuánta gente lo mueve de verdad
+  var dato="";
+  if((p.ap==="apps"||p.ap==="otros")&&d.r30>0&&d.h30>0) dato=apDato(perfPct(d.h30/d.r30),"de lo que ingresa vuelve al token ("+usdShort(d.h30)+" de "+usdShort(d.r30)+" en 30 días).");
+  else if(d.tit>0&&d.trad>0) dato=apDato("1 de cada "+perfNum(Math.max(1,d.tit/d.trad)),"titulares operó en las últimas 24 h ("+perfNum(d.trad)+" de "+perfNum(d.tit)+").");
+  var cod=d.cod&&d.cod.url?"<a class='ap-link' href='"+esc(d.cod.url)+"' target='_blank' rel='noopener'>Ver su código ↗</a>":"";
+  return "<section class='card tdc' id='t-ap'><h2>"+esc(AP_H2[p.ap])+" <small>"+esc(AP_NOM[p.ap])+"</small></h2>"+
+    "<div class='ap-tiles'>"+t.join("")+"</div>"+dato+partes+vale+(hk?"<p class='kick ap-k'>Hackeos</p><ul class='ap-hk'>"+hk+"</ul>":"")+cod+
+    "<p class='wsrc'>DefiLlama (comisiones, ingresos, depósitos, hackeos), Jupiter (actividad y titulares), GitHub (código) y Streamflow (bloqueos), datos del día. Que un proyecto se use mucho no dice si su token va a subir.</p></section>";
+}
+function apDato(b,t){ return "<div class='ap-dato'><span class='kick'>Dato</span><b>"+esc(b)+"</b><p>"+esc(t)+"</p></div>"; }
+function apVale(x){ return x.toLocaleString("es-ES",{maximumFractionDigits:1}); }
+// La tarjeta de banderas con puntos por apartado: pequeño en la tarjeta, todo en grande en el centro de la pantalla
+var CK_LEY="<p class='pc-ley'><span style='--c:var(--bajo)'>suma</span><span style='--c:var(--medio)'>resta</span><span style='--c:var(--alto)'>resta mucho o trampa</span><span style='--c:var(--dia)'>para saber</span><span style='--c:var(--muted)'>aún no lo tenemos</span></p>";
+function pBanderasHtml(r){
+  var cs=(r.perfil.checks||[]).filter(function(c){ return CK_NOM[c.k]; });
+  return "<p class='kick'>Las banderas · "+esc(AP_NOM[r.perfil.ap]||"")+"</p><div class='bp-h'><h3 class='tgt'>Por qué sale así</h3><button type='button' class='bp-amp' data-bands='1' title='Ver en grande'>⤢</button></div>"+
+    "<ul class='bp'>"+cs.map(function(c){ return "<li><i style='background:"+CK_COL[c.col]+"'></i>"+esc(CK_NOM[c.k])+"</li>"; }).join("")+"</ul>"+CK_LEY+
+    "<button type='button' class='btn ghost small bp-ver' data-bands='1'>Ver todas con el detalle ⤢</button>";
+}
+function bandsOpen(){
+  var r=state.token; if(!r||!r.perfil) return;
+  var cs=(r.perfil.checks||[]).filter(function(c){ return CK_NOM[c.k]; });
+  var m=$("#bmodal");
+  if(!m){ m=document.createElement("div"); m.id="bmodal"; m.className="bmodal"; m.hidden=true; document.body.appendChild(m);
+    m.addEventListener("click",function(e){ if(e.target===m||e.target.closest("[data-bclose]")) bandsClose(); });
+    document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&!m.hidden) bandsClose(); }); }
+  m.innerHTML="<div class='bm-caja' role='dialog' aria-modal='true' aria-label='Por qué sale así'><button type='button' class='bm-x' data-bclose='1' title='Cerrar'>✕</button>"+
+    "<p class='kick'>Las banderas · "+esc(AP_NOM[r.perfil.ap]||"")+"</p><h3 class='tgt'>Por qué sale así</h3>"+
+    "<div class='bm-cks'>"+cs.map(function(c){ var t=ckDet(c); return "<div><i style='background:"+CK_COL[c.col]+"'></i><b>"+esc(CK_NOM[c.k])+"</b>"+(t?"<span>"+esc(t)+"</span>":"")+"</div>"; }).join("")+"</div>"+CK_LEY+
+    "<p class='kick bm-k'>Las 5 banderas de siempre</p>"+(state.bandLh||"")+
+    "<p class='pc-nota'>El color resume lo que vemos en la cadena y en fuentes públicas (DefiLlama, Jupiter, GitHub, Streamflow). No es un consejo de inversión. <a href='"+LHOW+"#nivel' target='_blank' rel='noopener'>Cómo se decide el nivel →</a></p></div>";
+  m.hidden=false; document.body.style.overflow="hidden";
+}
+function bandsClose(){ var m=$("#bmodal"); if(m){ m.hidden=true; document.body.style.overflow=""; } }
+document.addEventListener("click",function(e){ if(e.target.closest&&e.target.closest("[data-bands]")) bandsOpen(); });
 function renderToken(noScroll){
   var r=state.token, L=LEVELS[r.lvl], fav=!!lista.t[r.mint];
   var tip=TOKEN_TIP[r.lvl]||"";
   if(r.tierCap) tip="Sin alertas, pero con menos de 7 días todavía no ha demostrado nada.";
+  if(r.perfil&&!r.perfil.trap&&r.lvl!=="DIAMANTE"){   // con puntos por apartado: lo que resta, por su nombre
+    var rs=r.perfil.checks.filter(function(c){ return (c.col==="resta"||c.col==="grave")&&CK_NOM[c.k]; }).map(function(c){ return CK_NOM[c.k]; });
+    tip=rs.length?"Lo que resta: "+rs.slice(0,3).map(function(n){ return "«"+n+"»"; }).join(", ")+".":"Ningún chequeo de su apartado resta.";
+    if(r.perfil.cap) tip+=" Con menos de 7 días todavía no ha demostrado nada.";
+  }
   if(r.launchLvl) tip+=" Sube a "+L.label.toLowerCase()+(r.faceLvl?" por quién está detrás del lanzamiento (mira «Control del creador»).":" por lo que pasó en el lanzamiento (mira «Compras en el lanzamiento»).");
   if(r.imp) tip="Es una copia de "+r.imp.sym+" con otra dirección: no es "+r.imp.sym+" y su precio no tiene nada que ver con el suyo. No lo compres pensando que es el original, y si lo tienes, no entres en webs que aparezcan a su nombre para «cambiarlo» o «reclamarlo».";
   else if(dataOnly(r)){
@@ -3613,10 +3906,10 @@ function renderToken(noScroll){
   $("#summary").innerHTML=
     "<div class='tsum tsum2'>"+
     "<div class='tsum-t'><div class='thd'><p class='kick'>Token"+(r.type?" · "+esc(TYPES[r.type].label):"")+"</p>"+
-    "<div class='tidr'>"+tokAv(r.img,r.sym)+"<h2 class='tname'>"+esc(r.sym)+(r.name&&!sameName(r.name,r.sym)?"<small>"+esc(r.name)+"</small>":"")+"</h2>"+stampHtml(r)+"</div>"+
+    "<div class='tidr'>"+tokAv(r.img,r.sym)+"<h2 class='tname'>"+esc(r.sym)+(r.name&&!sameName(r.name,r.sym)?"<small>"+esc(r.name)+"</small>":"")+"</h2>"+(r.perfil?"":stampHtml(r))+"</div>"+
     "<div class='taddr'><button class='mono tmint2' type='button' data-copy='"+esc(r.mint)+"' title='Copiar dirección del token'>"+esc(r.mint)+"</button>"+
       "<button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copiar dirección del token'>copiar</button></div></div>"+
-    "<p class='sub'><b class='tvl lv-"+esc(L.cls)+"'>"+esc(dataOnly(r)?"Riesgo medio por falta de datos":L.label)+".</b> "+esc(tip)+"</p>"+tierBadge(r)+
+    "<p class='sub'>"+(r.perfil?"":"<b class='tvl lv-"+esc(L.cls)+"'>"+esc(dataOnly(r)?"Riesgo medio por falta de datos":L.label)+".</b> ")+esc(tip)+"</p>"+(r.perfil?pbarHtml(r):tierBadge(r))+
     (chips.length?"<div class='tchips'>"+chips.map(function(c){ return "<span>"+esc(c[0])+" <b>"+esc(c[1])+"</b></span>"; }).join("")+"</div>":"")+
     "<div class='ctrade' id='ctrade' hidden></div>"+
     "</div></div>"+
@@ -3851,6 +4144,7 @@ function renderList(){
           :"<ul class='why'>"+why+"</ul>";
           // Un token suelto: banderas a la izquierda y gráfica, lanzamiento e historial a la derecha
           if(state.token!==r) return lh;
+          if(r.perfil){ state.bandLh=lh; return curvaHtml(r)+"<div class='tgrid'><div class='tcol'>"+pBanderasHtml(r)+"</div></div>"; }
           return curvaHtml(r)+"<div class='tgrid'><div class='tcol'><p class='kick'>Las 5 banderas</p><h3 class='tgt'>Por qué sale así</h3>"+"<a class='lhow' href='"+LHOW+"#nivel' target='_blank' rel='noopener'>"+"Cómo se decide el nivel →"+"</a>"+lh+"</div></div>";
         })()+
         "<div class='links'>"+links+"</div>"+
@@ -3901,13 +4195,15 @@ function tokenDetail(r){
       "<button type='button' class='tnv' data-tgo='summary'>Veredicto</button>"+
       "<button type='button' data-tgo='list'>Banderas</button>"+
       "<button type='button' data-tgo='t-chart'>Gráfica</button>"+
+      (apBlockHtml(r)?"<button type='button' data-tgo='t-ap'>"+esc(AP_TAB[r.perfil.ap])+"</button>":"")+
       "<button type='button' data-tgo='t-quote'>Dónde cotiza</button>"+
       (r.emisor?"":"<button type='button' class='tnmap' data-map='"+esc(r.mint)+"'>◉ Mapa</button>")+
       "<button type='button' data-tgo='t-who'>Quién está detrás</button>"+
       (r.emisor?"":"<button type='button' data-tgo='t-hold'>Ballenas</button>")+"</nav>"+
-    "<div class='tc2'><section class='card tdc' id='t-chart'><h2>Gráfica <small>precio en $</small></h2>"+
+    "<div class='tc2'><section class='card tdc' id='t-chart'><p class='kick tdk'>Gráfica</p><h2>Precio y lo que pasó <small>en $, con las marcas</small></h2>"+
       (r.par&&r.par.pairAddress?chartHtml(r):"<div class='pchart'>"+chartNA("Sin mercado: no hay precio que dibujar.")+"</div>")+histHtml(r)+"<div class='mkstory' id='mkstory'></div></section></div>"+
-    "<section class='card tdc' id='t-quote'><h2>Dónde cotiza <small>y cuánto cuesta entrar y salir</small></h2>"+
+    apBlockHtml(r)+
+    "<section class='card tdc' id='t-quote'><p class='kick tdk'>Dónde cotiza</p><h2>Entrar y salir <small>dónde te cuesta menos</small></h2>"+
       "<div id='quotebox'><p class='hint'>Buscando dónde se negocia…</p></div></section>"+
     "<section class='card tdc' id='t-who'><h2>Quién está detrás<span class='tnew'>nuevo</span> <small>lo que hicieron antes</small></h2>"+
       (young?"<div class='lights' style='margin:0 0 12px'><div class='lt lt-na' id='bundlebox'><i class='ld'></i><div><b>Compras en el lanzamiento</b><span>Revisando quién compró en el primer segundo…</span></div></div></div>":"")+
@@ -3915,7 +4211,8 @@ function tokenDetail(r){
       "<p class='wsrc'>Hechos del registro de SolFlag (desde el 29/10/2026): quién pagó, creó y financió cada lanzamiento y cómo acabó a las 24 h. Son datos, no acusaciones. ¿Un dato mal? <a href='mailto:solflag.team@gmail.com'>Escríbenos</a>.</p></section>"+
     (r.emisor?"":"<section class='card tdc hcompact' id='t-hold'><h2>Ballenas <small>las cuentas con más saldo</small></h2>"+
       "<div class='tlazy' id='thlazy'><span>Mira quién tiene más de este token: personas, exchanges, pools y grupos que comparten financiador.</span><button type='button' class='btn small' data-hold='"+esc(r.mint)+"'>Ver las ballenas</button></div>"+
-      "<button type='button' class='btn small hfull' id='hfull' hidden>Ver todas las ballenas →</button></section>");
+      "<button type='button' class='btn small hfull' id='hfull' hidden>Ver todas las ballenas →</button></section>")+
+    "<div class='pie-ci'><span>!</span><p><b>SolFlag da datos, no consejos de inversión.</b> Nada de esta página es una recomendación para comprar, vender o mantener ningún token. El nivel y las banderas resumen lo que vemos en la cadena y en fuentes públicas en este momento, y pueden cambiar. Comprueba siempre por tu cuenta y no pongas dinero que no puedas permitirte perder.</p></div>";
   // si ya se buscaron las ballenas de este token, se enseñan otra vez sin repetir la búsqueda
   if(r.emisor){}   // sin apartado de ballenas
   else if(state.hold&&state.hold.mint===r.mint){ whalesHere(); renderHolders(true); }
@@ -4034,37 +4331,48 @@ async function loadQuote(r){
 function paintQuote(r,j,amt){
   var box=$("#quotebox"); if(!box) return;
   var risky=quoteRiesgo(r), pools=j?j.pools:[], cex=j&&j.cex?j.cex:[];
-  var go=function(u){ return risky||!u?"":"<a class='ir' href='"+esc(u)+"' target='_blank' rel='noopener'>Ir ↗</a>"; };
-  var chain=(r.par?"<div class='cq-row'><span><b>Mejor ruta de Jupiter</b><small>reparte la compra entre todos los pools · no pide identidad</small></span><span class='n' id='cqroute'>…</span>"+go(j&&j.ruta)+"</div>":"")+
-    pools.slice(0,2).map(function(p){ return "<div class='cq-row'><span>"+esc(p.dex)+"<small>"+esc(p.par)+"</small></span><span class='n'>"+esc(usd(p.liq))+"<small>liquidez</small></span>"+go(p.url)+"</div>"; }).join("");
-  var best=cex.filter(function(x){ return x.g==="ok"&&x.id!=="?"; }).slice(0,3);
-  var ex=!j||j.cex===null?"<p class='hint'>No se pudo consultar ahora. Vuelve a probar en un rato.</p>":
-    !cex.length?"<p class='hint'>No cotiza en ningún exchange centralizado: solo se compra y vende en la cadena.</p>":
-    best.length?best.map(function(x){ return "<div class='cq-row'><span>"+esc(x.n)+"<small>"+esc(x.par)+" · comisión "+(x.feeNote?"hasta ":"")+cqPct(x.fee)+"</small>"+cqId(x)+"</span><span class='n "+cqTone(x.cost)+"'>~"+cqPct(x.cost)+"<small>ida y vuelta</small></span>"+go(x.url)+"</div>"; }).join(""):
-    "<p class='hint'>Cotiza en "+cex.length+" exchanges que aún no hemos revisado.</p>";
   box.innerHTML=
-    (r.par?"<div class='cq-top'><b>Si compras y vendes al momento</b><span class='cq-amts'>"+[100,1000,10000].map(function(a){ return "<button type='button' data-cqamt='"+a+"' class='"+(a===amt?"on":"")+"'>"+(a===100?"100 $":usd(a))+"</button>"; }).join("")+"</span></div>"+
-      "<div class='cq-big' id='cqbig'><span class='hint'>Calculando con Jupiter…</span></div>"+
-      "<div class='cq-mini'><div><b id='cqb'>…</b><span>al comprar</span></div><div><b id='cqs'>…</b><span>al vender</span></div><div><b id='cqr'>…</b><span>ida y vuelta</span></div></div>":
-      "<p class='hint'>Sin mercado en la cadena: no hay dónde comprar ni vender.</p>")+
+    "<div class='cq2-top'><div><p class='kick cq2-k'>Entrar y salir</p><p class='cq2-sub'>dónde te cuesta menos</p></div>"+
+      (r.par||cex.length?"<span class='cq-amts'>"+[100,1000,10000].map(function(a){ return "<button type='button' data-cqamt='"+a+"' class='"+(a===amt?"on":"")+"'>"+(a===100?"100 $":usd(a))+"</button>"; }).join("")+"</span>":"")+"</div>"+
+    "<div class='cq2-hero' id='cqbig'><span class='hint'>"+(r.par?"Calculando con Jupiter…":"Sin mercado en la cadena: no hay dónde comprar ni vender.")+"</span></div>"+
+    "<p class='cq2-comp' id='cqcomp' hidden></p>"+
     (risky?"<p class='cq-stop'><b>Riesgo alto:</b> no enlazamos sitios para comprarlo. Te enseñamos dónde se negocia y, sobre todo, lo que cuesta salir.</p>":"")+
-    "<div class='cq-cols'><div class='cq-col'><h3>En la cadena</h3>"+(chain||"<p class='hint'>Sin pools con liquidez.</p>")+"</div>"+
-      "<div class='cq-col'><h3>En exchanges</h3>"+ex+"</div></div>"+
+    "<p class='kick cq2-k' id='cqrk'>Del más barato al más caro · ida y vuelta</p><div class='cq2-rank' id='cqrank'></div>"+
+    (!j||j.cex===null?"<p class='hint'>No se pudieron consultar los exchanges ahora. Vuelve a probar en un rato.</p>":"")+
+    (pools.length?"<p class='cq2-pools'>En la cadena: "+pools.slice(0,3).map(function(p){ return esc(p.dex)+" "+esc(p.par)+" ("+esc(usdShort(p.liq))+")"; }).join(" · ")+(pools.length>3?" y "+(pools.length-3)+" más":"")+". Jupiter reparte la compra entre todos.</p>":"")+
     (pools.length+cex.length>3?"<a class='cq-all' href='"+esc(quoteAllLink(r))+"'>Ver "+(pools.length?pools.length+(pools.length>=30?"+ pools":" pools"):"")+(pools.length&&cex.length?" y ":"")+(cex.length?cex.length+" exchanges":"")+", con comisión, identidad y MiCA →</a>":"")+
     "<p class='wsrc'>La dirección buena termina en <b>…"+esc(r.mint.slice(-4))+"</b>: otro token con el mismo nombre es otro token. Coste en la cadena: cotización de Jupiter (ya incluye la comisión de los pools; no la de tu app). "+
       "Exchanges: diferencia de precio + comisión al comprar y al vender, revisado a mano el "+(j?esc(j.revisado.split("-").reverse().join("/")):"")+". SolFlag no cobra de ningún sitio. Es información, no una recomendación de compra. "+
       "Pools: DexScreener · Exchanges: <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a></p>";
+  paintQuoteCost(r,null,amt,true);
 }
-function paintQuoteCost(r,rt,amt){
-  var big=$("#cqbig"); if(!big) return;
+// El ranking: la ruta de Jupiter (si hay) y los exchanges revisados, ordenados por lo que cuesta comprar y vender al momento
+function paintQuoteCost(r,rt,amt,first){
+  var big=$("#cqbig"), rank=$("#cqrank"); if(!big||!rank) return;
   document.querySelectorAll("[data-cqamt]").forEach(function(b){ b.classList.toggle("on",Number(b.getAttribute("data-cqamt"))===amt); });
-  if(!rt){ big.innerHTML="<span class='hint'>Jupiter no encuentra ruta para "+usd(amt)+" ahora mismo.</span>"; ["#cqb","#cqs","#cqr"].forEach(function(s){ $(s).textContent="—"; }); return; }
-  var p=(amt-rt.back)/amt*100;
-  big.innerHTML="Pones <b>"+usd(amt)+"</b> y recuperas <b class='"+cqTone(p)+"'>"+usd(rt.back)+"</b>";
-  $("#cqb").textContent=cqPct(rt.b); $("#cqb").className=cqTone(rt.b);
-  $("#cqs").textContent=cqPct(rt.s); $("#cqs").className=cqTone(rt.s);
-  $("#cqr").textContent=cqPct(p); $("#cqr").className=cqTone(p);
-  var ro=$("#cqroute"); if(ro){ ro.innerHTML=cqPct(p)+"<small>ida y vuelta</small>"; ro.className="n "+cqTone(p); }
+  var q=quoteData[r.mint]&&quoteData[r.mint].j, risky=quoteRiesgo(r), cex=q&&q.cex?q.cex:[];
+  var go=function(u){ return risky||!u?"":"<a class='ir' href='"+esc(u)+"' target='_blank' rel='noopener'>Ir ↗</a>"; };
+  var rows=[];
+  if(r.par) rows.push({n:"Mejor ruta de Jupiter",t:"cadena",sub:"reparte la compra entre todos los pools · no pide identidad",p:rt?(amt-rt.back)/amt*100:null,u:q&&q.ruta,wait:!rt&&first});
+  cex.filter(function(x){ return x.g==="ok"&&x.id!=="?"; }).slice(0,5).forEach(function(x){ rows.push({n:x.n,t:"ex",sub:x.par+" · comisión "+(x.feeNote?"hasta ":"")+cqPct(x.fee),p:x.cost,u:x.url,tags:cqId(x)}); });
+  rows.sort(function(a,b){ return (a.p==null?99:a.p)-(b.p==null?99:b.p); });
+  var max=Math.max(1,Math.max.apply(null,rows.map(function(x){ return x.p||0; })));
+  rank.innerHTML=rows.length?rows.map(function(x,i){
+    return "<div class='cq2-row"+(i===0&&x.p!=null?" top":"")+"'><span class='cq2-pos'>"+(i+1)+"</span>"+
+      "<div class='cq2-nm'><b>"+esc(x.n)+"</b><small><em class='"+(x.t==="ex"?"tx":"tc")+"'>"+(x.t==="ex"?"Exchange":"En la cadena")+"</em>"+esc(x.sub)+"</small>"+(x.tags?"<span class='cq2-tags'>"+x.tags+"</span>":"")+"</div>"+
+      "<div class='cq2-br'><i style='width:"+(x.p==null?0:Math.max(3,x.p/max*100))+"%' class='"+(x.p==null?"":cqTone(x.p))+"'></i></div>"+
+      "<span class='cq2-cs "+(x.p==null?"":cqTone(x.p))+"'>"+(x.p==null?(x.wait?"…":"—"):(x.t==="ex"?"~":"")+cqPct(x.p))+"</span>"+go(x.u)+"</div>";
+  }).join(""):"<p class='hint'>No cotiza en ningún sitio que conozcamos.</p>";
+  if(first) return;
+  var mejor=rows.filter(function(x){ return x.p!=null; })[0], cad=rows.filter(function(x){ return x.t==="cadena"; })[0];
+  if(!mejor){ big.innerHTML="<span class='hint'>Jupiter no encuentra ruta para "+usd(amt)+" ahora mismo.</span>"; return; }
+  var back=amt*(1-mejor.p/100), pv=Math.max(0.5,100-mejor.p);
+  big.innerHTML="<div class='cq2-lado'><small>Pones</small><b>"+usd(amt)+"</b></div>"+
+    "<div class='cq2-flecha'><div class='cq2-tira'><i style='width:"+pv+"%'></i></div><span>comprar y vender al momento en <b>"+esc(mejor.t==="cadena"?"la cadena":mejor.n)+"</b></span></div>"+
+    "<div class='cq2-lado'><small>Recuperas</small><b class='"+cqTone(mejor.p)+"'>"+usd(back)+"</b></div>";
+  var comp=$("#cqcomp");
+  if(comp){ comp.hidden=!(cad&&cad.p!=null&&cad!==mejor);
+    if(!comp.hidden) comp.innerHTML="En la cadena te costaría <b class='"+cqTone(cad.p)+"'>"+cqPct(cad.p)+"</b>; en "+esc(mejor.n)+", <b class='"+cqTone(mejor.p)+"'>"+cqPct(mejor.p)+"</b>."; }
 }
 document.addEventListener("click",function(e){
   var b=e.target.closest&&e.target.closest("[data-cqamt]"); if(!b||!state.token) return;
@@ -4383,6 +4691,63 @@ function paintFresh(keepAnim){
   $("#sftime").textContent=fresh.ts?"actualizado "+ftime(fresh.ts):"";
   paintHot();
 }
+/* Apartados de la pestaña Escáner (20/11/2026, maqueta aprobada maquetas/web/escaner-categorias-aprobado.html).
+   «Todos» = lo de siempre. En un apartado: sus mayores y lo que más se mueve hoy, de datos/ecosistema.json (los mismos
+   datos que la página Ecosistema, una vez al día), y qué miramos en él. En Meme siguen debajo la tendencia y lo recién lanzado.
+   Pendiente: chequeos propios de cada apartado (hoy el análisis usa las mismas banderas para todos). */
+var SAP={cur:"todos",d:null,carga:false};
+var SAP_ECO="/ecosistema/";
+var SAP_MINT=/^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+var SAP_NOM={meme:"Meme",rwa:"Activos tokenizados",defi:"DeFi",juegos:"Juegos",ia:"IA",apps:"Apps y bots",otros:"Otros"};
+var SAP_MED={fees:"comisiones 30 d",circ:"en circulación en Solana",valor:"valor tokenizado",token:"capitalización"};
+var SAP_QUE={
+  meme:["Qué miramos en una meme","Las banderas de siempre:",["¿Pueden crear más o congelarte?","Quién lo tiene (sin contar pools)","¿Puedes vender y cuánto te cuesta?","Quién lo lanzó y su historial","De qué depende (la curva de Pump.fun)"]],
+  rwa:["Qué miramos en un activo tokenizado","No importa quién lo lanzó en Pump.fun, sino:",["¿Es la dirección oficial del emisor? (y sus copias)","Respaldo, custodio e informes","Quién puede congelar y por qué (es normal aquí)","Desvío frente al precio real","Dónde cotiza"]],
+  defi:["Qué miramos en DeFi","Dónde dejas tu dinero y quién puede cambiar las reglas:",["Quién controla el contrato (multifirma, retardo)","Tesorería y movimientos del equipo","Calendario de desbloqueos","De qué depende (oráculos, pools)","Auditorías públicas"]],
+  juegos:["Qué miramos en un juego","Que se pueda comprobar en la cadena:",["Programa verificado y código público","Emisión de premios e inflación","Tesorería y quién la mueve","Jugadores reales, no bots","Desbloqueos del equipo"]],
+  ia:["Qué miramos en un token de IA","Muchos son memes con otro nombre:",["¿El agente opera de verdad en la cadena?","Quién está detrás y su historial","Quién lo tiene","¿Puedes vender?","Promesas sin calendario"]],
+  apps:["Qué miramos en apps y bots","Las herramientas con las que se opera:",["Si el token es el oficial de la app","Cuánto cobra la app de verdad (comisiones)","Quién lo tiene","¿Puedes vender y cuánto te cuesta?"]],
+  otros:["Qué miramos en el resto","DePIN, pagos, privacidad y herramientas:",["Si el token es el oficial del proyecto","Uso real del proyecto","Quién lo tiene","¿Puedes vender y cuánto te cuesta?"]]
+};
+function sapCargar(){
+  if(SAP.d||SAP.carga) return; SAP.carga=true;
+  fetch("/datos/ecosistema.json",{cache:"no-cache"}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(d){ SAP.d=d; sapPinta(); })
+    .catch(function(){ SAP.carga=false; $("#sapcards").innerHTML="<p class='hint'>No se pudieron cargar los datos. Prueba de nuevo en un momento.</p>"; });
+}
+function sapPct(x){ if(x==null||Math.abs(x)<0.0005) return ""; return "<span class='"+(x>=0?"sapup":"sapdn")+"'>"+(x>0?"+":"")+fmtPct(x*100)+"</span>"; }
+function sapAv(r){
+  var i=esc(String(r.sym||r.n||"?").slice(0,2).toUpperCase());
+  return /^https:\/\//.test(r.logo||"")?"<img src='"+esc(r.logo)+"' alt='' loading='lazy' width='32' height='32' data-sapi='"+i+"'>":"<span class='sapav'>"+i+"</span>";
+}
+function sapPinta(){
+  var c=SAP.cur;
+  [].forEach.call(document.querySelectorAll("#sapbar [data-sap]"),function(b){ b.setAttribute("aria-pressed",String(b.getAttribute("data-sap")===c)); });
+  $("#sapbox").hidden=c==="todos";
+  var live=document.querySelector("#scanpage .live2"); if(live) live.hidden=!(c==="todos"||c==="meme");
+  if(c==="todos") return;
+  var q=SAP_QUE[c];
+  $("#sapwhat").innerHTML="<h2>"+esc(q[0])+"</h2><p>"+esc(q[1])+"</p><ul>"+q[2].map(function(x){ return "<li>"+esc(x)+"</li>"; }).join("")+"</ul>"+
+    "<p class='sapnota'>Hoy el análisis usa las mismas banderas en todos los apartados. Los chequeos propios de cada uno están en camino.</p>";
+  $("#saph").innerHTML=esc(SAP_NOM[c])+" <small>los mayores, con su token en Solana</small>";
+  if(!SAP.d){ $("#sapcards").innerHTML="<p class='hint'>Cargando…</p>"; $("#saprows").innerHTML=""; $("#sapsrc").innerHTML=""; sapCargar(); return; }
+  var rs=SAP.d.rows.filter(function(r){ return r.apc===c&&SAP_MINT.test(r.mint||""); });
+  var vacio="<p class='hint'>Aún no hay tokens de este apartado con datos.</p>";
+  var big=rs.slice().sort(function(a,b){ return (b.m||0)-(a.m||0); }).slice(0,5);
+  $("#sapcards").innerHTML=big.length?big.map(function(r){
+    return "<button type='button' class='sapc' data-try='"+esc(r.mint)+"'>"+sapAv(r)+"<b>"+esc(r.n)+"</b><small>"+esc(r.sym||"")+"</small>"+
+      "<span class='sapv'>"+usdShort(r.m||0)+"</span><small>"+esc(SAP_MED[r.med]||"")+"</small>"+sapPct(r.c24)+"</button>";
+  }).join(""):vacio;
+  var mov=rs.filter(function(r){ return r.trad!=null; }).sort(function(a,b){ return b.trad-a.trad; }).slice(0,10);
+  $("#saprows").innerHTML=mov.length?mov.map(function(r,i){
+    return "<button type='button' class='sapr' data-try='"+esc(r.mint)+"'><span class='sapi'>"+(i+1)+"</span>"+sapAv(r)+
+      "<span class='sapn'><b>"+esc(r.n)+"</b><small>"+esc(r.sym||"")+"</small></span><span class='sapt'>"+Number(r.trad).toLocaleString("de-DE")+"<small>traders</small></span><span class='sapp'>"+sapPct(r.c24)+"</span></button>";
+  }).join(""):vacio;
+  $("#sapsrc").innerHTML="Datos del día: DefiLlama, CoinGecko y Jupiter. Que se mueva no es una recomendación de compra. <a href='"+SAP_ECO+"'>Ver el apartado entero en Ecosistema →</a> · <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a>";
+}
+document.addEventListener("click",function(ev){ var b=ev.target.closest&&ev.target.closest("[data-sap]"); if(b){ SAP.cur=b.getAttribute("data-sap"); sapPinta(); } });
+// logo que no carga: sus iniciales
+document.addEventListener("error",function(e){ var im=e.target; if(im&&im.tagName==="IMG"&&im.hasAttribute("data-sapi")){ var s=document.createElement("span"); s.className="sapav"; s.textContent=im.getAttribute("data-sapi"); im.replaceWith(s); } },true);
 /* Portada: «Tokens calientes» con lo mismo que la página Escáner (En tendencia y Recién lanzados) */
 var hot={tab:"t"};
 function hotSeal(r){

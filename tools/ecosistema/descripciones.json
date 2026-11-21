@@ -1,0 +1,465 @@
+{
+ "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn": {
+  "n": "PumpSwap",
+  "es": "Pump.fun, la mayor lanzadera de memecoins de Solana. Hoy es una empresa con varias partes: la lanzadera, su exchange PumpSwap, la app Terminal, la app del móvil y perps. Usa parte de lo que gana en recomprar su token PUMP.",
+  "en": "Pump.fun, the largest memecoin launchpad on Solana. Today it is a company with several parts: the launchpad, its PumpSwap exchange, the Terminal app, the mobile app and perps. It uses part of its earnings to buy back its PUMP token."
+ },
+ "METvsvVRapdj9cFLzq4Tr43xK4tAjQfwX76z3n6mWQL": {
+  "n": "Meteora",
+  "es": "Exchange descentralizado de Solana con pools de liquidez dinámica (DLMM), donde muchos tokens nuevos tienen su primer pool. También funciona como lanzadera.",
+  "en": "A Solana decentralized exchange with dynamic liquidity pools (DLMM), where many new tokens get their first pool. It also works as a launchpad."
+ },
+ "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R": {
+  "n": "Raydium",
+  "es": "Uno de los primeros exchanges descentralizados de Solana: pools donde se cambian tokens y donde cualquiera puede poner liquidez y cobrar comisiones. Tiene también su propia lanzadera.",
+  "en": "One of the first decentralized exchanges on Solana: pools where tokens are swapped and anyone can provide liquidity and earn fees. It also has its own launchpad."
+ },
+ "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE": {
+  "n": "Orca",
+  "es": "Exchange descentralizado de Solana pensado para ser fácil de usar: cambiar tokens y poner liquidez en pools concentrados para cobrar comisiones.",
+  "en": "A Solana decentralized exchange built to be easy to use: swap tokens and provide concentrated liquidity to earn fees."
+ },
+ "METAwkXcqyXKy1AtsSgJ8JiUHwGCafnZL38n3vYmeta": {
+  "n": "MetaDao",
+  "es": "Plataforma de Solana para lanzar proyectos y gobernarlos con «futarquía»: las propuestas no se votan, se deciden según cómo cotizan en mercados de predicción.",
+  "en": "A Solana platform to launch projects and govern them with futarchy: proposals are not voted on, they are decided by how they trade in prediction markets."
+ },
+ "4qQeZ5LwSz6HuupUu8jCtgXyW1mYQcNbFAW1sWZp89HL": {
+  "n": "PancakeSwap",
+  "es": "Exchange descentralizado nacido en BNB Chain que también funciona en Solana. CAKE es su token.",
+  "en": "A decentralized exchange born on BNB Chain that also runs on Solana. CAKE is its token."
+ },
+ "WETZjtprkDMCcUxPi9PfWnowMRZkiGGHDb9rABuRZ2U": {
+  "n": "HumidiFi",
+  "es": "Exchange de Solana de tipo «AMM propio»: un creador de mercado que pone sus propios precios y que mueve gran parte del volumen que pasa por Jupiter.",
+  "en": "A proprietary AMM on Solana: a market maker that sets its own prices and handles a large share of the volume routed through Jupiter."
+ },
+ "KMNo3nJsBXfcpJTVhZcXLW7RmTwTt4GVFE7suUBo9sS": {
+  "n": "Kamino",
+  "es": "Protocolo de préstamos de Solana: depositas tokens para cobrar intereses o pides prestado dejando una garantía. Empezó gestionando liquidez de forma automática.",
+  "en": "A Solana lending protocol: deposit tokens to earn interest or borrow against collateral. It started by managing liquidity automatically."
+ },
+ "DuEy8wWrzCUun5ZbbG9hkVqXqqicpTQw8gB7nEAzpCHQ": {
+  "n": "Fluid",
+  "es": "Protocolo de préstamos y exchange de Instadapp, nacido en Ethereum y ahora también en Solana, que usa el mismo dinero depositado para prestar y para cambiar tokens.",
+  "en": "A lending protocol and exchange by Instadapp, born on Ethereum and now also on Solana, that uses the same deposits both for lending and for swaps."
+ },
+ "SAVEaeeqeXNKYb4Lyx28DkUms5gyZ76vGa6fCfdzWfK": {
+  "n": "Save Protocol",
+  "es": "Protocolo de préstamos de Solana, antes llamado Solend: depositas para cobrar intereses o pides prestado con garantía.",
+  "en": "A Solana lending protocol, formerly called Solend: deposit to earn interest or borrow against collateral."
+ },
+ "omfgRBnxHsNJh6YeGbGAmWenNkenzsXyBXm3WDhmeta": {
+  "n": "Omnipair",
+  "es": "Protocolo de Solana que no se puede cambiar y que junta en un mismo pool el cambio de tokens, los préstamos y el trading con apalancamiento, sin oráculos de precio ni listas de tokens permitidos.",
+  "en": "An immutable Solana protocol that puts swaps, lending and margin trading in the same pool, with no price oracles and no token whitelists."
+ },
+ "SHARKSYJjqaNyxVfrpnBN9pjgkhwDhatnMyicWPnr1s": {
+  "n": "Sharky",
+  "es": "Protocolo de préstamos con NFT como garantía en Solana: pides prestado dejando tu NFT y los prestamistas compiten por darte las mejores condiciones.",
+  "en": "An NFT lending protocol on Solana: you borrow using your NFT as collateral and lenders compete to offer the best terms."
+ },
+ "CLoUDKc4Ane7HeQcPpE3YHnznRxhMimJ4MyaUqyHFzAu": {
+  "n": "Sanctum",
+  "es": "Infraestructura de staking líquido de Solana: permite crear tokens de SOL en staking (LST) y cambiarlos entre sí con liquidez compartida.",
+  "en": "Solana liquid staking infrastructure: it lets anyone create staked SOL tokens (LSTs) and swap between them with shared liquidity."
+ },
+ "MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey": {
+  "n": "Marinade",
+  "es": "Staking líquido de Solana: dejas tu SOL en staking y recibes mSOL, que sigue cobrando el rendimiento y se puede usar en DeFi. MNDE es su token de gobierno.",
+  "en": "Liquid staking on Solana: you stake SOL and get mSOL, which keeps earning the yield and can be used in DeFi. MNDE is its governance token."
+ },
+ "VAULTVXqi93aaq9FsyPKgdgp6Ge1H1HoSvNC4ZbqFDs": {
+  "n": "The Vault",
+  "es": "Staking líquido de Solana con vSOL, que reparte el staking entre validadores pequeños y comunitarios para descentralizar la red.",
+  "en": "Liquid staking on Solana with vSOL, spreading stake across small and community validators to decentralize the network."
+ },
+ "DBRiDgJAMsM95moTzJs7M9LnkGErpbv9v6CUR1DXnUu5": {
+  "n": "deBridge",
+  "es": "Puente entre cadenas para mover tokens e información a Solana y desde ella casi al instante, sin pools de liquidez bloqueada.",
+  "en": "A cross-chain bridge to move tokens and data to and from Solana almost instantly, without locked liquidity pools."
+ },
+ "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ": {
+  "n": "Portal",
+  "es": "Wormhole, el protocolo de mensajes entre cadenas detrás del puente Portal: mueve tokens y datos entre Solana y otras redes. W es su token.",
+  "en": "Wormhole, the cross-chain messaging protocol behind the Portal bridge: it moves tokens and data between Solana and other networks. W is its token."
+ },
+ "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263": {
+  "n": "BONK.fun",
+  "es": "BONK, la memecoin con forma de perro lanzada en Navidad de 2022 para animar a Solana tras la caída de FTX. Repartió la mitad del total entre la comunidad y hoy tiene su propia lanzadera, BONK.fun.",
+  "en": "BONK, the dog memecoin launched on Christmas 2022 to lift Solana after the FTX collapse. It airdropped half its supply to the community and today has its own launchpad, BONK.fun."
+ },
+ "6GmAFSYs4gk3FDao5FzzySQpPZaWsa4rUJHacpMpUNgx": {
+  "n": "StonkFun",
+  "es": "Lanzadera de tokens en Solana. CoinGecko la tiene como lanzadera, sin más descripción.",
+  "en": "A token launchpad on Solana. CoinGecko lists it as a launchpad, with no further description."
+ },
+ "MukLDtJ8Cx9DxLbeyLRSWPSposTMWuwHANbuaudpump": {
+  "n": "OTC",
+  "es": "Token de OTC Desks, un proyecto de Solana nacido en Pump.fun que dice dar acceso a acciones, empresas antes de salir a bolsa y rendimiento.",
+  "en": "The token of OTC Desks, a Solana project born on Pump.fun that says it offers access to stocks, pre-IPO companies and yield."
+ },
+ "31k88G5Mq7ptbRDf3AM13HAq6wRQHXHikR8hik7wPygk": {
+  "n": "Graphite Protocol",
+  "es": "Proyecto de Solana con herramientas para creadores de contenido (Creator Suite). CoinGecko lo clasifica como infraestructura.",
+  "en": "A Solana project with tools for content creators (Creator Suite). CoinGecko classifies it as infrastructure."
+ },
+ "BZFYNPeQAEW3HWQ4DNsTVahC1n4ZjTgn6jB2nnBbB96W": {
+  "n": "Sapling",
+  "es": "Lanzadera de Solana basada en Zcash: cada token lanzado cotiza contra ZEC y parte de sus comisiones se guarda en una bóveda que los titulares pueden cobrar quemando sus tokens.",
+  "en": "A Solana launchpad built around Zcash: every token launched trades against ZEC and part of its fees goes to a vault that holders can claim by burning their tokens."
+ },
+ "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN": {
+  "n": "Jupiter",
+  "es": "El mayor agregador de Solana: busca el mejor precio entre todos los exchanges para cambiar tokens. Tiene también perps, órdenes límite, compras periódicas, préstamos y su propia app.",
+  "en": "The largest aggregator on Solana: it finds the best price across all exchanges to swap tokens. It also has perps, limit orders, recurring buys, lending and its own app."
+ },
+ "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL": {
+  "n": "Jito",
+  "es": "Red de Solana con JitoSOL (staking líquido) y herramientas de MEV que reparten entre quienes hacen staking lo que pagan los bots por ordenar transacciones. JTO es su token de gobierno.",
+  "en": "A Solana network with JitoSOL (liquid staking) and MEV tools that share with stakers what bots pay to order transactions. JTO is its governance token."
+ },
+ "BKipkearSqAUdNKa1WDstvcMjoPsSKBuNyvKDQDDu9WE": {
+  "n": "HawkFi",
+  "es": "Plataforma de Solana para invertir en DeFi con un clic: estrategias automáticas de liquidez y rendimiento.",
+  "en": "A Solana platform for one-click DeFi investing: automated liquidity and yield strategies."
+ },
+ "Ax8PSfCXxmxb8C8kYTzN5CPpTe6PyeZfFf8rrXNCjupx": {
+  "n": "Milk Money",
+  "es": "Token de Solana cuya tesorería se usa como liquidez en pools DLMM con un bot propio, para dar mercado a proyectos nuevos.",
+  "en": "A Solana token whose treasury is deployed as liquidity in DLMM pools by its own bot, to provide markets for new projects."
+ },
+ "TUNAfXDZEdQizTMTh3uEvNvYqJmqFHZbEJt8joP4cyx": {
+  "n": "DefiTuna",
+  "es": "Plataforma de Solana para poner liquidez concentrada con apalancamiento: pides prestado para poner más liquidez en un pool.",
+  "en": "A Solana platform for leveraged concentrated liquidity: you borrow to put more liquidity into a pool."
+ },
+ "HUMA1821qVDKta3u2ovmfDQeW2fSQouSKE8fkF44wvGw": {
+  "n": "Huma",
+  "es": "Red de «PayFi»: financia pagos internacionales con stablecoins para que empresas de pagos liquiden al momento, a cualquier hora.",
+  "en": "A PayFi network: it finances international payments with stablecoins so payment companies can settle instantly, at any time."
+ },
+ "5VzwKkvynPJzcgwhBe7ESEyNgqMbo15yBu7Sehssd9ED": {
+  "n": "Securitize",
+  "es": "La mayor empresa de tokenización de activos reales: fondos de BlackRock, Apollo, KKR o VanEck en forma de token, con entidades reguladas en Estados Unidos.",
+  "en": "The largest real-world asset tokenization company: funds from BlackRock, Apollo, KKR or VanEck as tokens, through regulated US entities."
+ },
+ "1xdtu7y3LkkrVCAbm5KGKfYzq1qgKhxxk5AaJBqpump": {
+  "n": "Mansory",
+  "es": "Token que CoinGecko asocia a Mansory, la empresa alemana que personaliza coches de lujo. Nació en Pump.fun.",
+  "en": "A token CoinGecko links to Mansory, the German company that customizes luxury cars. It was born on Pump.fun."
+ },
+ "STREAMribRwybYpMmSYoCsQUdr6MZNXEqHgm7p1gu9M": {
+  "n": "Streamflow",
+  "es": "Herramienta para repartir y bloquear tokens: bloqueos del equipo e inversores, pagos a plazos, airdrops y staking. De ahí lee SolFlag los desbloqueos.",
+  "en": "A tool to distribute and lock tokens: team and investor vesting, payments over time, airdrops and staking. SolFlag reads unlocks from it."
+ },
+ "2x8o3hA5S5fBxCSE9hzVTf3RohcMWHqkDNKNEPuzprD5": {
+  "n": "SolTradingBot",
+  "es": "Bot de Telegram para comprar y vender tokens de Solana desde el chat. Cobra una comisión por operación.",
+  "en": "A Telegram bot to buy and sell Solana tokens from the chat. It charges a fee per trade."
+ },
+ "DriFtupJYLTosbwoN8koMbEYSx54aFAVLddWsbksjwg7": {
+  "n": "Drift",
+  "es": "Exchange descentralizado de perps (derivados) en Solana, con préstamos y mercados de predicción. En abril de 2026 sufrió un robo de 295 M$.",
+  "en": "A decentralized perps (derivatives) exchange on Solana, with lending and prediction markets. In April 2026 it suffered a 295 M$ theft."
+ },
+ "7Zhxshgt7Ft6pHFYMrHE1epWdWre7sJ1Af1GhEUnitas": {
+  "n": "Unitas",
+  "es": "Dólar con rendimiento en la cadena: genera intereses con una estrategia neutral sobre JLP, el pool de liquidez de Jupiter.",
+  "en": "An on-chain dollar with yield: it earns through a market-neutral strategy on JLP, the Jupiter liquidity pool."
+ },
+ "SLXdx4BUt2v9uJQNzWqSfzTJ9UKLUDsvxHFMEEdrfgq": {
+  "n": "Solstice",
+  "es": "Protocolo de Solana que lleva a DeFi estrategias de rendimiento de tipo institucional. Emite el dólar USX; SLX es su token.",
+  "en": "A Solana protocol that brings institutional-style yield strategies to DeFi. It issues the USX dollar; SLX is its token."
+ },
+ "METAewgxyPbgwsseH8T16a39CQ5VyVxZi9zXiDPY18m": {
+  "n": "Metaplex",
+  "es": "La herramienta con la que se crean casi todos los tokens y NFT de Solana. Parte de lo que cobra vuelve a su token MPLX.",
+  "en": "The tool used to create almost every token and NFT on Solana. Part of what it earns goes back to its MPLX token."
+ },
+ "SNS8DJbHc34nKySHVhLGMUUE72ho6igvJaxtq9T3cX3": {
+  "n": "Solana Name Service",
+  "es": "Nombres .sol: permite usar un nombre como tunombre.sol en vez de una dirección larga. Cobra por registrar y renovar nombres.",
+  "en": "The .sol names: it lets you use a name like yourname.sol instead of a long address. It charges to register and renew names."
+ },
+ "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3": {
+  "n": "Pyth",
+  "es": "Oráculo de precios: lleva precios de mercado en tiempo real, de fuentes institucionales, a las apps de Solana y de otras cadenas.",
+  "en": "A price oracle: it brings real-time market prices from institutional sources to apps on Solana and other chains."
+ },
+ "7JA5eZdCzztSfQbJvS8aVVxMFfd81Rs9VvwnocV1mKHu": {
+  "n": "Geodnet",
+  "es": "Red de estaciones repartidas por el mundo que corrigen la señal GPS para lograr precisión de centímetros (para drones, robots, agricultura). Cobra por esos datos.",
+  "en": "A worldwide network of stations that correct GPS signals to centimeter accuracy (for drones, robots, farming). It charges for that data."
+ },
+ "9gaCDFUN1Kvz1YfocbcowtzZq8PCebdfgT5AmJz5yEVY": {
+  "n": "Tree News",
+  "es": "Token de Tree News, un servicio de noticias rápidas para traders: da acceso a un nivel de suscripción. CoinGecko asocia este token a Tree Capital; lo estamos comprobando.",
+  "en": "The Tree News token, a fast news service for traders: it unlocks a subscription tier. CoinGecko links this token to Tree Capital; we are checking it."
+ },
+ "61V8vBaqAGMpgDQi4JcAwo1dmBGHsyhzodcPqnEVpump": {
+  "n": "AI Rig Complex",
+  "es": "Token de Rig, un framework de código abierto en Rust para crear agentes de IA. Nació en Pump.fun.",
+  "en": "The token of Rig, an open-source Rust framework to build AI agents. It was born on Pump.fun."
+ },
+ "74SBV4zDXxTRgv1pEMoECskKBkZHc2yGPnc7GYVepump": {
+  "n": "Swarms",
+  "es": "Framework de código abierto para que varios agentes de IA trabajen juntos, como un enjambre. Su token nació en Pump.fun.",
+  "en": "An open-source framework for many AI agents to work together, like a swarm. Its token was born on Pump.fun."
+ },
+ "6HHzBVkxtoz86Bjy2duaUw77hVfJzQkuoLizWeEMBLEM": {
+  "n": "Emblem Vault",
+  "es": "Proyecto de agentes de IA para operar en DeFi (DeFAI). CoinGecko no tiene más descripción.",
+  "en": "An AI agents project for trading in DeFi (DeFAI). CoinGecko has no further description."
+ },
+ "3iQL8BFS2vE7mww4ehAqQHAsbmRNCrPxizWAT2Zfyr9y": {
+  "n": "Virtuals Protocol",
+  "es": "Lanzadera para crear agentes de IA con su propio token, sin saber programar. Nació en Base y llegó a Solana con una copia puenteada de su token.",
+  "en": "A launchpad to create AI agents with their own token, no coding needed. It was born on Base and reached Solana through a bridged copy of its token."
+ },
+ "CARDSccUMFKoPRZxt5vt3ksUbxEFEcnZ3H2pd3dKxYjp": {
+  "n": "Collector Crypt",
+  "es": "Convierte cartas coleccionables físicas (como las de Pokémon) en tokens: la carta se guarda en una cámara y en la cadena se compra y se vende su propiedad.",
+  "en": "It turns physical trading cards (like Pokémon cards) into tokens: the card is stored in a vault and its ownership is bought and sold on chain."
+ },
+ "HKJHsYJHMVK5VRyHHk5GhvzY9tBAAtPvDkZfDH6RLDTd": {
+  "n": "Ready Cards",
+  "es": "Plataforma de cartas coleccionables graduadas con sobres que se abren en la cadena y recompra garantizada de las cartas.",
+  "en": "A platform for graded trading cards with packs opened on chain and guaranteed buybacks of the cards."
+ },
+ "HuAXPyDWDaMYFKuwQHpqL1oPnj93zdzWmtvFGzCeCUa7": {
+  "n": "Nullmask",
+  "es": "Protocolo de privacidad en Solana. CoinGecko no tiene más descripción.",
+  "en": "A privacy protocol on Solana. CoinGecko has no further description."
+ },
+ "HgTGdc29D5bDMrDvsCLnorxz899VyDj7ZN7FPa6vpump": {
+  "n": "Veil",
+  "es": "Protocolo de privacidad en Solana: guardas tokens en un saldo protegido y puedes enviarlos, cambiarlos (vía Jupiter) o prestarlos sin que se vea de quién son, con pruebas de conocimiento cero.",
+  "en": "A privacy protocol on Solana: you keep tokens in a shielded balance and can send, swap (via Jupiter) or lend them without revealing who owns them, using zero-knowledge proofs."
+ },
+ "oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp": {
+  "n": "ORE Protocol",
+  "es": "Token que se «mina» en Solana jugando rondas en la cadena, con emisión limitada, pensado como dinero digital difícil de devaluar.",
+  "en": "A token mined on Solana by playing on-chain rounds, with a limited supply, meant as digital money that is hard to debase."
+ },
+ "SATqS9DYpLQsM2z51P4QCoqJRHa5wboV4qjJerJRUSH": {
+  "n": "Sat Rush",
+  "es": "Juego de minería de Bitcoin en la cadena de Solana: rondas de 60 segundos en las que se ganan sats, su token RUSH y puntos.",
+  "en": "An on-chain Bitcoin mining game on Solana: 60-second rounds where you earn sats, its RUSH token and points."
+ },
+ "GodL6KZ9uuUoQwELggtVzQkKmU1LfqmDokPibPeDKkhF": {
+  "n": "GODL protocol",
+  "es": "Token de Solana con lanzamiento justo y minería por rondas, con un máximo de 21 millones, sin ventas privadas ni reparto para el equipo.",
+  "en": "A Solana token with a fair launch and round-based mining, capped at 21 million, with no private sales and no team allocation."
+ },
+ "zinc155BS4mSPk8GXQj4R5hkVDQXcW253pTYq5SGyfi": {
+  "n": "ZINC",
+  "es": "Token de minería por prueba de trabajo con privacidad, en Solana.",
+  "en": "A privacy-preserving proof-of-work mining token on Solana."
+ },
+ "rndrizKT3MK1iimdxRdWabcF7Zg7AR5T4nud4EkHBof": {
+  "n": "Render Network BME",
+  "es": "Red de ordenadores con tarjeta gráfica que se alquilan para renderizar en 3D y para IA. Lo que pagan los clientes en RENDER se quema. Se mudó de Ethereum a Solana en 2023.",
+  "en": "A network of GPU computers rented out for 3D rendering and AI. What customers pay in RENDER is burned. It moved from Ethereum to Solana in 2023."
+ },
+ "4vMsoUT2BWatFweudnQM1xedRLfJgJ7hswhcpz4xgBTy": {
+  "n": "Hivemapper",
+  "es": "Red que crea un mapa del mundo con cámaras de coche: quien graba las calles cobra en HONEY y las empresas pagan por usar el mapa.",
+  "en": "A network that builds a world map with dashcams: drivers who record streets earn HONEY and companies pay to use the map."
+ },
+ "J6MZ299GjaeEXMk7easK9NkpiRHKsmxnQDr2ZqiqVYUL": {
+  "n": "Infinity Gaming",
+  "es": "Ecosistema de casino online, apuestas deportivas y mercados de predicción con su token $INF8 en Solana.",
+  "en": "An online casino, sports betting and prediction markets ecosystem with its $INF8 token on Solana."
+ },
+ "HnGCbLLonRzNRAFHqv5AbvZ4FixMkUQztE2egh4sAmqZ": {
+  "n": "Zylo Ecosystem",
+  "es": "Capa económica que une varias apps y juegos (también de Telegram) para que el progreso y el valor del usuario pasen de uno a otro.",
+  "en": "An economic layer that links several apps and games (including Telegram ones) so a user progress and value carry over between them."
+ },
+ "vRseBFqTy9QLmmo5qGiwo74AVpdqqMTnxPqWoWMpump": {
+  "n": "Verse World",
+  "es": "Mundo digital al estilo de un juego de mundo abierto, para ordenador (Epic Games Store) y realidad virtual, de una empresa de VR con clientes como Toyota o la Policía de Dubái. Su token nació en Pump.fun.",
+  "en": "An open-world style digital world for desktop (Epic Games Store) and virtual reality, by a VR company with clients like Toyota or Dubai Police. Its token was born on Pump.fun."
+ },
+ "BjcRmwm8e25RgjkyaFE56fc7bxRgGPw96JUkXRJFEroT": {
+  "n": "IdleMine",
+  "es": "Juego de móvil en el que se «mina» manteniendo el dedo en la pantalla, con duelos 1 contra 1 y premios diarios.",
+  "en": "A mobile game where you mine by holding your thumb on the screen, with 1v1 battles and daily rewards."
+ },
+ "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx": {
+  "n": "Star Atlas",
+  "es": "Juego de estrategia espacial en Solana, con naves, territorios y economía propia, en marcha desde 2021. ATLAS es la moneda del juego.",
+  "en": "A space strategy game on Solana, with ships, territories and its own economy, running since 2021. ATLAS is the in-game currency."
+ },
+ "poLisWXnNRwC6oBu1vHiuKQzFjGL4XDSu4g9qjz9qVk": {
+  "n": "Star Atlas DAO",
+  "es": "Token de gobierno de Star Atlas, el juego de estrategia espacial de Solana: con POLIS se vota cómo evoluciona el juego.",
+  "en": "The governance token of Star Atlas, the Solana space strategy game: POLIS holders vote on how the game evolves."
+ },
+ "6FhVPctYg363pQbs4iSvqyHe2cJzfsvFD96gePy6pump": {
+  "n": "Exfil.fun",
+  "es": "Juego de Solana alrededor del trading de memecoins. Su token nació en Pump.fun.",
+  "en": "A Solana game built around memecoin trading. Its token was born on Pump.fun."
+ },
+ "3VW31dwix6k2EdzhDgZ2zB15J7FbHYQwAUqXgktRcJEX": {
+  "n": "SOLPUMP",
+  "es": "Casino en la cadena de Solana, sin verificación de identidad. Dice usar el 20 % de sus beneficios en recomprar y quemar su token.",
+  "en": "An on-chain casino on Solana with no ID checks. It says it uses 20% of its profit to buy back and burn its token."
+ },
+ "Tqj8yFmagrg7oorpQkVGYR52r96RFTamvWfth9bpump": {
+  "n": "Kintara",
+  "es": "Juego de Solana cuyo token nació en Pump.fun. CoinGecko no tiene más descripción.",
+  "en": "A Solana game whose token was born on Pump.fun. CoinGecko has no further description."
+ },
+ "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": {
+  "n": "USD Coin",
+  "es": "El dólar digital de Circle: cada USDC está respaldado por dólares y bonos del Tesoro de EE. UU. y se puede canjear 1 a 1.",
+  "en": "Circle digital dollar: each USDC is backed by dollars and US Treasuries and can be redeemed 1 to 1."
+ },
+ "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB": {
+  "n": "Tether",
+  "es": "USDT, el dólar digital más usado del mundo, emitido por Tether. Busca valer siempre 1 $.",
+  "en": "USDT, the most used digital dollar in the world, issued by Tether. It aims to always be worth $1."
+ },
+ "72puLt71H93Z9CzHuBRTwFpL4TG3WZUhnoCC7p8gxigu": {
+  "n": "USDGO",
+  "es": "Dólar digital regulado de OSL Group (Hong Kong), lanzado en 2026 para pagos de empresas y liquidaciones entre países.",
+  "en": "A regulated digital dollar by OSL Group (Hong Kong), launched in 2026 for corporate payments and cross-border settlement."
+ },
+ "USD1ttGY1N17NEEHLmELoaybftRBUSErhqYiQzvEmuB": {
+  "n": "World Liberty Financial USD",
+  "es": "USD1, el dólar digital de World Liberty Financial, con las reservas en custodia de BitGo.",
+  "en": "USD1, the World Liberty Financial digital dollar, with reserves held by BitGo."
+ },
+ "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo": {
+  "n": "PayPal USD",
+  "es": "El dólar digital de PayPal, emitido por Paxos y respaldado al 100 % por dólares y bonos del Tesoro a corto plazo. Se canjea 1 a 1.",
+  "en": "PayPal digital dollar, issued by Paxos and fully backed by dollars and short-term Treasuries. Redeemable 1 to 1."
+ },
+ "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH": {
+  "n": "Global Dollar",
+  "es": "USDG, dólar digital emitido por Paxos desde Singapur (supervisado por su banco central) y canjeable 1 a 1 por dólares.",
+  "en": "USDG, a digital dollar issued by Paxos from Singapore (supervised by its central bank), redeemable 1 to 1 for dollars."
+ },
+ "APhcqtzE73es3KAGiVksZFMLGwJDiAey5qZKUrQHEHfS": {
+  "n": "SoFiUSD",
+  "es": "Dólar digital de SoFi Bank, el primer banco nacional de EE. UU. con una stablecoin en una cadena pública, respaldado 1 a 1 con efectivo.",
+  "en": "A digital dollar by SoFi Bank, the first US national bank with a stablecoin on a public chain, backed 1 to 1 by cash."
+ },
+ "DEkqHyPN7GMRJ5cArtQFAWefqbZb33Hyf6s5iCwjEonT": {
+  "n": "Ethena USDe",
+  "es": "Dólar sintético de Ethena: no está respaldado por dólares en un banco, sino por cripto con una cobertura que anula las subidas y bajadas, y genera rendimiento.",
+  "en": "Ethena synthetic dollar: it is not backed by dollars in a bank but by crypto hedged to cancel price moves, and it earns yield."
+ },
+ "6FrrzDk5mQARGc1TDYoyVnSyRdds1t4PbtohCD6p3tgG": {
+  "n": "Solstice USX",
+  "es": "Dólar digital de Solstice en Solana, respaldado con otras stablecoins como USDC y USDT.",
+  "en": "Solstice digital dollar on Solana, backed by other stablecoins like USDC and USDT."
+ },
+ "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH": {
+  "n": "CASH",
+  "es": "Stablecoin de Phantom, creada con Bridge (de Stripe), para pagos del día a día. Empezó en Solana.",
+  "en": "Phantom stablecoin, built with Bridge (by Stripe), for everyday payments. It launched first on Solana."
+ },
+ "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv": {
+  "n": "Pudgy Penguins",
+  "es": "La memecoin oficial de Pudgy Penguins, la colección de NFT de pingüinos convertida en marca, con juguetes y mucha presencia en redes.",
+  "en": "The official memecoin of Pudgy Penguins, the penguin NFT collection turned brand, with toys and a big social media presence."
+ },
+ "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN": {
+  "n": "Official Trump",
+  "es": "Memecoin con la marca de Donald Trump, lanzada en enero de 2025. Su valor depende solo de quién la compra.",
+  "en": "A memecoin with the Donald Trump brand, launched in January 2025. Its value depends only on who buys it."
+ },
+ "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm": {
+  "n": "dogwifhat",
+  "es": "Memecoin de un perro con un gorro de lana rosa, lanzada de forma anónima a finales de 2023 y una de las más conocidas de Solana.",
+  "en": "A memecoin of a dog wearing a pink knitted hat, launched anonymously in late 2023 and one of the best-known on Solana."
+ },
+ "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump": {
+  "n": "Fartcoin",
+  "es": "Memecoin de humor nacida en Pump.fun a partir de una idea del bot de IA «Terminal of Truths».",
+  "en": "A joke memecoin born on Pump.fun from an idea of the AI bot Terminal of Truths."
+ },
+ "FUAfBo2jgks6gB4Z4LfZkqSZgzNucisEHqnNebaRxM1P": {
+  "n": "Melania Meme",
+  "es": "Memecoin con la marca de Melania Trump, lanzada en enero de 2025.",
+  "en": "A memecoin with the Melania Trump brand, launched in January 2025."
+ },
+ "9PR7nCP9DpcUotnDPVLUBUZKu5WAYkwrCUx9wDnSpump": {
+  "n": "Comedian",
+  "es": "Memecoin inspirada en «Comedian», la obra del plátano pegado a la pared de Maurizio Cattelan. Nació en Pump.fun.",
+  "en": "A memecoin inspired by Comedian, Maurizio Cattelan banana taped to a wall. It was born on Pump.fun."
+ },
+ "2Wu1g2ft7qZHfTpfzP3wLdfPeV1is4EwQ3CXBfRYAciD": {
+  "n": "GOHOME",
+  "es": "Memecoin nacida de una anécdota de la web de la Casa Blanca en enero de 2025 (un botón «go home» al quitar su página en español).",
+  "en": "A memecoin born from a White House website anecdote in January 2025 (a go home button when its Spanish page was removed)."
+ },
+ "ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82": {
+  "n": "BOOK OF MEME",
+  "es": "Memecoin del artista Darkfarms que quiere ser un archivo de memes guardado en la cadena.",
+  "en": "A memecoin by the artist Darkfarms meant as an archive of memes stored on chain."
+ },
+ "2qEHjDLDLbuBgRYvsxhc5D6uDWAivNFZGan56P1tpump": {
+  "n": "Peanut the Squirrel",
+  "es": "Memecoin en recuerdo de Peanut, la ardilla de Instagram que las autoridades de Nueva York sacrificaron en 2024. Nació en Pump.fun.",
+  "en": "A memecoin in memory of Peanut, the Instagram squirrel put down by New York authorities in 2024. It was born on Pump.fun."
+ },
+ "Grass7B4RdKfBCjTKgSqnXkqjwiGvQyFbuSCUJr3XXjs": {
+  "n": "Grass",
+  "es": "Red en la que la gente comparte la conexión a internet que no usa para recoger datos públicos de la web con los que se entrena IA, y cobra por ello.",
+  "en": "A network where people share their unused internet bandwidth to collect public web data used to train AI, and get paid for it."
+ },
+ "BZLbGTNCSFfoth2GYDtwr7e4imWzpR5jqcUuGEwr646K": {
+  "n": "io.net",
+  "es": "Red de ordenadores con tarjeta gráfica repartidos por el mundo que se alquilan para entrenar y ejecutar IA, más barata que la nube tradicional.",
+  "en": "A worldwide network of GPU computers rented out to train and run AI, cheaper than traditional cloud."
+ },
+ "nosXBVoaCTtYdLvKY6Csb4AC8JCdQKKAaWYtx2ZMoo7": {
+  "n": "Nosana",
+  "es": "Red de ordenadores repartidos por el mundo que alquilan su tarjeta gráfica para hacer funcionar modelos de IA. Se paga y se cobra en NOS.",
+  "en": "A worldwide network of computers renting out their GPUs to run AI models. Payments go in NOS."
+ },
+ "HNg5PYJmtqcmzXrv6S9zP1CDKk5BgDuyFBxbvNApump": {
+  "n": "Alchemist AI",
+  "es": "Plataforma para crear aplicaciones sin programar: describes lo que quieres y la IA la hace. Su token nació en Pump.fun.",
+  "en": "A no-code platform to build apps: you describe what you want and the AI builds it. Its token was born on Pump.fun."
+ },
+ "PERLEQKUNUp1dgFZ8EvyXHdN9d6ZQqfGxALDvfs6pDs": {
+  "n": "Perle",
+  "es": "Conecta a expertos con empresas que entrenan modelos de IA: los expertos etiquetan y revisan datos, cobran en el token y su trabajo queda registrado en la cadena.",
+  "en": "It connects experts with companies training AI models: experts label and review data, get paid in the token and their work is recorded on chain."
+ },
+ "1zJX5gRnjLgmTpq5sVwkq69mNDQkCemqoasyjaPW6jm": {
+  "n": "Kled AI",
+  "es": "Mercado de datos para IA: la gente sube fotos, vídeos y otros datos propios y cobra cuando se usan para entrenar modelos.",
+  "en": "A data marketplace for AI: people upload their own photos, videos and other data and get paid when they are used to train models."
+ },
+ "739dnZEG4yaBWFsY8L8ZwrfhGG6dhtCSercW8Umspump": {
+  "n": "clawpump.tech",
+  "es": "Permite a agentes de IA lanzar tokens en Pump.fun sin pagar el gas; cobra las comisiones de esos tokens y reparte parte entre sus titulares.",
+  "en": "It lets AI agents launch tokens on Pump.fun without paying gas; it collects those tokens fees and shares part with its holders."
+ },
+ "FRySi8LPkuByB7VPSCCggxpewFUeeJiwEGRKKuhwpKcX": {
+  "n": "NATIX Network",
+  "es": "Red que recoge vídeo de conducción real con cámaras de coche para entrenar IA física: coches autónomos y robots.",
+  "en": "A network that collects real driving footage from car cameras to train physical AI: self-driving cars and robots."
+ },
+ "375aiUqZERLrB9sHtsArKr4nuWCgBrtqibUDBMGeLvZC": {
+  "n": "375ai",
+  "es": "Red de sensores con cámara y micrófono en carreteras y calles que recoge datos del mundo real para venderlos y entrenar IA.",
+  "en": "A network of camera and microphone sensors on roads and streets that collects real-world data to sell and to train AI."
+ },
+ "MEFNBXixkEbait3xn9bkm8WsJzXtVsaJEn4c8Sam21u": {
+  "es": "El mayor mercado de NFT: se compran y venden NFT en Solana, Bitcoin, Ethereum y otras siete cadenas. El token ME vive en Solana.",
+  "en": "The largest NFT marketplace: NFTs are bought and sold on Solana, Bitcoin, Ethereum and seven other chains. The ME token lives on Solana."
+ },
+ "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6": {
+  "es": "El mayor mercado de NFT de Solana, pensado para quien compra y vende a menudo. La mitad de lo que cobran Tensor y Vector va a la tesorería de TNSR.",
+  "en": "The leading NFT marketplace on Solana, built for frequent traders. Half of the fees from Tensor and Vector go to the TNSR treasury."
+ }
+}

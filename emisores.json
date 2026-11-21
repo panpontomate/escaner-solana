@@ -1530,6 +1530,10 @@
         "Xsb1a2VbaT6rLLq48qcgMQ1iPbs5fW2JZZURBxKfhY6": "ZSx",
         "XsRPgsEQ3dFR84DhMv18jtob5D77FivAsTTsv1jCYmv": "ZTSx",
         "XsYo1hFTUk7pU4GdYxu67sEEHcw8CvdgkPzF9dRXqyh": "Zx"
+      },
+      "reservas": {
+        "url": "https://defi.xstocks.fi/proof-of-reserves",
+        "que": "prueba de reservas por token, en directo: en circulación frente a en custodia (p. ej. NVDAx 100,35 %)"
       }
     },
     {
@@ -1545,7 +1549,11 @@
         "2apBGMsS6ti9RyF5TwQTDswXBWskiJP2LD4cUEDqYJjk",
         "DRXA1H9SjZPyPCEeuAWpfwk8GqVW6dZsKFAtdfpFwApX",
         "8kC6WyMQvcKynL3oXxJdH1aH6sEpuL4KQHX2tY8nDkwy"
-      ]
+      ],
+      "reservas": {
+        "url": "https://www.paxos.com/pyusd-transparency",
+        "que": "informes mensuales de reservas (PYUSD; USDG en https://paxos.com/usdg-transparency)"
+      }
     },
     {
       "name": "Circle",
@@ -1559,7 +1567,11 @@
         "7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar",
         "Hy9168u7b2Toujh8SJKtKK8DWbyaBbXPzxm337R4o4XY",
         "6FF2CPcL6fat16QVJH6W27DeBcX7TSqbwY3a5wtyVJLC"
-      ]
+      ],
+      "reservas": {
+        "url": "https://www.circle.com/transparency",
+        "que": "reservas e informes mensuales"
+      }
     },
     {
       "name": "Ondo",
@@ -1574,7 +1586,11 @@
         "51QVCuHfL1FeNjd8BDeffCKhCcAYoULnVB3yjNhShiuK",
         "6ViaRWzv7p56RfP1A9Hxy2ctu9kfE3XL43SxWuq3E4cE",
         "9foMHsSDq7nMg4WPusSz9eY7tyxyukqborA8GyU5cUxD"
-      ]
+      ],
+      "reservas": {
+        "url": "https://docs.ondo.finance/ondo-stocks/trust-and-transparency",
+        "que": "acciones: atestación diaria de Ankura Trust por activo (app.ondo.finance/assets/…), conciliación mensual y auditoría anual; USDY: https://ondo.finance/usdy"
+      }
     },
     {
       "name": "Tether",
@@ -1584,7 +1600,11 @@
       },
       "keys": [
         "Q6XprfkF8RQQKoQVG33xT88H7wi8Uk1B1CC7YAs69Gi"
-      ]
+      ],
+      "reservas": {
+        "url": "https://tether.to/en/transparency",
+        "que": "reservas e informes trimestrales"
+      }
     },
     {
       "name": "Backpack Securities",
@@ -1783,7 +1803,12 @@
         "BjdMbQ3nQJ6np2JUNp1ivt6xcMjNUXjWD6xauvJTBV9U",
         "2R1N2gJibQEZJVe2b1hzutGUQ2sCAAQcyv9sCQQGfwg8",
         "DZDiU8T6FkmPFZV155LZukgEjXnGnQuW7xcDEEi1pU4p"
-      ]
+      ],
+      "reservas": {
+        "url": "https://backpack.exchange/reserves",
+        "que": "prueba de reservas del exchange (100,28 % el 20/11) SIN desglose de las acciones; custodia de las acciones en RQD Clearing",
+        "parcial": true
+      }
     },
     {
       "name": "Ethena",
@@ -1793,7 +1818,11 @@
       },
       "keys": [
         "4x3oQtX4MhjTKGBeXDZbtTSLZ9cUWo5waN2UChAuthtS"
-      ]
+      ],
+      "reservas": {
+        "url": "https://app.ethena.fi/dashboards/transparency",
+        "que": "panel de reservas y atestaciones de custodios"
+      }
     },
     {
       "name": "World Liberty Financial (BitGo)",
@@ -1804,7 +1833,11 @@
       "keys": [
         "BQh68x9D7TDqgJUXiJX1BsD1eR7kkV978owqwBEftpwK",
         "84ssq8Ud2WRzxVCuEmPa9xLPBUt4odmB8wuE8svZkh71"
-      ]
+      ],
+      "reservas": {
+        "url": "https://docs.worldlibertyfinancial.com/usd1-token/attestation-reports",
+        "que": "atestaciones mensuales (BitGo) y prueba de reservas en https://por.worldlibertyfinancial.com"
+      }
     },
     {
       "name": "Solstice",
@@ -1816,7 +1849,11 @@
       "keys": [
         "Ze3CQhTMi6KMU3nWZQUegA2JpeFd2eMx1Y2Gswqnto4",
         "2aHdm37djj4c21ztMRBmmo4my6RtzN5Nn58Y39rpWbRM"
-      ]
+      ],
+      "reservas": {
+        "url": "https://docs.solstice.finance/legal-documents/attestations-and-proof-of-solvency",
+        "que": "atestaciones y prueba de solvencia"
+      }
     }
   ]
 }

@@ -78,6 +78,7 @@ for (const [k, hijos] of Object.entries(porPadre)) {
   const info = padre || P[String(top.defillamaId)] || {};
   const sym = info.symbol && info.symbol !== "-" ? info.symbol : "";
   rows.push({
+    ids: hijos.map((h) => String(h.defillamaId)), pid: hijos[0].parentProtocol || null,
     n, ap: m[0], gr: m[1], med: "fees", m: f30, c: f60 > 0 ? f30 / f60 - 1 : null,
     r30: hijos.reduce((s, h) => s + (REV[String(h.defillamaId)] || 0), 0) || null,
     tvl: hijos.reduce((s, h) => s + tvlSol(P[String(h.defillamaId)]), 0) || null,
@@ -225,6 +226,7 @@ for (let i = 0; i < conMint.length; i += 100) {
   for (const r of lote) {
     const t = por[MINT[r.gecko]]; if (!t) continue;
     r.mint = t.id; r.tit = t.holderCount ?? null;
+    if (!r.logo && String(t.icon || "").startsWith("https://")) r.logo = t.icon;               // stablecoins: DefiLlama no trae logo
     const d = t.stats24h || {};
     r.titC = d.holderChange != null ? d.holderChange / 100 : null;
     r.trad = d.numTraders ?? null; r.org = d.numOrganicBuyers ?? null;
@@ -242,16 +244,30 @@ const HIST = path.join(OUT, "ecosistema-historial.json");
 let hist = {};
 try { hist = JSON.parse(fs.readFileSync(HIST, "utf8")); } catch {}
 if (!hist.dias) hist = { dias: {} };
-hist.dias[dia] = { m: Object.fromEntries(sel.filter((r) => r.m > 0).map((r) => [r.n, Math.round(r.m)])), sin: sel.filter((r) => !r.tok).map((r) => r.n) };
+// Supply de cada token (para la EMISIÓN: cuántos se crean o se queman al mes). Se lee en la cadena (RPC propio si hay).
+const RPC_SUP = process.env.SOLANA_RPC || "https://api.mainnet-beta.solana.com";
+const conMintSel = sel.filter((r) => r.mint), sup = {}, supplyCrudo = {};
+for (let i = 0; i < conMintSel.length; i += 100) {
+  const lote = conMintSel.slice(i, i + 100);
+  const r = await j(RPC_SUP, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getMultipleAccounts", params: [lote.map((x) => x.mint), { encoding: "jsonParsed" }] }) }).catch(() => null);
+  (r && r.result ? r.result.value : []).forEach((a, k) => { const inf = a && a.data && a.data.parsed && a.data.parsed.info; if (inf) { sup[lote[k].mint] = Number(inf.supply) / 10 ** inf.decimals; supplyCrudo[lote[k].mint] = Number(inf.supply); } });
+}
+hist.dias[dia] = { m: Object.fromEntries(sel.filter((r) => r.m > 0).map((r) => [r.n, Math.round(r.m)])), sin: sel.filter((r) => !r.tok).map((r) => r.n), sup };
 for (const d of Object.keys(hist.dias)) if ((hoy - new Date(d)) / 864e5 > 400) delete hist.dias[d];
 const dias = Object.keys(hist.dias).sort();
 const viejo = dias.filter((d) => (hoy - new Date(d)) / 864e5 >= 28).pop();
 if (viejo) for (const r of sel) if (r.c == null && hist.dias[viejo].m[r.n] > 0 && r.m > 0) r.c = r.m / hist.dias[viejo].m[r.n] - 1;
+// Emisión a 30 días: cambio del supply frente a hace ≥28 días (positivo = se crearon tokens; negativo = se quemaron)
+const viejoSup = dias.filter((d) => (hoy - new Date(d)) / 864e5 >= 28 && hist.dias[d].sup).pop();
+if (viejoSup) for (const r of sel) { const a = hist.dias[viejoSup].sup[r.mint], b = sup[r.mint]; if (a > 0 && b != null) r.emi30 = b / a - 1; }
 for (const r of sel) {
   if (!r.tok) continue;
   const sinDias = dias.filter((d) => d !== dia && (hoy - new Date(d)) / 864e5 <= 30 && hist.dias[d].sin.includes(r.n));
   if (sinDias.length >= 3) r.nuevo = dias.find((d) => d > sinDias[sinDias.length - 1]) || dia;   // primer día que salió con token
 }
+// Código de apartado (apc): lo usa la pestaña Escáner, que en inglés no puede comparar con el nombre en español
+const APC = { "Meme": "meme", "Activos tokenizados": "rwa", "DeFi": "defi", "Juegos": "juegos", "IA": "ia", "Apps y bots": "apps", "Otros": "otros" };
+for (const r of sel) r.apc = APC[r.ap] || "otros";
 const D = {
   fecha: hoy.toISOString(),
   mercado: { fees: totFees60 > 0 ? totFees30 / totFees60 - 1 : null, circ: stPrev > 0 ? stTot / stPrev - 1 : null },
@@ -259,9 +275,100 @@ const D = {
   rows: sel,
 };
 if (sel.length < 100) throw new Error("Solo " + sel.length + " filas: algo ha fallado, no se publica");
+
+// 7) perfiles.json (21/11): lo que el Escáner necesita para los PUNTOS POR APARTADO de cada token (motor, perfil.js)
+//    y que no está en la cadena. Una entrada por dirección; si varias filas comparten token (Pump.fun: lanzadera,
+//    PumpSwap, Terminal, app), se suman como UNA empresa. Campos: ver scoreProfile en solana-risk-engine/src/perfil.js
+const perfiles = await hacerPerfiles(sel).catch((e) => { console.log("perfiles:", e.message); return null; });
+for (const r of sel) { delete r.ids; delete r.pid; }
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(HIST, JSON.stringify(hist));
 fs.writeFileSync(path.join(OUT, "ecosistema.json"), JSON.stringify(D));
+if (perfiles && Object.keys(perfiles.t).length >= 50) fs.writeFileSync(path.join(OUT, "perfiles.json"), JSON.stringify(perfiles));
+else console.log("perfiles.json no se escribe (pocos tokens): se queda el de ayer");
 const cuenta = {};
 for (const r of sel) cuenta[r.ap + " · " + r.gr] = (cuenta[r.ap + " · " + r.gr] || 0) + 1;
 console.log(sel.length, "filas ·", sel.filter((r) => r.nuevo).length, "acaban de sacar token"); console.log(cuenta);
+
+async function hacerPerfiles(sel) {
+  const [hold, hacks] = await Promise.all([
+    j("https://api.llama.fi/overview/fees/solana?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true&dataType=dailyHoldersRevenue").catch(() => ({ protocols: [] })),
+    j("https://api.llama.fi/hacks").catch(() => []),
+  ]);
+  const HOLD = Object.fromEntries(hold.protocols.map((p) => [String(p.defillamaId), p.total30d || 0]));
+  const t = {};
+  for (const r of sel) {
+    if (!r.mint) continue;
+    const e = t[r.mint] ||= { ap: r.apc, ids: new Set(), pids: new Set() };
+    if (r.med === "fees") {
+      e.f30 = (e.f30 || 0) + r.m; e.f60 = (e.f60 || 0) + (r.c != null && r.c > -1 ? r.m / (1 + r.c) : 0);
+      if (r.r30) e.r30 = (e.r30 || 0) + r.r30;
+      for (const id of r.ids || []) { e.ids.add(id); if (HOLD[id]) e.h30 = (e.h30 || 0) + HOLD[id]; }
+      if (r.pid) e.pids.add(r.pid);
+      (e.partes ||= []).push([r.n, Math.round(r.m)]);   // cada parte de la empresa con lo que cobra
+      // el apartado de la fila que más cobra (Pump: la lanzadera es DeFi, pero la empresa entera va como app)
+      if (!e.top || r.m > e.top) { e.top = r.m; e.ap = r.apc; }
+    }
+    if (r.tvl) e.tvl = (e.tvl || 0) + r.tvl;
+    if (r.trad != null) e.trad = r.trad; if (r.orgScore != null) e.org = r.orgScore;
+    if (r.tit != null) e.tit = r.tit; if (r.titC != null) e.titC = r.titC;
+    if (r.gecko) e.gecko = r.gecko;
+    if (r.mcap) e.mcap = Math.round(r.mcap);
+  }
+  // apartado decidido a mano: Pump.fun es UNA empresa de apps (decisión del usuario 21/11), aunque PumpSwap sea la parte que más cobra
+  const AP_FORZADO = { pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn: "apps" };
+  for (const [mint, e] of Object.entries(t)) {
+    if (AP_FORZADO[mint]) e.ap = AP_FORZADO[mint];
+    if (e.f60 > 0) e.c = Math.round((e.f30 / e.f60 - 1) * 1000) / 1000;
+    const ps = [...e.ids].map((id) => P[id]).filter(Boolean);
+    const aud = Math.max(0, ...ps.map((p) => +p.audits || 0)); if (aud || ps.some((p) => (p.audit_links || []).length)) e.aud = aud || 1;
+    const desde = Math.min(...ps.map((p) => p.listedAt || Infinity)); if (isFinite(desde)) e.desde = desde;
+    const hk = hacks.filter((h) => e.ids.has(String(h.defillamaId)) || (h.parentProtocolId && e.pids.has(h.parentProtocolId)));
+    if (hk.length) e.hk = hk.map((h) => ({ d: h.date, p: Math.max(0, Math.round((h.amount || 0) - (h.returnedFunds || 0))) }));
+    for (const k of ["f30", "r30", "h30", "tvl"]) if (e[k] != null) e[k] = Math.round(e[k]);
+    if (e.partes && e.partes.length < 2) delete e.partes; else if (e.partes) e.partes.sort((a, b) => b[1] - a[1]);
+    delete e.ids; delete e.pids; delete e.top; delete e.f60;
+  }
+  // IA: ¿hay código público y se mueve? (GitHub enlazado desde CoinGecko; con GITHUB_TOKEN en Actions, 1.000/h)
+  const GH = process.env.GITHUB_TOKEN ? { headers: { authorization: "Bearer " + process.env.GITHUB_TOKEN } } : undefined;
+  for (const e of Object.values(t).filter((x) => x.ap === "ia" && x.gecko)) {
+    const c = await cgj(`https://api.coingecko.com/api/v3/coins/${e.gecko}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false`).catch(() => null);
+    await espera(2500);
+    const u = ((((c || {}).links || {}).repos_url || {}).github || []).find((x) => /github\.com\/[^/]+/.test(x));
+    if (!u) { e.cod = { dias: null }; continue; }
+    const [, own, repo] = u.match(/github\.com\/([^/#?]+)\/?([^/#?]*)/);
+    let lista = [];
+    if (repo) { const r = await fetch("https://api.github.com/repos/" + own + "/" + repo, GH).catch(() => null); if (r && r.ok) lista = [await r.json()]; }
+    if (!lista.length) for (const tipo of ["orgs", "users"]) { const r = await fetch("https://api.github.com/" + tipo + "/" + own + "/repos?sort=pushed&per_page=30", GH).catch(() => null); if (r && r.ok) { lista = await r.json(); break; } }
+    const ult = lista.filter((x) => !x.fork).map((x) => x.pushed_at).sort().pop();
+    e.cod = ult ? { dias: Math.round((Date.now() - Date.parse(ult)) / 864e5), repos: lista.length, url: u } : { dias: null };
+  }
+  // Desbloqueos de Streamflow (% del supply que se libera en 30 días y lo que sigue bloqueado): solo proyectos y solo
+  // con el RPC de Helius (getProgramAccounts es pesado para el RPC público)
+  if (RPC_HELIUS) for (const [mint, e] of Object.entries(t)) {
+    if (e.ap === "meme" || e.ap === "rwa") continue;
+    const acc = await j(RPC_HELIUS, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getProgramAccounts", params: ["strmRqUCoQUgGUan5YhzUZa6KqdzwX5L6FpUxfmKg5m", { encoding: "base64", filters: [{ memcmp: { offset: 177, bytes: mint } }] }] }) }).then((x) => x.result).catch(() => null);
+    await espera(150);
+    if (!acc) continue;
+    if (!acc.length) { e.dl = null; continue; }
+    const s = supplyCrudo[mint]; if (!s) continue;
+    const u = (d, o) => Number(d.readBigUInt64LE(o)), ahora = Date.now() / 1000, mes = ahora + 30 * 86400; let lib = 0, bloq = 0;
+    for (const a of acc) { const d = Buffer.from(a.account.data[0], "base64"); if (d.length < 457 || u(d, 25)) continue;
+      const dep = u(d, 417), start = u(d, 409), period = u(d, 425) || 1, app = u(d, 433), cliff = u(d, 441) || start, ca = u(d, 449);
+      const v = (x) => x < cliff ? 0 : Math.min(dep, ca + Math.floor((x - cliff) / period) * app); const resto = dep - v(ahora); if (resto <= 0) continue; bloq += resto; lib += v(mes) - v(ahora); }
+    e.dl = { lib: Math.round(10000 * lib / s) / 100, bloq: Math.round(10000 * bloq / s) / 100 };
+  }
+  // Apps de Solana con token que el Ecosistema aún no tiene en su lista (decidido 21/11): apartado y actividad de Jupiter
+  const EXTRA = { MEFNBXixkEbait3xn9bkm8WsJzXtVsaJEn4c8Sam21u: "apps", TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6: "apps" };
+  const faltan = Object.keys(EXTRA).filter((m) => !t[m]);
+  if (faltan.length) {
+    const l = await j("https://lite-api.jup.ag/tokens/v2/search?query=" + faltan.join(",")).catch(() => []);
+    for (const m of faltan) { const x = l.find((y) => y.id === m) || {}, d = x.stats24h || {};
+      t[m] = { ap: EXTRA[m], trad: d.numTraders ?? null, org: x.organicScore != null ? Math.round(x.organicScore) : null, tit: x.holderCount ?? null, titC: d.holderChange != null ? d.holderChange / 100 : null }; }
+  }
+  // «Qué es» escrito a mano (21/11): tools/ecosistema/descripciones.json, {dirección: {es, en}}; el resto lo monta la web
+  try { const D = JSON.parse(fs.readFileSync(path.join(AQUI, "descripciones.json"), "utf8")); for (const [m, q] of Object.entries(D)) if (t[m] && q && q.es) t[m].que = { es: q.es, en: q.en || q.es }; } catch (x) { console.log("descripciones:", x.message); }
+  for (const e of Object.values(t)) delete e.gecko;
+  console.log("perfiles:", Object.keys(t).length, "tokens ·", Object.values(t).filter((e) => e.dl).length, "con desbloqueos ·", Object.values(t).filter((e) => e.cod && e.cod.dias != null).length, "con código");
+  return { fecha: new Date().toISOString(), t };
+}

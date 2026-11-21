@@ -1,0 +1,117 @@
+{
+  "nota": "Programas principales de cada protocolo DeFi, de su documentación o repositorio oficial (20/11/2026). Para leer quién puede cambiar el contrato. Faltan: Jupiter, Sanctum, deBridge, Portal, PancakeSwap, HumidiFi, Fluid, Omnipair, Sharky, The Vault, HawkFi, Milk Money, DefiTuna, Unitas, Solstice, Geodnet.",
+  "programas": {
+    "PumpSwap": [
+      [
+        "AMM",
+        "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
+        "https://github.com/pump-fun/pump-public-docs/blob/main/docs/PUMP_SWAP_README.md"
+      ],
+      [
+        "Curva (bonding curve)",
+        "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+        "https://github.com/pump-fun/pump-public-docs/blob/main/docs/PUMP_PROGRAM_README.md"
+      ]
+    ],
+    "Meteora": [
+      [
+        "DLMM",
+        "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",
+        "https://github.com/MeteoraAg/dlmm-sdk/blob/main/idls/dlmm.json"
+      ],
+      [
+        "DAMM v2",
+        "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+        "https://github.com/MeteoraAg/damm-v2"
+      ]
+    ],
+    "Raydium": [
+      [
+        "AMM v4",
+        "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+        "https://github.com/raydium-io/raydium-amm"
+      ],
+      [
+        "CLMM",
+        "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "https://github.com/raydium-io/raydium-clmm"
+      ],
+      [
+        "CPMM",
+        "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C",
+        "https://github.com/raydium-io/raydium-cp-swap"
+      ]
+    ],
+    "Orca": [
+      [
+        "Whirlpools",
+        "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+        "https://github.com/orca-so/whirlpools"
+      ]
+    ],
+    "MetaDao": [
+      [
+        "Futarchy",
+        "FUTARELBfJfQ8RDGhg1wdhddq1odMAJUePHFuBYfUxKq",
+        "https://github.com/metaDAOproject/programs"
+      ],
+      [
+        "AMM",
+        "AMMJdEiCCa8mdugg6JPF7gFirmmxisTfDJoSNSUi5zDJ",
+        "https://github.com/metaDAOproject/programs"
+      ]
+    ],
+    "Kamino": [
+      [
+        "Lend",
+        "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+        "https://github.com/Kamino-Finance/klend"
+      ],
+      [
+        "Farms",
+        "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
+        "https://github.com/Kamino-Finance/kfarms"
+      ]
+    ],
+    "Save Protocol": [
+      [
+        "Lending",
+        "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo",
+        "https://github.com/solendprotocol/solana-program-library"
+      ]
+    ],
+    "Marinade": [
+      [
+        "Staking líquido",
+        "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD",
+        "https://github.com/marinade-finance/liquid-staking-program/blob/main/Docs/DEPLOYMENT.md"
+      ]
+    ],
+    "Jito": [
+      [
+        "Reparto de propinas",
+        "4R3gSG8BpU4t19KYj8CfnbtRpnT8gtk4dvTHxVRwc2r7",
+        "https://github.com/jito-foundation/jito-programs"
+      ],
+      [
+        "Pago de propinas",
+        "T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqt",
+        "https://github.com/jito-foundation/jito-programs"
+      ]
+    ],
+    "Drift": [
+      [
+        "Drift v2",
+        "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
+        "https://github.com/velocity-exchange/protocol-v2/blob/master/Anchor.toml"
+      ]
+    ],
+    "Pyth": [
+      [
+        "Receptor de precios",
+        "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+        "https://github.com/pyth-network/pyth-crosschain/tree/main/target_chains/solana"
+      ]
+    ]
+  }
+}
