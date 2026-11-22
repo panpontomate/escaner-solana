@@ -4092,9 +4092,17 @@ function renderToken(noScroll){
       (r.emisor?"":"<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span></button>")+
     "</div>"+deskActions(r,fav);
   $("#filters").style.display="none";
-  stockVs(r.mint);
-  tokenDetail(r);
-  renderList();
+  if(r.emisor) stockVs(r.mint);   // la lista de acciones (/api/acciones) solo hace falta para un activo tokenizado (22/11)
+  // la cabecera y la barra salen ya; los bloques (banderas, gráfica, Dónde cotiza, Quién está detrás, Ballenas) en el
+  // siguiente fotograma, en el mismo orden de siempre: el primer pintado no espera a recolocar toda la página (22/11)
+  tokenView();
+  if(tdMint!==r.mint){ $("#tdetail").innerHTML=""; $("#list").innerHTML=""; tdMint=r.mint; }   // sin bloques del token anterior bajo la cabecera nueva
+  var tdRunNow=++tdRun;
+  requestAnimationFrame(function(){ setTimeout(function(){
+    if(tdRunNow!==tdRun||state.token!==r) return;
+    tokenDetail(r);
+    renderList();
+  },0); });
   state.shown.W=true;
   if(state.mode==="W") $("#results").hidden=false;
   if(!noScroll) $("#results").scrollIntoView({behavior:"smooth",block:"start"});
@@ -4351,10 +4359,13 @@ function haceMin(ts){
 function fillTokenExtras(){ paintChart(); paintBundle(); }
 
 /* ---------- token en el Escáner: atajos (Gráfica · Mapa · Quién está detrás · Ballenas) y sus apartados ---------- */
+var tdRun=0, tdMint=null;
+// disposición de la vista de un token (sin contenido): va antes que los bloques para que la página no salte
+function tokenView(){ $("#results").classList.add("tview"); $("#results").classList.remove("wview"); $(".wrap").classList.add("tv-wide"); $("#tdetail").hidden=false; }
 function tokenDetail(r){
   var d=$("#tdetail"), wasIn=state.hin===r.mint;
   whalesHome();
-  $("#results").classList.add("tview"); $("#results").classList.remove("wview"); $(".wrap").classList.add("tv-wide"); d.hidden=false;
+  tokenView();
   listHome(); $("#wnum").hidden=true;
   var young=r.par&&r.par.pairCreatedAt&&Date.now()-r.par.pairCreatedAt<7*86400000;
   // atajos y gráfica en una sola caja: en pantalla ancha van juntos a la derecha aunque las banderas sean más altas (15/11)
