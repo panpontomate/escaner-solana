@@ -1509,7 +1509,7 @@ body{background:none!important;overflow-x:clip}
 .seam canvas{position:absolute;inset:0;width:100%;height:100%}
 
 /* cabecera fija con cristal (en el móvil las pestañas van abajo y el cristal las rompería: allí sin desenfoque) */
-.brand{position:sticky;top:0;z-index:40;background:rgba(5,4,13,.92);border-bottom-color:var(--line);min-height:68px}
+.brand{position:sticky;top:0;z-index:40;background:#05040d;box-shadow:0 0 0 100vmax #05040d;clip-path:inset(0 -100vmax);border-bottom-color:var(--line);min-height:68px}
 @media (min-width:701px){ .brand{background:rgba(5,4,13,.6);box-shadow:0 0 0 100vmax rgba(5,4,13,.6);clip-path:inset(0 -100vmax);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)} .tnav{top:84px} }
 .brand .tab{font-weight:700;color:#d8d2f5}
 .brand .lang{width:40px;height:40px;padding:0;display:grid;place-items:center;border-radius:50%;border-color:var(--line2)}
@@ -2199,6 +2199,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 .pc-x:hover{background:rgba(139,92,246,.18);border-color:#c4b5fd;transform:scale(1.06)}
 .pc-x svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pc-head .segs+.pc-x{margin-left:6px}
+@media (max-width:520px){ .pc-head .pc-x{order:2;margin-left:auto} .pc-head .segs{order:3;margin-left:0} .pc-head .segs+.pc-x{margin-left:auto} }
 .gx{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:rgba(5,4,13,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity .2s}
 .gx.on{opacity:1}
 .gx[hidden]{display:none}
@@ -4060,7 +4061,7 @@ function renderToken(noScroll){
   $("#results").classList.remove("wmode");
   $("#summary").innerHTML=
     "<div class='tsum tsum2'>"+
-    "<div class='tsum-t'><div class='thd'><p class='kick'>Token"+(r.type?" · "+esc(TYPES[r.type].label):"")+"</p>"+
+    "<div class='tsum-t'><div class='thd'><p class='kick'>Token"+(r.type&&!r.perfil?" · "+esc(TYPES[r.type].label):"")+"</p>"+
     "<div class='tidr'>"+tokAv(r.img,r.sym)+"<h2 class='tname'>"+esc(r.sym)+(r.name&&!sameName(r.name,r.sym)?"<small>"+esc(r.name)+"</small>":"")+"</h2>"+(r.perfil?"":stampHtml(r))+"</div>"+
     "<div class='taddr'><button class='mono tmint2' type='button' data-copy='"+esc(r.mint)+"' title='Copiar dirección del token'>"+esc(r.mint)+"</button>"+
       "<button class='copy' type='button' data-copy='"+esc(r.mint)+"' title='Copiar dirección del token'>copiar</button></div></div>"+
@@ -5941,6 +5942,7 @@ function cardLines(ctx,text,maxW,maxLines){
   return lines;
 }
 function usdShort(n){
+  if(n>=1e9) return String(Math.round(n/1e6)).replace(/\B(?=(\d{3})+(?!\d))/g,".")+" M $";
   if(n>=1e6) return (n/1e6).toLocaleString("es-ES",{maximumFractionDigits:2})+" M $";
   if(n>=1e3) return (n/1e3).toLocaleString("es-ES",{maximumFractionDigits:1})+" mil $";
   return usd(n);
@@ -6101,7 +6103,7 @@ function cardStampRaw(x,cx,cy,R,col,top,lbl,sub){
 }
 // kicker «TOKEN · TIPO», logo y nombre (con el nombre largo debajo si aporta), y la dirección; devuelve dónde acaba
 function cardTokenHead(x,r,im,px,py,maxW,av,nameMax){
-  cardKick(x,"TOKEN"+(r.type&&TYPES[r.type]?" · "+TYPES[r.type].label.toUpperCase():""),px,py,Math.round(av*.18),"left");
+  cardKick(x,"TOKEN"+(r.type&&TYPES[r.type]&&!r.perfil?" · "+TYPES[r.type].label.toUpperCase():""),px,py,Math.round(av*.18),"left");
   var ay=py+av*.28; cardAvatar(x,im,r.sym,px,ay,av);
   var nx=px+av+av*.24, nw=maxW-(nx-px); x.fillStyle="#f7f4ff";
   var fs=cardFitFont(x,r.sym,"700",nameMax,Math.round(nameMax*.5),CF.D,nw), long=r.name&&!sameName(r.name,r.sym);

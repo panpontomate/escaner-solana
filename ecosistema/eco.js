@@ -126,7 +126,7 @@
       <span class="num vol">${fm(r.r30)}</span>
       <span class="num vol">${precio}</span>
       <span class="num vol">${r.anios == null ? "—" : "×" + dec(r.anios, 1)}</span>
-      <span class="rel"><span class="num ${r.rel >= 0 ? "up" : "dn"}" title="${r.rel == null && r.med !== "fees" && r.med !== "circ" ? T.sinHist : ""}">${pc(r.rel)}</span>${bar}<small>${T.frente}</small></span>
+      ${r.rel == null && r.med === "token" ? `<span class="rel"></span>` : `<span class="rel"><span class="num ${r.rel >= 0 ? "up" : "dn"}" title="${r.rel == null && r.med !== "fees" && r.med !== "circ" ? T.sinHist : ""}">${pc(r.rel)}</span>${bar}<small>${T.frente}</small></span>`}
       ${ir}</div>${partes(r)}`;
   }
   // una empresa con varias partes (Pump.fun, 21/11): una fila y debajo lo que cobra cada parte
@@ -279,7 +279,8 @@
       $("#lista").innerHTML = AP.map(([a, nom]) => {
         const rs = D.rows.filter((r) => r.ap === a && enTipo(r));
         if (!D.rows.some((r) => r.ap === a)) return "";
-        const top = rs.slice().sort((x, y) => (y.m || 0) - (x.m || 0)).slice(0, 5);
+        // en «Todos», lo que se mide por capitalización y casi nadie usa (menos de 20 traders en 24 h) no entra en los 5 primeros (22/11: Infinity Gaming, 43 M$ y 1 trader)
+        const top = rs.filter((r) => !(r.med === "token" && r.trad != null && r.trad < 20)).sort((x, y) => (y.m || 0) - (x.m || 0)).slice(0, 5);
         return `<div class="blq"><div class="cab"><h3>${esc(nom)}</h3><span>${rs.length}${T.proto}</span><button data-a="${esc(a)}">${T.ver(esc(nom))}</button></div>
           <div class="tbl">${HEAD()}${top.length ? top.map(fila).join("") : `<div class="vacio">${T.ninguno}</div>`}</div></div>`;
       }).join("");

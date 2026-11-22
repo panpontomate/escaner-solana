@@ -63,6 +63,7 @@ export const CODE = [
   [`return n.toLocaleString("de-DE",{minimumFractionDigits:n<1000?2:0,maximumFractionDigits:n<1000?2:0})+" $";`,
    `return "$"+n.toLocaleString("en-US",{minimumFractionDigits:n<1000?2:0,maximumFractionDigits:n<1000?2:0});`],
   [`return n.toLocaleString("es-ES",{maximumSignificantDigits:4})+" $";`, `return "$"+n.toLocaleString("en-US",{maximumSignificantDigits:4});`],
+  [`if(n>=1e9) return String(Math.round(n/1e6)).replace(/\\B(?=(\\d{3})+(?!\\d))/g,".")+" M $";`,`if(n>=1e9) return "$"+(n/1e9).toLocaleString("en-US",{maximumFractionDigits:2})+"B";`],
   [`if(n>=1e6) return (n/1e6).toLocaleString("es-ES",{maximumFractionDigits:2})+" M $";`, `if(n>=1e6) return "$"+(n/1e6).toLocaleString("en-US",{maximumFractionDigits:2})+"M";`],
   [`if(n>=1e3) return (n/1e3).toLocaleString("es-ES",{maximumFractionDigits:1})+" mil $";`, `if(n>=1e3) return "$"+(n/1e3).toLocaleString("en-US",{maximumFractionDigits:1})+"K";`],
   // "3 days ago" instead of "hace 3 días"
