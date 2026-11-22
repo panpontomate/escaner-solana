@@ -281,7 +281,7 @@ if (sel.length < 100) throw new Error("Solo " + sel.length + " filas: algo ha fa
 //    y que no está en la cadena. Una entrada por dirección; si varias filas comparten token (Pump.fun: lanzadera,
 //    PumpSwap, Terminal, app), se suman como UNA empresa. Campos: ver scoreProfile en solana-risk-engine/src/perfil.js
 const perfiles = await hacerPerfiles(sel).catch((e) => { console.log("perfiles:", e.message); return null; });
-// 8) Una empresa con varias partes se ve como UNA fila (21/11, decisión del usuario): Pump.fun va en Apps y bots con
+// 8) Una empresa con varias partes se ve como UNA fila (21/11, decisión del usuario): Pump.fun va en DeFi · DEX (22/11: compite con Raydium y Meteora) con
 //    sus partes debajo. Se hace después de los perfiles, que ya las suman por su cuenta a partir de las filas sueltas.
 const NOMBRE_EMPRESA = { "parent#pump": "Pump.fun" };
 for (const pid of SEPARAR) {
@@ -289,7 +289,7 @@ for (const pid of SEPARAR) {
   const conTok = ps.find((r) => r.mint) || ps.find((r) => r.tok) || ps[0], padre = PADRE[pid] || {};
   const m = ps.reduce((s, r) => s + r.m, 0), m60 = ps.reduce((s, r) => s + (r.c != null && r.c > -1 ? r.m / (1 + r.c) : 0), 0);
   const suma = (k) => ps.reduce((s, r) => s + (r[k] || 0), 0) || null;
-  const una = { ...conTok, n: NOMBRE_EMPRESA[pid] || padre.name || conTok.n, ap: "Apps y bots", gr: "Apps de trading", apc: "apps", med: "fees",
+  const una = { ...conTok, n: NOMBRE_EMPRESA[pid] || padre.name || conTok.n, ap: "DeFi", gr: "DEX", apc: "defi", med: "fees",
     m, c: m60 > 0 ? m / m60 - 1 : null, r30: suma("r30"), tvl: suma("tvl"), logo: logo(padre.logo) || conTok.logo,
     partes: ps.slice().sort((a, b) => b.m - a.m).map((r) => ({ n: r.n, gr: r.gr, m: Math.round(r.m), c: r.c })) };
   delete una.nuevo;
@@ -329,7 +329,7 @@ async function hacerPerfiles(sel) {
       for (const id of r.ids || []) { e.ids.add(id); if (HOLD[id]) e.h30 = (e.h30 || 0) + HOLD[id]; }
       if (r.pid) e.pids.add(r.pid);
       (e.partes ||= []).push([r.n, Math.round(r.m)]);   // cada parte de la empresa con lo que cobra
-      // el apartado de la fila que más cobra (Pump: la lanzadera es DeFi, pero la empresa entera va como app)
+      // el apartado de la fila que más cobra (Pump: PumpSwap, así que DeFi)
       if (!e.top || r.m > e.top) { e.top = r.m; e.ap = r.apc; }
     }
     if (r.tvl) e.tvl = (e.tvl || 0) + r.tvl;
@@ -338,8 +338,8 @@ async function hacerPerfiles(sel) {
     if (r.gecko) e.gecko = r.gecko;
     if (r.mcap) e.mcap = Math.round(r.mcap);
   }
-  // apartado decidido a mano: Pump.fun es UNA empresa de apps (decisión del usuario 21/11), aunque PumpSwap sea la parte que más cobra
-  const AP_FORZADO = { pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn: "apps" };
+  // apartado decidido a mano: Pump.fun es UNA empresa de DeFi (decisión del usuario 22/11; antes apps), con PumpSwap como la parte que más cobra
+  const AP_FORZADO = { pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn: "defi" };
   for (const [mint, e] of Object.entries(t)) {
     if (AP_FORZADO[mint]) e.ap = AP_FORZADO[mint];
     if (e.f60 > 0) e.c = Math.round((e.f30 / e.f60 - 1) * 1000) / 1000;

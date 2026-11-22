@@ -43,7 +43,7 @@
     todasCad: " · all its chains", enSol: " · on Solana", vsMes: " vs prev. month", volumen: " volume 24 h", comis: " in fees", partes: "Its parts", parte30: " fees, 30 d",
     depos: " deposited", tit: " holders", h24: " 24 h", trad: (t, o) => `${t} traders 24 h · ${o} organic`, cap: " market cap",
     sinTok: "No token", vale: "Analyze ›", frente: "vs the market", sinHist: "No history yet",
-    head: ["#", "Project", "Usage", "Revenue 30 d", "Price · 24 h", "Value × revenue", "vs the market"], valeT: "How many times its token is worth what the protocol earns in a year",
+    head: ["#", "Project", "Usage", "Keeps 30 d", "Back to the token", "Price · 24 h", "Value × revenue", "vs market"], valeT: "How many times its token is worth what the protocol earns in a year", ingT: "What the protocol keeps of the fees it charges, last 30 days (DefiLlama)", holdT: "What the protocol spent in 30 days on buying back its token or paying those who hold it (DefiLlama). × = how many times its token is worth that in a year",
     titT: "Wallets holding the token (Jupiter)", tradT: "Wallets that bought or sold in 24 h; organic = buyers that don't look like bots (Jupiter)",
     proto: " projects", ver: (a) => `See ${a} ›`, ninguno: "None in this tab.", elige: "The largest in each section. Pick one to see it in full.",
     k: { feesSol: "Solana fees, 30 d", vsMesK: "vs previous month", protoSin: "Projects · no token", stSol: "Stablecoins on Solana", valTok: "Tokenized value (top 10)", feesAp: "Section fees, 30 d", mercVs: "Market vs prev. month" },
@@ -57,7 +57,7 @@
     todasCad: " · todas sus cadenas", enSol: " · en Solana", vsMes: " vs mes ant.", volumen: " de volumen 24 h", comis: " de comisiones", partes: "Sus partes", parte30: " de comisiones, 30 d",
     depos: " depositados", tit: " titulares", h24: " 24 h", trad: (t, o) => `${t} traders 24 h · ${o} orgánicos`, cap: " de capitalización",
     sinTok: "Sin token", vale: "Analizar ›", frente: "frente al mercado", sinHist: "Aún sin histórico",
-    head: ["#", "Proyecto", "Uso", "Ingresos 30 d", "Precio · 24 h", "Vale × ingresos", "Frente al mercado"], valeT: "Cuántas veces vale su token lo que ingresa el protocolo en un año",
+    head: ["#", "Proyecto", "Uso", "Se queda 30 d", "Devuelve al token", "Precio · 24 h", "Vale × ingresos", "Vs. mercado"], valeT: "Cuántas veces vale su token lo que ingresa el protocolo en un año", ingT: "Lo que se queda el protocolo de las comisiones que cobra, últimos 30 días (DefiLlama)", holdT: "Lo que el protocolo gastó en 30 días en recomprar su token o pagar a quien lo tiene (DefiLlama). × = cuántas veces vale su token eso en un año",
     titT: "Wallets que tienen el token (Jupiter)", tradT: "Wallets que compraron o vendieron en 24 h; orgánicos = compradores que no parecen bots (Jupiter)",
     proto: " proyectos", ver: (a) => `Ver ${a} ›`, ninguno: "Ninguno en esta pestaña.", elige: "Los mayores de cada apartado. Elige uno para verlo entero.",
     k: { feesSol: "Comisiones en Solana, 30 d", vsMesK: "vs mes anterior", protoSin: "Proyectos · sin token", stSol: "Stablecoins en Solana", valTok: "Valor tokenizado (los 10)", feesAp: "Comisiones del apartado, 30 d", mercVs: "Mercado vs mes anterior" },
@@ -109,7 +109,7 @@
       .map(([g, n]) => `<button class="${g === grupo ? "on" : ""}" data-g="${esc(g)}">${esc(g === "Todos" ? T.todos : grNom(g))} <span>${n}</span></button>`).join("");
   }
 
-  const HEAD = () => `<div class="row h"><span class="i">${T.head[0]}</span><span>${T.head[1]}</span><span class="num">${T.head[2]}</span><span class="num vol">${T.head[3]}</span><span class="num vol">${T.head[4]}</span><span class="num vol" title="${T.valeT}">${T.head[5]}</span><span class="num">${T.head[6]}</span><span class="go"></span></div>`;
+  const HEAD = () => `<div class="row h"><span class="i">${T.head[0]}</span><span>${T.head[1]}</span><span class="num">${T.head[2]}</span><span class="num vol" title="${T.ingT}">${T.head[3]}</span><span class="num vol" title="${T.holdT}">${T.head[4]}</span><span class="num vol">${T.head[5]}</span><span class="num vol" title="${T.valeT}">${T.head[6]}</span><span class="num">${T.head[7]}</span><span class="go"></span></div>`;
   function fila(r, i) {
     const w = r.rel == null ? 0 : Math.min(35, Math.abs(r.rel) * 35);
     const bar = r.rel == null ? "" : `<span class="b"><i style="${r.rel >= 0 ? "left:50%" : "right:50%"};width:${w}px;background:${r.rel >= 0 ? "var(--ver)" : "var(--rojo)"}"></i></span>`;
@@ -124,6 +124,7 @@
       <span class="nm">${av(r)}<span><b>${esc(r.n)}${r.sym ? ` <span class="sym">${esc(r.sym)}</span>` : ""}</b><small>${sub}</small>${tit}</span></span>
       <span class="num">${r.m ? fm(r.m) : "—"}<small class="med">${r.m ? medida : ""}</small><small>${extra}</small>${trad}</span>
       <span class="num vol">${fm(r.r30)}</span>
+      <span class="num vol" title="${T.holdT}">${r.h30 == null ? "—" : fm(r.h30) + (r.mcap && r.h30 > 0 ? `<small>×${dec(r.mcap / (r.h30 * 12), 1)}</small>` : "")}</span>
       <span class="num vol">${precio}</span>
       <span class="num vol">${r.anios == null ? "—" : "×" + dec(r.anios, 1)}</span>
       ${r.rel == null && r.med === "token" ? `<span class="rel"></span>` : `<span class="rel"><span class="num ${r.rel >= 0 ? "up" : "dn"}" title="${r.rel == null && r.med !== "fees" && r.med !== "circ" ? T.sinHist : ""}">${pc(r.rel)}</span>${bar}<small>${T.frente}</small></span>`}
@@ -146,7 +147,7 @@
   const MZ = EN ? {
     datoK: "SolFlag registry", dato: (p, n, d, v) => `of the ${n} new tokens we saw being born since ${d} were dead after 24 h. Only ${v} were still alive. Before buying something newborn, check who is behind it.`,
     lzH: "Launchpads,", lzS: "where they are born and how many survive", lzTh: ["Launchpad", "Earns 30 d", "Its token", "Born", "Alive after 24 h"],
-    parte: "part of Pump.fun (shown whole in Apps and bots)", cadena: "on-chain: ", nuevo: "new", sinTok: "No token", conTok: "has a token", noReg: "Not in our registry yet",
+    parte: "part of Pump.fun (shown whole in DeFi)", cadena: "on-chain: ", nuevo: "new", sinTok: "No token", conTok: "has a token", noReg: "Not in our registry yet",
     vivos: (v, n) => `${v} of ${n} alive`,
     lzSrc: (d) => `Fees: DefiLlama (30 days, vs the previous month; “new” if it barely earned last month). Born and alive after 24 h: SolFlag registry since ${d}, with the launches our collector sees (a sample, not all). “Alive” = still has money in it and trading after 24 h.`,
     mmH: "Memecoins,", mmS: "who really trades them", mmTh: ["Memecoin", "Worth · 24 h", "Volume 24 h", "Holders", "Traders 24 h", "Signal"],
@@ -159,7 +160,7 @@
   } : {
     datoK: "Dato del registro de SolFlag", dato: (p, n, d, v) => `de los ${n} tokens nuevos que vimos nacer desde el ${d} estaban muertos a las 24 h. Solo ${v} seguían con vida. Antes de comprar algo recién nacido, mira quién está detrás.`,
     lzH: "Lanzaderas,", lzS: "dónde nacen y cuántas sobreviven", lzTh: ["Lanzadera", "Cobra 30 d", "Su token", "Nacieron", "Vivos a las 24 h"],
-    parte: "parte de Pump.fun (va entera en Apps y bots)", cadena: "en la cadena: ", nuevo: "nuevo", sinTok: "Sin token", conTok: "con token", noReg: "Aún no lo registramos",
+    parte: "parte de Pump.fun (va entera en DeFi)", cadena: "en la cadena: ", nuevo: "nuevo", sinTok: "Sin token", conTok: "con token", noReg: "Aún no lo registramos",
     vivos: (v, n) => `${v} de ${n} vivos`,
     lzSrc: (d) => `Comisiones: DefiLlama (30 días, frente al mes anterior; «nuevo» si el mes anterior casi no cobró). Nacieron y vivos a las 24 h: registro de SolFlag desde el ${d}, con los lanzamientos que ve nuestro recolector (una muestra, no todos). «Vivo» = sigue con dinero dentro y movimiento a las 24 h.`,
     mmH: "Memecoins,", mmS: "quién las mueve de verdad", mmTh: ["Memecoin", "Vale · 24 h", "Volumen 24 h", "Titulares", "Traders 24 h", "Señal"],
@@ -231,8 +232,9 @@
     queH: "Qué miramos en un token de IA", queS: "Muchos son memes con otro nombre:", queL: ["¿El agente opera de verdad en la cadena?", "Quién está detrás y su historial", "Quién lo tiene", "¿Puedes vender?", "Promesas sin calendario"],
   };
   let PERF = null, perfPide = null;
+  const pidePerf = () => perfPide || (perfPide = fetch("/datos/perfiles.json", { cache: "no-cache" }).then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { PERF = (j && j.t) || {}; }));
   function iaVista() {
-    if (!PERF && !perfPide) perfPide = fetch("/datos/perfiles.json", { cache: "no-cache" }).then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { PERF = (j && j.t) || {}; if (ap === "IA") pinta(); });
+    if (!PERF) pidePerf().then(() => { if (ap === "IA") pinta(); });
     const P = PERF || {};
     const rs = D.rows.filter((r) => r.ap === "IA").map((r) => { const p = (r.mint && P[r.mint]) || {}; return Object.assign({}, r, { cod: p.cod || null, dl: p.dl || null, cap: r.mcap || r.m }); }).sort((a, b) => (b.cap || 0) - (a.cap || 0));
     const num = (n, d) => n.toLocaleString(EN ? "en-US" : "es-ES", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0, useGrouping: "always" });
@@ -299,6 +301,7 @@
       r.anios = r.tok && r.mcap && r.r30 ? r.mcap / (r.r30 * 12) : null;
     });
     $("#fecha").textContent = T.fecha(new Date(D.fecha));
+    pidePerf().then(() => { D.rows.forEach((r) => { const p = r.tok && r.mint && PERF[r.mint]; r.h30 = p && p.h30 != null ? p.h30 : null; }); pinta(); });
     // el número de Activos tokenizados, desde el principio (lo que enseña su vista completa)
     if (window.SFActivos) window.SFActivos.datos().then((j) => { if (!j || !Array.isArray(j.filas)) return; const reales = D.rows.filter((r) => r.ap === "Activos tokenizados" && r.gr === "Activos reales" && !/mansory/i.test(r.n)).length; nRwa = j.filas.filter((f) => f.precio != null).length + (j.dolares || []).filter((d) => d.enSolana && d.valor).length + reales; cabecera(); });
     $("#mkF").textContent = pc(D.mercado.fees); $("#mkC").textContent = pc(D.mercado.circ);
