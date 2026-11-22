@@ -58,12 +58,14 @@ document.querySelectorAll("canvas[data-neb]").forEach(function(cv){
   items.push({cv:cv, w:0, h:0, paint:function(){ var s = SHAPES[cv.getAttribute("data-neb")](); return paintDots(cv, 41, s[0], s[1], s[2]); }});
 });
 document.querySelectorAll("canvas[data-seam]").forEach(function(cv){
-  var it = {cv:cv, w:0, h:0, open:RM ? 1 : 0, go:RM, img:null};
+  // se pinta entera una vez; la apertura es un recorte de CSS (22/11: antes se rehacía el lienzo en cada fotograma
+  // durante 1,8 s y daba tirones la primera vez que se bajaba por la portada en un móvil)
+  var it = {cv:cv, w:0, h:0, go:RM, img:null};
+  if (!RM && window.IntersectionObserver) cv.style.clipPath = "inset(0 50% 0 50%)";
   it.draw = function(){
     var D = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight; if (!W || !H || !it.img) return;
     cv.width = W*D; cv.height = H*D; var x = cv.getContext("2d"); x.setTransform(D, 0, 0, D, 0, 0);
-    var half = W/2*it.open; if (half <= 0) return;
-    x.save(); x.beginPath(); x.rect(W/2 - half, 0, half*2, H); x.clip(); x.drawImage(it.img, 0, 0, it.img.width, it.img.height, 0, 0, W, H); x.restore();
+    x.drawImage(it.img, 0, 0, it.img.width, it.img.height, 0, 0, W, H);
   };
   it.paint = function(){ var W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return false; it.img = document.createElement("canvas");
     paintDots(it.img, +cv.getAttribute("data-seam")*97, function(u, v){ var dv = (v - .5)/.16; return Math.exp(-dv*dv)*(1 - Math.pow(Math.abs(u - .5)*2, 3)*.6); }, 5, 1.35, W, H);
@@ -79,10 +81,12 @@ check();
 // las separaciones se abren del centro hacia los lados la primera vez que se ven
 if (!RM && window.IntersectionObserver){
   var io = new IntersectionObserver(function(es){ es.forEach(function(e){
-    var it = items.filter(function(q){ return q.cv === e.target; })[0]; if (!it || !e.isIntersecting || it.go) return;
-    it.go = true; io.unobserve(e.target); var t0 = performance.now();
-    (function step(now){ var k = Math.min(1, (now - t0)/1800); it.open = 1 - Math.pow(1 - k, 3); it.draw(); if (k < 1) requestAnimationFrame(step); })(t0);
+    var it = items.filter(function(q){ return q.cv.parentElement === e.target; })[0]; if (!it || !e.isIntersecting || it.go) return;
+    it.go = true; io.unobserve(e.target);
+    it.cv.style.transition = "clip-path 1.8s cubic-bezier(.33,1,.68,1)";
+    requestAnimationFrame(function(){ it.cv.style.clipPath = "inset(0 0 0 0)"; });
   }); }, {threshold:.4});
-  items.forEach(function(it){ if (it.draw) io.observe(it.cv); });
-} else items.forEach(function(it){ if (it.draw){ it.open = 1; it.draw(); } });
+  // se vigila el contenedor: con el recorte, el lienzo no tiene área visible y nunca se daría por visto
+  items.forEach(function(it){ if (it.draw) io.observe(it.cv.parentElement); });
+}
 })();
