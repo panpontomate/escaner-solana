@@ -279,8 +279,8 @@
       $("#lista").innerHTML = AP.map(([a, nom]) => {
         const rs = D.rows.filter((r) => r.ap === a && enTipo(r));
         if (!D.rows.some((r) => r.ap === a)) return "";
-        // en «Todos», lo que se mide por capitalización y casi nadie usa (menos de 20 traders en 24 h) no entra en los 5 primeros (22/11: Infinity Gaming, 43 M$ y 1 trader)
-        const top = rs.filter((r) => !(r.med === "token" && r.trad != null && r.trad < 20)).sort((x, y) => (y.m || 0) - (x.m || 0)).slice(0, 5);
+        // en «Todos», lo que se mide por capitalización y casi nadie usa (menos de 20 traders en 24 h, o sin dato de traders) no entra en los 5 primeros (22/11: Infinity Gaming, 43 M$ y 1 trader)
+        const top = rs.filter((r) => !(r.med === "token" && (r.trad == null || r.trad < 20))).sort((x, y) => (y.m || 0) - (x.m || 0)).slice(0, 5);
         return `<div class="blq"><div class="cab"><h3>${esc(nom)}</h3><span>${rs.length}${T.proto}</span><button data-a="${esc(a)}">${T.ver(esc(nom))}</button></div>
           <div class="tbl">${HEAD()}${top.length ? top.map(fila).join("") : `<div class="vacio">${T.ninguno}</div>`}</div></div>`;
       }).join("");
