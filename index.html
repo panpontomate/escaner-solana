@@ -2696,7 +2696,16 @@ setTimeout(function(){ if(window.__escOk) return; var e=document.getElementById(
 import * as SRE from "https://cdn.jsdelivr.net/npm/solana-risk-engine@0.7.2/+esm";
 window.__escOk=true;
 // Lista de emisores revisada (emisores.json): una rotación de claves aprobada no necesita otra versión del motor
-fetch("/emisores.json",{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j&&SRE.setIssuers) SRE.setIssuers(j.emisores); }).catch(function(){});
+// Se baja al momento si se abre un análisis directo (?token=, ?wallet=…); en la portada, en el primer rato libre (22/11).
+// Todo análisis espera a tenerla (assess y analyze), así que nunca se mide un token sin ella.
+var issuersP=null;
+function issuersReady(){
+  if(!issuersP) issuersP=fetch("/emisores.json",{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(j&&SRE.setIssuers) SRE.setIssuers(j.emisores); }).catch(function(){});
+  return issuersP;
+}
+if(/[?&](token|wallet|ballenas|map)=/.test(location.search)) issuersReady();
+else if(window.requestIdleCallback) requestIdleCallback(function(){ issuersReady(); },{timeout:2500});
+else setTimeout(issuersReady,1500);
 (function(){
 "use strict";
 
@@ -3524,6 +3533,7 @@ async function assess(mint,par,valor,unchecked,noConc,copies,perfil){
   var op={value:valor,marketUnknown:unchecked,skipConcentration:noConc,copies:!!copies};
   // puntos por apartado (motor 0.7.0): en todas partes (token suelto, wallet, Mi lista, Confluencia, listas de la portada);
   // el archivo del día se baja una sola vez. Sin entrada en el archivo: null (emisor conocido = activo tokenizado; lo demás, meme)
+  await issuersReady();
   if(perfil===undefined){ var PF=await perfilesData(); perfil=PF[mint]||null; }
   op.perfil=perfil;
   var r=await call(SRE.assess(client(),mint,par,op));
@@ -3684,6 +3694,7 @@ function friendlyError(e){
 // RugCheck, netBalances y assess: en el bloque del motor (librería)
 
 async function analyze(){
+  issuersReady();
   var wallet=$("#wallet").value.trim();
   state.scan=true;
   $("#error").hidden=true;
@@ -4765,6 +4776,28 @@ var sdatos={ok:false,run:false,green:[]};
 /* En tendencia ahora: los pools en tendencia de GeckoTerminal (por actividad, no hay puestos de pago). El veredicto
    se calcula de 2 en 2, de arriba abajo, y solo mientras la página Escáner está a la vista */
 var TREND_N=10, trend={dur:"h1",run:0,ts:0,rows:null,err:false};
+/* Veredictos de la tendencia guardados 10 min en este navegador: al volver a la portada salen al momento.
+   Solo lo que pintan la lista y la cinta (nivel y el tipo de cada señal) */
+var TREND_KEY="sf.trendR", TREND_TTL=600000;
+function trendCacheAll(){ try{ var o=JSON.parse(store(TREND_KEY)||"null"); if(o&&typeof o==="object") return o; }catch(e){} return {}; }
+function trendCacheGet(m){ var c=trendCacheAll()[m]; return c&&Date.now()-c.t<TREND_TTL?c.r:null; }
+function trendCacheSet(m,r){
+  var all=trendCacheAll(), now=Date.now();
+  Object.keys(all).forEach(function(k){ if(!all[k]||now-all[k].t>=TREND_TTL) delete all[k]; });
+  all[m]={t:now,r:{lvl:r.lvl,lights:(r.lights||[]).map(function(l){ return {s:l.s,k:l.k}; })}};
+  try{ store(TREND_KEY,JSON.stringify(all)); }catch(e){}
+}
+// espera a que la lista de tendencia (portada o pestaña Escáner) esté a menos de 400 px de verse
+function trendSeen(){
+  return new Promise(function(res){
+    var els=[$("#hotrows"),$("#strows")].filter(Boolean);
+    if(!els.length||!("IntersectionObserver" in window)) return res();
+    var o=new IntersectionObserver(function(es){ if(es.some(function(e){ return e.isIntersecting; })){ o.disconnect(); res(); } },{rootMargin:"400px 0px"});
+    els.forEach(function(el){ o.observe(el); });
+  });
+}
+// un hueco libre del navegador (sin pasar de 1,5 s) para no cortar el scroll ni lo que toque el usuario
+function idleSlot(){ return new Promise(function(res){ if(window.requestIdleCallback) requestIdleCallback(function(){ res(); },{timeout:1500}); else setTimeout(res,60); }); }
 async function loadTrend(){
   var run=++trend.run; trend.ts=Date.now(); trend.err=false; trend.rows=null; paintTrend();
   try{
@@ -4784,13 +4817,21 @@ async function loadTrend(){
       rows.push(x);
     });
     if(run!==trend.run) return;
-    trend.rows=rows; paintTrend();
-    var mk=await getMarkets(rows.map(function(x){ return x.mint; }));
-    await pool(rows,2,async function(x){
+    rows.forEach(function(x){ var c=trendCacheGet(x.mint); if(c){ x.r=c; x.st="done"; } });
+    trend.rows=rows; paintTrend(); paintCinta();
+    var rest=rows.filter(function(x){ return x.st!=="done"; });
+    if(!rest.length) return;
+    // el análisis (unas 70 peticiones) espera a que la lista esté a punto de verse y va en los ratos libres (22/11)
+    await trendSeen();
+    if(run!==trend.run||!liveOn()) return;
+    var mk=await getMarkets(rest.map(function(x){ return x.mint; }));
+    await pool(rest,2,async function(x){
       if(run!==trend.run||!liveOn()) return;
+      await idleSlot();
       var par=mk.data[x.mint]||x.gt;
       await fillLiquidity(par,x.liq);
       try{ x.r=await assess(x.mint,par,0,false); }catch(e){ x.r=null; }
+      if(x.r) trendCacheSet(x.mint,x.r);
       x.st="done";
       if(run===trend.run){ paintTrend(); paintCinta(); }
     });
@@ -5164,7 +5205,8 @@ function paintHome(){
   if(!trend.rows||Date.now()-trend.ts>300000) setTimeout(function(){ if(liveOn()) loadTrend(); },300); else paintTrend();
   if(Date.now()-fresh.ts>=30000) loadFresh(); else paintFresh(true);
   if(!fresh.timer) fresh.timer=setInterval(liveTick,10000);
-  loadDatos(); loadHotW();
+  // las wallets del día y los DEX (con exchanges.json) cuando la portada llega a la tendencia, que va justo encima (22/11)
+  loadDatos(); trendSeen().then(loadHotW);
 }
 document.addEventListener("keydown",function(ev){ if((ev.key==="Enter"||ev.key===" ")&&ev.target&&ev.target.id==="smbox"){ ev.preventDefault(); ev.target.click(); } });
 document.addEventListener("touchstart",function(ev){ var c=$("#scinta"); if(c) c.classList.toggle("stop",!!(ev.target.closest&&ev.target.closest("#scinta"))); },{passive:true});
