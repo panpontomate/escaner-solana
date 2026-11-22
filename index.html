@@ -2199,7 +2199,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 .pc-x:hover{background:rgba(139,92,246,.18);border-color:#c4b5fd;transform:scale(1.06)}
 .pc-x svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .pc-head .segs+.pc-x{margin-left:6px}
-@media (max-width:520px){ .pc-head .pc-x{order:2;margin-left:auto} .pc-head .segs{order:3;margin-left:0} .pc-head .segs+.pc-x{margin-left:auto} }
+@media (max-width:520px){ .pc-head .pc-x,.pc-head .segs+.pc-x{order:1;margin-left:auto} .pc-head .pc-chg{order:2;flex-basis:100%} .pc-head .segs{order:3;margin-left:0} }
 .gx{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:rgba(5,4,13,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity .2s}
 .gx.on{opacity:1}
 .gx[hidden]{display:none}
