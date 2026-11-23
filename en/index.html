@@ -1580,8 +1580,6 @@ body.landing #adv{margin-top:10px}
 .pchecks li{display:grid;grid-template-columns:12px 1fr;gap:2px 10px;padding:8px 0;border-top:1px solid var(--line);font-size:.9rem}
 .pchecks li i{width:10px;height:10px;border-radius:50%;margin-top:5px;grid-row:1/3}
 .pchecks li span{color:var(--muted);font-size:.82rem}
-.pc-ley{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0 0;font-size:.76rem;color:var(--muted)}
-.pc-ley span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:5px}
 .pc-nota{margin:8px 0 0;font-size:.76rem;color:var(--muted)}
 .ap-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px;margin-top:12px}
 .ap-tiles div{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.025)}
@@ -3443,7 +3441,7 @@ var SRE_KIND={program:"programa",active:"activa"};
 // «Cancelar» aborta su señal; un análisis nuevo pone state.cancel=false y estrena otra
 var eng={c:null,rpc:null,ac:null};
 // Mayores cuentas de un token (15/11): el RPC público que las da va en cola a 1 por segundo y era lo más lento del
-// veredicto. Se piden a nuestra API (Helius, 2 min en caché) y, si no contesta, al público como antes
+// veredicto. Se piden a nuestra API (Helius, 10 min en caché) y, si no contesta, al público como antes
 function topFetch(url,init){
   var q; try{ q=JSON.parse(init.body); }catch(e){ return fetch(url,init); }
   var m=q&&q.params&&q.params[0];
@@ -4024,11 +4022,10 @@ function apBlockHtml(r){
 function apDato(b,t){ return "<div class='ap-dato'><span class='kick'>Fact</span><b>"+esc(b)+"</b><p>"+esc(t)+"</p></div>"; }
 function apVale(x){ return x.toLocaleString("en-US",{maximumFractionDigits:1}); }
 // La tarjeta de banderas con puntos por apartado: pequeño en la tarjeta, todo en grande en el centro de la pantalla
-var CK_LEY="<p class='pc-ley'><span style='--c:var(--bajo)'>adds</span><span style='--c:var(--medio)'>subtracts</span><span style='--c:var(--alto)'>subtracts a lot or trap</span><span style='--c:var(--dia)'>good to know</span><span style='--c:var(--muted)'>not known yet</span></p>";
 function pBanderasHtml(r){
   var cs=(r.perfil.checks||[]).filter(function(c){ return CK_NOM[c.k]; });
   return "<p class='kick'>The flags · "+esc(AP_NOM[r.perfil.ap]||"")+"</p><div class='bp-h'><h3 class='tgt'>Why it scores this way</h3><button type='button' class='bp-amp' data-bands='1' title='See it larger'>⤢</button></div>"+
-    "<ul class='bp'>"+cs.map(function(c){ return "<li><i style='background:"+CK_COL[c.col]+"'></i>"+esc(CK_NOM[c.k])+"</li>"; }).join("")+"</ul>"+CK_LEY+
+    "<ul class='bp'>"+cs.map(function(c){ return "<li><i style='background:"+CK_COL[c.col]+"'></i>"+esc(CK_NOM[c.k])+"</li>"; }).join("")+"</ul>"+
     "<button type='button' class='btn ghost small bp-ver' data-bands='1'>See them all in detail ⤢</button>";
 }
 function bandsOpen(){
@@ -4040,7 +4037,7 @@ function bandsOpen(){
     document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&!m.hidden) bandsClose(); }); }
   m.innerHTML="<div class='bm-caja' role='dialog' aria-modal='true' aria-label='Why it scores this way'><button type='button' class='bm-x' data-bclose='1' title='Close'>✕</button>"+
     "<p class='kick'>The flags · "+esc(AP_NOM[r.perfil.ap]||"")+"</p><h3 class='tgt'>Why it scores this way</h3>"+
-    "<div class='bm-cks'>"+cs.map(function(c){ var t=ckDet(c); return "<div><i style='background:"+CK_COL[c.col]+"'></i><b>"+esc(CK_NOM[c.k])+"</b>"+(t?"<span>"+esc(t)+"</span>":"")+"</div>"; }).join("")+"</div>"+CK_LEY+
+    "<div class='bm-cks'>"+cs.map(function(c){ var t=ckDet(c); return "<div><i style='background:"+CK_COL[c.col]+"'></i><b>"+esc(CK_NOM[c.k])+"</b>"+(t?"<span>"+esc(t)+"</span>":"")+"</div>"; }).join("")+"</div>"+
     "<p class='kick bm-k'>The usual 5 flags</p>"+(state.bandLh||"")+
     "<p class='pc-nota'>The colour sums up what we see on chain and in public sources (DefiLlama, Jupiter, GitHub, Streamflow). Not investment advice. <a href='"+LHOW+"#nivel' target='_blank' rel='noopener'>How the tier is decided →</a></p></div>";
   m.hidden=false; document.body.style.overflow="hidden";
@@ -4584,7 +4581,7 @@ function eqTxt(g){ return "Part of a group of "+g.w+" wallets that send SOL to e
 function whoRow(roles,x,cara){
   var n=x.n||0, g=eqOf(x.wallet), res=x.resolved||0, dead=x.dead24||0, fr=res?dead/res:0;
   var cls=res>=3&&fr>=0.9?" r":(res&&fr>=0.5?" y":"");
-  var txt=!n?"First time we see it in a launch":
+  var txt=!n?"We don't see it in other launches (registry since 29/10/2026)":
     n+(n===1?" launch":" launches")+" before this one · "+dead+(dead===1?" dead":" dead")+" after 24 h"+(n>res?" · "+(n-res)+" without a result yet":"");
   return "<div class='whr"+cls+"'>"+tokAv("",x.wallet)+
     "<div style='min-width:0'><span class='role'>"+esc(roles)+(cara?"<span class='wkf'>Known face</span>":"")+"</span>"+

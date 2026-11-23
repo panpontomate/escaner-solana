@@ -12,7 +12,7 @@
 //   GET  /api/lanzaderas          por plataforma: tokens que vimos nacer y cuántos murieron a las 24 h (registro)
 //   GET  /api/acciones            activos tokenizados (lista diaria) frente al precio real: prima, bolsa abierta, liquidez (acciones.js)
 //   GET  /api/cotiza/<mint>        dónde se negocia: pools de la cadena y exchanges con comisión, identidad y MiCA (cotiza.js)
-//   GET  /api/top/<mint>           mayores cuentas del token (Helius, 2 min en caché, 30/min por conexión)
+//   GET  /api/top/<mint>           mayores cuentas del token (Helius, 10 min en caché, 30/min por conexión)
 //   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
 //   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
 //                                  veces (tabla pedidos), nada de quién. El recolector lo analiza después él mismo
@@ -267,7 +267,7 @@ export async function handle(req, env) {
     const r = await top(env, p[3], fetch);
     if (!r) return fail(503, "rpc unavailable");
     const res = json({ v: V, mint: p[3], result: r });
-    res.headers.set("cache-control", "public, max-age=120");   // las mayores cuentas cambian poco en 2 min; cada token nuevo, 1 crédito
+    res.headers.set("cache-control", "public, max-age=600");   // 10 min (23/11, antes 2): Helius tarda 3–7 s con tokens grandes y cada análisis lo esperaba; cada token nuevo, 1 crédito
     return res;
   }
   if (p.length === 3 && p[1] === "api" && p[2] === "acciones") {
