@@ -259,6 +259,7 @@ export const TEXT = {
   " Siguen vivos a las 24 h: <b>": " Still alive after 24 h: <b>",
   "Siguen vivos a las 24 h": "Still alive after 24 h",
   "con sus 24 h cumplidas": "once 24 h have passed",
+  "Todo en orden": "All clear",
   "Se movió hoy, a las ": "It moved today, at ",
   "Caída": "Crash",
   "Vende en la caída": "Sells in the crash",
