@@ -7649,8 +7649,8 @@ document.addEventListener("keydown",function(e){
    maqueta maquetas/grafica/marcas-grafica.html). Sale de las últimas 300 operaciones de GeckoTerminal (cada una con su
    wallet), del creador del análisis, de quién compró en el primer segundo (revisión del lanzamiento) y del registro.
    «El X % de lo suyo» solo cuando su compra está dentro de esas mismas operaciones: si no, no se pone ---------- */
-var MKCOL={cr:"#ff4d6d",la:"#fb923c",wb:"#38bdf8",tu:"#c4b5fd"};
-var MK={on:{cr:true,la:true,wb:true,tu:true},data:{}};
+var MKCOL={cr:"#ff4d6d",la:"#fb923c",wb:"#38bdf8",cb:"#f472b6",tu:"#c4b5fd"};
+var MK={on:{cr:true,la:true,wb:true,cb:true,tu:true},data:{}};
 try{ var mk0=JSON.parse(localStorage.getItem("sf.mk")||"null"); if(mk0) Object.keys(MK.on).forEach(function(k){ if(typeof mk0[k]==="boolean") MK.on[k]=mk0[k]; }); }catch(e){}
 function mkSave(){ try{ localStorage.setItem("sf.mk",JSON.stringify(MK.on)); }catch(e){} }
 async function mkWait(get,ms){ for(var t=0;t<ms;t+=400){ var v=get(); if(v!=="loading"&&v!==undefined) return v; await new Promise(function(res){ setTimeout(res,400); }); } return get(); }
@@ -7708,6 +7708,10 @@ async function mkLoad(r){
         bought[w]=got; sold[w]=gone; });
       ev.sort(function(a,b){ return a.ts-b.ts; });
     }
+    // caídas bruscas (25/11): velas de 1 min que caen más de un 30 % (de la apertura al mínimo) y quién vendió en ese
+    // momento (nuestra API, Helius). Las velas son las que ya baja la gráfica; los pools del token no cuentan como vendedores
+    var cbs=await cbFind(r);
+    if(cbs.length){ ev=ev.concat(cbs); ev.sort(function(a,b){ return a.ts-b.ts; }); }
     var laSold={}; ev.forEach(function(e){ if(e.k==="la") laSold[e.w]=1; });
     var crW=Object.keys(cr).filter(function(w){ return bought[w]>0; })[0];
     MK.data[m]={ev:ev,from:tr.length?tr[0].ts:0,n:tr.length,laTotal:Object.keys(la).length,laSold:Object.keys(laSold).length,
@@ -7715,6 +7719,24 @@ async function mkLoad(r){
       hel:hw.length,helCr:hw.some(function(w){ return cr[w]; })};
   }catch(e){ if(e&&e.message==="cancelado"){ delete MK.data[m]; return; } MK.data[m]="err"; }
   if(state.token===r) mkPaint();
+}
+async function cbFind(r){
+  var key=r.par.pairAddress+"|min", c=await mkWait(function(){ return charts[key]; },10000);
+  if(!Array.isArray(c)||c.length<5) return [];
+  var out=[], last=-1e15;
+  c.forEach(function(p){ var drop=(p[2]-p[4])/p[2]; if(drop>0.3&&p[0]-last>600000){ out.push({ts:p[0],k:"cb",sell:false,drop:Math.round(drop*100),open:p[2],low:p[4],close:p[1]}); last=p[0]; } });
+  out=out.sort(function(a,b){ return b.drop-a.drop; }).slice(0,2);
+  if(!out.length) return [];
+  var pools={}; pools[r.par.pairAddress]=1;
+  try{ var dx=await jfetch("https://api.dexscreener.com/token-pairs/v1/solana/"+r.mint); (dx||[]).forEach(function(p){ if(p&&p.pairAddress) pools[p.pairAddress]=1; }); }catch(e){}
+  var res=out.slice();
+  for(var i=0;i<out.length;i++){ var x=out[i], t=Math.floor(x.ts/1000);
+    try{ var q=await fetch(API+"caida/"+r.par.pairAddress+"?m="+r.mint+"&desde="+(t-30)+"&hasta="+(t+90));
+      var j=q.ok?await q.json():null;
+      ((j&&j.vendedores)||[]).filter(function(v){ return !pools[v.w]; }).slice(0,3).forEach(function(v){
+        res.push({ts:v.t*1000,k:"cb",sell:true,w:v.w,tok:v.tok,n:v.n,tx:v.sig,usd:v.tok*x.open}); });
+    }catch(e){} }
+  return res;
 }
 // las marcas de una gráfica: «Tú» (historial) y, si están, las del creador, el lanzamiento y las ballenas, una por vela y tipo.
 // Guarda en la serie qué pasó en cada vela, para el detalle al pasar el ratón
@@ -7731,23 +7753,25 @@ function mkSet(series,times,r,step,tz){
     Object.keys(g).forEach(function(key){ var e=g[key][0], n=g[key].length, up=e.k==="wb"&&!e.sell;
       // texto solo en lo importante (creador y tú); el resto, flechas de color
       mk.push({time:+t,position:up?"belowBar":"aboveBar",color:MKCOL[e.k],shape:up?"arrowUp":"arrowDown",size:e.k==="cr"?1.4:1,
-        text:e.k==="cr"?"Creador":e.k==="tu"?"Tú":n>1?"×"+n:""}); });
+        text:e.k==="cr"?"Creador":e.k==="tu"?"Tú":e.k==="cb"&&!e.sell?"Caída":n>1?"×"+n:""}); });
   });
   mk.sort(function(a,b){ return a.time-b.time; });
   series.setMarkers(mk); series._mkBy=by;
 }
+function tokShort(n){ n=Number(n)||0; var f=function(x){ return x.toLocaleString("es-ES",{maximumFractionDigits:x<10?2:x<100?1:0}); }; return n>=1e9?f(n/1e9)+" mil M":n>=1e6?f(n/1e6)+" M":n>=1e3?f(n/1e3)+" k":f(n); }
 function mkWho(k,sell,mv){
+  if(k==="cb") return sell?"Vende en la caída":"Caída brusca";
   if(mv) return k==="cr"?"El creador se deshace de sus tokens":"Comprador del lanzamiento se deshace de sus tokens";
   return k==="cr"?"El creador vende":k==="la"?"Comprador del lanzamiento vende":k==="wb"?(sell?"Ballena vende":"Ballena compra"):"Lo analizaste aquí"; }
 function mkPct(e){ return (e.k==="wb"?"{n} % de lo suyo":"el {n} % de lo suyo").replace("{n}",e.pct); }
-function mkLine(e,pre){ return mkWho(e.k,e.sell,e.mv)+(e.usd?" · "+usd(e.usd):"")+(e.pct!=null?" · "+mkPct(e):"")+(pre?" · "+"en la curva, antes de graduar":""); }
+function mkLine(e,pre){ if(e.k==="cb") return e.sell?mkWho("cb",true)+" · "+tokShort(e.tok)+" tokens"+(e.usd?" · ≈ "+usd(e.usd):"")+(e.n>1?" · "+"en {n} operaciones".replace("{n}",e.n):""):mkWho("cb",false)+" · "+"−{p} % en un minuto".replace("{p}",e.drop); return mkWho(e.k,e.sell,e.mv)+(e.usd?" · "+usd(e.usd):"")+(e.pct!=null?" · "+mkPct(e):"")+(pre?" · "+"en la curva, antes de graduar":""); }
 // el detalle de una vela con marcas, al pasar el ratón o tocar
 function mkTip(tip,series,pr,box){
   var evs=pr&&pr.time!=null&&series&&series._mkBy?series._mkBy[pr.time]:null;
   if(!tip) return;
   if(!evs||!evs.length||!pr.point){ tip.hidden=true; return; }
   tip.innerHTML=evs.map(function(e){ return "<div class='mke'><i style='background:"+MKCOL[e.k]+"'></i><span><b>"+esc(mkWho(e.k,e.sell,e.mv))+"</b>"+
-    (e.usd?" · "+esc(usd(e.usd)):"")+(e.pct!=null?" · "+esc(mkPct(e)):"")+"</span>"+(e.w?"<small>"+esc(short(e.w))+" · "+esc(ftime(e.ts))+"</small>":"")+"</div>"; }).join("");
+    (e.k==="cb"&&!e.sell?" · "+esc("−{p} % en un minuto".replace("{p}",e.drop)):"")+(e.k==="cb"&&e.sell?" · "+esc(tokShort(e.tok)+" tokens"):"")+(e.usd?" · "+esc(usd(e.usd)):"")+(e.pct!=null?" · "+esc(mkPct(e)):"")+"</span>"+(e.w?"<small>"+esc(short(e.w))+" · "+esc(ftime(e.ts))+"</small>":"")+"</div>"; }).join("");
   tip.hidden=false;
   var w=box.clientWidth, x=pr.point.x+16; if(x+270>w) x=pr.point.x-276;
   tip.style.left=Math.max(4,x)+"px"; tip.style.top=Math.max(4,pr.point.y-20)+"px";
@@ -7757,7 +7781,8 @@ function mkChipsHtml(m){
   var d=MK.data[m], ev=d&&d.ev||[], n=function(k){ return ev.filter(function(e){ return e.k===k; }).length; };
   if(!d||d==="loading") return "<span class='mkw'>"+"Buscando ventas del creador y de las ballenas…"+"</span>";
   if(d==="err") return "";
-  return [["cr","Creador",n("cr")],["la","Compradores del lanzamiento",n("la")],["wb","Ballenas",n("wb")],["tu","Tú",null]].map(function(x){
+  var ncb=ev.filter(function(e){ return e.k==="cb"&&!e.sell; }).length;
+  return [["cr","Creador",n("cr")],["la","Compradores del lanzamiento",n("la")],["wb","Ballenas",n("wb")]].concat(ncb?[["cb","Caídas bruscas",ncb]]:[]).concat([["tu","Tú",null]]).map(function(x){
     return "<button type='button' class='mkc' data-mk='"+x[0]+"' aria-pressed='"+MK.on[x[0]]+"'><i style='background:"+MKCOL[x[0]]+"'></i>"+esc(x[1])+(x[2]!=null?" <b>"+x[2]+"</b>":"")+"</button>"; }).join("")+
     "<button type='button' class='mkq' data-mkq>"+"¿Qué es cada marca?"+"</button>";
 }
@@ -7765,6 +7790,7 @@ function mkHelpHtml(){
   return "<ul class='mkh' hidden><li><i style='background:"+MKCOL.cr+"'></i><span><b>"+"Creador"+"</b>: "+"la wallet que creó el token vende o se deshace de sus tokens, es decir, los vende o los pasa a otra wallet (flecha roja grande)."+"</span></li>"+
     "<li><i style='background:"+MKCOL.la+"'></i><span><b>"+"Compradores del lanzamiento"+"</b>: "+"los que compraron en el primer bloque venden. «×3» = tres en la misma vela."+"</span></li>"+
     "<li><i style='background:"+MKCOL.wb+"'></i><span><b>"+"Ballenas"+"</b>: "+"compras (abajo) o ventas (arriba) de más del 2 % de la liquidez (y de 500 $ como mínimo), o de las 10 wallets con más saldo si has abierto «Ballenas»."+"</span></li>"+
+    "<li><i style='background:"+MKCOL.cb+"'></i><span><b>"+"Caída brusca"+"</b>: "+"el precio cae más de un 30 % en un minuto. En «Lo que pasó» ves quién vendió en ese momento."+"</span></li>"+
     "<li><i style='background:"+MKCOL.tu+"'></i><span><b>"+"Tú"+"</b>: "+"cuando lo analizaste."+"</span></li></ul>";
 }
 // lo que pasó: tres cifras y la lista en orden; pulsar una fila lleva la gráfica a esa vela
@@ -7799,13 +7825,13 @@ function mkStory(r){
   var todo=MK.all===r.mint, list=d.ev.slice().reverse().slice(0,todo?40:6);
   box.innerHTML="<h3 class='mkt'>"+"Lo que pasó"+"</h3><p class='mks'>"+"Las ventas y compras que importan, de la más reciente a la más antigua. Son hechos de la cadena, no acusaciones."+"</p>"+
     "<ul class='mktl'>"+list.map(function(e){ var pre=r.par&&r.par.pairCreatedAt&&!/^pump-?fun$/i.test(r.par.dexId||"")&&e.ts<r.par.pairCreatedAt-60000;   // antes de que existiera este pool
-      return "<li data-mkts='"+e.ts+"'><time>"+esc(ftime(e.ts))+"</time><i style='background:"+MKCOL[e.k]+"'></i><span>"+esc(mkLine(e,pre))+" <small>"+esc(short(e.w))+"</small></span>"+
-      "<a href='https://solscan.io/tx/"+esc(e.tx)+"' target='_blank' rel='noopener'>Solscan ↗</a></li>"; }).join("")+"</ul>"+
+      return "<li data-mkts='"+e.ts+"'><time>"+esc(ftime(e.ts))+"</time><i style='background:"+MKCOL[e.k]+"'></i><span>"+esc(mkLine(e,pre))+(e.w?" <small>"+esc(short(e.w))+"</small>":"")+"</span>"+
+      (e.tx?"<a href='https://solscan.io/tx/"+esc(e.tx)+"' target='_blank' rel='noopener'>Solscan ↗</a>":"<span></span>")+"</li>"; }).join("")+"</ul>"+
     (!todo&&d.ev.length>6?"<button type='button' class='btn small mkall' data-mkall>"+"Ver las {n}".replace("{n}",Math.min(40,d.ev.length))+"</button>":"")+
     (todo&&d.ev.length>40?"<p class='mks'>"+"Se enseñan las 40 más recientes."+"</p>":"")+
     "<p class='mks'>"+esc(mkSrc(d))+"</p>"+mkDato(r,d);
 }
-function mkSrc(d){ return "Operaciones de GeckoTerminal (las últimas {n}{desde}) y registro de SolFlag.".replace("{n}",d&&d.n||300).replace("{desde}",d&&d.from?", desde el {f}".replace("{f}",fdate(d.from)+" "+ftime(d.from)):"")+
+function mkSrc(d){ return (d&&d.ev&&d.ev.some(function(e){ return e.k==="cb"; })?"Caídas bruscas: velas de 1 min (GeckoTerminal) y, en ese minuto, quién vendió (Helius)."+" ":"")+"Operaciones de GeckoTerminal (las últimas {n}{desde}) y registro de SolFlag.".replace("{n}",d&&d.n||300).replace("{desde}",d&&d.from?", desde el {f}".replace("{f}",fdate(d.from)+" "+ftime(d.from)):"")+
   (d&&d.hel?" "+(d.helCr&&d.hel===1?"Del creador, toda su historia con este token (Helius).":d.helCr?"Del creador y de {n} compradores del lanzamiento, toda su historia con este token (Helius).":"De {n} compradores del lanzamiento, toda su historia con este token (Helius).").replace("{n}",d.hel-(d.helCr?1:0)):""); }
 // repintar marcas, interruptores y «Lo que pasó» (al llegar los datos o al pulsar un interruptor)
 function mkPaint(){
