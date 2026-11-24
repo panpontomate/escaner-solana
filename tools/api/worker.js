@@ -8,6 +8,8 @@
 //                                  en serie, financiadores de varios creadores y quién compra en los primeros bloques
 //   GET  /api/ventas/<mint>?w=<w1,w2…>&desde=<unix>   compras y ventas de ese token de hasta 5 wallets desde que nació
 //                                  (Helius), para las marcas de la gráfica; 30 min en la caché
+//   GET  /api/caida/<pool>?m=<mint>&desde=<unix>&hasta=<unix>   en una caída brusca (máx. 30 min), las wallets que más
+//                                  tokens soltaron (Helius); una semana en la caché si ya pasó
 //   GET  /api/logo/<mint>         el logo del token (getAsset de Helius), una semana en la caché
 //   GET  /api/lanzaderas          por plataforma: tokens que vimos nacer y cuántos murieron a las 24 h (registro)
 //   GET  /api/acciones            activos tokenizados (lista diaria) frente al precio real: prima, bolsa abierta, liquidez (acciones.js)
@@ -90,6 +92,9 @@ export async function lanzaderas(db) {
   return { v: 1, desde: isFinite(desde) ? desde : null, total: { n, con, muertos }, plats };
 }
 export const TOP = 12, DAY = 86400000, SLOT = 10800000;
+// financiadores: más candidatos, porque la web quita los de ritmo de exchange (24/11 las 12 primeras lo eran todas
+// y la tarjeta «Financia creadores» desapareció)
+export const TOP_FU = 50;
 export async function portada(db, now) {
   // ph(n, k): marcadores ?k … ?(k+n-1) para un IN
   const since = now - DAY, ph = (n, k) => Array.from({ length: n }, (_, i) => "?" + (i + k)).join(",");
@@ -109,7 +114,7 @@ export async function portada(db, now) {
     spark(await all(db, "SELECT cr AS w, CAST((t - ?1) / " + SLOT + " AS INTEGER) AS b, COUNT(*) AS n FROM lanz WHERE t > ?1 AND cr IN (" + ph(ws.length, 2) + ") GROUP BY cr, b", [since].concat(ws)), creators);
   }
 
-  const funders = (await all(db, "SELECT fu AS w, COUNT(DISTINCT cr) AS c, COUNT(*) AS n, MIN(t) AS first FROM lanz WHERE t > ?1 AND fu IS NOT NULL GROUP BY fu HAVING c > 1 ORDER BY c DESC, n DESC LIMIT " + TOP, [since]))
+  const funders = (await all(db, "SELECT fu AS w, COUNT(DISTINCT cr) AS c, COUNT(*) AS n, MIN(t) AS first FROM lanz WHERE t > ?1 AND fu IS NOT NULL GROUP BY fu HAVING c > 1 ORDER BY c DESC, n DESC LIMIT " + TOP_FU, [since]))
     .map((r) => ({ w: r.w, creators: r.c, n: r.n }));
   if (funders.length) {
     const ws = funders.map((f) => f.w);
@@ -221,6 +226,36 @@ export async function ventas(env, m, ws, desde, fetchFn) {
   return { v: V, mint: m, desde: desde, wallets: out };
 }
 
+// Caída brusca (25/11): en una ventana corta del pool, qué wallets se deshicieron de más tokens. Helius
+// getTransactionsForAddress con filtro de hora, hasta CAIDA_PAG páginas de 100. Son hechos de la cadena: la wallet que
+// manda tokens al pool (o a un enrutador) en esa ventana.
+export const CAIDA_PAG = 3, CAIDA_TOP = 5;
+export function salidas(t, m) {
+  if (!t || !t.meta) return {};
+  const d = {};
+  const add = (b, sg) => { if (b && b.mint === m && b.owner) d[b.owner] = (d[b.owner] || 0) + sg * (Number(b.uiTokenAmount && b.uiTokenAmount.uiAmount) || 0); };
+  (t.meta.preTokenBalances || []).forEach((b) => add(b, -1));
+  (t.meta.postTokenBalances || []).forEach((b) => add(b, 1));
+  return d;
+}
+export async function caida(env, pool, m, desde, hasta, fetchFn) {
+  const por = {}; let tok, n = 0, completo = false;
+  for (let pg = 0; pg < CAIDA_PAG; pg++) {
+    const j = await fetchFn(env.SOLANA_RPC, { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getTransactionsForAddress", params: [pool, { transactionDetails: "full", sortOrder: "asc", limit: 100,
+        encoding: "jsonParsed", maxSupportedTransactionVersion: 1, paginationToken: tok, filters: { blockTime: { gte: desde, lt: hasta }, status: "succeeded" } }] }) })
+      .then((r) => r.json()).catch(() => null);
+    const r = j && j.result; if (!r || !Array.isArray(r.data)) return null;
+    for (const t of r.data) { n++;
+      for (const [w, v] of Object.entries(salidas(t, m))) if (v < 0 && w !== pool) {
+        const x = por[w] || (por[w] = { w: w, tok: 0, n: 0, t: t.blockTime, sig: t.transaction && t.transaction.signatures && t.transaction.signatures[0] });
+        x.tok += -v; x.n++; } }
+    tok = r.paginationToken; if (!tok) { completo = true; break; }
+  }
+  const top = Object.values(por).sort((a, b) => b.tok - a.tok).slice(0, CAIDA_TOP).map((x) => Object.assign(x, { tok: Math.round(x.tok) }));
+  return { v: V, pool: pool, mint: m, desde: desde, hasta: hasta, ops: n, completo: completo, vendedores: top };
+}
+
 export async function handle(req, env) {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: Object.assign({}, HEAD, { "access-control-allow-methods": "GET, POST", "access-control-max-age": "86400" }) });
   const p = new URL(req.url).pathname.replace(/\/+$/, "").split("/");
@@ -246,6 +281,22 @@ export async function handle(req, env) {
     const res = json(v);
     // si alguna wallet no contestó, que no se quede media hora en la caché
     res.headers.set("cache-control", "public, max-age=" + (Object.values(v.wallets).some((x) => !x) ? 60 : 1800));
+    return res;
+  }
+  if (p.length === 4 && p[1] === "api" && p[2] === "caida") {
+    const q = new URL(req.url).searchParams, m = String(q.get("m") || ""), desde = Math.floor(Number(q.get("desde"))), hasta = Math.floor(Number(q.get("hasta")));
+    if (!ADDR.test(p[3]) || !ADDR.test(m)) return fail(400, "use /api/caida/<pool>?m=<mint>&desde=&hasta=");
+    if (!(desde > 1.6e9) || !(hasta > desde) || hasta - desde > 1800) return fail(400, "desde/hasta: unix seconds, 30 min at most");
+    if (!env.SOLANA_RPC) return fail(503, "rpc unavailable");
+    if (env.VENTAS_LIMIT) {
+      const { success } = await env.VENTAS_LIMIT.limit({ key: req.headers.get("cf-connecting-ip") || "?" });
+      if (!success) return fail(429, "too many requests");
+    }
+    const c = await caida(env, p[3], m, desde, hasta, fetch);
+    if (!c) return fail(503, "rpc unavailable");
+    const res = json(c);
+    // el pasado no cambia: una semana en la caché si la ventana ya acabó hace más de 10 min
+    res.headers.set("cache-control", "public, max-age=" + (hasta < Date.now() / 1000 - 600 ? 604800 : 120));
     return res;
   }
   if (p.length === 4 && p[1] === "api" && p[2] === "logo") {

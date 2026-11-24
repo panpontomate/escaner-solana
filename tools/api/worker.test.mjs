@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top } from "./worker.js";
+import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top, caida, salidas } from "./worker.js";
 import { SCHEMA } from "../caras/plano.mjs";
 
 const A = "PAY1111111111111111111111111111111", B = "FUND111111111111111111111111111111", C = "BUY1111111111111111111111111111111";
@@ -244,4 +244,21 @@ test("top: mayores cuentas con Helius; sin respuesta o sin lista, undefined (la 
   assert.equal(await top(env, "Mint1", async () => ({ ok: true, json: async () => ({ error: { message: "x" } }) })), undefined);
   assert.equal(await top(env, "Mint1", async () => { throw new Error("red"); }), undefined);
   assert.equal(await top({}, "Mint1", ok), undefined);
+});
+
+test("caida: las wallets que más tokens soltaron en la ventana, sin el pool; ventana de más de 30 min, 400", async () => {
+  const P = "Pool111111111111111111111111111111111111111", M = "Mint111111111111111111111111111111111111111";
+  const bal = (owner, ui) => ({ mint: M, owner: owner, uiTokenAmount: { uiAmount: ui } });
+  const tx = (owner, antes, despues, t) => ({ blockTime: t, transaction: { signatures: ["sig" + t] },
+    meta: { preTokenBalances: [bal(owner, antes), bal(P, 1000)], postTokenBalances: [bal(owner, despues), bal(P, 1000 + antes - despues)] } });
+  assert.deepEqual(salidas(tx("V1", 50, 0, 1), M), { V1: -50, [P]: 50 });
+  const env = { SOLANA_RPC: "https://helius.example" };
+  let llamadas = 0;
+  const c = await caida(env, P, M, 1700000000, 1700000600, async () => { llamadas++;
+    return { json: async () => ({ result: { data: [tx("V1", 7000, 0, 1700000010), tx("V2", 300, 100, 1700000020), tx("V1", 600, 0, 1700000030), tx("C1", 0, 400, 1700000040)] } }) }; });
+  assert.equal(llamadas, 1); assert.equal(c.completo, true); assert.equal(c.ops, 4);
+  assert.deepEqual(c.vendedores.map((v) => [v.w, v.tok, v.n]), [["V1", 7600, 2], ["V2", 200, 1]]);   // el comprador C1 y el pool no salen
+  assert.equal(await caida(env, P, M, 1700000000, 1700000600, async () => ({ json: async () => ({ error: { message: "x" } }) })), null);
+  const r = await handle(new Request("https://api.solflag.com/api/caida/" + P + "?m=" + M + "&desde=1700000000&hasta=1700009999"), env);
+  assert.equal(r.status, 400);
 });
