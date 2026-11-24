@@ -4104,7 +4104,7 @@ function renderToken(noScroll){
     var rs=r.perfil.checks.filter(function(c){ return (c.col==="resta"||c.col==="grave")&&CK_NOM[c.k]; }).map(function(c){ return CK_NOM[c.k]; });
     var rc=r.perfil.checks.filter(function(c){ return (c.col==="resta"||c.col==="grave")&&CK_NOM[c.k] }).sort(function(x,y){ return x.p-y.p; });   // lo que más resta, primero
     if(rc.length){ tip=""; rtags="<span class='rtags'>"+rc.slice(0,3).map(function(c){ var x=ckChip(c); return "<span class='rtag' style='--c:"+CK_COL[c.col]+"'><i></i>"+esc(CK_NOM[c.k])+(x?" <b>"+esc(x)+"</b>":"")+"</span>"; }).join("")+"</span>"; }
-    else tip="No check in its section subtracts.";
+    else tip="";   // 25/11: si nada resta, de momento no sale nada (pendiente de decidir con el usuario)
   }
   if(r.launchLvl) tip+=" Raised to "+L.label.toLowerCase()+(r.faceLvl?" because of who is behind the launch (see Creator control).":" because of what happened at launch (see Launch buys).");
   if(r.imp) tip="It is a copy of "+r.imp.sym+" with another address: it is not "+r.imp.sym+" and its price has nothing to do with the real one. Do not buy it thinking it is the original, and if you hold it, do not visit websites under its name to “swap” or “claim” it.";

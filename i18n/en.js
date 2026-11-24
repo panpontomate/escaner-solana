@@ -278,7 +278,6 @@ export const TEXT = {
   " <small>· nació en una lanzadera: se mide como una meme</small>": " <small>· born in a launchpad: scored as a meme</small>",
   "<small> / 110 puntos</small></span>": "<small> / 110 points</small></span>",
   " de 110": " of 110",
-  "Ningún chequeo de su apartado resta.": "No check in its section subtracts.",
   // los cinco niveles (motor 0.6.0, 14/11/2026)
   "Rojo": "Red",
   "Naranja": "Orange",
