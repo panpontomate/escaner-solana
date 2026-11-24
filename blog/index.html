@@ -84,6 +84,14 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
   <h1>Lo que vamos<span class="thin">construyendo.</span></h1>
   <p>Novedades de SolFlag, pruebas con tokens reales y lo que aprendemos por el camino. Contado tal cual, también lo que sale mal.</p>
   <nav class="toc" aria-label="Entradas">
+    <a href="#analisis-mas-limpio"><time datetime="2026-11-23">23 nov 2026</time><b>Un análisis más limpio y «Quién está detrás» más claro</b></a>
+    <a href="#mas-rapida"><time datetime="2026-11-22">22 nov 2026</time><b>Una web más rápida y la liquidez que de verdad cuenta</b></a>
+    <a href="#puntos-por-apartado"><time datetime="2026-11-21">21 nov 2026</time><b>Cada token, medido por lo que es: puntos por apartado</b></a>
+    <a href="#ecosistema"><time datetime="2026-11-20">20 nov 2026</time><b>Nueva página: el Ecosistema, todo Solana por apartados</b></a>
+    <a href="#mi-lista-pulsar"><time datetime="2026-11-19">19 nov 2026</time><b>Mi lista: pulsa y analiza</b></a>
+    <a href="#mi-lista-nombres"><time datetime="2026-11-18">18 nov 2026</time><b>Arreglo en Mi lista y una limpieza por dentro</b></a>
+    <a href="#radar-telegram"><time datetime="2026-11-17">17 nov 2026</time><b>El Radar, ahora en Telegram</b></a>
+    <a href="#aviso-regulador"><time datetime="2026-11-16">16 nov 2026</time><b>Dónde cotiza: el aviso del regulador, bien visible</b></a>
     <a href="#grafica-grande"><time datetime="2026-11-15">15 nov 2026</time><b>La gráfica, en grande: dibuja encima y mira cuándo vendió el creador</b></a>
     <a href="#llegaron-lejos"><time datetime="2026-11-14">14 nov 2026</time><b>Los que llegaron lejos no eran suerte; y cinco niveles en vez de tres</b></a>
     <a href="#claves-emisores"><time datetime="2026-11-12">12 nov 2026</time><b>Cuando un emisor cambia sus claves</b></a>
@@ -105,6 +113,97 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
 </section>
 
 <!-- Para añadir un avance: copia un <article> y ponlo el primero, con su enlace en el índice de arriba. Y tradúcelo en /en/blog/ con el mismo id -->
+
+<article id="analisis-mas-limpio">
+  <time datetime="2026-11-23">23 de noviembre de 2026</time>
+  <h2>Un análisis más limpio y «Quién está detrás» más claro</h2>
+  <div class="tags"><span>Análisis</span><span>Mejora</span></div>
+  <p>Tres retoques en el resultado de un token:</p>
+  <ul>
+    <li><b>Sin la leyenda de colores:</b> la barra de puntos ya enseña el nivel y lo que suma o resta, así que la leyenda solo repetía lo mismo.</li>
+    <li><b>«Quién está detrás», con un texto más claro</b> sobre qué guardamos en el registro y desde cuándo.</li>
+    <li><b>Más rápido en tokens grandes:</b> las cuentas con más saldo se recuerdan 10 minutos, así no esperas de nuevo si vuelves al mismo token.</li>
+  </ul>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Un%20an%C3%A1lisis%20m%C3%A1s%20limpio%20y%20%C2%ABQui%C3%A9n%20est%C3%A1%20detr%C3%A1s%C2%BB%20m%C3%A1s%20claro&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23analisis-mas-limpio" target="_blank" rel="noopener">Compartir en X</a><a href="#analisis-mas-limpio">Enlace a esta entrada</a></div>
+</article>
+
+<article id="mas-rapida">
+  <time datetime="2026-11-22">22 de noviembre de 2026</time>
+  <h2>Una web más rápida y la liquidez que de verdad cuenta</h2>
+  <div class="tags"><span>Rendimiento</span><span>Ecosistema</span></div>
+  <p>Hoy el trabajo ha sido sobre todo de velocidad:</p>
+  <ul>
+    <li><b>Portada más ligera:</b> los tokens en tendencia se analizan cuando llegas a verlos, no todos al entrar, y se recuerdan 10 minutos.</li>
+    <li><b>El resultado sale antes:</b> primero la cabecera con el nivel y, enseguida, el resto de bloques.</li>
+    <li><b>La liquidez del pool más grande:</b> el motor (versiones 0.7.1 y 0.7.2) mira todos los pools de cada token y se queda con el más grande, también en las listas. Antes podía tomar uno pequeño y dar una liquidez más baja de la real.</li>
+  </ul>
+  <p>En el Ecosistema, una columna nueva, <b>«Devuelve al token»</b>: cuánto de lo que gana un proyecto vuelve a los que tienen su token (recompras, quemas o reparto). Pump.fun pasa a DeFi, junto a los otros mercados. Y en el móvil, la cabecera ya no se transparenta y el botón de pantalla completa de la gráfica está en la línea del precio.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Una%20web%20m%C3%A1s%20r%C3%A1pida%20y%20la%20liquidez%20que%20de%20verdad%20cuenta&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23mas-rapida" target="_blank" rel="noopener">Compartir en X</a><a href="#mas-rapida">Enlace a esta entrada</a></div>
+</article>
+
+<article id="puntos-por-apartado">
+  <time datetime="2026-11-21">21 de noviembre de 2026</time>
+  <h2>Cada token, medido por lo que es: puntos por apartado</h2>
+  <div class="tags"><span>Escáner</span><span>Motor</span><span>Novedad</span></div>
+  <p>Hasta ahora SolFlag juzgaba un dólar digital como si fuera una memecoin. Circle puede congelar USDC o crear más: en un meme eso es una bandera roja; en una stablecoin regulada, es como funciona.</p>
+  <h3>Siete apartados, siete formas de medir</h3>
+  <p>Cada token se detecta como <b>meme, activo tokenizado, DeFi, juego, IA, app u otro</b>, y se mide con sus propias reglas. Un meme: quién lo controla, si hay una wallet grande, liquidez y antigüedad. Un activo tokenizado: si es del emisor oficial, si cambiaron sus claves y si hay reservas. DeFi: comisiones reales, auditorías, hackeos y desbloqueos. IA: si hay código público y si alguien sigue trabajando en él.</p>
+  <p>El resultado es <b>una barra de 0 a 110</b> en la que cada chequeo dice si suma o resta. Lo que todavía no sabemos no cuenta ni a favor ni en contra. Viene con la versión 0.7.0 del motor.</p>
+  <h3>Y además</h3>
+  <ul>
+    <li><b>El Escáner, por apartados:</b> cada uno con su propia vista, más compacta.</li>
+    <li><b>Activos tokenizados:</b> una lista automática de 110 (xStocks y Backpack) con precios de Jupiter, y el oro tokenizado ya sale bien. «Acciones» deja el menú: su vista completa está en el Ecosistema.</li>
+    <li><b>«Lo que pasó»</b> pasa al apartado de Ballenas.</li>
+    <li>En el Ecosistema, las lanzaderas de memes con nuestro registro (cuántos tokens nacen y cuántos sobreviven) y la IA con su código y su señal.</li>
+  </ul>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Cada%20token%2C%20medido%20por%20lo%20que%20es%3A%20puntos%20por%20apartado&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23puntos-por-apartado" target="_blank" rel="noopener">Compartir en X</a><a href="#puntos-por-apartado">Enlace a esta entrada</a></div>
+</article>
+
+<article id="ecosistema">
+  <time datetime="2026-11-20">20 de noviembre de 2026</time>
+  <h2>Nueva página: el Ecosistema, todo Solana por apartados</h2>
+  <div class="tags"><span>Ecosistema</span><span>Novedad</span></div>
+  <p>Solana no son solo memecoins. Hoy estrenamos <a href="/ecosistema/">Ecosistema</a>: todo Solana ordenado por apartados (memes, activos tokenizados, DeFi, juegos, IA, apps y bots y otros), con los 10 primeros de cada grupo.</p>
+  <p>Cada proyecto se mide por su <b>uso real</b>: lo que cobra en comisiones, el dinero en circulación, el valor tokenizado o su capitalización, según lo que sea. Salen los que tienen token y los que no, cuánta gente lo tiene y cuánta opera (datos de Jupiter), y una marca para los que <b>acaban de sacar token</b>. Los datos se recogen una vez al día. Está en el menú, justo después del Escáner.</p>
+  <h3>Más emisores de confianza</h3>
+  <p>Añadimos a la lista de emisores Ethena (USDe), World Liberty Financial con BitGo (USD1) y Solstice (USX y eUSX), con su página oficial de direcciones y sus claves comprobadas en la cadena. También las claves nuevas de Paxos para PYUSD y USDG, y las 95 acciones tokenizadas de Backpack. CASH se queda fuera: su emisor no publica su dirección en Solana.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Nueva%20p%C3%A1gina%3A%20el%20Ecosistema%2C%20todo%20Solana%20por%20apartados&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23ecosistema" target="_blank" rel="noopener">Compartir en X</a><a href="#ecosistema">Enlace a esta entrada</a></div>
+</article>
+
+<article id="mi-lista-pulsar">
+  <time datetime="2026-11-19">19 de noviembre de 2026</time>
+  <h2>Mi lista: pulsa y analiza</h2>
+  <div class="tags"><span>Mi lista</span><span>Mejora</span></div>
+  <p>En Mi lista, pulsar una wallet que sigues, la tarjeta o su nombre, abre su análisis. Antes el nombre solo subía la página. Lo mismo con el nombre de los tokens y con el historial de wallets.</p>
+  <p>Y en la portada, nombres más claros: «Tokens calientes» pasa a <b>«Tokens en tendencia»</b> y «Billeteras calientes de hoy», a <b>«Las wallets del día»</b>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Mi%20lista%3A%20pulsa%20y%20analiza&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23mi-lista-pulsar" target="_blank" rel="noopener">Compartir en X</a><a href="#mi-lista-pulsar">Enlace a esta entrada</a></div>
+</article>
+
+<article id="mi-lista-nombres">
+  <time datetime="2026-11-18">18 de noviembre de 2026</time>
+  <h2>Arreglo en Mi lista y una limpieza por dentro</h2>
+  <div class="tags"><span>Arreglo</span></div>
+  <p>El detalle por wallet de Mi lista vuelve a enseñar el nombre de cada wallet: salía «[object Object]».</p>
+  <p>Además hemos quitado código que ya no se usaba (el radar antiguo de la portada, restos del mapa anterior y doce funciones sueltas). No se ve, pero la web pesa menos.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Arreglo%20en%20Mi%20lista%20y%20una%20limpieza%20por%20dentro&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23mi-lista-nombres" target="_blank" rel="noopener">Compartir en X</a><a href="#mi-lista-nombres">Enlace a esta entrada</a></div>
+</article>
+
+<article id="radar-telegram">
+  <time datetime="2026-11-17">17 de noviembre de 2026</time>
+  <h2>El Radar, ahora en Telegram</h2>
+  <div class="tags"><span>Radar</span><span>Telegram</span><span>Novedad</span></div>
+  <p>Estrenamos el canal <a href="https://t.me/SolFlagRadar" target="_blank" rel="noopener">t.me/SolFlagRadar</a>. Avisa cuando <b>una cara conocida</b>, una wallet que ya lanzó otros tokens, saca uno nuevo con liquidez.</p>
+  <p>A las 24 horas, el propio canal contesta a cada aviso con lo que pasó: si el token sigue vivo o murió. Y a las 21:00 publica el resumen del día, con cuántos de los avisados murieron. Son hechos de la cadena, no acusaciones.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20El%20Radar%2C%20ahora%20en%20Telegram&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23radar-telegram" target="_blank" rel="noopener">Compartir en X</a><a href="#radar-telegram">Enlace a esta entrada</a></div>
+</article>
+
+<article id="aviso-regulador">
+  <time datetime="2026-11-16">16 de noviembre de 2026</time>
+  <h2>Dónde cotiza: el aviso del regulador, bien visible</h2>
+  <div class="tags"><span>Dónde cotiza</span><span>Arreglo</span></div>
+  <p>En «Dónde cotiza», la etiqueta roja que avisa de que un regulador ha alertado sobre un exchange (por ejemplo, «AVISO AFM» en MEXC) se veía como una bola cortada. Ahora sale como una etiqueta normal, que se lee entera.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20D%C3%B3nde%20cotiza%3A%20el%20aviso%20del%20regulador%2C%20bien%20visible&amp;url=https%3A%2F%2Fsolflag.com%2Fblog%2F%23aviso-regulador" target="_blank" rel="noopener">Compartir en X</a><a href="#aviso-regulador">Enlace a esta entrada</a></div>
+</article>
 
 <article id="grafica-grande">
   <time datetime="2026-11-15">15 de noviembre de 2026</time>

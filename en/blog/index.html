@@ -84,6 +84,14 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
   <h1>What we are<span class="thin">building.</span></h1>
   <p>SolFlag news, tests with real tokens and what we learn along the way. Told as it is, including what goes wrong.</p>
   <nav class="toc" aria-label="Posts">
+    <a href="#analisis-mas-limpio"><time datetime="2026-11-23">23 Nov 2026</time><b>A cleaner analysis and a clearer «Who is behind»</b></a>
+    <a href="#mas-rapida"><time datetime="2026-11-22">22 Nov 2026</time><b>A faster site and the liquidity that really counts</b></a>
+    <a href="#puntos-por-apartado"><time datetime="2026-11-21">21 Nov 2026</time><b>Each token, measured by what it is: points by section</b></a>
+    <a href="#ecosistema"><time datetime="2026-11-20">20 Nov 2026</time><b>New page: the Ecosystem, all of Solana by section</b></a>
+    <a href="#mi-lista-pulsar"><time datetime="2026-11-19">19 Nov 2026</time><b>My list: tap to analyse</b></a>
+    <a href="#mi-lista-nombres"><time datetime="2026-11-18">18 Nov 2026</time><b>A fix in My list and some cleaning inside</b></a>
+    <a href="#radar-telegram"><time datetime="2026-11-17">17 Nov 2026</time><b>The Radar, now on Telegram</b></a>
+    <a href="#aviso-regulador"><time datetime="2026-11-16">16 Nov 2026</time><b>Where it trades: the regulator warning, clearly visible</b></a>
     <a href="#grafica-grande"><time datetime="2026-11-15">15 Nov 2026</time><b>The chart, full screen: draw on it and see when the creator sold</b></a>
     <a href="#llegaron-lejos"><time datetime="2026-11-14">14 Nov 2026</time><b>The ones that went far were not luck; and five levels instead of three</b></a>
     <a href="#claves-emisores"><time datetime="2026-11-12">12 Nov 2026</time><b>When an issuer changes its keys</b></a>
@@ -105,6 +113,97 @@ footer p{flex-basis:100%;margin:6px 0 0;font-size:.84rem}
 </section>
 
 <!-- English copy of /blog/ (the Spanish one is the source): add each new post here too, translated, with the same id -->
+
+<article id="analisis-mas-limpio">
+  <time datetime="2026-11-23">23 November 2026</time>
+  <h2>A cleaner analysis and a clearer «Who is behind»</h2>
+  <div class="tags"><span>Analysis</span><span>Improvement</span></div>
+  <p>Three touches on the result of a token:</p>
+  <ul>
+    <li><b>No colour legend:</b> the points bar already shows the tier and what adds or subtracts, so the legend only repeated it.</li>
+    <li><b>«Who is behind», with clearer text</b> about what our registry keeps and since when.</li>
+    <li><b>Faster on big tokens:</b> the largest holders are remembered for 10 minutes, so you don't wait again when you come back to the same token.</li>
+  </ul>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20A%20cleaner%20analysis%20and%20a%20clearer%20%C2%ABWho%20is%20behind%C2%BB&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23analisis-mas-limpio" target="_blank" rel="noopener">Share on X</a><a href="#analisis-mas-limpio">Link to this post</a></div>
+</article>
+
+<article id="mas-rapida">
+  <time datetime="2026-11-22">22 November 2026</time>
+  <h2>A faster site and the liquidity that really counts</h2>
+  <div class="tags"><span>Performance</span><span>Ecosystem</span></div>
+  <p>Today was mostly about speed:</p>
+  <ul>
+    <li><b>Lighter home page:</b> trending tokens are analysed when you reach them, not all at once, and remembered for 10 minutes.</li>
+    <li><b>The result shows up sooner:</b> first the header with the tier and, right after, the other blocks.</li>
+    <li><b>Liquidity of the biggest pool:</b> the engine (versions 0.7.1 and 0.7.2) looks at every pool of a token and keeps the biggest one, in lists too. Before, it could pick a small one and show less liquidity than the real one.</li>
+  </ul>
+  <p>In the Ecosystem, a new column, <b>«Gives back to the token»</b>: how much of what a project earns goes back to its token holders (buybacks, burns or sharing). Pump.fun moves to DeFi, next to the other markets. And on mobile the header is no longer see-through and the chart's full-screen button sits on the price line.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20A%20faster%20site%20and%20the%20liquidity%20that%20really%20counts&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23mas-rapida" target="_blank" rel="noopener">Share on X</a><a href="#mas-rapida">Link to this post</a></div>
+</article>
+
+<article id="puntos-por-apartado">
+  <time datetime="2026-11-21">21 November 2026</time>
+  <h2>Each token, measured by what it is: points by section</h2>
+  <div class="tags"><span>Scanner</span><span>Engine</span><span>New</span></div>
+  <p>Until now SolFlag judged a digital dollar as if it were a memecoin. Circle can freeze USDC or mint more: on a meme that's a red flag; on a regulated stablecoin, that's just how it works.</p>
+  <h3>Seven sections, seven ways to measure</h3>
+  <p>Every token is detected as <b>meme, tokenized asset, DeFi, game, AI, app or other</b>, and measured by its own rules. A meme: who controls it, one big wallet, liquidity and age. A tokenized asset: is it the official issuer, did its keys change, are there reserves. DeFi: real fees, audits, hacks and unlocks. AI: is there public code and is anyone still working on it.</p>
+  <p>The result is <b>one bar from 0 to 110</b> where each check shows if it adds or subtracts. What we don't know yet counts neither for nor against. It comes with version 0.7.0 of the engine.</p>
+  <h3>Also</h3>
+  <ul>
+    <li><b>The Scanner, by section:</b> each one with its own, more compact view.</li>
+    <li><b>Tokenized assets:</b> an automatic list of 110 (xStocks and Backpack) with Jupiter prices, and tokenized gold now shows right. «Stocks» leaves the menu: its full view lives in the Ecosystem.</li>
+    <li><b>«What happened»</b> moves to the Whales section.</li>
+    <li>In the Ecosystem, meme launchpads with our registry (how many tokens are born and how many survive) and AI with its code and signal.</li>
+  </ul>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Each%20token%2C%20measured%20by%20what%20it%20is%3A%20points%20by%20section&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23puntos-por-apartado" target="_blank" rel="noopener">Share on X</a><a href="#puntos-por-apartado">Link to this post</a></div>
+</article>
+
+<article id="ecosistema">
+  <time datetime="2026-11-20">20 November 2026</time>
+  <h2>New page: the Ecosystem, all of Solana by section</h2>
+  <div class="tags"><span>Ecosystem</span><span>New</span></div>
+  <p>Solana isn't only memecoins. Today we launch the <a href="/en/ecosystem/">Ecosystem</a>: all of Solana sorted by section (memes, tokenized assets, DeFi, games, AI, apps and bots, and other), with the top 10 of each group.</p>
+  <p>Each project is measured by its <b>real use</b>: fees it charges, money in circulation, tokenized value or market cap, depending on what it is. You see projects with and without a token, how many people hold it and how many trade it (Jupiter data), and a mark for those that <b>just launched a token</b>. Data is collected once a day. It's in the menu, right after the Scanner.</p>
+  <h3>More trusted issuers</h3>
+  <p>We added Ethena (USDe), World Liberty Financial with BitGo (USD1) and Solstice (USX and eUSX) to the issuers list, with their official address page and their keys checked on chain. Also Paxos' new keys for PYUSD and USDG, and Backpack's 95 tokenized stocks. CASH stays out: its issuer doesn't publish its Solana address.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20New%20page%3A%20the%20Ecosystem%2C%20all%20of%20Solana%20by%20section&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23ecosistema" target="_blank" rel="noopener">Share on X</a><a href="#ecosistema">Link to this post</a></div>
+</article>
+
+<article id="mi-lista-pulsar">
+  <time datetime="2026-11-19">19 November 2026</time>
+  <h2>My list: tap to analyse</h2>
+  <div class="tags"><span>My list</span><span>Improvement</span></div>
+  <p>In My list, tapping a wallet you follow, its card or its name, opens its analysis. Before, the name only scrolled the page up. Same with token names and the wallet history.</p>
+  <p>And on the home page, clearer names: the hot tokens list is now <b>«Trending tokens»</b> and today's hot wallets, <b>«Wallets of the day»</b>.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20My%20list%3A%20tap%20to%20analyse&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23mi-lista-pulsar" target="_blank" rel="noopener">Share on X</a><a href="#mi-lista-pulsar">Link to this post</a></div>
+</article>
+
+<article id="mi-lista-nombres">
+  <time datetime="2026-11-18">18 November 2026</time>
+  <h2>A fix in My list and some cleaning inside</h2>
+  <div class="tags"><span>Fix</span></div>
+  <p>The per-wallet detail in My list shows each wallet's name again: it said «[object Object]».</p>
+  <p>We also removed code that was no longer used (the old home-page radar, leftovers of the previous map and twelve loose functions). You can't see it, but the site is lighter.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20A%20fix%20in%20My%20list%20and%20some%20cleaning%20inside&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23mi-lista-nombres" target="_blank" rel="noopener">Share on X</a><a href="#mi-lista-nombres">Link to this post</a></div>
+</article>
+
+<article id="radar-telegram">
+  <time datetime="2026-11-17">17 November 2026</time>
+  <h2>The Radar, now on Telegram</h2>
+  <div class="tags"><span>Radar</span><span>Telegram</span><span>New</span></div>
+  <p>We launch the <a href="https://t.me/SolFlagRadar" target="_blank" rel="noopener">t.me/SolFlagRadar</a> channel. It alerts when <b>a known face</b>, a wallet that already launched other tokens, launches a new one with liquidity.</p>
+  <p>After 24 hours the channel replies to each alert with what happened: whether the token is still alive or died. And at 21:00 it posts the day's summary, with how many of the alerted tokens died. Facts from the chain, not accusations.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20The%20Radar%2C%20now%20on%20Telegram&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23radar-telegram" target="_blank" rel="noopener">Share on X</a><a href="#radar-telegram">Link to this post</a></div>
+</article>
+
+<article id="aviso-regulador">
+  <time datetime="2026-11-16">16 November 2026</time>
+  <h2>Where it trades: the regulator warning, clearly visible</h2>
+  <div class="tags"><span>Where it trades</span><span>Fix</span></div>
+  <p>In «Where it trades», the red label that says a regulator has warned about an exchange (for example, «AFM WARNING» on MEXC) looked like a cut-off ball. It now shows as a normal label you can read in full.</p>
+  <div class="share"><a href="https://x.com/intent/post?text=SolFlag%3A%20Where%20it%20trades%3A%20the%20regulator%20warning%2C%20clearly%20visible&amp;url=https%3A%2F%2Fsolflag.com%2Fen%2Fblog%2F%23aviso-regulador" target="_blank" rel="noopener">Share on X</a><a href="#aviso-regulador">Link to this post</a></div>
+</article>
 
 <article id="grafica-grande">
   <time datetime="2026-11-15">15 November 2026</time>
