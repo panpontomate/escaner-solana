@@ -23,7 +23,6 @@ export const CODE = [
   ["function perfNum(n){ return Math.round(n).toLocaleString(\"de-DE\"); }", "function perfNum(n){ return Math.round(n).toLocaleString(\"en-US\"); }"],
   ["return d>=365?(d/365).toLocaleString(\"es-ES\",{maximumFractionDigits:1})+\" años\":Math.round(d)+\" días\";", "return d>=365?(d/365).toLocaleString(\"en-US\",{maximumFractionDigits:1})+\" years\":Math.round(d)+\" days\";"],
   ["case \"codigo\": return \"Último cambio hace \"+d+\" días\";", "case \"codigo\": return \"Last change \"+d+\" days ago\";"],
-  ["tip=rs.length?\"Lo que resta: \"+rs.slice(0,3).map(function(n){ return \"«\"+n+\"»\"; }).join(\", \")", "tip=rs.length?\"What subtracts: \"+rs.slice(0,3).map(function(n){ return \"\\u201c\"+n+\"\\u201d\"; }).join(\", \")"],
   // el blog tiene versión inglesa (15/11)
   ['<a href="https://solflag.com/blog/">Blog · Avances</a>', '<a href="https://solflag.com/en/blog/">Blog · Updates</a>'],
   // Dónde cotiza (14/11): la lista completa en inglés
@@ -141,7 +140,6 @@ export const TEXT = {
   "%'></i></div><span>comprar y vender al momento en <b>": "%'></i></div><span>buying and selling right away on <b>",
   "En la cadena te costaría <b class='": "On chain it would cost you <b class='",
   "</b>; en ": "</b>; on ",
-  "<p class='kick'>Las banderas · ": "<p class='kick'>The flags · ",
   "</p><div class='bp-h'><h3 class='tgt'>Por qué sale así</h3><button type='button' class='bp-amp' data-bands='1' title='Ver en grande'>⤢</button></div>": "</p><div class='bp-h'><h3 class='tgt'>Why it scores this way</h3><button type='button' class='bp-amp' data-bands='1' title='See it larger'>⤢</button></div>",
   "<button type='button' class='btn ghost small bp-ver' data-bands='1'>Ver todas con el detalle ⤢</button>": "<button type='button' class='btn ghost small bp-ver' data-bands='1'>See them all in detail ⤢</button>",
   "<div class='bm-caja' role='dialog' aria-modal='true' aria-label='Por qué sale así'><button type='button' class='bm-x' data-bclose='1' title='Cerrar'>✕</button>": "<div class='bm-caja' role='dialog' aria-modal='true' aria-label='Why it scores this way'><button type='button' class='bm-x' data-bclose='1' title='Close'>✕</button>",
@@ -250,7 +248,6 @@ export const TEXT = {
   "<small> / 110 puntos</small></span>": "<small> / 110 points</small></span>",
   " de 110": " of 110",
   "Ningún chequeo de su apartado resta.": "No check in its section subtracts.",
-  " Con menos de 7 días todavía no ha demostrado nada.": " Under 7 days old, it has proven nothing yet.",
   // los cinco niveles (motor 0.6.0, 14/11/2026)
   "Rojo": "Red",
   "Naranja": "Orange",
