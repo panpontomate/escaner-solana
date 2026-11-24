@@ -1,0 +1,45 @@
+# Recogida de datos de los tokens de la portada (24/11/2026): cada 15 min, fotos de precio, volumen, compras/ventas y
+# operaciones grandes con su wallet (gratis) y, cada 30 min, las 20 mayores cuentas y la cantidad de tokens (Helius).
+# Va a su propia rama «recogida» (un archivo por día), así no llena main de commits ni toca los datos de la web.
+# Si GitHub se salta ejecuciones, la siguiente recoge las operaciones grandes desde la última vista (hasta 300).
+name: recogida
+on:
+  schedule:
+    - cron: "3,18,33,48 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: recogida
+  cancel-in-progress: false
+jobs:
+  recoger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+      - name: Rama de datos «recogida» (se crea la primera vez)
+        run: |
+          if git ls-remote --exit-code --heads origin recogida >/dev/null; then
+            git fetch --depth 1 origin recogida
+            git worktree add rama origin/recogida
+          else
+            git worktree add --detach rama
+            cd rama && git checkout --orphan recogida && git rm -rf --quiet . && cd ..
+          fi
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Recoger
+        env:
+          SOLANA_RPC: ${{ secrets.SOLANA_RPC }}
+          SALIDA: rama
+        run: node tools/recogida/recoger.mjs
+      - name: Guardar
+        run: |
+          cd rama
+          git config user.name "solflag-recogida"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -q -m "recogida $(date -u +%Y-%m-%dT%H:%M)" || exit 0
+          git push -q origin HEAD:recogida
