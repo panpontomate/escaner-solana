@@ -55,8 +55,32 @@ export function pools(pares, mints) {
 export function nuevas(data, desde, mint) {
   return (data || []).map((d) => d.attributes || {}).filter((a) => !a.is_anomalous)
     .map((a) => ({ t: Date.parse(a.block_timestamp), lado: a.from_token_address === mint ? "vende" : a.to_token_address === mint ? "compra" : null,
-      usd: Math.round(Number(a.volume_in_usd) || 0), w: a.tx_from_address, tx: a.tx_hash }))
+      usd: Math.round(Number(a.volume_in_usd) || 0), w: a.tx_from_address, tx: a.tx_hash,
+      amt: Number(a.from_token_address === mint ? a.from_token_amount : a.to_token_amount) || 0 }))
     .filter((x) => x.t > desde && x.lado && x.w).sort((a, b) => a.t - b.t);
+}
+// Marcas de la gráfica que no se pierden (25/11): las operaciones grandes de los 27 y de hasta 20 tokens de los más
+// analizados en la web en las últimas 6 h (tabla pedidos, la llena /api/visto) van a D1, tabla ops; la web las lee con
+// /api/marcas/<mint>. Se guardan 30 días. Necesita CF_API_TOKEN, CF_ACCOUNT_ID y CF_D1_ID (sin ellos no se guarda nada).
+export const OPS_SCHEMA = ["CREATE TABLE IF NOT EXISTS ops (m TEXT, tx TEXT, t INTEGER, sell INTEGER, usd INTEGER, w TEXT, amt REAL, PRIMARY KEY (m, tx))",
+  "CREATE INDEX IF NOT EXISTS ops_mt ON ops (m, t)"];
+// D1 admite 100 parámetros por consulta: 14 filas de 7
+export function opsInsert(m, ops) {
+  const out = [];
+  for (let i = 0; i < ops.length; i += 14) {
+    const l = ops.slice(i, i + 14);
+    out.push({ sql: "INSERT INTO ops (m, tx, t, sell, usd, w, amt) VALUES " + l.map(() => "(?,?,?,?,?,?,?)").join(",") + " ON CONFLICT DO NOTHING",
+      params: l.flatMap((o) => [m, o.tx, o.t, o.lado === "vende" ? 1 : 0, o.usd, o.w, o.amt || 0]) });
+  }
+  return out;
+}
+const D1 = process.env.CF_API_TOKEN && process.env.CF_ACCOUNT_ID && process.env.CF_D1_ID
+  ? { url: "https://api.cloudflare.com/client/v4/accounts/" + process.env.CF_ACCOUNT_ID + "/d1/database/" + process.env.CF_D1_ID + "/query", token: process.env.CF_API_TOKEN } : null;
+async function d1(st) {
+  const r = await fetch(D1.url, { method: "POST", headers: { authorization: "Bearer " + D1.token, "content-type": "application/json" }, body: JSON.stringify(st) });
+  const j = await r.json().catch(() => null);
+  if (!r.ok || !j || !j.success) throw new Error("D1 " + r.status + ": " + JSON.stringify((j && j.errors) || "").slice(0, 200));
+  return j.result;
 }
 // dueño de cada cuenta de token (respuesta jsonParsed de getMultipleAccounts); las que no existen o no son de token, fuera
 export function duenos(cuentas, valores) {
@@ -76,13 +100,13 @@ async function main() {
   const P = pools(pares, mints);
   // 2) Helius cada 30 min (la foto de los minutos 0–14 y 30–44)
   const conHelius = !!RPC && Math.floor(new Date(ahora).getUTCMinutes() / 15) % 2 === 0;
-  const filas = [];
+  const filas = [], porMint = {};
   for (const [sym, m, ap] of TOKENS) {
     const p = P[m] || null, f = { t: ahora, sym, m, ap, dx: p };
     if (p && p.pool) {
       const j = await json("https://api.geckoterminal.com/api/v2/networks/solana/pools/" + p.pool + "/trades?trade_volume_in_usd_greater_than=" + MIN_USD);
       const ops = nuevas(j && j.data, est.ult[p.pool] || ahora - 3600000, m);
-      if (j) { f.ops = ops; if (ops.length) est.ult[p.pool] = ops[ops.length - 1].t; else if (!est.ult[p.pool]) est.ult[p.pool] = ahora - 3600000; }
+      if (j) { f.ops = ops; porMint[m] = ops; if (ops.length) est.ult[p.pool] = ops[ops.length - 1].t; else if (!est.ult[p.pool]) est.ult[p.pool] = ahora - 3600000; }
       await espera(2200);   // GeckoTerminal: 30 por minuto
     }
     if (conHelius) {
@@ -100,10 +124,37 @@ async function main() {
     if (r && r.value) Object.assign(est.duenos, duenos(lote, r.value));
   }
   for (const f of filas) if (f.top) f.top = f.top.map(([c, n]) => [c, n, est.duenos[c] || null]);
+  // 4) los más analizados en la web (no van al .jsonl, solo a D1): la primera vez, todas sus operaciones grandes
+  let extra = [];
+  if (D1) try {
+    const r = await d1({ sql: "SELECT m FROM pedidos WHERE t1 > ? ORDER BY n DESC LIMIT 60", params: [ahora - 6 * 3600000] });
+    extra = ((r[0] && r[0].results) || []).map((x) => x.m).filter((m) => !mints.includes(m)).slice(0, 20);
+  } catch (e) { console.log("pedidos:", e.message); }
+  if (extra.length) {
+    const PX = pools(await json("https://api.dexscreener.com/tokens/v1/solana/" + extra.join(",")), extra);
+    for (const m of extra) {
+      const p = PX[m]; if (!p || !p.pool) continue;
+      const j = await json("https://api.geckoterminal.com/api/v2/networks/solana/pools/" + p.pool + "/trades?trade_volume_in_usd_greater_than=" + MIN_USD);
+      if (j) { const ops = nuevas(j.data, est.ult[p.pool] || 0, m); porMint[m] = ops; if (ops.length) est.ult[p.pool] = ops[ops.length - 1].t; }
+      await espera(2200);
+    }
+  }
+  for (const [k, t] of Object.entries(est.ult)) if (t < ahora - 7 * 864e5) delete est.ult[k];   // pools que ya no se miran
+  // la primera vez, también lo que ya estaba en los .jsonl (desde el 24/11)
+  if (D1 && !est.opsD1) for (const fi of fs.readdirSync(SALIDA).filter((x) => /^\d{4}-\d\d-\d\d\.jsonl$/.test(x)))
+    for (const l of fs.readFileSync(path.join(SALIDA, fi), "utf8").split("\n")) { if (!l) continue; const f = JSON.parse(l); if (f.ops && f.ops.length) porMint[f.m] = (porMint[f.m] || []).concat(f.ops); }
+  let enD1 = 0;
+  if (D1) try {
+    for (const sql of OPS_SCHEMA) await d1({ sql });
+    for (const [m, ops] of Object.entries(porMint)) for (const st of opsInsert(m, ops)) { await d1(st); }
+    enD1 = Object.values(porMint).reduce((s, o) => s + o.length, 0);
+    await d1({ sql: "DELETE FROM ops WHERE t < ?", params: [ahora - 30 * 864e5] });
+    est.opsD1 = est.opsD1 || ahora;
+  } catch (e) { console.log("ops:", e.message); }
   const dia = new Date(ahora).toISOString().slice(0, 10);
   fs.appendFileSync(path.join(SALIDA, dia + ".jsonl"), filas.map((f) => JSON.stringify(f)).join("\n") + "\n");
   est.ultima = ahora;
   fs.writeFileSync(fEst, JSON.stringify(est));
-  console.log(`recogida: ${filas.length} tokens · ${filas.filter((f) => f.dx).length} con pool · ${filas.reduce((s, f) => s + (f.ops ? f.ops.length : 0), 0)} operaciones grandes nuevas · Helius ${conHelius ? "sí" : "no"}`);
+  console.log(`recogida: ${filas.length} tokens · ${filas.filter((f) => f.dx).length} con pool · ${filas.reduce((s, f) => s + (f.ops ? f.ops.length : 0), 0)} operaciones grandes nuevas · Helius ${conHelius ? "sí" : "no"} · ${extra.length} más analizados · ${enD1} operaciones a D1`);
 }
 if (import.meta.url === "file://" + process.argv[1] || process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) main();

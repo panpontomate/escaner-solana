@@ -2,7 +2,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top, caida, salidas, rpcValido } from "./worker.js";
+import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top, caida, salidas, rpcValido, marcas } from "./worker.js";
+import { OPS_SCHEMA, opsInsert } from "../recogida/recoger.mjs";
 import { SCHEMA } from "../caras/plano.mjs";
 
 const A = "PAY1111111111111111111111111111111", B = "FUND111111111111111111111111111111", C = "BUY1111111111111111111111111111111";
@@ -273,4 +274,18 @@ test("/api/rpc: solo métodos de lectura, sin lotes y con tope de cuentas", asyn
   assert.equal(rpcValido([{ method: "getAccountInfo", params: [A] }]), false);
   const r = await handle(new Request("https://api.solflag.com/api/rpc", { method: "POST", body: JSON.stringify({ method: "getProgramAccounts", params: [A] }) }), { SOLANA_RPC: "https://x" });
   assert.equal(r.status, 400);
+});
+
+test("/api/marcas: operaciones guardadas por la recogida, en orden y desde la primera", async () => {
+  const db = new DatabaseSync(":memory:");
+  const mk = { prepare: (sql) => ({ bind: (...a) => ({ all: async () => ({ results: db.prepare(sql).all(...a) }), first: async () => db.prepare(sql).get(...a) }) }) };
+  assert.deepEqual((await marcas(mk, M1, 0)).ops, []);          // sin tabla todavía
+  OPS_SCHEMA.forEach((s) => db.exec(s));
+  const ops = [{ t: 3000, lado: "vende", usd: 5000, w: A, tx: "t3", amt: 10 }, { t: 1000, lado: "compra", usd: 2000, w: B, tx: "t1" }];
+  for (const st of opsInsert(M1, ops.concat(ops))) db.prepare(st.sql).run(...st.params);   // repetidas: no se duplican
+  const r = await marcas(mk, M1, 0);
+  assert.deepEqual(r.ops, [[1000, 0, 2000, B, "t1", 0], [3000, 1, 5000, A, "t3", 10]]);
+  assert.equal(r.desde, 1000);
+  assert.equal((await marcas(mk, M1, 2000)).ops.length, 1);
+  assert.equal(opsInsert(M1, Array(30).fill(ops[0])).length, 3);  // de 14 en 14 (100 parámetros en D1)
 });

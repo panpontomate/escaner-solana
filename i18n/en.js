@@ -1270,6 +1270,7 @@ export const TEXT = {
   "Se enseñan las 40 más recientes.": "Showing the 40 most recent.",
   "Operaciones de GeckoTerminal (las últimas {n}{desde}) y registro de SolFlag.": "GeckoTerminal trades (the last {n}{desde}) and the SolFlag registry.",
   ", desde el {f}": ", since {f}",
+  "Antes de eso, {n} operaciones de más de 1.000 $ que guarda SolFlag desde el {f}.": "Before that, {n} trades over $1,000 that SolFlag has been storing since {f}.",
   // gráfica en pantalla completa y dibujos (15/11)
   "Gráfica en pantalla completa": "Full-screen chart",
   "Cerrar (Esc)": "Close (Esc)",

@@ -15,6 +15,8 @@
 //   GET  /api/acciones            activos tokenizados (lista diaria) frente al precio real: prima, bolsa abierta, liquidez (acciones.js)
 //   GET  /api/cotiza/<mint>        dónde se negocia: pools de la cadena y exchanges con comisión, identidad y MiCA (cotiza.js)
 //   GET  /api/top/<mint>           mayores cuentas del token (Helius, 10 min en caché, 30/min por conexión)
+//   GET  /api/marcas/<mint>?desde= operaciones de más de 1.000 $ guardadas por la recogida (marcas de la gráfica, 5 min en caché)
+//   POST /api/rpc                  plan B de RPC de la web (Helius; solo lectura, 120/min por conexión)
 //   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
 //   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
 //                                  veces (tabla pedidos), nada de quién. El recolector lo analiza después él mismo
@@ -256,6 +258,19 @@ export async function caida(env, pool, m, desde, hasta, fetchFn) {
   return { v: V, pool: pool, mint: m, desde: desde, hasta: hasta, ops: n, completo: completo, vendedores: top };
 }
 
+// Operaciones guardadas de un token: [t ms, vende 1/0, usd, wallet, tx, cantidad], de la más antigua a la más nueva (las
+// 3.000 últimas). «desde» = la primera que tenemos de ese token. Sin tabla todavía: lista vacía
+export async function marcas(db, m, desde) {
+  try {
+    const r = await db.prepare("SELECT t, sell, usd, w, tx, amt FROM ops WHERE m = ? AND t >= ? ORDER BY t DESC LIMIT 3000").bind(m, desde).all();
+    const p = await db.prepare("SELECT MIN(t) AS d FROM ops WHERE m = ?").bind(m).first();
+    return { v: V, mint: m, desde: (p && p.d) || null, ops: (r.results || []).reverse().map((x) => [x.t, x.sell, x.usd, x.w, x.tx, x.amt]) };
+  } catch (e) {
+    if (/no such table/i.test(String(e && e.message))) return { v: V, mint: m, desde: null, ops: [] };
+    throw e;
+  }
+}
+
 // Plan B de RPC para la web (25/11): si los RPC públicos fallan (el 24/11 Vibe Station rechazaba y PublicNode daba
 // error de CORS, y el análisis se quedaba sin concentración), la web repite la petición aquí y va a Helius.
 // Solo métodos de lectura que usa el análisis, de uno en uno (sin lotes) y con tope de cuentas.
@@ -325,6 +340,13 @@ export async function handle(req, env) {
     // el pasado no cambia: una semana en la caché si la ventana ya acabó hace más de 10 min
     res.headers.set("cache-control", "public, max-age=" + (hasta < Date.now() / 1000 - 600 ? 604800 : 120));
     return res;
+  }
+  // marcas de la gráfica que no se pierden (25/11): operaciones de más de 1.000 $ que guarda la recogida (tabla ops)
+  if (p.length === 4 && p[1] === "api" && p[2] === "marcas") {
+    if (!ADDR.test(p[3])) return fail(400, "not a Solana address");
+    const desde = Math.max(0, Math.floor(Number(new URL(req.url).searchParams.get("desde")) || 0));
+    try { const res = json(await marcas(env.DB, p[3], desde)); res.headers.set("cache-control", "public, max-age=300"); return res; }
+    catch (e) { return fail(503, "database unavailable"); }
   }
   if (p.length === 4 && p[1] === "api" && p[2] === "logo") {
     if (!ADDR.test(p[3])) return fail(400, "not a Solana address");

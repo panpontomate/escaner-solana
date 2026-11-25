@@ -7766,6 +7766,9 @@ async function mkLoad(r){
   var m=r.mint; if(!r.par||!r.par.pairAddress||MK.data[m]!==undefined) return;
   MK.data[m]="loading";
   try{
+    // marcas que no se pierden (25/11): las operaciones de más de 1.000 $ que guarda la recogida (los 27 de la portada y
+    // los más analizados), de antes de las 300 de GeckoTerminal. Se piden a la vez
+    var gq=fetch(API+"marcas/"+m).then(function(x){ return x.ok?x.json():null; }).catch(function(){ return null; });
     var j=await jfetch(GT+"pools/"+r.par.pairAddress+"/trades");
     // quién es quién: se espera un poco al registro y a la revisión del lanzamiento, que van a la vez
     var wh=await mkWait(function(){ return who[m]; },12000), bd=await mkWait(function(){ return bundles[m]; },15000);
@@ -7780,6 +7783,12 @@ async function mkLoad(r){
       if(a.is_anomalous||!(sell||buy)) return null;
       return {ts:Date.parse(a.block_timestamp),sell:sell,w:a.tx_from_address,usd:Number(a.volume_in_usd)||0,amt:Number(sell?a.from_token_amount:a.to_token_amount)||0,tx:a.tx_hash}; })
       .filter(function(x){ return x&&x.ts&&x.w; }).sort(function(a,b){ return a.ts-b.ts; });
+    var nGT=tr.length, gt0=nGT?tr[0].ts:0, gd=await gq, nG=0;
+    if(gd&&gd.ops&&gd.ops.length){
+      var visto={}; tr.forEach(function(x){ visto[x.tx]=1; });
+      var viejas=gd.ops.filter(function(o){ return (!nGT||o[0]<gt0)&&!visto[o[4]]; }).map(function(o){ return {ts:o[0],sell:!!o[1],w:o[3],usd:o[2],amt:o[5]||0,tx:o[4]}; });
+      nG=viejas.length; if(nG) tr=viejas.concat(tr);
+    }
     var bought={}, sold={}, ev=[];
     tr.forEach(function(x){
       if(!x.sell){ bought[x.w]=(bought[x.w]||0)+x.amt; }
@@ -7793,7 +7802,7 @@ async function mkLoad(r){
     // Si esas 300 operaciones no llegan al nacimiento del token, la historia completa del creador y de los que más
     // compraron en el lanzamiento (Helius, en nuestra API; hasta 5 wallets). Sustituye a lo de GeckoTerminal de esas wallets
     var born=(bd&&bd.born)||r.par.pairCreatedAt||0, hel=null;   // el nacimiento del token, no el del pool (graduados)
-    if(born&&tr.length&&tr[0].ts>born+120000&&Date.now()-born<30*86400000){
+    if(born&&nGT&&gt0>born+120000&&Date.now()-born<30*86400000){
       var lw=Object.keys(la).sort(function(a,b){ var pa=bd&&bd.ws?(bd.ws.filter(function(x){ return x.w===a; })[0]||{}).pct||0:0, pb=bd&&bd.ws?(bd.ws.filter(function(x){ return x.w===b; })[0]||{}).pct||0:0; return pb-pa; });
       var ws=Object.keys(cr).concat(lw).slice(0,5);
       // v=2: que no valga lo guardado en la caché por versiones anteriores de esta petición
@@ -7822,7 +7831,7 @@ async function mkLoad(r){
     if(cbs.length){ ev=ev.concat(cbs); ev.sort(function(a,b){ return a.ts-b.ts; }); }
     var laSold={}; ev.forEach(function(e){ if(e.k==="la") laSold[e.w]=1; });
     var crW=Object.keys(cr).filter(function(w){ return bought[w]>0; })[0];
-    MK.data[m]={ev:ev,from:tr.length?tr[0].ts:0,n:tr.length,laTotal:Object.keys(la).length,laSold:Object.keys(laSold).length,
+    MK.data[m]={ev:ev,from:gt0,n:nGT,nG:nG,gFrom:gd&&gd.desde||0,laTotal:Object.keys(la).length,laSold:Object.keys(laSold).length,
       crPct:crW?Math.min(100,Math.round((sold[crW]||0)/bought[crW]*100)):null,crSells:ev.filter(function(e){ return e.k==="cr"; }).length,big:big,
       hel:hw.length,helCr:hw.some(function(w){ return cr[w]; })};
   }catch(e){ if(e&&e.message==="cancelado"){ delete MK.data[m]; return; } MK.data[m]="err"; }
@@ -7940,6 +7949,7 @@ function mkStory(r){
     "<p class='mks'>"+esc(mkSrc(d))+"</p>"+mkDato(r,d);
 }
 function mkSrc(d){ return (d&&d.ev&&d.ev.some(function(e){ return e.k==="cb"; })?"Sudden crashes: 1-min candles (GeckoTerminal) and, in that minute, who sold (Helius)."+" ":"")+"GeckoTerminal trades (the last {n}{desde}) and the SolFlag registry.".replace("{n}",d&&d.n||300).replace("{desde}",d&&d.from?", since {f}".replace("{f}",fdate(d.from)+" "+ftime(d.from)):"")+
+  (d&&d.nG?" "+"Before that, {n} trades over $1,000 that SolFlag has been storing since {f}.".replace("{n}",d.nG).replace("{f}",fdate(d.gFrom)):"")+
   (d&&d.hel?" "+(d.helCr&&d.hel===1?"For the creator, their whole history with this token (Helius).":d.helCr?"For the creator and {n} launch buyers, their whole history with this token (Helius).":"For {n} launch buyers, their whole history with this token (Helius).").replace("{n}",d.hel-(d.helCr?1:0)):""); }
 // repintar marcas, interruptores y «Lo que pasó» (al llegar los datos o al pulsar un interruptor)
 function mkPaint(){
