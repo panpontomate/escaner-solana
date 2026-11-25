@@ -43,5 +43,9 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: _site
+      # 25/11: GitHub tarda en «ver» el paquete recién subido y deploy-pages fallaba a menudo
+      # («Fetching artifact metadata failed / No artifacts named github-pages»): se espera un poco antes de publicar
+      - name: Esperar a que GitHub registre el paquete
+        run: sleep 20
       - id: dep
         uses: actions/deploy-pages@v5
