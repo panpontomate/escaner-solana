@@ -169,3 +169,59 @@ footer a:hover{color:#fff}
 .mz-cod a{color:inherit;text-decoration:none;border-bottom:1px dotted currentColor}
 @media (max-width:1000px){ .mz-ia{grid-template-columns:22px 28px minmax(0,1.3fr) .9fr .9fr minmax(0,1fr) minmax(0,1.3fr)} .mz-ia .mz-tit{display:none} }
 @media (max-width:760px){ .mz-ia{grid-template-columns:28px minmax(0,1fr) auto 78px}.mz-ia .mz-tit{display:none}.mz-ia .mz-codc,.mz-ia .mz-sen{grid-column:2/-1} .mz-h.mz-ia .mz-codc{display:none} }
+
+/* ---------- Vistas propias de DeFi, Juegos, Apps y bots y Otros (maquetas del 23/11, subidas el 25/11) ---------- */
+.mz-card h2{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.ab-tot{margin-left:auto;font:600 .8rem Manrope;color:var(--mut2)}
+.ab-sin{font:700 .66rem Manrope;letter-spacing:.06em;text-transform:uppercase;color:#7ab8c4;border:1px solid rgba(122,184,196,.5);border-radius:6px;padding:2px 7px;justify-self:start}
+.df-tok b{font:600 .82rem "IBM Plex Mono",monospace;display:block}.df-tok small{font:500 .72rem Manrope;color:var(--mut2)}
+.mz-x .up{color:var(--ver)}.mz-x .dn{color:var(--rojo)}
+.mz-x small.mano{white-space:normal;cursor:help}
+.cad{display:inline-flex;flex-direction:column;gap:1px;justify-self:start}.cad small{font:600 .66rem Manrope;color:var(--mut2)}.cad b{font:700 .8rem Manrope;color:#c4b5fd;white-space:nowrap}
+.cad a{font:600 .7rem Manrope;color:var(--mut2);text-decoration:none}.cad a:hover{color:#7ab8c4}
+.df .go,.jg .go,.ab .go,.ot .go{justify-self:end;font-size:12.5px;font-weight:700;color:#7ab8c4;text-decoration:none;white-space:nowrap}
+.df .go:hover,.jg .go:hover,.ab .go:hover,.ot .go:hover{text-decoration:underline}
+/* DeFi */
+.df{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr .7fr .75fr .95fr .7fr .6fr minmax(0,1.5fr) 74px}
+.mz-h.df>span:nth-child(3),.mz-h.df>.df-tk,.mz-h.df>.df-sen{text-align:left}
+.df-mas summary{cursor:pointer;list-style:none;padding:10px 2px 2px;border-top:1px solid var(--line);font:700 .82rem Manrope;color:#7ab8c4}
+.df-mas summary::-webkit-details-marker{display:none}.df-mas summary::after{content:" ↓"}.df-mas[open] summary::after{content:" ↑"}
+.df-vuelve{border-left:3px solid var(--ver);border-radius:4px 14px 14px 4px;padding:14px 20px;background:linear-gradient(120deg,rgba(74,222,128,.08),rgba(255,255,255,.015) 75%);margin-bottom:18px}
+.df-vuelve .top b{font:600 1.05rem Fraunces,serif}.df-vuelve .top span{font-size:.84rem;color:var(--mut);margin-left:10px}
+.fv{display:grid;grid-template-columns:24px 70px minmax(0,1fr) 80px minmax(0,1.3fr);gap:10px;align-items:center;margin-top:8px;font-size:.84rem}
+.fv img,.fv .av{width:24px;height:24px;border-radius:7px}.fv-n{font:600 .82rem "IBM Plex Mono",monospace}
+.fv-b{height:8px;border-radius:9px;background:rgba(255,255,255,.05)}.fv-b i{display:block;height:100%;border-radius:9px;background:var(--ver)}
+.fv-v{font:700 .84rem "IBM Plex Mono",monospace;text-align:right}.fv-p{color:var(--mut2);font-size:.76rem}
+.df-nav{position:sticky;top:74px;z-index:15;display:flex;gap:6px;flex-wrap:wrap;padding:10px 0;margin:0 0 14px;background:linear-gradient(#05040d 70%,rgba(5,4,13,0))}
+.df-nav a{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(14,10,36,.75);color:var(--tx,#f1eeff);font:600 .82rem Manrope;text-decoration:none;white-space:nowrap}
+.df-nav a em{font-style:normal;font-size:.72rem;color:var(--mut2)}
+.df-nav a:hover{border-color:#7ab8c4}.df-nav a.on{background:rgba(122,184,196,.16);border-color:#7ab8c4;color:#fff}
+.df-g{scroll-margin-top:140px}
+@media (max-width:1100px){ .df{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr .7fr .95fr .7fr .6fr minmax(0,1.3fr) 74px} .df .df-tvl{display:none} }
+/* Juegos */
+.jg{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr .6fr .9fr .6fr .8fr minmax(0,1.5fr) 74px}
+.mz-h.jg>span:nth-child(3),.mz-h.jg>.jg-tk,.mz-h.jg>.jg-sen{text-align:left}
+.jg-sym{font:600 .82rem "IBM Plex Mono",monospace}
+@media (max-width:1000px){ .jg{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr .6fr .9fr .8fr minmax(0,1.3fr) 74px} .jg .jg-tit{display:none} }
+/* Apps y bots */
+.ab{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr .7fr minmax(0,1fr) .7fr .8fr minmax(0,1.5fr) 74px}
+.mz-h.ab>span:nth-child(3),.mz-h.ab>span:nth-child(6),.mz-h.ab>span:nth-child(8),.mz-h.ab>span:nth-child(9){text-align:left}
+.ab-cuota{display:flex;align-items:center;gap:8px}.ab-cuota i{display:block;height:6px;border-radius:9px;background:#7ab8c4;min-width:3px}
+.ab-cuota em{font:600 .74rem "IBM Plex Mono",monospace;font-style:normal;color:var(--mut)}
+.ab-relc{text-align:right}.ab-rel{font:700 .84rem "IBM Plex Mono",monospace}.ab-rel.up{color:var(--ver)}.ab-rel.dn{color:var(--rojo)}
+.ab-tok{font:600 .84rem "IBM Plex Mono",monospace}.ab-tok small{display:block;font:500 .72rem Manrope;color:var(--mut2)}
+@media (max-width:1000px){ .ab{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr minmax(0,1fr) .7fr .8fr minmax(0,1.3fr) 74px} .ab .ab-q{display:none} }
+/* Otros */
+.ot{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr .7fr .95fr .7fr .7fr .6fr minmax(0,1.5fr) 74px}
+.mz-h.ot>span:nth-child(3),.mz-h.ot>.ot-tk,.mz-h.ot>.ot-sen{text-align:left}
+@media (max-width:1100px){ .ot{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr .95fr .7fr .7fr .6fr minmax(0,1.3fr) 74px} .ot .ot-q{display:none} }
+@media (max-width:760px){
+  .df .go,.jg .go,.ab .go,.ot .go{display:none} .ab-tot{margin-left:0;width:100%}
+  .df{grid-template-columns:28px minmax(0,1fr) auto 66px}.df .df-tvl,.df .df-dev,.df .df-tk,.df>.df-tok,.df>.ab-sin,.df>.cad,.df .df-vx,.df .df-sen{display:none}.df .mz-sen{grid-column:2/-1}
+  .df-nav{top:64px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px 12px;padding:8px 16px}.df-nav::-webkit-scrollbar{display:none}.df-g{scroll-margin-top:120px}
+  .fv{grid-template-columns:24px 60px minmax(0,1fr) 70px}.fv-p{grid-column:2/-1;margin-top:-6px}.df-vuelve .top span{display:block;margin:2px 0 0}
+  .jg{grid-template-columns:28px minmax(0,1fr) auto 70px}.jg .jg-tk,.jg .jg-dev,.jg .jg-tit,.jg .jg-sen{display:none}.jg .mz-sen{grid-column:2/-1}
+  .ab{grid-template-columns:28px minmax(0,1fr) auto 64px}.ab .ab-q,.ab .ab-cuota,.ab .ab-cuota-h,.ab>.ab-tok,.ab>.ab-sin,.ab>.cad,.ab .ab-tok-h,.ab .ab-sen-h{display:none}.ab .mz-sen{grid-column:2/-1}
+  .ot{grid-template-columns:28px minmax(0,1fr) auto 66px}.ot .ot-q,.ot .ot-dev,.ot .ot-tk,.ot>.df-tok,.ot>.ab-sin,.ot>.cad,.ot .ot-vx,.ot .ot-sen{display:none}.ot .mz-sen{grid-column:2/-1}
+}
+.nm b a{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(122,184,196,.55)}.nm b a:hover{color:var(--tq);border-bottom-color:var(--tq)}

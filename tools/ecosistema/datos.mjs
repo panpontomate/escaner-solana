@@ -84,9 +84,14 @@ for (const [k, hijos] of Object.entries(porPadre)) {
     r30: hijos.reduce((s, h) => s + (REV[String(h.defillamaId)] || 0), 0) || null,
     tvl: hijos.reduce((s, h) => s + tvlSol(P[String(h.defillamaId)]), 0) || null,
     tok: !!(info.gecko_id || sym), sym, gecko: info.gecko_id || null, mcap: info.mcap || null,
-    logo: logo(info.logo || top.logo),
+    logo: logo(info.logo || top.logo), addr: info.address || (P[String(top.defillamaId)] || {}).address || null,
   });
 }
+// Cambios de apartado decididos a mano (23/11): StonkFun es un DEX como Pump.fun (antes Meme › Lanzaderas);
+// Infinity Gaming y SOLPUMP son casinos según su propia descripción; Solflare es una wallet (DefiLlama la pone en Privacy)
+const MOVER = { "StonkFun": ["DeFi", "DEX"], "Infinity Gaming": ["Juegos", "Azar"], "SOLPUMP": ["Juegos", "Azar"], "Solflare": ["Apps y bots", "Wallets"] };
+const mover = (l) => { for (const r of l) if (MOVER[r.n]) [r.ap, r.gr] = MOVER[r.n]; };
+mover(rows);
 const totFees30 = fees.total30d, totFees60 = fees.total60dto30d;
 
 // 2) Activos reales: valor en Solana. a) TVL de DefiLlama de los protocolos RWA en Solana
@@ -202,12 +207,19 @@ for (const [cat, apN, grN] of CG_APS) {
 }
 console.log("IA y juegos de CoinGecko en Solana:", tk.length);
 const todas = [...sinHylo, ...st, ...tk];
+mover(todas);   // los de CoinGecko (Infinity Gaming, SOLPUMP) llegan después
 
 // 4) Los 10 primeros de cada grupo
 const sel = [];
 const grupos = {};
 for (const r of todas) (grupos[r.ap + "|" + r.gr] ||= []).push(r);
-for (const lista of Object.values(grupos)) sel.push(...lista.filter((r) => r.m > 0 || r.f30 > 0).sort((a, b) => (b.m || 0) - (a.m || 0)).slice(0, POR_GRUPO));
+// 24/11: en DeFi, lo que se mide por comisiones solo entra si cobra al menos 1.000 $ al mes (fuera los casi muertos:
+// Nirvana cobraba 17 $/mes, sin ficha en CoinGecko y con 3 $ de liquidez; FBYT, 128 $)
+const DEFI_MIN = 1000;
+// fuera a mano (24/11): Loan Meme — su web (loanmeme.com) es un dominio caducado
+const FUERA = new Set(["Loan Meme"]);
+const entra = (r) => (r.m > 0 || r.f30 > 0) && !FUERA.has(r.n) && !(r.ap === "DeFi" && r.med === "fees" && !(r.m >= DEFI_MIN));
+for (const lista of Object.values(grupos)) sel.push(...lista.filter(entra).sort((a, b) => (b.m || 0) - (a.m || 0)).slice(0, POR_GRUPO));
 
 // 5) Precios de CoinGecko (una petición)
 const ids = [...new Set(sel.filter((r) => r.gecko).map((r) => r.gecko))];
@@ -219,13 +231,15 @@ for (const r of sel) if (r.gr === "Stablecoins") r.mcap = null;
 
 // 6) Titulares y traders de Jupiter (gratis, hasta 100 tokens por petición): cuánta gente lo tiene y cuánta opera,
 //    separando la actividad orgánica de los bots. Sirve en todos los apartados con token en Solana.
-const conMint = sel.filter((r) => r.gecko && MINT[r.gecko]);
+// 23/11: sin ficha en CoinGecko (H081, FBYT…) la dirección sale de DefiLlama («solana:<mint>»)
+const mintDe = (r) => (r.gecko && MINT[r.gecko]) || (/^solana:/.test(r.addr || "") ? r.addr.slice(7) : null);
+const conMint = sel.filter((r) => r.tok && mintDe(r));
 for (let i = 0; i < conMint.length; i += 100) {
   const lote = conMint.slice(i, i + 100);
-  const l = await j("https://lite-api.jup.ag/tokens/v2/search?query=" + lote.map((r) => MINT[r.gecko]).join(",")).catch(() => []);
+  const l = await j("https://lite-api.jup.ag/tokens/v2/search?query=" + lote.map(mintDe).join(",")).catch(() => []);
   const por = Object.fromEntries(l.map((t) => [t.id, t]));
   for (const r of lote) {
-    const t = por[MINT[r.gecko]]; if (!t) continue;
+    const t = por[mintDe(r)]; if (!t) continue;
     r.mint = t.id; r.tit = t.holderCount ?? null;
     if (!r.logo && String(t.icon || "").startsWith("https://")) r.logo = t.icon;               // stablecoins: DefiLlama no trae logo
     const d = t.stats24h || {};
@@ -234,7 +248,33 @@ for (let i = 0; i < conMint.length; i += 100) {
     r.orgScore = t.organicScore != null ? Math.round(t.organicScore) : null;
   }
 }
+const CADENA = { base: "Base", arbitrum: "Arbitrum", robinhood: "Robinhood Chain", bsc: "BNB Chain", avax: "Avalanche", fantom: "Fantom", polygon: "Polygon", optimism: "Optimism", ethereum: "Ethereum" };
+for (const r of sel) if (r.tok && !r.mint && r.addr && !/^solana:/.test(r.addr)) { const k = r.addr.includes(":") ? r.addr.split(":")[0] : "ethereum"; r.cad = CADENA[k] || k; }
+// copias en Solana con el mismo símbolo (23/11): la web avisa «En Solana solo hay copias con este nombre»
+for (const r of sel.filter((x) => x.cad && x.sym)) {
+  const l = await j("https://lite-api.jup.ag/tokens/v2/search?query=" + encodeURIComponent(r.sym)).catch(() => []);
+  if (Array.isArray(l)) r.copias = l.filter((t) => (t.symbol || "").toUpperCase() === r.sym.toUpperCase()).length;   // sin respuesta: sin dato, no «0 copias»
+  await new Promise((ok) => setTimeout(ok, 1200));
+}
 console.log("con titulares de Jupiter:", sel.filter((r) => r.tit != null).length);
+
+// Datos a mano con su fuente (24/11, aprobados por el usuario): lo que DefiLlama no da. q = lo que se queda; dep = depositado.
+const MANO = {
+  "Harmonic": { r30: 0, q: { es: "se queda 0 %", en: "keeps 0%" }, src: "docs.harmonic.gg (100 % de la propina al validador)" },
+  "Lulo": { q: { es: "cobra el 10 % del rendimiento", en: "charges 10% of the yield" }, src: "lulo.fi (FAQ)" },
+  "LP Agent": { dep: { es: "600 k$+ (todas las cadenas)", en: "$600k+ (all chains)" }, src: "lpagent.io" },
+};
+for (const r of sel) { const x = MANO[r.n]; if (!x) continue; if ("r30" in x) r.r30 = x.r30; r.mano = { q: x.q || null, dep: x.dep || null, src: x.src, f: "2026-11-24" }; }
+// dfdvSOL: DefiLlama no da lo depositado; sale de la cadena: tokens emitidos × su precio en Jupiter (24/11)
+const DFDV = "sctmB7GPi5L2Q5G9tUSzXvhZ4YiDMEGcRov9KfArQpx", dfdv = sel.find((r) => r.n === "dfdvSOL");
+if (dfdv && !dfdv.tvl) try {
+  const [a, p] = await Promise.all([
+    j(process.env.SOLANA_RPC || "https://api.mainnet-beta.solana.com", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getAccountInfo", params: [DFDV, { encoding: "jsonParsed" }] }) }),
+    j("https://lite-api.jup.ag/price/v3?ids=" + DFDV),
+  ]);
+  const inf = a.result.value.data.parsed.info, precio = p[DFDV] && p[DFDV].usdPrice;
+  if (precio) dfdv.tvl = Number(inf.supply) / 10 ** inf.decimals * precio;
+} catch (e) { console.log("dfdvSOL:", e.message.replace(/api-key=[^&\s]+/, "api-key=***")); }
 
 const hoy = new Date();
 const dia = hoy.toISOString().slice(0, 10);
@@ -257,7 +297,9 @@ hist.dias[dia] = { m: Object.fromEntries(sel.filter((r) => r.m > 0).map((r) => [
 for (const d of Object.keys(hist.dias)) if ((hoy - new Date(d)) / 864e5 > 400) delete hist.dias[d];
 const dias = Object.keys(hist.dias).sort();
 const viejo = dias.filter((d) => (hoy - new Date(d)) / 864e5 >= 28).pop();
-if (viejo) for (const r of sel) if (r.c == null && hist.dias[viejo].m[r.n] > 0 && r.m > 0) r.c = r.m / hist.dias[viejo].m[r.n] - 1;
+// IA y Memes (medidos por capitalización, «token»): solo con nuestro historial desde el 1/12 (decisión del 24/11),
+// así que el cambio a 30 días no sale hasta el 31/12; antes, «sin dato a 30 días»
+if (viejo) for (const r of sel) if (r.c == null && (r.med !== "token" || viejo >= "2026-12-01") && hist.dias[viejo].m[r.n] > 0 && r.m > 0) r.c = r.m / hist.dias[viejo].m[r.n] - 1;
 // Emisión a 30 días: cambio del supply frente a hace ≥28 días (positivo = se crearon tokens; negativo = se quemaron)
 const viejoSup = dias.filter((d) => (hoy - new Date(d)) / 864e5 >= 28 && hist.dias[d].sup).pop();
 if (viejoSup) for (const r of sel) { const a = hist.dias[viejoSup].sup[r.mint], b = sup[r.mint]; if (a > 0 && b != null) r.emi30 = b / a - 1; }
@@ -296,7 +338,7 @@ for (const pid of SEPARAR) {
   sel.splice(sel.indexOf(ps[0]), 0, una);
   for (const r of ps) sel.splice(sel.indexOf(r), 1);
 }
-for (const r of sel) { delete r.ids; delete r.pid; }
+for (const r of sel) { delete r.ids; delete r.pid; delete r.addr; }
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(HIST, JSON.stringify(hist));
 fs.writeFileSync(path.join(OUT, "ecosistema.json"), JSON.stringify(D));
@@ -339,7 +381,8 @@ async function hacerPerfiles(sel) {
     if (r.mcap) e.mcap = Math.round(r.mcap);
   }
   // apartado decidido a mano: Pump.fun es UNA empresa de DeFi (decisión del usuario 22/11; antes apps), con PumpSwap como la parte que más cobra
-  const AP_FORZADO = { pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn: "defi" };
+  // (23/11) StonkFun también: DeFi · DEX
+  const AP_FORZADO = { pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn: "defi", "6GmAFSYs4gk3FDao5FzzySQpPZaWsa4rUJHacpMpUNgx": "defi" };
   for (const [mint, e] of Object.entries(t)) {
     if (AP_FORZADO[mint]) e.ap = AP_FORZADO[mint];
     if (e.f60 > 0) e.c = Math.round((e.f30 / e.f60 - 1) * 1000) / 1000;

@@ -19,19 +19,19 @@
   const AP = EN ? [
     ["Meme", "Meme", "Solana memecoins, by market cap, and the launchpads where they are born (Pump, BONK.fun…), by the fees they charge."],
     ["Activos tokenizados", "Tokenized assets", "Stablecoins by money circulating on Solana; stocks, funds and credit by tokenized value."],
-    ["DeFi", "DeFi", "DEXs, lending, derivatives, staking, bridges… measured by fees."],
-    ["Juegos", "Games", "Games, games of chance, physical cards and gamified mining. Those that charge on-chain, by fees; the rest, by their token (CoinGecko). Real players are not measured yet."],
+    ["DeFi", "DeFi", "DEXs, lending, staking, derivatives, bridges and the rest of Solana DeFi, measured by what they charge, what they keep and what reaches their token."],
+    ["Juegos", "Games", "Games, collectible cards, gamified mining and games of chance on Solana: those that charge, by what they charge; those with only a token, by what it's worth and how many people trade it."],
     ["IA", "AI", "AI agents and projects on Solana, by their token (CoinGecko). Their real on-chain usage is not measured yet."],
     ["Apps y bots", "Apps and bots", "Trading apps and bots, wallets and data: the tools people trade with, measured by fees."],
-    ["Otros", "Other", "DePIN, privacy, payments, social and tools."],
+    ["Otros", "Other", "DePIN, privacy, payments, tools and social: what isn't DeFi or games, measured by what it charges."],
   ] : [
     ["Meme", "Meme", "Las memecoins de Solana, por su capitalización, y las lanzaderas donde nacen (Pump, BONK.fun…), por las comisiones que cobran."],
     ["Activos tokenizados", "Activos tokenizados", "Stablecoins por dinero en circulación en Solana; acciones, fondos y crédito por valor tokenizado."],
-    ["DeFi", "DeFi", "DEX, préstamos, derivados, staking, puentes…, medidos por comisiones."],
-    ["Juegos", "Juegos", "Juegos, azar, cartas físicas y minería con juego. Los que cobran en la cadena, por comisiones; los demás, por su token (CoinGecko). Aún no medimos jugadores reales."],
+    ["DeFi", "DeFi", "DEX, préstamos, staking, derivados, puentes y el resto de la DeFi de Solana, medidos por lo que cobran, lo que se quedan y lo que llega a su token."],
+    ["Juegos", "Juegos", "Juegos, cartas coleccionables, minería con juego y azar en Solana: los que cobran, por lo que cobran; los que solo tienen token, por lo que vale y cuánta gente lo mueve."],
     ["IA", "IA", "Agentes y proyectos de IA en Solana, por su token (CoinGecko). Aún no medimos su uso real en la cadena."],
-    ["Apps y bots", "Apps y bots", "Apps y bots de trading, wallets y datos: las herramientas con las que se opera, medidas por comisiones."],
-    ["Otros", "Otros", "DePIN, privacidad, pagos, social y herramientas."],
+    ["Apps y bots", "Apps y bots", "Apps y bots de trading, wallets y datos: las herramientas con las que se opera, medidas por las comisiones que cobran."],
+    ["Otros", "Otros", "DePIN, privacidad, pagos, herramientas y social: lo que no es DeFi ni juego, medido por lo que cobra."],
   ];
   const GR = EN ? { "Lanzaderas": "Launchpads", "Apps de trading": "Trading apps", "Bots de Telegram": "Telegram bots", "Datos": "Data",
     "Activos reales": "Real-world assets", "Agregadores": "Aggregators", "Préstamos": "Lending", "Derivados": "Derivatives", "Oráculos": "Oracles",
@@ -46,7 +46,7 @@
     head: ["#", "Project", "Usage", "Keeps 30 d", "Back to the token", "Price · 24 h", "Value × revenue", "vs market"], valeT: "How many times its token is worth what the protocol earns in a year", ingT: "What the protocol keeps of the fees it charges, last 30 days (DefiLlama)", holdT: "What the protocol spent in 30 days on buying back its token or paying those who hold it (DefiLlama). × = how many times its token is worth that in a year",
     titT: "Wallets holding the token (Jupiter)", tradT: "Wallets that bought or sold in 24 h; organic = buyers that don't look like bots (Jupiter)",
     proto: " projects", ver: (a) => `See ${a} ›`, ninguno: "None in this tab.", elige: "The largest in each section. Pick one to see it in full.",
-    k: { feesSol: "Solana fees, 30 d", vsMesK: "vs previous month", protoSin: "Projects · no token", stSol: "Stablecoins on Solana", valTok: "Tokenized value (top 10)", feesAp: "Section fees, 30 d", mercVs: "Market vs prev. month" },
+    k: { dfFees: "DeFi charges in 30 d", dfDep: "Deposited", jgFees: "They charge in 30 d", jgTrad: "Traders in 24 h, all", feesSol: "Solana fees, 30 d", vsMesK: "vs previous month", protoSin: "Projects · no token", stSol: "Stablecoins on Solana", valTok: "Tokenized value (top 10)", feesAp: "Section fees, 30 d", mercVs: "Market vs prev. month" },
     nuevoTop: (d, a) => `With token since ${d} · ${a}`, nuevoH: (n) => `${n} now has a token`,
     nuevoP: (m, med) => `It showed up here without a token, with ${m} (${med}).`,
     nuevoW: "Copies with the same name usually appear: check the address on its official website before buying.",
@@ -60,7 +60,7 @@
     head: ["#", "Proyecto", "Uso", "Se queda 30 d", "Devuelve al token", "Precio · 24 h", "Vale × ingresos", "Vs. mercado"], valeT: "Cuántas veces vale su token lo que ingresa el protocolo en un año", ingT: "Lo que se queda el protocolo de las comisiones que cobra, últimos 30 días (DefiLlama)", holdT: "Lo que el protocolo gastó en 30 días en recomprar su token o pagar a quien lo tiene (DefiLlama). × = cuántas veces vale su token eso en un año",
     titT: "Wallets que tienen el token (Jupiter)", tradT: "Wallets que compraron o vendieron en 24 h; orgánicos = compradores que no parecen bots (Jupiter)",
     proto: " proyectos", ver: (a) => `Ver ${a} ›`, ninguno: "Ninguno en esta pestaña.", elige: "Los mayores de cada apartado. Elige uno para verlo entero.",
-    k: { feesSol: "Comisiones en Solana, 30 d", vsMesK: "vs mes anterior", protoSin: "Proyectos · sin token", stSol: "Stablecoins en Solana", valTok: "Valor tokenizado (los 10)", feesAp: "Comisiones del apartado, 30 d", mercVs: "Mercado vs mes anterior" },
+    k: { dfFees: "Cobra la DeFi en 30 d", dfDep: "Depositado", jgFees: "Cobran en 30 d", jgTrad: "Traders en 24 h, todos", feesSol: "Comisiones en Solana, 30 d", vsMesK: "vs mes anterior", protoSin: "Proyectos · sin token", stSol: "Stablecoins en Solana", valTok: "Valor tokenizado (los 10)", feesAp: "Comisiones del apartado, 30 d", mercVs: "Mercado vs mes anterior" },
     nuevoTop: (d, a) => `Con token desde el ${d} · ${a}`, nuevoH: (n) => `${n} ya tiene token`,
     nuevoP: (m, med) => `Salía aquí sin token, con ${m} (${med}).`,
     nuevoW: "Suelen salir copias con el mismo nombre: comprueba la dirección en su web oficial antes de comprar.",
@@ -98,6 +98,8 @@
     let k;
     if (ap === "Activos tokenizados") k = [[T.k.stSol, fm(D.totStables)], [T.k.vsMesK, pc(D.mercado.circ), D.mercado.circ], [T.k.valTok, fm(val.reduce((s, r) => s + (r.m || 0), 0))]];
     else if (ap === "Todos") k = [[T.k.feesSol, fm(D.totFees30)], [T.k.vsMesK, pc(D.mercado.fees), D.mercado.fees], [T.k.protoSin, rs.length + " · " + sinTok]];
+    else if (ap === "DeFi") k = [[T.k.dfFees, fm(fees.reduce((s, r) => s + r.m, 0))], [T.k.dfDep, fm(rs.reduce((s, r) => s + (r.tvl || 0), 0))], [T.k.mercVs, pc(D.mercado.fees), D.mercado.fees]];
+    else if (ap === "Juegos") k = [[T.k.jgFees, fm(fees.reduce((s, r) => s + r.m, 0))], [T.k.jgTrad, fk(rs.reduce((s, r) => s + (r.trad || 0), 0))], [T.k.protoSin, rs.length + " · " + sinTok]];
     else k = [[T.k.feesAp, fm(fees.reduce((s, r) => s + r.m, 0))], [T.k.mercVs, pc(D.mercado.fees), D.mercado.fees], [T.k.protoSin, rs.length + " · " + sinTok]];
     $("#mk").innerHTML = k.map(([t, v, s]) => `<div><small>${t}</small><b class="${s == null ? "" : s < 0 ? "dn" : "up"}">${v}</b></div>`).join("");
     $("#nTodos").textContent = rs.length; $("#nCon").textContent = rs.filter((r) => r.tok).length; $("#nSin").textContent = sinTok;
@@ -118,22 +120,17 @@
     const sub = (ap === "Todos" ? esc(apNom(r.ap)) + " · " : "") + esc(grNom(r.gr)) + (r.tvl ? " · " + fm(r.tvl) + T.depos : "");
     const tit = r.tit != null ? `<small title="${T.titT}">${fk(r.tit)}${T.tit}${r.titC != null && Math.abs(r.titC) >= 0.0005 ? ` <span class="${r.titC >= 0 ? "up" : "dn"}">${pc1(r.titC)}${T.h24}</span>` : ""}</small>` : "";
     const trad = r.trad != null ? `<small title="${T.tradT}">${T.trad(fk(r.trad), fk(r.org || 0))}</small>` : "";
-    const precio = r.tok ? (r.precio != null ? fp(r.precio) + ` <span class="pc ${r.c24 >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span>` : "—") + (r.mcap ? `<small>${fm(r.mcap)}${T.cap}</small>` : "") : `<span class="sin">${T.sinTok}</span>`;
+    const precio = r.cad ? `<small>${EN ? "token on" : "token en"} ${esc(r.cad)}</small>` : r.tok ? (r.precio != null ? fp(r.precio) + ` <span class="pc ${r.c24 >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span>` : "—") + (r.mcap ? `<small>${fm(r.mcap)}${T.cap}</small>` : "") : `<span class="sin">${T.sinTok}</span>`;
     const ir = r.mint && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(r.mint) ? `<a class="go" href="${EN ? "/en/" : "/"}?token=${r.mint}">${T.vale}</a>` : `<span class="go"></span>`;
     return `<div class="row"><span class="i">${i + 1}</span>
-      <span class="nm">${av(r)}<span><b>${esc(r.n)}${r.sym ? ` <span class="sym">${esc(r.sym)}</span>` : ""}</b><small>${sub}</small>${tit}</span></span>
+      <span class="nm">${av(r)}<span><b>${tok(r) ? `<a href="${tok(r)}">${esc(r.n)}</a>` : esc(r.n)}${r.sym ? ` <span class="sym">${esc(r.sym)}</span>` : ""}</b><small>${sub}</small>${tit}</span></span>
       <span class="num">${r.m ? fm(r.m) : "—"}<small class="med">${r.m ? medida : ""}</small><small>${extra}</small>${trad}</span>
       <span class="num vol">${fm(r.r30)}</span>
       <span class="num vol" title="${T.holdT}">${r.h30 == null ? "—" : fm(r.h30) + (r.mcap && r.h30 > 0 ? `<small>×${dec(r.mcap / (r.h30 * 12), 1)}</small>` : "")}</span>
       <span class="num vol">${precio}</span>
       <span class="num vol">${r.anios == null ? "—" : "×" + dec(r.anios, 1)}</span>
       ${r.rel == null && r.med === "token" ? `<span class="rel"></span>` : `<span class="rel"><span class="num ${r.rel >= 0 ? "up" : "dn"}" title="${r.rel == null && r.med !== "fees" && r.med !== "circ" ? T.sinHist : ""}">${pc(r.rel)}</span>${bar}<small>${T.frente}</small></span>`}
-      ${ir}</div>${partes(r)}`;
-  }
-  // una empresa con varias partes (Pump.fun, 21/11): una fila y debajo lo que cobra cada parte
-  function partes(r) {
-    if (!r.partes || r.partes.length < 2) return "";
-    return `<div class="partes"><span class="pk">${T.partes}</span>${r.partes.map((p) => `<span><b>${esc(p.n)}</b> ${esc(grNom(p.gr))} · ${fm(p.m)}${T.parte30}${p.c == null ? "" : ` <em class="${p.c >= 0 ? "up" : "dn"}">${pc(p.c)}</em>`}</span>`).join("")}</div>`;
+      ${ir}</div>`;
   }
   const ordena = (rs) => rs.sort((a, b) => orden === "anios" ? (a.anios ?? 1e18) - (b.anios ?? 1e18) : (b[orden] ?? -1e18) - (a[orden] ?? -1e18));
 
@@ -147,7 +144,7 @@
   const MZ = EN ? {
     datoK: "SolFlag registry", dato: (p, n, d, v) => `of the ${n} new tokens we saw being born since ${d} were dead after 24 h. Only ${v} were still alive. Before buying something newborn, check who is behind it.`,
     lzH: "Launchpads,", lzS: "where they are born and how many survive", lzTh: ["Launchpad", "Earns 30 d", "Its token", "Born", "Alive after 24 h"],
-    parte: "part of Pump.fun (shown whole in DeFi)", cadena: "on-chain: ", nuevo: "new", sinTok: "No token", conTok: "has a token", noReg: "Not in our registry yet",
+    parte: "part of Pump.fun (shown whole in DeFi)", enDefi: "listed in DeFi · DEX", cadena: "on-chain: ", nuevo: "new", sinTok: "No token", conTok: "has a token", noReg: "Not in our registry yet",
     vivos: (v, n) => `${v} of ${n} alive`,
     lzSrc: (d) => `Fees: DefiLlama (30 days, vs the previous month; “new” if it barely earned last month). Born and alive after 24 h: SolFlag registry since ${d}, with the launches our collector sees (a sample, not all). “Alive” = still has money in it and trading after 24 h.`,
     mmH: "Memecoins,", mmS: "who really trades them", mmTh: ["Memecoin", "Worth · 24 h", "Volume 24 h", "Holders", "Traders 24 h", "Signal"],
@@ -160,7 +157,7 @@
   } : {
     datoK: "Dato del registro de SolFlag", dato: (p, n, d, v) => `de los ${n} tokens nuevos que vimos nacer desde el ${d} estaban muertos a las 24 h. Solo ${v} seguían con vida. Antes de comprar algo recién nacido, mira quién está detrás.`,
     lzH: "Lanzaderas,", lzS: "dónde nacen y cuántas sobreviven", lzTh: ["Lanzadera", "Cobra 30 d", "Su token", "Nacieron", "Vivos a las 24 h"],
-    parte: "parte de Pump.fun (va entera en DeFi)", cadena: "en la cadena: ", nuevo: "nuevo", sinTok: "Sin token", conTok: "con token", noReg: "Aún no lo registramos",
+    parte: "parte de Pump.fun (va entera en DeFi)", enDefi: "va en DeFi · DEX", cadena: "en la cadena: ", nuevo: "nuevo", sinTok: "Sin token", conTok: "con token", noReg: "Aún no lo registramos",
     vivos: (v, n) => `${v} de ${n} vivos`,
     lzSrc: (d) => `Comisiones: DefiLlama (30 días, frente al mes anterior; «nuevo» si el mes anterior casi no cobró). Nacieron y vivos a las 24 h: registro de SolFlag desde el ${d}, con los lanzamientos que ve nuestro recolector (una muestra, no todos). «Vivo» = sigue con dinero dentro y movimiento a las 24 h.`,
     mmH: "Memecoins,", mmS: "quién las mueve de verdad", mmTh: ["Memecoin", "Vale · 24 h", "Volumen 24 h", "Titulares", "Traders 24 h", "Señal"],
@@ -183,12 +180,13 @@
     const lz = rs.filter((r) => r.gr === "Lanzaderas").map((r) => Object.assign({}, r));
     const pump = D.rows.find((r) => r.n === "Pump.fun" && r.partes), pp = pump && pump.partes.find((p) => p.gr === "Lanzaderas");
     if (pp) lz.push(Object.assign({}, pump, { n: "Pump.fun", m: pp.m, c: pp.c, parte: true }));
+    const stk = D.rows.find((r) => r.n === "StonkFun" && r.ap !== "Meme"); if (stk) lz.push(Object.assign({}, stk, { enDefi: true }));
     lz.sort((a, b) => (b.m || 0) - (a.m || 0));
     const reg = REG && REG.plats, tot = REG && REG.total, desde = REG && REG.desde ? new Date(REG.desde).toLocaleDateString(EN ? "en-GB" : "es-ES", { day: "numeric", month: EN ? "short" : "numeric" }) : "";
     const cambio = (c) => c == null ? "" : c > 5 ? `<span class="mz-nuevo">${MZ.nuevo}</span>` : `<span class="${c >= 0 ? "up" : "dn"}">${pc1(c) || pc(c)}</span>`;
     const nom = (r, extra) => { const h = tok(r); const n = `${esc(r.n)}${r.sym && r.tok !== false ? ` <small>${esc(r.sym)}</small>` : ""}`; return `<span class="mz-n"><b>${h ? `<a href="${h}">${n}</a>` : n}</b>${extra != null ? `<small>${extra}</small>` : ""}</span>`; };
     const lzFila = (r, i) => { const k = PLAT[r.n], g = reg && k && reg[k], v = g ? g.con - g.muertos : 0;
-      const sub = r.parte ? MZ.parte : k && MZ.notas[k] ? MZ.cadena + MZ.notas[k] : "";
+      const sub = r.parte ? MZ.parte : r.enDefi ? MZ.enDefi : k && MZ.notas[k] ? MZ.cadena + MZ.notas[k] : "";
       return `<div class="mz-t mz-lz"><span class="mz-i">${i + 1}</span>${av(r)}${nom(r, esc(sub))}<span class="mz-x">${fm(r.m)}<small>${cambio(r.c)}</small></span>` +
         `<span class="mz-x mz-m mz-tok">${r.tok ? (r.mcap ? fm(r.mcap) + `<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span></small>` : MZ.conTok) : `<span class="mz-sin">${MZ.sinTok}</span>`}</span>` +
         `<span class="mz-x mz-m mz-nac">${g ? num(g.n) : "—"}</span>` +
@@ -260,11 +258,229 @@
       `<p class="mz-src">${IA.src}</p><div class="mz-que"><div class="top"><b>${IA.queH}</b><span>${IA.queS}</span></div><ul>${IA.queL.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
   }
 
+  // ---------- DeFi, Juegos, Apps y bots y Otros (maquetas del 23/11 en maquetas/web/ecosistema-*.html, subidas el 25/11) ----------
+  const V = EN ? {
+    dato: "Fact", tokEn: "token on", sinPrecio: "no price", noAplica: "n/a", vsMes: " vs prev. month",
+    copias: (n) => `⚠ On Solana there are only copies with this name (${n})`, fuera: "Earns mostly outside Solana",
+    devQ: (p) => `Returns ${p}% of what it keeps to the token`, devC: (p) => `Returns ${p}% of what it charges to the token`,
+    vx: (x) => `Its token is worth ${x} times what it earns in a year`, vxC: (x) => `Its token is worth ${x} times what it charges in a year`,
+    vxPoco: (v, m) => `Its token is worth ${v} and it charges ${m} a month on Solana`,
+    bloq: (b) => `${b}% still locked`, masMes: (m) => `Charges more than last month with the market at ${m}`, pierde: "Losing usage faster than the market",
+    deQueda: (p) => `${p}% of what it keeps`, deCobra: (p) => `${p}% of what it charges`,
+    proy: (n) => n === 1 ? "1 project" : n + " projects", cobran: (m) => ` · charge ${m} in 30 days`, depos: (m) => ` · ${m} deposited`, verOtros: (n) => `See the other ${n}`,
+    mano: (s) => `Taken by hand from ${s}, 24 Nov 2026`,
+    df: { th: ["Project", "Charges · 30 d", "Keeps", "Deposited", "Back to the token", "Token", "Value × revenue", "Signal"],
+      sub: { DEX: "where tokens are swapped", Agregadores: "find the best price across all DEXs", Staking: "SOL that works and earns interest", MEV: "transaction ordering and its tips",
+        "Préstamos": "borrow and lend against collateral", Derivados: "futures and leverage", Puentes: "move money between chains", "Oráculos": "prices and data for contracts",
+        Rendimiento: "vaults and strategies that chase yield", Liquidez: "manage liquidity positions", Predicciones: "bet on outcomes" },
+      dato: (a, b, n, r) => `Of every $100 Solana DeFi charges, ${a} go to Pump.fun and ${b} to Jupiter. The other ${n} projects share ${r}.`, de100: (n) => `${n} of 100`,
+      vH: "What goes back to holders", vS: "Buybacks or payouts in the last 30 days: the business money that reaches the token.",
+      src: (f) => `“Charges”: fees users pay in 30 days. “Keeps”: the part the protocol keeps (the rest goes to liquidity providers or validators). “Back to the token”: buybacks or payouts to holders in 30 days. “Deposited”: money inside the protocol on Solana. “Value × revenue”: its token's value divided by what it keeps in a year. All from DefiLlama and Solana only; market cap from CoinGecko. Data from ${f}; not recommendations.`,
+      queH: "What we check in a DeFi protocol", queS: "Being widely used doesn't mean its token wins:", queL: ["How much of what it charges does it keep?", "Does anything reach the token?", "How much is left to unlock", "Who can change the contracts?", "Audits and hacks"], nav: "DeFi groups" },
+    jg: { th: ["Project", "Usage", "Token", "Back to the token", "Holders", "Traders 24 h", "Signal"],
+      gr: [["Cartas físicas", "Physical cards,", "real cards stored in a vault and turned into tokens"], ["Minería con juego", "Gamified mining,", "mining a token by playing rounds on-chain"], ["Juegos", "Games,", "games with their own token"], ["Azar", "Games of chance,", "casinos, betting and roulettes"]],
+      cobra: "charges 30 d", vale: "worth", h24: " 24 h", y: " and ",
+      dato: (ns, v, n, c, m, t) => `The 3 most valuable game tokens (${ns}: ${v} together) were traded by ${n} people in 24 h. ${c}, which charges ${m} a month, had ${t}.`,
+      src: (f) => `“Usage”: what it charges in 30 days (DefiLlama, Solana only) or, if it charges nothing measurable, what its token is worth (CoinGecko). “Back to the token”: buybacks or payouts to holders in 30 days (DefiLlama). Holders and traders: Jupiter (organic = buyers that don't look like bots). Unlocks: Streamflow. Data from ${f}; not recommendations.`,
+      queH: "What we check in a game token", queS: "Many have a token and hardly any players:", queL: ["Can you play it today?", "How many people really trade it", "How much is left to unlock", "If it charges, does the token gain from it?", "Is it a game or a casino?"] },
+    ab: { th: ["Project", "Charges · 30 d", "Keeps", "Share of group", "Vs. market", "Token", "Signal"],
+      gr: [["Apps de trading", "Trading apps,", "web terminals to buy and sell"], ["Bots de Telegram", "Telegram bots,", "buy and sell from the chat"], ["Wallets", "Wallets,", "where you keep your tokens and sign"], ["Datos", "Data,", "charts and token lists"]],
+      tot: (m, n) => `${m} in 30 days among ${n}`,
+      dato: (v, a, b, s, n) => `Trading apps charge ${v} times more than Telegram bots: ${a} vs ${b} in 30 days. And ${s} of ${n} have no token: using them has nothing to do with buying one.`,
+      src: (mk, f) => `Fees and what each one keeps: DefiLlama (only what's charged on Solana). “Share of group”: its part of what the whole group charges. “Vs. market”: how much it changed in 30 days compared with all Solana fees (${mk}). Market cap: CoinGecko. Data from ${f}; not recommendations.`,
+      queH: "What we check in an app or a bot", queS: "Using it means giving it power over your money:", queL: ["Who holds your keys?", "How much it charges per trade", "If it has a token, does it gain from the business?", "Hacks and key leaks", "Copy trading: who's on the other side"] },
+    ot: { th: ["Project", "Charges · 30 d", "Keeps", "Back to the token", "Token", "Traders 24 h", "Value × revenue", "Signal"],
+      sub: { DePIN: "networks of real devices paid for their use", "Privacidad": "hide balances and transfers", Pagos: "get paid, pay and distribute tokens", Herramientas: "what other projects use to work", Social: "news and networks" },
+      dato: (m, p, v, x) => `Render Network charges the most in this section (${m} in 30 days) and returns ${p}% to the token. Even so, its token is worth ${v}: ${x} times what it earns in a year.`,
+      src: (f) => `“Charges”: fees users pay in 30 days. “Keeps”: the part the protocol keeps. “Back to the token”: buybacks or payouts to holders in 30 days. “Value × revenue”: its token's value divided by what it keeps in a year. Fees: DefiLlama (Solana only). Market cap: CoinGecko. Traders: Jupiter. Data from ${f}; not recommendations.`,
+      queH: "What we check here", queS: "Each group is a different business:", queL: ["Are there real devices or users behind it?", "Does anything reach the token?", "Privacy: who controls the contract?", "How much is left to unlock", "How many people really trade it"] },
+  } : {
+    dato: "Dato", tokEn: "token en", sinPrecio: "sin precio", noAplica: "no aplica", vsMes: " vs mes ant.",
+    copias: (n) => `⚠ En Solana solo hay copias con este nombre (${n})`, fuera: "Cobra sobre todo fuera de Solana",
+    devQ: (p) => `Devuelve al token el ${p} % de lo que se queda`, devC: (p) => `Devuelve al token el ${p} % de lo que cobra`,
+    vx: (x) => `Su token vale ${x} veces lo que ingresa en un año`, vxC: (x) => `Su token vale ${x} veces lo que cobra en un año`,
+    vxPoco: (v, m) => `Su token vale ${v} y en Solana cobra ${m} al mes`,
+    bloq: (b) => `${b} % aún bloqueado`, masMes: (m) => `Cobra más que el mes pasado con el mercado en ${m}`, pierde: "Pierde uso más rápido que el mercado",
+    deQueda: (p) => `${p} % de lo que se queda`, deCobra: (p) => `${p} % de lo que cobra`,
+    proy: (n) => n === 1 ? "1 proyecto" : n + " proyectos", cobran: (m) => ` · cobran ${m} en 30 días`, depos: (m) => ` · ${m} depositados`, verOtros: (n) => `Ver los otros ${n}`,
+    mano: (s) => `Dato a mano de ${s}, 24/11/2026`,
+    df: { th: ["Proyecto", "Cobra · 30 d", "Se queda", "Depositado", "Devuelve al token", "Token", "Vale × ingresos", "Señal"],
+      sub: { DEX: "donde se cambian tokens", Agregadores: "buscan el mejor precio entre todos los DEX", Staking: "SOL que trabaja y cobra intereses", MEV: "el orden de las transacciones y sus propinas",
+        "Préstamos": "pedir y prestar con garantía", Derivados: "futuros y apalancamiento", Puentes: "mover dinero entre cadenas", "Oráculos": "precios y datos para los contratos",
+        Rendimiento: "bóvedas y estrategias que buscan intereses", Liquidez: "gestionar posiciones de liquidez", Predicciones: "apostar a resultados" },
+      dato: (a, b, n, r) => `De cada 100 $ que cobra la DeFi de Solana, ${a} se los lleva Pump.fun y ${b} Jupiter. Los otros ${n} proyectos se reparten ${r}.`, de100: (n) => `${n} de 100`,
+      vH: "Lo que vuelve a los titulares", vS: "Recompras o reparto de los últimos 30 días: el dinero del negocio que llega al token.",
+      src: (f) => `«Cobra»: comisiones que pagan los usuarios en 30 días. «Se queda»: la parte que se queda el protocolo (el resto va a quien pone la liquidez o a los validadores). «Devuelve al token»: recompras o reparto a titulares en 30 días. «Depositado»: dinero dentro del protocolo en Solana. «Vale × ingresos»: lo que vale su token dividido entre lo que se queda en un año. Todo de DefiLlama y solo en Solana; capitalización de CoinGecko. Datos del ${f}; no son recomendaciones.`,
+      queH: "Qué miramos en un protocolo DeFi", queS: "Que se use mucho no significa que su token gane:", queL: ["¿Cuánto se queda de lo que cobra?", "¿Llega algo al token?", "Cuánto queda por desbloquear", "¿Quién puede cambiar los contratos?", "Auditorías y hackeos"], nav: "Grupos de DeFi" },
+    jg: { th: ["Proyecto", "Uso", "Token", "Devuelve al token", "Titulares", "Traders 24 h", "Señal"],
+      gr: [["Cartas físicas", "Cartas físicas,", "cartas reales guardadas en una cámara y convertidas en tokens"], ["Minería con juego", "Minería con juego,", "minar un token jugando rondas en la cadena"], ["Juegos", "Juegos,", "juegos con su propio token"], ["Azar", "Azar,", "casinos, apuestas y ruletas"]],
+      cobra: "cobra 30 d", vale: "vale", h24: " 24 h", y: " y ",
+      dato: (ns, v, n, c, m, t) => `Los 3 tokens de juegos que más valen (${ns}: ${v} juntos) los movieron ${n} personas en 24 h. ${c}, que cobra ${m} al mes, tuvo ${t}.`,
+      src: (f) => `«Uso»: lo que cobra en 30 días (DefiLlama, solo en Solana) o, si no cobra nada medible, lo que vale su token (CoinGecko). «Devuelve al token»: recompras o reparto a titulares en 30 días (DefiLlama). Titulares y traders: Jupiter (orgánicos = compradores que no parecen bots). Desbloqueos: Streamflow. Datos del ${f}; no son recomendaciones.`,
+      queH: "Qué miramos en un token de juego", queS: "Muchos tienen token y casi ningún jugador:", queL: ["¿Se puede jugar hoy?", "Cuánta gente lo mueve de verdad", "Cuánto queda por desbloquear", "Si cobra, ¿gana el token con ello?", "¿Es un juego o un casino?"] },
+    ab: { th: ["Proyecto", "Cobra · 30 d", "Se queda", "Cuota del grupo", "Vs. mercado", "Token", "Señal"],
+      gr: [["Apps de trading", "Apps de trading,", "terminales web para comprar y vender"], ["Bots de Telegram", "Bots de Telegram,", "comprar y vender desde el chat"], ["Wallets", "Wallets,", "donde guardas tus tokens y firmas"], ["Datos", "Datos,", "gráficas y listas de tokens"]],
+      tot: (m, n) => `${m} en 30 días entre ${n}`,
+      dato: (v, a, b, s, n) => `Las apps de trading cobran ${v} veces más que los bots de Telegram: ${a} frente a ${b} en 30 días. Y ${s} de ${n} no tienen token: usarlas no tiene nada que ver con comprar uno.`,
+      src: (mk, f) => `Comisiones y lo que se queda cada uno: DefiLlama (solo lo cobrado en Solana). «Cuota del grupo»: su parte de lo que cobra todo el grupo. «Vs. mercado»: cuánto cambió en 30 días comparado con todas las comisiones de Solana (${mk}). Capitalización: CoinGecko. Datos del ${f}; no son recomendaciones.`,
+      queH: "Qué miramos en una app o un bot", queS: "Usarla es darle permiso sobre tu dinero:", queL: ["¿Quién guarda tus claves?", "Cuánto cobra por operación", "Si tiene token, ¿gana con el negocio?", "Hackeos y fugas de claves", "Copiar operaciones: quién está al otro lado"] },
+    ot: { th: ["Proyecto", "Cobra · 30 d", "Se queda", "Devuelve al token", "Token", "Traders 24 h", "Vale × ingresos", "Señal"],
+      sub: { DePIN: "redes de aparatos reales que cobran por su uso", "Privacidad": "esconder saldos y movimientos", Pagos: "cobrar, pagar y repartir tokens", Herramientas: "lo que usan otros proyectos para funcionar", Social: "noticias y redes" },
+      dato: (m, p, v, x) => `Render Network es el que más cobra de este apartado (${m} en 30 días) y devuelve al token el ${p} %. Aun así, su token vale ${v}: ${x} veces lo que ingresa en un año.`,
+      src: (f) => `«Cobra»: comisiones que pagan los usuarios en 30 días. «Se queda»: la parte que se queda el protocolo. «Devuelve al token»: recompras o reparto a titulares en 30 días. «Vale × ingresos»: lo que vale su token dividido entre lo que se queda en un año. Comisiones: DefiLlama (solo Solana). Capitalización: CoinGecko. Traders: Jupiter. Datos del ${f}; no son recomendaciones.`,
+      queH: "Qué miramos aquí", queS: "Cada grupo es un negocio distinto:", queL: ["¿Hay aparatos o usuarios reales detrás?", "¿Llega algo al token?", "Privacidad: ¿quién controla el contrato?", "Cuánto queda por desbloquear", "Cuánta gente lo mueve de verdad"] },
+  };
+  // tokens de proyectos que cobran sobre todo en otras cadenas: aquí solo contamos Solana, así que «vale × ingresos» engaña
+  const MULTI = new Set(["CAKE", "FLUID", "GMX", "ACX", "THOR", "DBR", "W", "EDGE"]);
+  // grupos sin depósitos (y HumidiFi, que pone su propio dinero): «no aplica» en vez de «—»
+  const SIN_DEP = new Set(["Agregadores", "Puentes", "MEV", "Oráculos", "Predicciones"]);
+  const fmv = (n) => n == null ? "—" : n < 1e3 ? (EN ? "$" + Math.round(n) : Math.round(n) + " $") : fm(n);
+  const pcv = (x) => (x > 0 ? "+" : "") + Math.round(x * 100) + sp + "%";
+  const dec0 = (x) => num(x, x < 10 ? 1 : 0);
+  const fechaV = () => new Date(D.fecha).toLocaleDateString(EN ? "en-GB" : "es-ES");
+  const sumaV = (l, k) => l.reduce((s, r) => s + (r[k] || 0), 0);
+  const goV = (r) => tok(r) ? `<a class="go" href="${tok(r)}">${T.vale}</a>` : `<span class="go"></span>`;
+  const nomV = (r) => { const h = tok(r), n = esc(r.n === "Render Network BME" ? "Render Network" : r.n); return `<span class="mz-n"><b>${h ? `<a href="${h}">${n}</a>` : n}</b></span>`; };
+  const sinV = `<span class="ab-sin">${T.sinTok}</span>`;
+  const cadV = (r) => `<span class="cad"><small>${V.tokEn}</small><b>${esc(r.cad)}</b>${r.gecko ? `<a href="https://www.coingecko.com/${EN ? "en/coins" : "es/monedas"}/${esc(r.gecko)}" target="_blank" rel="noopener">CoinGecko ↗</a>` : ""}</span>`;
+  const tokV = (r) => r.cad ? cadV(r) : r.tok ? `<span class="df-tok"><b>${esc(r.sym)}</b><small>${r.mcap ? fm(r.mcap) : V.sinPrecio}</small></span>` : sinV;
+  const manoV = (t) => t ? `<small class="mano" title="${esc(V.mano(t.src))}">${esc(EN ? t.en : t.es)}</small>` : "";
+  const cambioV = (r) => `<small><span class="${(r.c || 0) >= 0 ? "up" : "dn"}">${r.c == null ? "&nbsp;" : pcv(r.c) + V.vsMes}</span></small>`;
+  const datoV = (b, p) => `<div class="mz-dato"><span class="mz-k">${V.dato}</span><b>${b}</b><p>${p}</p></div>`;
+  const queV = (q) => `<div class="mz-que"><div class="top"><b>${q.queH}</b><span>${q.queS}</span></div><ul>${q.queL.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
+  const tit2 = (t, s, tot) => `<h2>${t} <small>${s}</small><span class="ab-tot">${tot}</span></h2>`;
+  // filas del apartado con lo que viene de perfiles.json (devuelve al token, desbloqueos)
+  const deApV = (a) => D.rows.filter((r) => r.ap === a).map((r) => { const p = (PERF && r.mint && PERF[r.mint]) || {}, ing = r.r30 || null;
+    return Object.assign({}, r, { h30: p.h30 ?? null, dl: p.dl || null, ing, cap: r.mcap || (r.med === "token" ? r.m : null),
+      rel: r.med === "fees" && r.c != null && D.mercado.fees != null ? (1 + r.c) / (1 + D.mercado.fees) - 1 : null,
+      vx: r.tok && !r.cad && r.mcap && ing >= 1e3 && !MULTI.has(r.sym) ? r.mcap / (ing * 12) : null }); });
+  const devV = (r) => r.h30 ? `${fm(r.h30)}<small>${r.ing ? V.deQueda(Math.min(100, Math.round(r.h30 / r.ing * 100))) : "&nbsp;"}</small>` : `<span class="mz-na">—</span>`;
+  const vxV = (r) => r.vx != null ? `${dec0(r.vx)}×` : `<span class="mz-na">—</span>`;
+  const MK = () => pcv(D.mercado.fees || 0);
+  let navIO = null;
+
+  function defiVista() {
+    const rs = deApV("DeFi"), q = V.df;
+    const senal = (r) => {
+      if (r.cad) return r.copias ? `<span class="mz-sen mz-a">${V.copias(r.copias)}</span>` : `<span class="mz-sen mz-a">${V.fuera}</span>`;
+      if (r.h30 && r.ing && r.h30 / r.ing >= 0.3 && r.h30 >= 50e3) return `<span class="mz-sen mz-v">${V.devQ(Math.min(100, Math.round(r.h30 / r.ing * 100)))}</span>`;
+      if (r.tok && MULTI.has(r.sym)) return `<span class="mz-sen mz-a">${V.fuera}</span>`;
+      if (r.vx != null && r.vx >= 50) return `<span class="mz-sen mz-r">${V.vx(num(r.vx))}</span>`;
+      if (r.dl && r.dl.bloq >= 10) return `<span class="mz-sen mz-a">${V.bloq(num(r.dl.bloq))}</span>`;
+      if (r.c != null && r.c > 0 && r.m >= 50e3) return `<span class="mz-sen mz-v">${V.masMes(MK())}</span>`;
+      if (r.rel != null && r.rel <= -0.4 && r.m >= 10e3) return `<span class="mz-sen mz-a">${V.pierde}</span>`;
+      return "<span></span>"; };
+    const dep = (r) => r.tvl ? fm(r.tvl) : r.mano && r.mano.dep ? manoV(r.mano.dep) : SIN_DEP.has(r.gr) || r.n === "HumidiFi" ? `<span class="mz-na">${V.noAplica}</span>` : "—";
+    const queda = (r) => (r.r30 != null ? fmv(r.r30) : "—") + (r.mano ? manoV(r.mano.q) : "");
+    const fila = (r, i) => `<div class="mz-t df"><span class="mz-i">${i + 1}</span>${av(r)}${nomV(r)}<span class="mz-x">${fmv(r.m)}${cambioV(r)}</span>` +
+      `<span class="mz-x">${queda(r)}</span><span class="mz-x df-tvl">${dep(r)}</span><span class="mz-x df-dev">${devV(r)}</span>${tokV(r)}<span class="mz-x df-vx">${vxV(r)}</span>${senal(r)}${goV(r)}</div>`;
+    const head = `<div class="mz-t df mz-h"><span class="mz-i"></span><span></span><span>${q.th[0]}</span><span>${q.th[1]}</span><span>${q.th[2]}</span><span class="df-tvl">${q.th[3]}</span><span class="df-dev">${q.th[4]}</span><span class="df-tk">${q.th[5]}</span><span class="df-vx">${q.th[6]}</span><span class="df-sen">${q.th[7]}</span><span class="go"></span></div>`;
+    const grupos = [...new Set(rs.map((r) => r.gr))].map((g) => ({ g, l: rs.filter((r) => r.gr === g).sort((a, b) => (b.m || 0) - (a.m || 0)) })).sort((a, b) => sumaV(b.l, "m") - sumaV(a.l, "m"));
+    const slug = (g) => "g-" + g.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const nav = `<nav class="df-nav" aria-label="${q.nav}">${grupos.map(({ g, l }) => `<a href="#${slug(g)}">${esc(grNom(g))}<em>${l.length}</em></a>`).join("")}</nav>`;
+    const tarj = grupos.map(({ g, l }) => { const resto = l.slice(5);
+      return `<section class="mz-card df-g" id="${slug(g)}">${tit2(esc(grNom(g)) + ",", q.sub[g] || "", V.proy(l.length) + V.cobran(fm(sumaV(l, "m"))) + (sumaV(l, "tvl") ? V.depos(fm(sumaV(l, "tvl"))) : ""))}${head}` +
+        l.slice(0, 5).map(fila).join("") + (resto.length ? `<details class="df-mas"><summary>${V.verOtros(resto.length)}</summary>${resto.map((r, i) => fila(r, i + 5)).join("")}</details>` : "") + `</section>`; }).join("");
+    const tot = sumaV(rs, "m"), pf = rs.find((r) => r.n === "Pump.fun"), jup = rs.find((r) => r.n === "Jupiter");
+    let dato = "";
+    if (pf && jup && tot) { const c1 = Math.round(pf.m / tot * 100), c2 = Math.round((pf.m + jup.m) / tot * 100); dato = datoV(q.de100(c2), q.dato(c1, c2 - c1, rs.length - 2, 100 - c2)); }
+    const dev = rs.filter((r) => r.h30 && r.h30 >= 50e3).sort((a, b) => b.h30 - a.h30).slice(0, 8);
+    const tira = dev.length ? `<section class="df-vuelve"><div class="top"><b>${q.vH}</b><span>${q.vS}</span></div>` + dev.map((r) => `<div class="fv">${av(r)}<span class="fv-n">${esc(r.sym)}</span><span class="fv-b"><i style="width:${Math.max(2, Math.round(r.h30 / dev[0].h30 * 100))}%"></i></span><span class="fv-v">${fm(r.h30)}</span><span class="fv-p">${MULTI.has(r.sym) ? V.fuera : r.ing ? V.deQueda(Math.min(100, Math.round(r.h30 / r.ing * 100))) : ""}</span></div>`).join("") + `</section>` : "";
+    $("#lista").innerHTML = nav + dato + tira + tarj + `<p class="mz-src">${q.src(fechaV())}</p>` + queV(q);
+    // la píldora del grupo que se está viendo, encendida
+    if (navIO) navIO.disconnect();
+    const as = [...document.querySelectorAll(".df-nav a")], vis = new Map();
+    navIO = new IntersectionObserver((es) => { es.forEach((e) => vis.set(e.target.id, e.isIntersecting ? e.intersectionRect.height : 0));
+      let best = null, h = 0; vis.forEach((v, k) => { if (v > h) { h = v; best = k; } });
+      as.forEach((a) => { const on = a.getAttribute("href") === "#" + best; a.classList.toggle("on", on); if (on && a.parentNode.scrollWidth > a.parentNode.clientWidth) a.parentNode.scrollLeft = a.offsetLeft - a.parentNode.clientWidth / 2 + a.offsetWidth / 2; }); },
+      { rootMargin: "-140px 0px -40% 0px", threshold: [0, .1, .3, .6, 1] });
+    document.querySelectorAll(".df-g").forEach((s) => navIO.observe(s));
+  }
+
+  function juegosVista() {
+    const rs = deApV("Juegos"), q = V.jg;
+    const senal = (r) => {
+      if (r.trad != null && r.trad < 50 && r.cap >= 1e6) return `<span class="mz-sen mz-r">${IA.pocos(fm(r.cap), r.trad)}</span>`;
+      if (r.trad >= 50 && r.org != null && r.org / r.trad < 0.02) return `<span class="mz-sen mz-r">${IA.bots(fm(r.cap))}</span>`;
+      if (r.med === "fees" && r.h30 && r.m && r.h30 / r.m >= 0.5) return `<span class="mz-sen mz-v">${V.devC(Math.round(r.h30 / r.m * 100))}</span>`;
+      if (r.dl && r.dl.bloq >= 10) return `<span class="mz-sen mz-a">${IA.bloq(num(r.dl.bloq), r.dl.lib >= 0.1 ? num(r.dl.lib, 1) : "")}</span>`;
+      if (r.med === "fees" && r.c != null && r.c > 0 && r.m >= 1e3) return `<span class="mz-sen mz-v">${V.masMes(MK())}</span>`;
+      if (r.rel != null && r.rel <= -0.4) return `<span class="mz-sen mz-a">${V.pierde}</span>`;
+      return "<span></span>"; };
+    const fila = (r, i) => {
+      const uso = r.med === "fees" ? `${fmv(r.m)}<small>${q.cobra} · <span class="${(r.c || 0) >= 0 ? "up" : "dn"}">${r.c == null ? "" : pcv(r.c)}</span></small>`
+        : `${fm(r.cap)}<small>${q.vale} · <span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${r.c24 == null ? "" : pcv(r.c24) + q.h24}</span></small>`;
+      const dev = r.med === "fees" && r.h30 && r.m ? `${fm(r.h30)}<small>${V.deCobra(Math.round(r.h30 / r.m * 100))}</small>` : `<span class="mz-na">—</span>`;
+      const tk = r.cad ? cadV(r) : r.tok ? `<b class="jg-sym">${esc(r.sym)}</b>` : sinV;
+      return `<div class="mz-t jg"><span class="mz-i">${i + 1}</span>${av(r)}${nomV(r)}<span class="mz-x">${uso}</span><span class="jg-tk">${tk}</span><span class="mz-x jg-dev">${dev}</span>` +
+        `<span class="mz-x jg-tit">${r.tit != null ? fk(r.tit) : "—"}</span><span class="mz-x">${r.trad != null ? fk(r.trad) : "—"}<small>${r.org != null ? MZ.org(r.org) : "&nbsp;"}</small></span>${senal(r)}${goV(r)}</div>`; };
+    const head = `<div class="mz-t jg mz-h"><span class="mz-i"></span><span></span><span>${q.th[0]}</span><span>${q.th[1]}</span><span class="jg-tk">${q.th[2]}</span><span class="jg-dev">${q.th[3]}</span><span class="jg-tit">${q.th[4]}</span><span>${q.th[5]}</span><span class="jg-sen">${q.th[6]}</span><span class="go"></span></div>`;
+    const tarj = q.gr.map(([g, t1, t2]) => {
+      const tf = g === "Juegos" || g === "Azar" ? -1 : 1;
+      const l = rs.filter((r) => r.gr === g).sort((a, b) => tf * ((b.med === "fees") - (a.med === "fees")) || (b.med === "fees" ? (b.m || 0) - (a.m || 0) : (b.cap || 0) - (a.cap || 0)));
+      if (!l.length) return "";
+      const cob = sumaV(l.filter((r) => r.med === "fees"), "m");
+      return `<section class="mz-card">${tit2(t1, t2, V.proy(l.length) + (cob ? V.cobran(fm(cob)) : ""))}${head}${l.map(fila).join("")}</section>`; }).join("");
+    const top3 = rs.filter((r) => r.med === "token" && r.cap).sort((a, b) => b.cap - a.cap).slice(0, 3);
+    const cc = rs.filter((r) => r.med === "fees").sort((a, b) => (b.m || 0) - (a.m || 0))[0];
+    let dato = "";
+    if (top3.length === 3 && cc && cc.trad != null) { const nT = sumaV(top3, "trad"), ns = top3.map((r) => r.n).join(", ").replace(/, ([^,]*)$/, q.y + "$1");
+      dato = datoV(num(nT), q.dato(esc(ns), fm(sumaV(top3, "cap")), num(nT), esc(cc.n), fm(cc.m), num(cc.trad))); }
+    $("#lista").innerHTML = dato + tarj + `<p class="mz-src">${q.src(fechaV())}</p>` + queV(q);
+  }
+
+  function appsVista() {
+    const rs = deApV("Apps y bots"), q = V.ab;
+    const senal = (r) => {
+      if (r.cad) return r.copias ? `<span class="mz-sen mz-a">${V.copias(r.copias)}</span>` : `<span class="mz-sen mz-a">${V.fuera}</span>`;
+      if (r.tok && r.mcap && r.m) { const x = r.mcap / (r.m * 12);
+        if (r.m < 5e3) return `<span class="mz-sen mz-a">${V.vxPoco(fm(r.mcap), fmv(r.m))}</span>`;
+        return `<span class="mz-sen ${x >= 20 ? "mz-r" : "mz-a"}">${V.vxC(x >= 20 ? num(x) : num(x, 1))}</span>`; }
+      if (r.c != null && r.c > 0) return `<span class="mz-sen mz-v">${V.masMes(MK())}</span>`;
+      if (r.rel != null && r.rel <= -0.4) return `<span class="mz-sen mz-a">${V.pierde}</span>`;
+      return "<span></span>"; };
+    const fila = (r, i, tot) => { const cu = tot ? r.m / tot : 0;
+      const tk = r.cad ? cadV(r) : r.tok ? `<span class="ab-tok">${esc(r.sym)}<small>${r.mcap ? fm(r.mcap) : V.sinPrecio}</small></span>` : sinV;
+      return `<div class="mz-t ab"><span class="mz-i">${i + 1}</span>${av(r)}${nomV(r)}<span class="mz-x">${fmv(r.m)}${cambioV(r)}</span><span class="mz-x ab-q">${r.r30 ? fmv(r.r30) : "—"}</span>` +
+        `<span class="ab-cuota"><i style="width:${Math.max(2, Math.round(cu * 100))}%"></i><em>${cu >= 0.01 ? Math.round(cu * 100) + sp + "%" : "&lt;1" + sp + "%"}</em></span>` +
+        `<span class="ab-relc">${r.rel == null ? "" : `<span class="ab-rel ${r.rel >= 0 ? "up" : "dn"}">${pcv(r.rel)}</span>`}</span>${tk}${senal(r)}${goV(r)}</div>`; };
+    const head = `<div class="mz-t ab mz-h"><span class="mz-i"></span><span></span><span>${q.th[0]}</span><span>${q.th[1]}</span><span class="ab-q">${q.th[2]}</span><span class="ab-cuota-h">${q.th[3]}</span><span class="ab-relc">${q.th[4]}</span><span class="ab-tok-h">${q.th[5]}</span><span class="ab-sen-h">${q.th[6]}</span><span class="go"></span></div>`;
+    const tarj = q.gr.map(([g, t1, t2]) => { const l = rs.filter((r) => r.gr === g).sort((a, b) => (b.m || 0) - (a.m || 0)), tot = sumaV(l, "m");
+      return l.length ? `<section class="mz-card">${tit2(t1, t2, q.tot(fm(tot), l.length))}${head}${l.map((r, i) => fila(r, i, tot)).join("")}</section>` : ""; }).join("");
+    const apps = sumaV(rs.filter((r) => r.gr === "Apps de trading"), "m"), bots = sumaV(rs.filter((r) => r.gr === "Bots de Telegram"), "m");
+    const veces = bots ? Math.round(apps / bots) : 0;
+    $("#lista").innerHTML = (veces >= 2 ? datoV(veces + "×", q.dato(veces, fm(apps), fm(bots), rs.filter((r) => !r.tok).length, rs.length)) : "") + tarj +
+      `<p class="mz-src">${q.src(MK(), fechaV())}</p>` + queV(q);
+  }
+
+  function otrosVista() {
+    const rs = deApV("Otros"), q = V.ot;
+    const senal = (r) => {
+      if (r.trad != null && r.trad < 50 && r.cap >= 1e6) return `<span class="mz-sen mz-r">${IA.pocos(fm(r.cap), r.trad)}</span>`;
+      if (r.h30 && r.ing && r.h30 / r.ing >= 0.3 && r.h30 >= 30e3) return `<span class="mz-sen mz-v">${V.devQ(Math.min(100, Math.round(r.h30 / r.ing * 100)))}</span>`;
+      if (r.vx != null && r.vx >= 50) return `<span class="mz-sen mz-r">${V.vx(num(r.vx))}</span>`;
+      if (r.c != null && r.c > 0 && r.m >= 30e3) return `<span class="mz-sen mz-v">${V.masMes(MK())}</span>`;
+      if (r.rel != null && r.rel <= -0.4 && r.m >= 10e3) return `<span class="mz-sen mz-a">${V.pierde}</span>`;
+      return "<span></span>"; };
+    const fila = (r, i) => `<div class="mz-t ot"><span class="mz-i">${i + 1}</span>${av(r)}${nomV(r)}<span class="mz-x">${fmv(r.m)}${cambioV(r)}</span>` +
+      `<span class="mz-x ot-q">${r.ing ? fmv(r.ing) : "—"}</span><span class="mz-x ot-dev">${devV(r)}</span>${tokV(r)}` +
+      `<span class="mz-x ot-tr">${r.trad != null ? fk(r.trad) : "—"}<small>${r.org != null ? MZ.org(r.org) : "&nbsp;"}</small></span><span class="mz-x ot-vx">${vxV(r)}</span>${senal(r)}${goV(r)}</div>`;
+    const head = `<div class="mz-t ot mz-h"><span class="mz-i"></span><span></span><span>${q.th[0]}</span><span>${q.th[1]}</span><span class="ot-q">${q.th[2]}</span><span class="ot-dev">${q.th[3]}</span><span class="ot-tk">${q.th[4]}</span><span class="ot-tr">${q.th[5]}</span><span class="ot-vx">${q.th[6]}</span><span class="ot-sen">${q.th[7]}</span><span class="go"></span></div>`;
+    const grupos = [...new Set(rs.map((r) => r.gr))].map((g) => ({ g, l: rs.filter((r) => r.gr === g).sort((a, b) => (b.m || 0) - (a.m || 0)) })).sort((a, b) => sumaV(b.l, "m") - sumaV(a.l, "m"));
+    const tarj = grupos.map(({ g, l }) => `<section class="mz-card">${tit2(esc(grNom(g)) + ",", q.sub[g] || "", V.proy(l.length) + V.cobran(fm(sumaV(l, "m"))))}${head}${l.map(fila).join("")}</section>`).join("");
+    const rn = rs.find((r) => /^Render Network/.test(r.n));
+    const dato = rn && rn.vx && rn.h30 && rn.ing ? datoV(num(rn.vx) + "×", q.dato(fm(rn.m), Math.round(rn.h30 / rn.ing * 100), fm(rn.mcap), num(rn.vx))) : "";
+    $("#lista").innerHTML = dato + tarj + `<p class="mz-src">${q.src(fechaV())}</p>` + queV(q);
+  }
+  const VISTA = { "DeFi": defiVista, "Juegos": juegosVista, "Apps y bots": appsVista, "Otros": otrosVista };
+
   function pinta() {
     cabecera();
+    if (navIO && ap !== "DeFi") { navIO.disconnect(); navIO = null; }
     // Activos tokenizados (21/11): la vista completa, la misma que /acciones/ (acciones/activos.js)
     const rwa = ap === "Activos tokenizados" && window.SFActivos;
-    document.querySelector(".tabs").style.display = rwa || ap === "Meme" || ap === "IA" ? "none" : "";
+    document.querySelector(".tabs").style.display = rwa || ap === "Meme" || ap === "IA" || VISTA[ap] ? "none" : "";
+    if (VISTA[ap] && tipo !== "nuevo") { $("#bar").style.display = "none"; $("#lista").classList.remove("sfa"); VISTA[ap](); return; }
     if (ap === "IA" && tipo !== "nuevo") { $("#bar").style.display = "none"; $("#lista").classList.remove("sfa"); iaVista(); return; }
     if (ap === "Meme" && tipo !== "nuevo") { $("#bar").style.display = "none"; $("#lista").classList.remove("sfa"); memeVista(); return; }
     if (rwa) {
