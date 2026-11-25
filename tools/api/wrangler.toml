@@ -39,3 +39,9 @@ simple = { limit = 10, period = 60 }
 name = "TOP_LIMIT"
 namespace_id = "1003"
 simple = { limit = 30, period = 60 }
+
+# límite de /api/rpc (plan B de RPC de la web, gasta créditos de Helius): 120 por minuto por conexión
+[[ratelimits]]
+name = "RPC_LIMIT"
+namespace_id = "1004"
+simple = { limit = 120, period = 60 }

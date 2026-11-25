@@ -256,10 +256,37 @@ export async function caida(env, pool, m, desde, hasta, fetchFn) {
   return { v: V, pool: pool, mint: m, desde: desde, hasta: hasta, ops: n, completo: completo, vendedores: top };
 }
 
+// Plan B de RPC para la web (25/11): si los RPC públicos fallan (el 24/11 Vibe Station rechazaba y PublicNode daba
+// error de CORS, y el análisis se quedaba sin concentración), la web repite la petición aquí y va a Helius.
+// Solo métodos de lectura que usa el análisis, de uno en uno (sin lotes) y con tope de cuentas.
+const RPC_OK = new Set(["getAccountInfo", "getBalance", "getMultipleAccounts", "getSignaturesForAddress", "getTransaction",
+  "getTokenAccountsByOwner", "getTokenLargestAccounts", "getTokenSupply"]);
+export function rpcValido(q) {
+  if (!q || typeof q !== "object" || Array.isArray(q) || !RPC_OK.has(q.method) || !Array.isArray(q.params)) return false;
+  if (q.method === "getMultipleAccounts") return Array.isArray(q.params[0]) && q.params[0].length <= 100 && q.params[0].every((a) => ADDR.test(a));
+  return typeof q.params[0] === "string" && q.params[0].length <= 100;
+}
+async function rpcPlanB(req, env) {
+  if (!env.SOLANA_RPC) return fail(503, "rpc unavailable");
+  if (env.RPC_LIMIT) {
+    const { success } = await env.RPC_LIMIT.limit({ key: req.headers.get("cf-connecting-ip") || "?" });
+    if (!success) return fail(429, "too many requests");
+  }
+  const txt = await req.text();
+  if (txt.length > 20000) return fail(413, "too large");
+  let q; try { q = JSON.parse(txt); } catch (e) { return fail(400, "not JSON"); }
+  if (!rpcValido(q)) return fail(400, "method not allowed");
+  const r = await fetch(env.SOLANA_RPC, { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: q.id ?? 1, method: q.method, params: q.params }) }).catch(() => null);
+  if (!r) return fail(503, "rpc unavailable");
+  return new Response(await r.text(), { status: r.status, headers: Object.assign({}, HEAD, { "content-type": "application/json", "cache-control": "no-store" }) });
+}
+
 export async function handle(req, env) {
-  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: Object.assign({}, HEAD, { "access-control-allow-methods": "GET, POST", "access-control-max-age": "86400" }) });
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: Object.assign({}, HEAD, { "access-control-allow-methods": "GET, POST", "access-control-allow-headers": "content-type", "access-control-max-age": "86400" }) });
   const p = new URL(req.url).pathname.replace(/\/+$/, "").split("/");
   if (req.method === "POST" && p.length === 4 && p[1] === "api" && p[2] === "visto") return visto(req, env, p[3]);
+  if (req.method === "POST" && p.length === 3 && p[1] === "api" && p[2] === "rpc") return rpcPlanB(req, env);
   if (req.method !== "GET") return fail(405, "only GET");
   if (p.length === 3 && p[1] === "api" && p[2] === "lanzaderas") {
     try { const res = json(await lanzaderas(env.DB)); res.headers.set("cache-control", "public, max-age=21600"); return res; } catch (e) { return fail(503, "database unavailable"); }

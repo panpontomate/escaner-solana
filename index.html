@@ -3503,8 +3503,28 @@ function topFetch(url,init){
 // operaciones de los 10 tokens en tendencia. Ahora sale una petición cada GT_GAP ms; lo que se ve (listas, gráfica)
 // pasa delante de las operaciones de los análisis, y tras un 429 se espera unos segundos en vez de insistir
 var GT_GAP=1300, gtq={last:0,pause:0,q:[],timer:null};
+// Plan B de RPC (25/11): si PublicNode o Vibe Station fallan (red o CORS, 401/403/429/5xx), la misma petición va a
+// nuestra API, que la pasa a Helius. Si el fallo es de red, 429 o 5xx, ese RPC se salta 5 min y todo va directo a la API
+var RPC_PUB={}; RPC_PUB[PUBLIC_RPC]=1; RPC_PUB[VIBE_RPC]=1;
+var rpcCaido={};
+function rpcB(init){ return fetch(API+"rpc",{method:"POST",headers:{"Content-Type":"application/json"},body:init.body,signal:init.signal}); }
+function rpcFetch(url,init){
+  if(rpcCaido[url]>Date.now()) return rpcB(init);
+  return fetch(url,init).then(function(r){
+    if(r.status===401||r.status===403||r.status===429||r.status>=500){
+      if(r.status===429||r.status>=500) rpcCaido[url]=Date.now()+300000;
+      return rpcB(init).then(function(b){ return b.ok?b:r; },function(){ return r; });
+    }
+    return r;
+  },function(e){
+    if(init.signal&&init.signal.aborted) throw e;
+    rpcCaido[url]=Date.now()+300000;
+    return rpcB(init);
+  });
+}
 function gtFetch(url,init){
   if(url===VIBE_RPC&&init&&typeof init.body==="string"&&init.body.indexOf('"getTokenLargestAccounts"')>=0) return topFetch(url,init);
+  if(RPC_PUB[url]&&init&&typeof init.body==="string") return rpcFetch(url,init);
   if(typeof url!=="string"||url.indexOf("api.geckoterminal.com")<0) return fetch(url,init);
   var sig=init&&init.signal, hi=!/\/trades(\?|$)/.test(url);
   return new Promise(function(res,rej){

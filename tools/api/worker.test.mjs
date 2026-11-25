@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top, caida, salidas } from "./worker.js";
+import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top, caida, salidas, rpcValido } from "./worker.js";
 import { SCHEMA } from "../caras/plano.mjs";
 
 const A = "PAY1111111111111111111111111111111", B = "FUND111111111111111111111111111111", C = "BUY1111111111111111111111111111111";
@@ -260,5 +260,17 @@ test("caida: las wallets que más tokens soltaron en la ventana, sin el pool; ve
   assert.deepEqual(c.vendedores.map((v) => [v.w, v.tok, v.n]), [["V1", 7600, 2], ["V2", 200, 1]]);   // el comprador C1 y el pool no salen
   assert.equal(await caida(env, P, M, 1700000000, 1700000600, async () => ({ json: async () => ({ error: { message: "x" } }) })), null);
   const r = await handle(new Request("https://api.solflag.com/api/caida/" + P + "?m=" + M + "&desde=1700000000&hasta=1700009999"), env);
+  assert.equal(r.status, 400);
+});
+
+test("/api/rpc: solo métodos de lectura, sin lotes y con tope de cuentas", async () => {
+  const A = "So11111111111111111111111111111111111111112";
+  assert.equal(rpcValido({ method: "getAccountInfo", params: [A, { encoding: "base64" }] }), true);
+  assert.equal(rpcValido({ method: "getMultipleAccounts", params: [[A, A], { encoding: "jsonParsed" }] }), true);
+  assert.equal(rpcValido({ method: "getMultipleAccounts", params: [Array(101).fill(A)] }), false);
+  assert.equal(rpcValido({ method: "getProgramAccounts", params: [A] }), false);
+  assert.equal(rpcValido({ method: "sendTransaction", params: ["abc"] }), false);
+  assert.equal(rpcValido([{ method: "getAccountInfo", params: [A] }]), false);
+  const r = await handle(new Request("https://api.solflag.com/api/rpc", { method: "POST", body: JSON.stringify({ method: "getProgramAccounts", params: [A] }) }), { SOLANA_RPC: "https://x" });
   assert.equal(r.status, 400);
 });
