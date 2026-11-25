@@ -114,11 +114,12 @@ async function main() {
   let est = {}; try { est = JSON.parse(fs.readFileSync(fEst, "utf8")); } catch {}
   est.ult = est.ult || {};
   const ahora = Date.now();
-  // las memecoins del Ecosistema de hoy también (25/11): para «Quién la tiene» y las ballenas de la vista de Meme
+  // todos los tokens del Ecosistema de hoy que están en Solana (25/11; antes solo las memecoins): «Quién la tiene» y ballenas
   const eco = await json("https://solflag.com/datos/ecosistema.json");
   const LISTA = TOKENS.slice();
-  for (const r of ((eco && eco.rows) || []).filter((r) => r.ap === "Meme" && r.gr === "Memecoins" && r.mint))
-    if (!LISTA.some((t) => t[1] === r.mint)) LISTA.push([r.sym, r.mint, "meme"]);
+  const AP = { "DeFi": "defi", "Juegos": "juegos", "Activos tokenizados": "rwa", "IA": "ia", "Otros": "otros", "Apps y bots": "apps", "Meme": "meme" };
+  for (const r of ((eco && eco.rows) || []).filter((r) => r.mint && !r.cad))
+    if (!LISTA.some((t) => t[1] === r.mint)) LISTA.push([r.sym, r.mint, AP[r.ap] || "otros"]);
   const mints = LISTA.map((t) => t[1]);
   // 1) DexScreener: hasta 30 tokens por petición
   let pares = [];
