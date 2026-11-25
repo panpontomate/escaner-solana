@@ -1569,6 +1569,7 @@ body.landing #adv{margin-top:10px}
 .sub .rtag{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:999px;background:color-mix(in srgb,var(--c) 10%,transparent);font:600 .9rem/1.2 var(--f-body);color:#f1eeff}
 .sub .rtag i{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
 .sub .rtag b{font:600 .88rem "IBM Plex Mono",ui-monospace,monospace}
+@media (max-width:760px){ .sub .rtag{border-radius:14px;align-items:flex-start}.sub .rtag i{margin-top:5px}.sub .rtag b{font:600 .84rem var(--f-body)} }
 .pb-ap{margin:0 0 10px;font-size:.9rem}.pb-ap .kick{margin-right:6px}.pb-ap small{color:var(--muted)}
 .pb-l1{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 .pb-niv{font:700 1.9rem/1 Fraunces,Georgia,serif;color:var(--pc)}
@@ -3978,7 +3979,7 @@ var CK_NOM={copia:"¿Es una copia?",oficial:"Token oficial",claves:"Claves del e
   traders:"Actividad real",organico:"Compradores reales",titulares:"Titulares",titularesC:"Titulares en 24 h",
   crear:"Puede crear más",congelar:"Puede congelar",desbloqueos:"Desbloqueos",hackeo:"Hackeos"};
 var CK_COL={suma:"var(--bajo)",resta:"var(--medio)",grave:"var(--alto)",neutro:"var(--dia)",falta:"var(--muted)"};
-function perfPct(x){ return (Math.round(x*1000)/10).toLocaleString("es-ES",{maximumFractionDigits:1})+" %"; }
+function perfPct(x){ return (Math.round(Number((x*1000).toPrecision(12)))/10).toLocaleString("es-ES",{maximumFractionDigits:1})+" %"; }
 function perfNum(n){ return Math.round(n).toLocaleString("de-DE"); }
 // el dato de cada chequeo, en una línea
 function ckDet(c){
@@ -7769,7 +7770,8 @@ async function mkLoad(r){
     // marcas que no se pierden (25/11): las operaciones de más de 1.000 $ que guarda la recogida (los 27 de la portada y
     // los más analizados), de antes de las 300 de GeckoTerminal. Se piden a la vez
     var gq=fetch(API+"marcas/"+m).then(function(x){ return x.ok?x.json():null; }).catch(function(){ return null; });
-    var j=await jfetch(GT+"pools/"+r.par.pairAddress+"/trades");
+    // si GeckoTerminal no contesta (429 frecuente), se sigue con las guardadas (25/11)
+    var j=null; try{ j=await jfetch(GT+"pools/"+r.par.pairAddress+"/trades",undefined,2); }catch(e){ if(e&&e.message==="cancelado") throw e; }
     // quién es quién: se espera un poco al registro y a la revisión del lanzamiento, que van a la vez
     var wh=await mkWait(function(){ return who[m]; },12000), bd=await mkWait(function(){ return bundles[m]; },15000);
     var cr={}, la={}, top={};
@@ -7948,8 +7950,8 @@ function mkStory(r){
     (todo&&d.ev.length>40?"<p class='mks'>"+"Se enseñan las 40 más recientes."+"</p>":"")+
     "<p class='mks'>"+esc(mkSrc(d))+"</p>"+mkDato(r,d);
 }
-function mkSrc(d){ return (d&&d.ev&&d.ev.some(function(e){ return e.k==="cb"; })?"Caídas bruscas: velas de 1 min (GeckoTerminal) y, en ese minuto, quién vendió (Helius)."+" ":"")+"Operaciones de GeckoTerminal (las últimas {n}{desde}) y registro de SolFlag.".replace("{n}",d&&d.n||300).replace("{desde}",d&&d.from?", desde el {f}".replace("{f}",fdate(d.from)+" "+ftime(d.from)):"")+
-  (d&&d.nG?" "+"Antes de eso, {n} operaciones de más de 1.000 $ que guarda SolFlag desde el {f}.".replace("{n}",d.nG).replace("{f}",fdate(d.gFrom)):"")+
+function mkSrc(d){ return (d&&d.ev&&d.ev.some(function(e){ return e.k==="cb"; })?"Caídas bruscas: velas de 1 min (GeckoTerminal) y, en ese minuto, quién vendió (Helius)."+" ":"")+(d&&d.n===0&&d.nG?"{n} operaciones de más de 1.000 $ guardadas por SolFlag desde el {f} (GeckoTerminal no contestó) y registro de SolFlag.".replace("{n}",d.nG).replace("{f}",fdate(d.gFrom)):"Operaciones de GeckoTerminal (las últimas {n}{desde}) y registro de SolFlag.".replace("{n}",d&&d.n||300).replace("{desde}",d&&d.from?", desde el {f}".replace("{f}",fdate(d.from)+" "+ftime(d.from)):""))+
+  (d&&d.nG&&d.n?" "+"Antes de eso, {n} operaciones de más de 1.000 $ que guarda SolFlag desde el {f}.".replace("{n}",d.nG).replace("{f}",fdate(d.gFrom)):"")+
   (d&&d.hel?" "+(d.helCr&&d.hel===1?"Del creador, toda su historia con este token (Helius).":d.helCr?"Del creador y de {n} compradores del lanzamiento, toda su historia con este token (Helius).":"De {n} compradores del lanzamiento, toda su historia con este token (Helius).").replace("{n}",d.hel-(d.helCr?1:0)):""); }
 // repintar marcas, interruptores y «Lo que pasó» (al llegar los datos o al pulsar un interruptor)
 function mkPaint(){

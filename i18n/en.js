@@ -19,7 +19,7 @@ export const CODE = [
   // puntos por apartado (21/11): números y orden de palabras en inglés
   ["if(d.que&&d.que.es) return d.que.es;", "if(d.que&&d.que.en) return d.que.en;"],
   ["function apVale(x){ return x.toLocaleString(\"es-ES\",{maximumFractionDigits:1}); }", "function apVale(x){ return x.toLocaleString(\"en-US\",{maximumFractionDigits:1}); }"],
-  ["function perfPct(x){ return (Math.round(x*1000)/10).toLocaleString(\"es-ES\",{maximumFractionDigits:1})+\" %\"; }", "function perfPct(x){ return (Math.round(x*1000)/10).toLocaleString(\"en-US\",{maximumFractionDigits:1})+\"%\"; }"],
+  ["function perfPct(x){ return (Math.round(Number((x*1000).toPrecision(12)))/10).toLocaleString(\"es-ES\",{maximumFractionDigits:1})+\" %\"; }", "function perfPct(x){ return (Math.round(Number((x*1000).toPrecision(12)))/10).toLocaleString(\"en-US\",{maximumFractionDigits:1})+\"%\"; }"],
   ["function perfNum(n){ return Math.round(n).toLocaleString(\"de-DE\"); }", "function perfNum(n){ return Math.round(n).toLocaleString(\"en-US\"); }"],
   ["return d>=365?(d/365).toLocaleString(\"es-ES\",{maximumFractionDigits:1})+\" años\":Math.round(d)+\" días\";", "return d>=365?(d/365).toLocaleString(\"en-US\",{maximumFractionDigits:1})+\" years\":Math.round(d)+\" days\";"],
   ["case \"codigo\": return \"Último cambio hace \"+d+\" días\";", "case \"codigo\": return \"Last change \"+d+\" days ago\";"],
@@ -1270,6 +1270,7 @@ export const TEXT = {
   "Se enseñan las 40 más recientes.": "Showing the 40 most recent.",
   "Operaciones de GeckoTerminal (las últimas {n}{desde}) y registro de SolFlag.": "GeckoTerminal trades (the last {n}{desde}) and the SolFlag registry.",
   ", desde el {f}": ", since {f}",
+  "{n} operaciones de más de 1.000 $ guardadas por SolFlag desde el {f} (GeckoTerminal no contestó) y registro de SolFlag.": "{n} trades over $1,000 stored by SolFlag since {f} (GeckoTerminal did not answer) and the SolFlag registry.",
   "Antes de eso, {n} operaciones de más de 1.000 $ que guarda SolFlag desde el {f}.": "Before that, {n} trades over $1,000 that SolFlag has been storing since {f}.",
   // gráfica en pantalla completa y dibujos (15/11)
   "Gráfica en pantalla completa": "Full-screen chart",
