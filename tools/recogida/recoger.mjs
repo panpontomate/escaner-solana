@@ -51,6 +51,9 @@ export function pools(pares, mints) {
   }
   return out;
 }
+// sin operaciones grandes posibles: su pool movió menos de MIN_USD en la última hora (DexScreener) → no se pregunta a
+// GeckoTerminal (30 por minuto, era lo que alargaba la recogida); lo perdido se recupera en la siguiente vuelta
+export const quieto = (p) => !!(p && p.vol && typeof p.vol.h1 === "number" && p.vol.h1 < MIN_USD);
 // operaciones grandes nuevas (más recientes que la última vista de ese pool)
 export function nuevas(data, desde, mint) {
   return (data || []).map((d) => d.attributes || {}).filter((a) => !a.is_anomalous)
@@ -130,7 +133,7 @@ async function main() {
   const filas = [], porMint = {};
   for (const [sym, m, ap] of LISTA) {
     const p = P[m] || null, f = { t: ahora, sym, m, ap, dx: p };
-    if (p && p.pool) {
+    if (p && p.pool && !quieto(p)) {
       const j = await json("https://api.geckoterminal.com/api/v2/networks/solana/pools/" + p.pool + "/trades?trade_volume_in_usd_greater_than=" + MIN_USD);
       const ops = nuevas(j && j.data, est.ult[p.pool] || ahora - 3600000, m);
       if (j) { f.ops = ops; porMint[m] = ops; if (ops.length) est.ult[p.pool] = ops[ops.length - 1].t; else if (!est.ult[p.pool]) est.ult[p.pool] = ahora - 3600000; }
@@ -170,7 +173,7 @@ async function main() {
   if (extra.length) {
     const PX = pools(await json("https://api.dexscreener.com/tokens/v1/solana/" + extra.join(",")), extra);
     for (const m of extra) {
-      const p = PX[m]; if (!p || !p.pool) continue;
+      const p = PX[m]; if (!p || !p.pool || quieto(p)) continue;
       const j = await json("https://api.geckoterminal.com/api/v2/networks/solana/pools/" + p.pool + "/trades?trade_volume_in_usd_greater_than=" + MIN_USD);
       if (j) { const ops = nuevas(j.data, est.ult[p.pool] || 0, m); porMint[m] = ops; if (ops.length) est.ult[p.pool] = ops[ops.length - 1].t; }
       await espera(2200);
