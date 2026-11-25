@@ -247,6 +247,7 @@ export const TEXT = {
   "{v} tokenizados": "{v} tokenized",
   "vale {v}": "worth {v}",
   "mercado de NFT": "NFT marketplace",
+  "móvil y tienda de apps de Solana": "Solana phone and app store",
   "sin dato a 30 días": "no 30-day data",
   " % en 30 días": "% in 30 days",
   "El {d} nacieron <b>{n}</b> tokens nuevos en Solana.": "On {d}, <b>{n}</b> new tokens were born on Solana.",

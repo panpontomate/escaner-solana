@@ -5197,7 +5197,7 @@ document.addEventListener("error",function(e){ var im=e.target; if(im&&im.tagNam
    Cada cuadrado va pasando por sus tokens de la lista fija (27, decidida 24/11) y late según cómo ha crecido su sector en
    30 días (verde si crece, rojo si baja; sin dato, lila). Datos del día: ecosistema.json, perfiles.json y el historial */
 var PE_AP=[["defi","DeFi","DeFi",["PUMP","JUP","MET","RAY","SANC","JTO","ORCA","KMNO"],1],["juegos","Games","Games",["CARDS","ORE","ATLAS"]],
-  ["apps","Apps and bots","Apps and bots",[],0,["MEFNBXixkEbait3xn9bkm8WsJzXtVsaJEn4c8Sam21u","TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6"]],
+  ["apps","Apps and bots","Apps and bots",[],0,["MEFNBXixkEbait3xn9bkm8WsJzXtVsaJEn4c8Sam21u","TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6","SKRbvo6Gf7GondiT3BbTfuRDPqLWei4j2Qy2NPGZhW3"]],
   ["rwa","Tokenized assets","Tokenized assets",["USDC","PYUSD","HUMA"]],["ia","AI","AI",["GRASS","IO"]],
   ["otros","Other","Other",["RENDER","MASK","MPLX"],2],["meme","Meme","Memes",["PENGU","TRUMP","BONK","WIF","FARTCOIN"],2]];
 var PE={run:false,ok:false,timers:[]}, PE_BASE=document.documentElement.lang==="en"?"/en/":"/";
@@ -5217,6 +5217,9 @@ function peCrec(rows,ap){
   if(base.length<2) return null;
   return base.reduce(function(s,r){ return s+r.m*r.c; },0)/base.reduce(function(s,r){ return s+r.m; },0);
 }
+// apps con token que el Ecosistema no tiene (DefiLlama no las mide): nombre, símbolo y qué son (25/11: + Seeker)
+var PE_EXTRA={MEFNBXixkEbait3xn9bkm8WsJzXtVsaJEn4c8Sam21u:["Magic Eden","ME","NFT marketplace"],TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6:["Tensor","TNSR","NFT marketplace"],
+  SKRbvo6Gf7GondiT3BbTfuRDPqLWei4j2Qy2NPGZhW3:["Seeker","SKR","Solana phone and app store"]};
 async function loadEcoHome(){
   if(PE.run||PE.ok) return; PE.run=true;
   try{
@@ -5228,7 +5231,7 @@ async function loadEcoHome(){
     var dl=ix&&ix.days?Object.keys(ix.days).sort().filter(function(d){ return ix.days[d].n; }):[], ud=dl.length>1?dl[dl.length-2]:dl[0];   // el último día completo
     $("#pegrid").innerHTML=PE_AP.map(function(a){
       var ej=a[3].map(porSym).filter(Boolean).map(function(r){ return {n:r.n,sym:r.sym,mint:r.mint,logo:r.logo,dato:peDato(r),trad:r.trad,tit:r.tit,sp:peSpark(h,r.n)}; });
-      (a[5]||[]).forEach(function(m){ var p=P[m]; if(p) ej.push({n:m.indexOf("MEFN")===0?"Magic Eden":"Tensor",sym:m.indexOf("MEFN")===0?"ME":"TNSR",mint:m,logo:"",dato:"NFT marketplace",trad:p.trad,tit:p.tit,sp:""}); });
+      (a[5]||[]).forEach(function(m){ var p=P[m], x=PE_EXTRA[m]; if(p&&x) ej.push({n:x[0],sym:x[1],mint:m,logo:"",dato:x[2],trad:p.trad,tit:p.tit,sp:""}); });
       if(!ej.length) return "";
       var c=peCrec(eco.rows,a[0]),   // por el código del apartado (apc): el nombre se traduce en inglés
        gt=c==null?"no 30-day data":(c>0?"+":"−")+Math.abs(Math.round(c*100))+"% in 30 days";

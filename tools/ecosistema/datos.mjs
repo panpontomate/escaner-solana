@@ -434,7 +434,8 @@ async function hacerPerfiles(sel) {
     e.dl = { lib: Math.round(10000 * lib / s) / 100, bloq: Math.round(10000 * bloq / s) / 100 };
   }
   // Apps de Solana con token que el Ecosistema aún no tiene en su lista (decidido 21/11): apartado y actividad de Jupiter
-  const EXTRA = { MEFNBXixkEbait3xn9bkm8WsJzXtVsaJEn4c8Sam21u: "apps", TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6: "apps" };
+  // 25/11: + Seeker (SKR, Solana Mobile), el 3.º de Apps y bots en la portada y la recogida
+  const EXTRA = { MEFNBXixkEbait3xn9bkm8WsJzXtVsaJEn4c8Sam21u: "apps", TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6: "apps", SKRbvo6Gf7GondiT3BbTfuRDPqLWei4j2Qy2NPGZhW3: "apps" };
   const faltan = Object.keys(EXTRA).filter((m) => !t[m]);
   if (faltan.length) {
     const l = await j("https://lite-api.jup.ag/tokens/v2/search?query=" + faltan.join(",")).catch(() => []);

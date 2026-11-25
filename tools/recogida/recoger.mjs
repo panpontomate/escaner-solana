@@ -23,7 +23,8 @@ export const TOKENS = [
   ["PENGU", "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv", "meme"], ["TRUMP", "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN", "meme"],
   ["BONK", "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", "meme"], ["WIF", "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", "meme"],
   ["FARTCOIN", "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump", "meme"],
-  ["ME", "MEFNBXixkEbait3xn9bkm8WsJzXtVsaJEn4c8Sam21u", "apps"], ["TNSR", "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6", "apps"]
+  ["ME", "MEFNBXixkEbait3xn9bkm8WsJzXtVsaJEn4c8Sam21u", "apps"], ["TNSR", "TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6", "apps"],
+  ["SKR", "SKRbvo6Gf7GondiT3BbTfuRDPqLWei4j2Qy2NPGZhW3", "apps"]
 ];
 const SALIDA = process.env.SALIDA || "recogida";
 const RPC = process.env.SOLANA_RPC || "";
