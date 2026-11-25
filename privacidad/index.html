@@ -91,7 +91,7 @@ article td:first-child{color:#fff;font-weight:600;width:34%}
   <p class="kick">Privacidad</p>
   <h1>Guardamos<span class="thin">lo mínimo.</span></h1>
   <p>SolFlag no tiene cuentas, ni cookies, ni publicidad. Lo que guardas en la web se queda en tu navegador. Aquí está todo lo que pasa con tus datos, sin letra pequeña.</p>
-  <p class="upd">Última actualización: 11 de noviembre de 2026</p>
+  <p class="upd">Última actualización: 25 de noviembre de 2026</p>
   <p class="lang"><a href="/en/privacy/" hreflang="en">English version</a></p>
 </section>
 
@@ -107,10 +107,11 @@ article td:first-child{color:#fff;font-weight:600;width:34%}
     <tr><td>Tu URL de RPC (por ejemplo, de Helius), si la pones</td><td>Solo en tu navegador. Se usa para hablar con ese servicio desde tu navegador; nunca pasa por nosotros.</td></tr>
     <tr><td>Estadísticas</td><td>Contamos visitas y cuántas veces se usa cada función (analizar, ballenas, mapa, volver atrás, compartir, abrir el bot) con <b>GoatCounter</b>, <b>sin cookies</b>. Se registra la página (si entras por un enlace de un token o de un mapa, incluye la dirección de ese token; la de una wallet, nunca), de dónde vienes, el navegador, el tamaño de pantalla y el país aproximado. No guardamos tu IP ni las wallets que analizas.</td></tr>
     <tr><td>Tokens analizados</td><td>Cuando analizas un <b>token</b>, la web avisa a nuestra API (api.solflag.com, en Cloudflare) de <b>qué token</b> fue. Guardamos solo la dirección del token, cuántas veces se ha analizado y cuándo, para estudiar después quién está detrás. <b>No guardamos quién lo analizó</b> ni tu IP, y de las <b>wallets</b> no se avisa nunca. Cloudflare limita cuántos avisos llegan desde una misma conexión sin que nosotros guardemos la IP.</td></tr>
+    <tr><td>Consultas a la cadena a través de nuestra API</td><td>Algunas consultas pasan por nuestra API (api.solflag.com, en Cloudflare), que las envía a <b>Helius</b>: las mayores cuentas de un token y, si los nodos públicos fallan, cualquier consulta a la cadena, también las de una wallet. <b>No guardamos esas consultas</b> ni tu IP; Cloudflare y Helius pueden registrar datos técnicos.</td></tr>
     <tr><td>Alojamiento</td><td>La web la sirve <b>GitHub Pages</b> (GitHub, Inc.), que puede registrar tu IP por motivos técnicos y de seguridad.</td></tr>
     <tr><td>Fuentes tipográficas</td><td>Se sirven desde solflag.com: tu navegador no las pide a Google.</td></tr>
   </table>
-  <p>Para analizar un token o una wallet, <b>tu navegador pregunta directamente</b> a servicios públicos: datos de mercado (DexScreener, GeckoTerminal, CoinGecko), RugCheck, nodos de Solana (PublicNode, Solana Vibe Station o el tuyo) y jsDelivr y cdnjs (el código del motor y del mapa). Ellos ven tu IP y la dirección que consultas, y tienen sus propias políticas de privacidad.</p>
+  <p>Para analizar un token o una wallet, <b>tu navegador pregunta directamente</b> a servicios públicos: datos de mercado (DexScreener, GeckoTerminal, CoinGecko, Jupiter), RugCheck, nodos de Solana (PublicNode, Solana Vibe Station o el tuyo; si fallan, nuestra API) y jsDelivr y cdnjs (el código del motor y del mapa). Ellos ven tu IP y la dirección que consultas, y tienen sus propias políticas de privacidad.</p>
 </article>
 <article id="bot">
   <h2>El bot de Telegram (@SolFlagBot)</h2>
@@ -121,6 +122,7 @@ article td:first-child{color:#fff;font-weight:600;width:34%}
 <article id="cadena">
   <h2>Datos públicos de la cadena</h2>
   <p>Las direcciones y transacciones de Solana son públicas. SolFlag publica datos sobre direcciones (el registro de lanzamientos, las caras conocidas y la base de wallets): <b>hechos</b> que se ven en la cadena, como cuántos lanzamientos pagó una wallet y cómo acabaron, nunca etiquetas personales ni acusaciones. El registro se puede descargar en <a href="/acierto/">Datos y acierto</a>.</p>
+  <p>Además guardamos durante 30 días las operaciones de más de 1.000 $ de los tokens que seguimos (con la wallet que las hizo) y sus mayores cuentas, para enseñar en la gráfica quién compró o vendió y quién tiene cada token.</p>
   <p>Algunas wallets de empresas llevan nombre, como las de exchanges (Binance, Coinbase…), cuando su dirección es pública y está comprobada. A personas no les ponemos nombre.</p>
   <p>Si una dirección es tuya y crees que un dato está mal, escribe a <a href="mailto:solflag.team@gmail.com">solflag.team@gmail.com</a>: lo revisamos y, si hay un error, lo corregimos.</p>
 </article>
