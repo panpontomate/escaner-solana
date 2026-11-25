@@ -4,6 +4,10 @@ name = "solflag-api"
 main = "worker.js"
 compatibility_date = "2026-11-01"
 
+# reloj de la recogida (lanza .github/workflows/recogida.yml; ver lanzarRecogida en worker.js)
+[triggers]
+crons = ["3,18,33,48 * * * *"]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "solflag-plano"
