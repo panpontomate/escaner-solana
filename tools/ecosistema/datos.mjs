@@ -331,13 +331,25 @@ for (const pid of SEPARAR) {
   const conTok = ps.find((r) => r.mint) || ps.find((r) => r.tok) || ps[0], padre = PADRE[pid] || {};
   const m = ps.reduce((s, r) => s + r.m, 0), m60 = ps.reduce((s, r) => s + (r.c != null && r.c > -1 ? r.m / (1 + r.c) : 0), 0);
   const suma = (k) => ps.reduce((s, r) => s + (r[k] || 0), 0) || null;
-  const una = { ...conTok, n: NOMBRE_EMPRESA[pid] || padre.name || conTok.n, ap: "DeFi", gr: "DEX", apc: "defi", med: "fees",
+  const una = { ...conTok, ids: ps.flatMap((r) => r.ids || []), n: NOMBRE_EMPRESA[pid] || padre.name || conTok.n, ap: "DeFi", gr: "DEX", apc: "defi", med: "fees",
     m, c: m60 > 0 ? m / m60 - 1 : null, r30: suma("r30"), tvl: suma("tvl"), logo: logo(padre.logo) || conTok.logo,
     partes: ps.slice().sort((a, b) => b.m - a.m).map((r) => ({ n: r.n, gr: r.gr, m: Math.round(r.m), c: r.c })) };
   delete una.nuevo;
   sel.splice(sel.indexOf(ps[0]), 0, una);
   for (const r of ps) sel.splice(sel.indexOf(r), 1);
 }
+// 9) Hackeos y auditorías en CADA fila (25/11), tenga token o no: la vista de DeFi los enseña en «Riesgos de este mes»
+//    y en la señal. hk = [{d: unix s, p: $ perdidos y no devueltos}] (DefiLlama hacks), aud = nº de auditorías (o 1 si hay enlace)
+const HACKS = await j("https://api.llama.fi/hacks").catch(() => []);
+for (const r of sel) {
+  const ids = new Set(r.ids || []);
+  if (!ids.size && !r.pid) continue;
+  const hk = HACKS.filter((h) => ids.has(String(h.defillamaId)) || (r.pid && h.parentProtocolId === r.pid));
+  if (hk.length) r.hk = hk.map((h) => ({ d: h.date, p: Math.max(0, Math.round((h.amount || 0) - (h.returnedFunds || 0))) }));
+  const ps = [...ids].map((id) => P[id]).filter(Boolean), aud = Math.max(0, ...ps.map((p) => +p.audits || 0));
+  if (aud || ps.some((p) => (p.audit_links || []).length)) r.aud = aud || 1;
+}
+console.log("con hackeos:", sel.filter((r) => r.hk).length, "· auditados:", sel.filter((r) => r.aud).length);
 for (const r of sel) { delete r.ids; delete r.pid; delete r.addr; }
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(HIST, JSON.stringify(hist));

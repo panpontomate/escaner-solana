@@ -269,6 +269,10 @@
     deQueda: (p) => `${p}% of what it keeps`, deCobra: (p) => `${p}% of what it charges`,
     proy: (n) => n === 1 ? "1 project" : n + " projects", cobran: (m) => ` · charge ${m} in 30 days`, depos: (m) => ` · ${m} deposited`, verOtros: (n) => `See the other ${n}`,
     mano: (s) => `Taken by hand from ${s}, 24 Nov 2026`,
+    mes: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], aud: "✓ audited", bloqT: (b, l) => `${b}% still locked${l ? ", releases " + l + "% this month" : ""}`,
+    hack: (f, p) => `Hacked in ${f}: ${p} lost`, perd: (p) => p + " lost", devuelto: "returned",
+    rH: "Risks this month", rS: "Tokens that unlock and protocols hacked in the last year.", rDl: "🔓 Unlocks this month", rHk: "⚠ Hacked in the last year",
+    suelta: (l, b) => `releases <em>${l}%</em> of the total · ${b}% still locked`, nada: "Nothing this month", ninguno: "None",
     df: { th: ["Project", "Charges · 30 d", "Keeps", "Deposited", "Back to the token", "Token", "Value × revenue", "Signal"],
       sub: { DEX: "where tokens are swapped", Agregadores: "find the best price across all DEXs", Staking: "SOL that works and earns interest", MEV: "transaction ordering and its tips",
         "Préstamos": "borrow and lend against collateral", Derivados: "futures and leverage", Puentes: "move money between chains", "Oráculos": "prices and data for contracts",
@@ -304,6 +308,10 @@
     deQueda: (p) => `${p} % de lo que se queda`, deCobra: (p) => `${p} % de lo que cobra`,
     proy: (n) => n === 1 ? "1 proyecto" : n + " proyectos", cobran: (m) => ` · cobran ${m} en 30 días`, depos: (m) => ` · ${m} depositados`, verOtros: (n) => `Ver los otros ${n}`,
     mano: (s) => `Dato a mano de ${s}, 24/11/2026`,
+    mes: ["ene.", "feb.", "mar.", "abr.", "may.", "jun.", "jul.", "ago.", "sep.", "oct.", "nov.", "dic."], aud: "✓ auditado", bloqT: (b, l) => `${b} % aún bloqueado${l ? ", suelta " + l + " % este mes" : ""}`,
+    hack: (f, p) => `Hackeado en ${f}: ${p} perdidos`, perd: (p) => p + " perdidos", devuelto: "devuelto",
+    rH: "Riesgos de este mes", rS: "Tokens que se desbloquean y protocolos hackeados en el último año.", rDl: "🔓 Se desbloquea este mes", rHk: "⚠ Hackeados en el último año",
+    suelta: (l, b) => `suelta <em>${l} %</em> del total · quedan ${b} % bloqueados`, nada: "Nada este mes", ninguno: "Ninguno",
     df: { th: ["Proyecto", "Cobra · 30 d", "Se queda", "Depositado", "Devuelve al token", "Token", "Vale × ingresos", "Señal"],
       sub: { DEX: "donde se cambian tokens", Agregadores: "buscan el mejor precio entre todos los DEX", Staking: "SOL que trabaja y cobra intereses", MEV: "el orden de las transacciones y sus propinas",
         "Préstamos": "pedir y prestar con garantía", Derivados: "futuros y apalancamiento", Puentes: "mover dinero entre cadenas", "Oráculos": "precios y datos para los contratos",
@@ -351,7 +359,7 @@
   const tit2 = (t, s, tot) => `<h2>${t} <small>${s}</small><span class="ab-tot">${tot}</span></h2>`;
   // filas del apartado con lo que viene de perfiles.json (devuelve al token, desbloqueos)
   const deApV = (a) => D.rows.filter((r) => r.ap === a).map((r) => { const p = (PERF && r.mint && PERF[r.mint]) || {}, ing = r.r30 || null;
-    return Object.assign({}, r, { h30: p.h30 ?? null, dl: p.dl || null, ing, cap: r.mcap || (r.med === "token" ? r.m : null),
+    return Object.assign({}, r, { h30: p.h30 ?? null, dl: p.dl || null, hk: r.hk || p.hk || null, aud: r.aud || p.aud || null, ing, cap: r.mcap || (r.med === "token" ? r.m : null),
       rel: r.med === "fees" && r.c != null && D.mercado.fees != null ? (1 + r.c) / (1 + D.mercado.fees) - 1 : null,
       vx: r.tok && !r.cad && r.mcap && ing >= 1e3 && !MULTI.has(r.sym) ? r.mcap / (ing * 12) : null }); });
   const devV = (r) => r.h30 ? `${fm(r.h30)}<small>${r.ing ? V.deQueda(Math.min(100, Math.round(r.h30 / r.ing * 100))) : "&nbsp;"}</small>` : `<span class="mz-na">—</span>`;
@@ -359,9 +367,18 @@
   const MK = () => pcv(D.mercado.fees || 0);
   let navIO = null;
 
+  // riesgos de DeFi (25/11, maqueta maquetas/web/ecosistema-defi-riesgos.html): el hackeo va arriba (tira y señal), bajo el nombre solo desbloqueo y auditoría
+  const fechaHk = (d) => { const x = new Date(d * 1000); return V.mes[x.getUTCMonth()] + " " + x.getUTCFullYear(); };
+  const hkUlt = (r) => r.hk && r.hk.length ? r.hk.slice().sort((a, b) => b.d - a.d)[0] : null;
+  const hkAnio = (r) => { const h = hkUlt(r); return h && Date.now() / 1000 - h.d < 365 * 86400 ? h : null; };
+  const rgsV = (r) => { const o = [];
+    if (r.dl && r.dl.bloq >= 0.5) o.push(`<span class="rg rg-d" title="${esc(V.bloqT(num(r.dl.bloq, 1), r.dl.lib >= 0.1 ? num(r.dl.lib, 1) : ""))}">🔓 ${num(r.dl.bloq, 1)}${sp}%</span>`);
+    if (r.aud) o.push(`<span class="rg rg-a">${V.aud}</span>`);
+    return o.length ? `<small class="rgs">${o.join("")}</small>` : ""; };
   function defiVista() {
     const rs = deApV("DeFi"), q = V.df;
     const senal = (r) => {
+      const hy = hkAnio(r); if (hy && hy.p >= 1e5) return `<span class="mz-sen mz-r">${V.hack(fechaHk(hy.d), fm(hy.p))}</span>`;
       if (r.cad) return r.copias ? `<span class="mz-sen mz-a">${V.copias(r.copias)}</span>` : `<span class="mz-sen mz-a">${V.fuera}</span>`;
       if (r.h30 && r.ing && r.h30 / r.ing >= 0.3 && r.h30 >= 50e3) return `<span class="mz-sen mz-v">${V.devQ(Math.min(100, Math.round(r.h30 / r.ing * 100)))}</span>`;
       if (r.tok && MULTI.has(r.sym)) return `<span class="mz-sen mz-a">${V.fuera}</span>`;
@@ -372,7 +389,7 @@
       return "<span></span>"; };
     const dep = (r) => r.tvl ? fm(r.tvl) : r.mano && r.mano.dep ? manoV(r.mano.dep) : SIN_DEP.has(r.gr) || r.n === "HumidiFi" ? `<span class="mz-na">${V.noAplica}</span>` : "—";
     const queda = (r) => (r.r30 != null ? fmv(r.r30) : "—") + (r.mano ? manoV(r.mano.q) : "");
-    const fila = (r, i) => `<div class="mz-t df"><span class="mz-i">${i + 1}</span>${av(r)}${nomV(r)}<span class="mz-x">${fmv(r.m)}${cambioV(r)}</span>` +
+    const fila = (r, i) => `<div class="mz-t df"><span class="mz-i">${i + 1}</span>${av(r)}${nomV(r).slice(0, -7) + rgsV(r) + "</span>"}<span class="mz-x">${fmv(r.m)}${cambioV(r)}</span>` +
       `<span class="mz-x">${queda(r)}</span><span class="mz-x df-tvl">${dep(r)}</span><span class="mz-x df-dev">${devV(r)}</span>${tokV(r)}<span class="mz-x df-vx">${vxV(r)}</span>${senal(r)}${goV(r)}</div>`;
     const head = `<div class="mz-t df mz-h"><span class="mz-i"></span><span></span><span>${q.th[0]}</span><span>${q.th[1]}</span><span>${q.th[2]}</span><span class="df-tvl">${q.th[3]}</span><span class="df-dev">${q.th[4]}</span><span class="df-tk">${q.th[5]}</span><span class="df-vx">${q.th[6]}</span><span class="df-sen">${q.th[7]}</span><span class="go"></span></div>`;
     const grupos = [...new Set(rs.map((r) => r.gr))].map((g) => ({ g, l: rs.filter((r) => r.gr === g).sort((a, b) => (b.m || 0) - (a.m || 0)) })).sort((a, b) => sumaV(b.l, "m") - sumaV(a.l, "m"));
@@ -386,7 +403,12 @@
     if (pf && jup && tot) { const c1 = Math.round(pf.m / tot * 100), c2 = Math.round((pf.m + jup.m) / tot * 100); dato = datoV(q.de100(c2), q.dato(c1, c2 - c1, rs.length - 2, 100 - c2)); }
     const dev = rs.filter((r) => r.h30 && r.h30 >= 50e3).sort((a, b) => b.h30 - a.h30).slice(0, 8);
     const tira = dev.length ? `<section class="df-vuelve"><div class="top"><b>${q.vH}</b><span>${q.vS}</span></div>` + dev.map((r) => `<div class="fv">${av(r)}<span class="fv-n">${esc(r.sym)}</span><span class="fv-b"><i style="width:${Math.max(2, Math.round(r.h30 / dev[0].h30 * 100))}%"></i></span><span class="fv-v">${fm(r.h30)}</span><span class="fv-p">${MULTI.has(r.sym) ? V.fuera : r.ing ? V.deQueda(Math.min(100, Math.round(r.h30 / r.ing * 100))) : ""}</span></div>`).join("") + `</section>` : "";
-    $("#lista").innerHTML = nav + dato + tira + tarj + `<p class="mz-src">${q.src(fechaV())}</p>` + queV(q);
+    const dlMes = rs.filter((r) => r.dl && r.dl.lib >= 0.1).sort((a, b) => b.dl.lib - a.dl.lib);
+    const hk12 = rs.filter(hkAnio).sort((a, b) => hkUlt(b).d - hkUlt(a).d);
+    const riesgo = dlMes.length || hk12.length ? `<section class="df-riesgo"><div class="top"><b>${V.rH}</b><span>${V.rS}</span></div><div class="rcols">` +
+      `<div><h4>${V.rDl}</h4>${dlMes.map((r) => `<div class="ri">${av(r)}<b>${esc(r.sym || r.n)}</b><span>${V.suelta(num(r.dl.lib, 1), num(r.dl.bloq, 1))}</span></div>`).join("") || `<p class="mz-na">${V.nada}</p>`}</div>` +
+      `<div><h4>${V.rHk}</h4>${hk12.map((r) => { const h = hkUlt(r); return `<div class="ri">${av(r)}<b>${esc(r.n)}</b><span>${fechaHk(h.d)} · <em class="r">${h.p >= 1e5 ? V.perd(fm(h.p)) : V.devuelto}</em></span></div>`; }).join("") || `<p class="mz-na">${V.ninguno}</p>`}</div></div></section>` : "";
+    $("#lista").innerHTML = nav + dato + tira + riesgo + tarj + `<p class="mz-src">${q.src(fechaV())}</p>` + queV(q);
     // la píldora del grupo que se está viendo, encendida
     if (navIO) navIO.disconnect();
     const as = [...document.querySelectorAll(".df-nav a")], vis = new Map();
