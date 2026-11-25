@@ -82,6 +82,25 @@ async function d1(st) {
   if (!r.ok || !j || !j.success) throw new Error("D1 " + r.status + ": " + JSON.stringify((j && j.errors) || "").slice(0, 200));
   return j.result;
 }
+// «Quién la tiene» (25/11): de las 20 mayores cuentas, qué parte del total tienen las wallets (sin pools ni exchanges
+// conocidos), los exchanges conocidos y los programas (bloqueos, pools…). tipo = {dueño: "w" | "x" | "p"}; números en %.
+export function quienDe(top, supply, tipo) {
+  const sup = Number(supply); if (!(sup > 0) || !top || !top.length) return null;
+  const por = {};
+  for (const [, n, d] of top) if (d) por[d] = (por[d] || 0) + Number(n);
+  const de = (k) => Object.entries(por).filter(([d]) => tipo[d] === k).sort((a, b) => b[1] - a[1]);
+  const w = de("w"), x = de("x"), p = de("p"), pc = (v) => Math.round(v / sup * 1000) / 10;
+  return { mayor: w.length ? pc(w[0][1]) : 0, top10w: pc(w.slice(0, 10).reduce((a, y) => a + y[1], 0)), exch: pc(x.reduce((a, y) => a + y[1], 0)), pools: pc(p.reduce((a, y) => a + y[1], 0)) };
+}
+export const QUIEN_SCHEMA = "CREATE TABLE IF NOT EXISTS quien (m TEXT PRIMARY KEY, t INTEGER, mayor REAL, top10w REAL, exch REAL, pools REAL)";
+// wallets de exchanges conocidos: la lista del motor (src/known.js), leída de jsDelivr una vez al día
+async function exchangesConocidos(est, ahora) {
+  if (est.exch && est.exch.t > ahora - 864e5) return new Set(est.exch.l);
+  const txt = await fetch("https://cdn.jsdelivr.net/npm/solana-risk-engine@latest/src/known.js").then((r) => r.ok ? r.text() : "").catch(() => "");
+  const l = [...txt.matchAll(/"([1-9A-HJ-NP-Za-km-z]{32,44})":\s*\{[^}]*t:\s*"exchange"/g)].map((x) => x[1]);
+  if (l.length) est.exch = { t: ahora, l };
+  return new Set(l.length ? l : (est.exch && est.exch.l) || []);
+}
 // dueño de cada cuenta de token (respuesta jsonParsed de getMultipleAccounts); las que no existen o no son de token, fuera
 export function duenos(cuentas, valores) {
   const out = {};
@@ -94,14 +113,21 @@ async function main() {
   const fEst = path.join(SALIDA, "estado.json");
   let est = {}; try { est = JSON.parse(fs.readFileSync(fEst, "utf8")); } catch {}
   est.ult = est.ult || {};
-  const ahora = Date.now(), mints = TOKENS.map((t) => t[1]);
+  const ahora = Date.now();
+  // las memecoins del Ecosistema de hoy también (25/11): para «Quién la tiene» y las ballenas de la vista de Meme
+  const eco = await json("https://solflag.com/datos/ecosistema.json");
+  const LISTA = TOKENS.slice();
+  for (const r of ((eco && eco.rows) || []).filter((r) => r.ap === "Meme" && r.gr === "Memecoins" && r.mint))
+    if (!LISTA.some((t) => t[1] === r.mint)) LISTA.push([r.sym, r.mint, "meme"]);
+  const mints = LISTA.map((t) => t[1]);
   // 1) DexScreener: hasta 30 tokens por petición
-  const pares = await json("https://api.dexscreener.com/tokens/v1/solana/" + mints.join(","));
+  let pares = [];
+  for (let i = 0; i < mints.length; i += 30) pares = pares.concat((await json("https://api.dexscreener.com/tokens/v1/solana/" + mints.slice(i, i + 30).join(","))) || []);
   const P = pools(pares, mints);
   // 2) Helius cada 30 min (la foto de los minutos 0–14 y 30–44)
   const conHelius = !!RPC && Math.floor(new Date(ahora).getUTCMinutes() / 15) % 2 === 0;
   const filas = [], porMint = {};
-  for (const [sym, m, ap] of TOKENS) {
+  for (const [sym, m, ap] of LISTA) {
     const p = P[m] || null, f = { t: ahora, sym, m, ap, dx: p };
     if (p && p.pool) {
       const j = await json("https://api.geckoterminal.com/api/v2/networks/solana/pools/" + p.pool + "/trades?trade_volume_in_usd_greater_than=" + MIN_USD);
@@ -124,6 +150,16 @@ async function main() {
     if (r && r.value) Object.assign(est.duenos, duenos(lote, r.value));
   }
   for (const f of filas) if (f.top) f.top = f.top.map(([c, n]) => [c, n, est.duenos[c] || null]);
+  // 3b) qué es cada dueño: exchange conocido, wallet (cuenta del System Program) o programa; solo los que no sabíamos
+  est.tipo = est.tipo || {};
+  const EXCH = conHelius ? await exchangesConocidos(est, ahora) : new Set();
+  const nuevosD = [...new Set(filas.flatMap((f) => (f.top || []).map((x) => x[2]).filter(Boolean)))].filter((d) => !(d in est.tipo));
+  for (let i = 0; i < nuevosD.length; i += 100) {
+    const lote = nuevosD.slice(i, i + 100), r = await rpc("getMultipleAccounts", [lote, { encoding: "base64", dataSlice: { offset: 0, length: 0 } }]);
+    if (r && r.value) lote.forEach((d, k) => { const a = r.value[k]; est.tipo[d] = !a || a.owner === "11111111111111111111111111111111" ? "w" : "p"; });
+  }
+  const tipo = {}; for (const [d, t] of Object.entries(est.tipo)) tipo[d] = EXCH.has(d) ? "x" : t;
+  const quien = filas.map((f) => f.top && f.supply ? [f.m, quienDe(f.top, f.supply, tipo)] : null).filter((x) => x && x[1]);
   // 4) los más analizados en la web (no van al .jsonl, solo a D1): la primera vez, todas sus operaciones grandes
   let extra = [];
   if (D1) try {
@@ -151,10 +187,16 @@ async function main() {
     await d1({ sql: "DELETE FROM ops WHERE t < ?", params: [ahora - 30 * 864e5] });
     est.opsD1 = est.opsD1 || ahora;
   } catch (e) { console.log("ops:", e.message); }
+  if (D1 && quien.length) try {
+    await d1({ sql: QUIEN_SCHEMA });
+    for (let i = 0; i < quien.length; i += 16) { const l = quien.slice(i, i + 16);
+      await d1({ sql: "INSERT INTO quien (m, t, mayor, top10w, exch, pools) VALUES " + l.map(() => "(?,?,?,?,?,?)").join(",") + " ON CONFLICT(m) DO UPDATE SET t=excluded.t, mayor=excluded.mayor, top10w=excluded.top10w, exch=excluded.exch, pools=excluded.pools",
+        params: l.flatMap(([m, q]) => [m, ahora, q.mayor, q.top10w, q.exch, q.pools]) }); }
+  } catch (e) { console.log("quien:", e.message); }
   const dia = new Date(ahora).toISOString().slice(0, 10);
   fs.appendFileSync(path.join(SALIDA, dia + ".jsonl"), filas.map((f) => JSON.stringify(f)).join("\n") + "\n");
   est.ultima = ahora;
   fs.writeFileSync(fEst, JSON.stringify(est));
-  console.log(`recogida: ${filas.length} tokens · ${filas.filter((f) => f.dx).length} con pool · ${filas.reduce((s, f) => s + (f.ops ? f.ops.length : 0), 0)} operaciones grandes nuevas · Helius ${conHelius ? "sí" : "no"} · ${extra.length} más analizados · ${enD1} operaciones a D1`);
+  console.log(`recogida: ${filas.length} tokens · ${filas.filter((f) => f.dx).length} con pool · ${filas.reduce((s, f) => s + (f.ops ? f.ops.length : 0), 0)} operaciones grandes nuevas · Helius ${conHelius ? "sí" : "no"} · ${extra.length} más analizados · ${enD1} operaciones a D1 · quién la tiene: ${quien.length}`);
 }
 if (import.meta.url === "file://" + process.argv[1] || process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) main();

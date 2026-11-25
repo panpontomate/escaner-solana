@@ -16,6 +16,7 @@
 //   GET  /api/cotiza/<mint>        dónde se negocia: pools de la cadena y exchanges con comisión, identidad y MiCA (cotiza.js)
 //   GET  /api/top/<mint>           mayores cuentas del token (Helius, 10 min en caché, 30/min por conexión)
 //   GET  /api/marcas/<mint>?desde= operaciones de más de 1.000 $ guardadas por la recogida (marcas de la gráfica, 5 min en caché)
+//   GET  /api/quien                quién tiene las memecoins (top 20) y ballenas de 24 h, de la recogida (5 min en caché)
 //   POST /api/rpc                  plan B de RPC de la web (Helius; solo lectura, 120/min por conexión)
 //   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
 //   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
@@ -258,6 +259,19 @@ export async function caida(env, pool, m, desde, hasta, fetchFn) {
   return { v: V, pool: pool, mint: m, desde: desde, hasta: hasta, ops: n, completo: completo, vendedores: top };
 }
 
+// {mint: {t, mayor, top10w, exch, pools, compra, vende, n}}: la última foto de «quién la tiene» (tabla quien) y las
+// compras y ventas de más de 1.000 $ de las últimas 24 h (tabla ops). Sin tablas todavía: vacío
+export async function quienTodos(db, ahora) {
+  const out = {}, no = (e) => /no such table/i.test(String(e && e.message));
+  try { for (const r of (await db.prepare("SELECT m, t, mayor, top10w, exch, pools FROM quien").bind().all()).results || []) out[r.m] = { t: r.t, mayor: r.mayor, top10w: r.top10w, exch: r.exch, pools: r.pools }; }
+  catch (e) { if (!no(e)) throw e; }
+  try {
+    const q = "SELECT m, SUM(CASE WHEN sell = 0 THEN usd ELSE 0 END) AS compra, SUM(CASE WHEN sell = 1 THEN usd ELSE 0 END) AS vende, COUNT(*) AS n FROM ops WHERE t > ? GROUP BY m";
+    for (const r of (await db.prepare(q).bind(ahora - 864e5).all()).results || []) if (out[r.m]) Object.assign(out[r.m], { compra: r.compra, vende: r.vende, n: r.n });
+  } catch (e) { if (!no(e)) throw e; }
+  return { v: V, quien: out };
+}
+
 // Operaciones guardadas de un token: [t ms, vende 1/0, usd, wallet, tx, cantidad], de la más antigua a la más nueva (las
 // 3.000 últimas). «desde» = la primera que tenemos de ese token. Sin tabla todavía: lista vacía
 export async function marcas(db, m, desde) {
@@ -340,6 +354,11 @@ export async function handle(req, env) {
     // el pasado no cambia: una semana en la caché si la ventana ya acabó hace más de 10 min
     res.headers.set("cache-control", "public, max-age=" + (hasta < Date.now() / 1000 - 600 ? 604800 : 120));
     return res;
+  }
+  // «Quién la tiene» y ballenas de 24 h de lo que sigue la recogida (25/11, vista de Meme del Ecosistema)
+  if (p.length === 3 && p[1] === "api" && p[2] === "quien") {
+    try { const res = json(await quienTodos(env.DB, Date.now())); res.headers.set("cache-control", "public, max-age=300"); return res; }
+    catch (e) { return fail(503, "database unavailable"); }
   }
   // marcas de la gráfica que no se pierden (25/11): operaciones de más de 1.000 $ que guarda la recogida (tabla ops)
   if (p.length === 4 && p[1] === "api" && p[2] === "marcas") {

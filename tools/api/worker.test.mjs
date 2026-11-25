@@ -2,8 +2,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top, caida, salidas, rpcValido, marcas } from "./worker.js";
-import { OPS_SCHEMA, opsInsert } from "../recogida/recoger.mjs";
+import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top, caida, salidas, rpcValido, marcas, quienTodos } from "./worker.js";
+import { OPS_SCHEMA, opsInsert, QUIEN_SCHEMA, quienDe } from "../recogida/recoger.mjs";
 import { SCHEMA } from "../caras/plano.mjs";
 
 const A = "PAY1111111111111111111111111111111", B = "FUND111111111111111111111111111111", C = "BUY1111111111111111111111111111111";
@@ -288,4 +288,17 @@ test("/api/marcas: operaciones guardadas por la recogida, en orden y desde la pr
   assert.equal(r.desde, 1000);
   assert.equal((await marcas(mk, M1, 2000)).ops.length, 1);
   assert.equal(opsInsert(M1, Array(30).fill(ops[0])).length, 3);  // de 14 en 14 (100 parámetros en D1)
+});
+
+test("/api/quien: última foto de quién la tiene y ballenas de 24 h", async () => {
+  const db = new DatabaseSync(":memory:");
+  const mk = { prepare: (sql) => ({ bind: (...a) => ({ all: async () => ({ results: db.prepare(sql).all(...a) }) }) }) };
+  assert.deepEqual((await quienTodos(mk, 2e8)).quien, {});          // sin tablas todavía
+  db.exec(QUIEN_SCHEMA); OPS_SCHEMA.forEach((s) => db.exec(s));
+  const q = quienDe([["a", "40", "W"], ["b", "20", "X"], ["c", "10", "P"]], "100", { W: "w", X: "x", P: "p" });
+  db.prepare("INSERT INTO quien (m, t, mayor, top10w, exch, pools) VALUES (?,?,?,?,?,?)").run(M1, 1, q.mayor, q.top10w, q.exch, q.pools);
+  for (const st of opsInsert(M1, [{ t: 1.99e8, lado: "compra", usd: 3000, w: A, tx: "x1" }, { t: 1.995e8, lado: "vende", usd: 5000, w: B, tx: "x2" }, { t: 1, lado: "vende", usd: 9e9, w: B, tx: "viejo" }])) db.prepare(st.sql).run(...st.params);
+  const r = (await quienTodos(mk, 2e8)).quien[M1];
+  assert.deepEqual([r.mayor, r.top10w, r.exch, r.pools], [40, 40, 20, 10]);
+  assert.deepEqual([r.compra, r.vende, r.n], [3000, 5000, 2]);     // la de hace más de 24 h no cuenta
 });

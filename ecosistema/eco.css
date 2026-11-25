@@ -259,3 +259,19 @@ footer a:hover{color:#fff}
 .df-riesgo .ri b{font:600 .82rem "IBM Plex Mono",monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .df-riesgo .ri span{color:var(--mut)}.df-riesgo .ri em{font-style:normal;color:#fbbf24;font-weight:700}.df-riesgo .ri em.r{color:#ff8a8a}
 @media (max-width:760px){ .df-riesgo .rcols{grid-template-columns:1fr} .df-riesgo .top span{display:block;margin:2px 0 0} }
+
+/* ---------- Meme: «Quién la tiene» y «Ballenas 24 h» (maqueta maquetas/web/ecosistema-meme-quien.html, 25/11) ---------- */
+.mq{grid-template-columns:22px 28px minmax(0,1.2fr) .8fr .6fr minmax(0,1.5fr) minmax(0,1fr) minmax(0,1.3fr) 74px}
+.mz-h.mq>span:nth-child(3),.mz-h.mq>.mq-lq{text-align:left}
+.mq .go{justify-self:end;font-size:12.5px;font-weight:700;color:#7ab8c4;text-decoration:none;white-space:nowrap}.mq .go:hover{text-decoration:underline}
+.mq .mz-x .up{color:var(--ver)}.mq .mz-x .dn{color:var(--rojo)}
+.mq-q{display:flex;flex-direction:column;gap:5px;min-width:0}
+.mq-q small{font:500 .74rem Manrope;color:var(--mut2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mq-q small b{color:var(--tx,#f1eeff)}.mq-q small b.a{color:#fbbf24}
+.mq-bar{display:flex;height:8px;border-radius:9px;overflow:hidden;background:rgba(255,255,255,.04)}
+.mq-bar i,.mq-ley i{display:block;height:100%}
+.mq-bar .w,.mq-ley .w{background:#c4b5fd}.mq-bar .x,.mq-ley .x{background:#7ab8c4}.mq-bar .p,.mq-ley .p{background:#fbbf24}.mq-bar .r,.mq-ley .r{background:rgba(255,255,255,.08)}
+.mq-ley{display:flex;gap:6px 16px;flex-wrap:wrap;align-items:center;font-size:.76rem;color:var(--mut2);margin:6px 0 0}
+.mq-ley span{display:inline-flex;align-items:center;gap:6px}.mq-ley i{display:inline-block;width:10px;height:10px;border-radius:3px}
+.mq-b{display:flex;flex-direction:column;font:600 .8rem "IBM Plex Mono",monospace}.mq-b .up{color:var(--ver)}.mq-b .dn{color:var(--rojo)}
+@media (max-width:1100px){ .mq{grid-template-columns:22px 28px minmax(0,1.2fr) .8fr minmax(0,1.5fr) minmax(0,1fr) minmax(0,1.3fr) 74px} .mq .mq-tit{display:none} }
+@media (max-width:760px){ .mq{grid-template-columns:28px minmax(0,1fr) auto}.mq .mq-tit,.mq .mq-b,.mq .mq-bc,.mq .go,.mz-h.mq>.mq-lq{display:none}.mq .mq-q,.mq .mz-sen,.mq>.mz-na{grid-column:2/-1} }

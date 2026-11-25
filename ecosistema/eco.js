@@ -147,7 +147,12 @@
     parte: "part of Pump.fun (shown whole in DeFi)", enDefi: "listed in DeFi · DEX", cadena: "on-chain: ", nuevo: "new", sinTok: "No token", conTok: "has a token", noReg: "Not in our registry yet",
     vivos: (v, n) => `${v} of ${n} alive`,
     lzSrc: (d) => `Fees: DefiLlama (30 days, vs the previous month; “new” if it barely earned last month). Born and alive after 24 h: SolFlag registry since ${d}, with the launches our collector sees (a sample, not all). “Alive” = still has money in it and trading after 24 h.`,
-    mmH: "Memecoins,", mmS: "who really trades them", mmTh: ["Memecoin", "Worth · 24 h", "Volume 24 h", "Holders", "Traders 24 h", "Signal"],
+    mmH: "Memecoins,", mmS: "who holds them and who moves them", mmTh: ["Memecoin", "Worth · 24 h", "Holders", "Who holds it", "Whales 24 h", "Signal"],
+    ley: ["10 largest wallets", "exchanges", "programs (locks, pools)", "the rest"], mayor: (p) => `largest wallet <b${p >= 15 ? ' class="a"' : ""}>${p}%</b>`, top10: (p) => ` · top 10: ${p}%`,
+    noSigue: "not tracked yet", sinOps: "no large trades", compran: (v) => "buy " + v, venden: (v) => "sell " + v, trs: " traders",
+    unaW: (p) => `One wallet holds ${p}%`, enProg: (p) => `${p}% sits in programs (locks or pools)`, venden2: "Whales are selling more than they buy",
+    barT: (w, x, p) => `10 largest wallets ${w}% · exchanges ${x}% · programs ${p}%`,
+    quienSrc: " Who holds it: the token's 20 largest accounts and their owner (Helius); “exchange” = a known exchange wallet; “program” = a program account (locks, pools…); the rest are wallets that are neither a pool nor a known exchange (people or custodians). Whales: buys and sells over $1,000 in the last 24 h, stored by SolFlag.",
     org: (n) => n === 1 ? "1 organic" : n + " organic",
     bots: (t, o) => `${t} traders and ${o === 0 ? "no organic ones" : o === 1 ? "1 organic" : o + " organic"}: mostly bots`, poco: (t) => `Little trading: ${t} traders yesterday`,
     gana: (x) => `Gaining holders: ${x} in 24 h`, orgP: (x) => `${x}% organic buyers`,
@@ -160,7 +165,12 @@
     parte: "parte de Pump.fun (va entera en DeFi)", enDefi: "va en DeFi · DEX", cadena: "en la cadena: ", nuevo: "nuevo", sinTok: "Sin token", conTok: "con token", noReg: "Aún no lo registramos",
     vivos: (v, n) => `${v} de ${n} vivos`,
     lzSrc: (d) => `Comisiones: DefiLlama (30 días, frente al mes anterior; «nuevo» si el mes anterior casi no cobró). Nacieron y vivos a las 24 h: registro de SolFlag desde el ${d}, con los lanzamientos que ve nuestro recolector (una muestra, no todos). «Vivo» = sigue con dinero dentro y movimiento a las 24 h.`,
-    mmH: "Memecoins,", mmS: "quién las mueve de verdad", mmTh: ["Memecoin", "Vale · 24 h", "Volumen 24 h", "Titulares", "Traders 24 h", "Señal"],
+    mmH: "Memecoins,", mmS: "quién las tiene y quién las mueve", mmTh: ["Memecoin", "Vale · 24 h", "Titulares", "Quién la tiene", "Ballenas 24 h", "Señal"],
+    ley: ["10 mayores wallets", "exchanges", "programas (bloqueos, pools)", "el resto"], mayor: (p) => `la mayor wallet <b${p >= 15 ? ' class="a"' : ""}>${p} %</b>`, top10: (p) => ` · las 10 mayores ${p} %`,
+    noSigue: "aún no la seguimos", sinOps: "sin operaciones grandes", compran: (v) => "compran " + v, venden: (v) => "venden " + v, trs: " traders",
+    unaW: (p) => `Una sola wallet tiene el ${p} %`, enProg: (p) => `El ${p} % está en programas (bloqueos o pools)`, venden2: "Las ballenas venden más de lo que compran",
+    barT: (w, x, p) => `10 mayores wallets ${w} % · exchanges ${x} % · programas ${p} %`,
+    quienSrc: " Quién la tiene: las 20 mayores cuentas del token (Helius) y su dueño; «exchange» = wallet de un exchange conocido; «programa» = cuenta de un programa (bloqueos, pools…); el resto, wallets que no son pool ni exchange conocido (personas o custodios). Ballenas: compras y ventas de más de 1.000 $ en las últimas 24 h, guardadas por SolFlag.",
     org: (n) => n === 1 ? "1 orgánico" : n + " orgánicos",
     bots: (t, o) => `${t} traders y ${o === 0 ? "ninguno orgánico" : o === 1 ? "1 orgánico" : o + " orgánicos"}: casi todo bots`, poco: (t) => `Poco movimiento: ${t} traders ayer`,
     gana: (x) => `Gana titulares: ${x} en 24 h`, orgP: (x) => `${x} % de compradores orgánicos`,
@@ -170,11 +180,12 @@
   };
   // lanzadera de DefiLlama → plataforma en nuestro registro (launchpad.platform de RugCheck)
   const PLAT = { "Pump.fun": "pump_fun", "BONK.fun": "raydium_launchlab", "Bags": "meteora_dbc", "StonkFun": "stonk_fun", "Rapid Launch": "rapidlaunch" };
-  let REG = null, regPide = null;
+  let REG = null, regPide = null, QZ = null, qzPide = null;
   const num = (n, d) => n.toLocaleString(EN ? "en-US" : "es-ES", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0, useGrouping: "always" });
   const tok = (r) => /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(r.mint || "") ? (EN ? "/en/" : "/") + "?token=" + r.mint : null;
   function memeVista() {
     if (!REG && !regPide) regPide = fetch("https://api.solflag.com/api/lanzaderas").then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { REG = j || {}; if (ap === "Meme") pinta(); });
+    if (!QZ && !qzPide) qzPide = fetch("https://api.solflag.com/api/quien").then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { QZ = (j && j.quien) || {}; if (ap === "Meme") pinta(); });
     const rs = D.rows.filter((r) => r.ap === "Meme");
     const memes = rs.filter((r) => r.gr === "Memecoins").sort((a, b) => (b.m || 0) - (a.m || 0));
     const lz = rs.filter((r) => r.gr === "Lanzaderas").map((r) => Object.assign({}, r));
@@ -191,21 +202,31 @@
         `<span class="mz-x mz-m mz-tok">${r.tok ? (r.mcap ? fm(r.mcap) + `<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span></small>` : MZ.conTok) : `<span class="mz-sin">${MZ.sinTok}</span>`}</span>` +
         `<span class="mz-x mz-m mz-nac">${g ? num(g.n) : "—"}</span>` +
         (g && g.con ? `<span class="mz-viv"><b>${num(v / g.con * 100, 1)}${sp}%</b><small>${MZ.vivos(num(v), num(g.con))}</small></span>` : `<span class="mz-na">${reg ? MZ.noReg : "…"}</span>`) + "</div>"; };
-    const senal = (r) => {
+    const qz = (r) => QZ && r.mint && QZ[r.mint] ? QZ[r.mint] : null;
+    const senal = (r) => { const q = qz(r);
+      if (q && q.mayor >= 15) return `<span class="mz-sen mz-a">${MZ.unaW(num(q.mayor, 1))}</span>`;
+      if (q && q.pools >= 50) return `<span class="mz-sen mz-a">${MZ.enProg(num(q.pools))}</span>`;
+      if (q && q.vende > (q.compra || 0) * 1.5 && q.vende >= 5e3) return `<span class="mz-sen mz-r">${MZ.venden2}</span>`;
       if (r.trad >= 50 && r.org != null && r.org / r.trad < 0.02) return `<span class="mz-sen mz-r">${MZ.bots(num(r.trad), r.org)}</span>`;
       if (r.trad != null && r.trad < 100) return `<span class="mz-sen mz-a">${MZ.poco(r.trad)}</span>`;
       if (r.titC != null && r.titC >= 0.001) return `<span class="mz-sen mz-v">${MZ.gana(pc1(r.titC))}</span>`;
       if (r.org != null && r.trad && r.org / r.trad >= 0.03) return `<span class="mz-sen mz-v">${MZ.orgP(num(r.org / r.trad * 100))}</span>`;
       return "<span></span>"; };
-    const mmFila = (r, i) => `<div class="mz-t mz-mm"><span class="mz-i">${i + 1}</span>${av(r)}${nom(r)}<span class="mz-x">${fm(r.m)}<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span></small></span>` +
-      `<span class="mz-x mz-m mz-vol">${r.vol ? fm(r.vol) : "—"}</span><span class="mz-x mz-m mz-tit">${r.tit != null ? fk(r.tit) : "—"}<small>${r.titC != null && Math.abs(r.titC) >= 0.0005 ? `<span class="${r.titC >= 0 ? "up" : "dn"}">${pc1(r.titC)}</span>` : "&nbsp;"}</small></span>` +
-      `<span class="mz-x">${r.trad != null ? fk(r.trad) : "—"}<small>${r.org != null ? MZ.org(r.org) : "&nbsp;"}</small></span>${senal(r)}</div>`;
+    const quienC = (r) => { const q = qz(r); if (!QZ) return '<span class="mz-na">…</span>'; if (!q) return `<span class="mz-na">${MZ.noSigue}</span>`;
+      const resto = Math.max(0, 100 - q.top10w - q.exch - q.pools);
+      return `<span class="mq-q"><span class="mq-bar" title="${esc(MZ.barT(num(q.top10w, 1), num(q.exch, 1), num(q.pools, 1)))}"><i class="w" style="width:${q.top10w}%"></i><i class="x" style="width:${q.exch}%"></i><i class="p" style="width:${q.pools}%"></i><i class="r" style="width:${resto}%"></i></span>` +
+        `<small>${MZ.mayor(num(q.mayor, 1))}${MZ.top10(num(q.top10w))}</small></span>`; };
+    const ballC = (r) => { const q = qz(r); if (!q) return '<span class="mz-na mq-bc">—</span>'; if (!q.n) return `<span class="mz-na mq-bc">${MZ.sinOps}</span>`;
+      return `<span class="mq-b"><span class="up">${MZ.compran(fm(q.compra || 0))}</span><span class="dn">${MZ.venden(fm(q.vende || 0))}</span></span>`; };
+    const mmFila = (r, i) => `<div class="mz-t mq"><span class="mz-i">${i + 1}</span>${av(r)}${nom(r)}<span class="mz-x">${fm(r.m)}<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span></small></span>` +
+      `<span class="mz-x mq-tit">${r.tit != null ? fk(r.tit) : "—"}<small>${r.trad != null ? fk(r.trad) + MZ.trs : "&nbsp;"}</small></span>${quienC(r)}${ballC(r)}${senal(r)}${goV(r)}</div>`;
+    const ley = `<p class="mq-ley">${["w", "x", "p", "r"].map((c, k) => `<span><i class="${c}"></i>${MZ.ley[k]}</span>`).join("")}</p>`;
     $("#lista").innerHTML =
       (tot && tot.con ? `<div class="mz-dato"><span class="mz-k">${MZ.datoK}</span><b>${num(tot.muertos / tot.con * 100, 1)}${sp}%</b><p>${MZ.dato(0, num(tot.con), desde, num(tot.con - tot.muertos))}</p></div>` : "") +
       `<section class="mz-card"><h2>${MZ.lzH} <small>${MZ.lzS}</small></h2><div class="mz-t mz-lz mz-h"><span></span><span></span><span>${MZ.lzTh[0]}</span><span>${MZ.lzTh[1]}</span><span class="mz-tok">${MZ.lzTh[2]}</span><span class="mz-nac">${MZ.lzTh[3]}</span><span>${MZ.lzTh[4]}</span></div>` +
         lz.map(lzFila).join("") + `<p class="mz-src">${MZ.lzSrc(desde || "30/10")}</p></section>` +
-      `<section class="mz-card"><h2>${MZ.mmH} <small>${MZ.mmS}</small></h2><div class="mz-t mz-mm mz-h"><span></span><span></span><span>${MZ.mmTh[0]}</span><span>${MZ.mmTh[1]}</span><span class="mz-vol">${MZ.mmTh[2]}</span><span class="mz-tit">${MZ.mmTh[3]}</span><span>${MZ.mmTh[4]}</span><span>${MZ.mmTh[5]}</span></div>` +
-        memes.map(mmFila).join("") + `<p class="mz-src">${MZ.mmSrc}</p></section>` +
+      `<section class="mz-card"><h2>${MZ.mmH} <small>${MZ.mmS}</small></h2>${ley}<div class="mz-t mq mz-h"><span class="mz-i"></span><span></span><span>${MZ.mmTh[0]}</span><span>${MZ.mmTh[1]}</span><span class="mq-tit">${MZ.mmTh[2]}</span><span class="mq-lq">${MZ.mmTh[3]}</span><span class="mq-lq">${MZ.mmTh[4]}</span><span class="mq-lq">${MZ.mmTh[5]}</span><span class="go"></span></div>` +
+        memes.map(mmFila).join("") + `<p class="mz-src">${MZ.mmSrc}${MZ.quienSrc}</p></section>` +
       `<div class="mz-que"><div class="top"><b>${MZ.queH}</b><span>${MZ.queS}</span></div><ul>${MZ.queL.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
   }
 
