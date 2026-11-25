@@ -92,7 +92,7 @@
       return n ? `<button class="${a === ap ? "on" : ""}" data-a="${esc(a)}">${esc(a === "Todos" ? T.todos : apNom(a))}<em>${n}</em></button>` : "";
     }).join("");
     const d = AP.find((a) => a[0] === ap);
-    $("#apdesc").textContent = d ? d[2] : T.elige;
+    $("#apdesc").textContent = d ? d[2] : TD.intro;
     const fees = rs.filter((r) => r.med === "fees"), val = rs.filter((r) => r.med === "valor");
     const sinTok = rs.filter((r) => !r.tok).length;
     let k;
@@ -474,6 +474,78 @@
   }
   const VISTA = { "DeFi": defiVista, "Juegos": juegosVista, "Apps y bots": appsVista, "Otros": otrosVista };
 
+  // ---------- «Todos» (maqueta maquetas/web/ecosistema-todos.html, 25/11): un bloque por apartado con su «Dato», sus mayores
+  // con las dos columnas que importan en él y «Ver X ›». DeFi, el más grande, arriba a todo el ancho con más columnas ----------
+  const TD = EN ? {
+    intro: "The largest in each section and the most striking fact about each one. Pick one to see it in full.",
+    sub: { "Meme": "memecoins and where they are born", "Activos tokenizados": "stablecoins, stocks and funds", "DeFi": "DEXs, lending, staking…", "Juegos": "games, cards and chance",
+      "IA": "AI agents and projects", "Apps y bots": "trading, wallets and data", "Otros": "DePIN, payments, privacy…" },
+    meme: (n) => `of the ${n} new tokens we saw being born were dead after 24 h.`,
+    rwa: (c) => `in stablecoins on Solana (${c} vs the previous month). Plus tokenized stocks and funds.`,
+    defi: (n) => `Of every $100 Solana DeFi charges, ${n} go to Pump.fun and Jupiter.`, de100: (n) => `${n} of 100`,
+    juegos: (c, m, t) => `people traded the 3 most valuable game tokens in 24 h. ${c}, which charges ${m} a month, had ${t}.`,
+    ia: "AI tokens show no public code or haven't touched it in over 6 months.", de: (a, b) => `${a} of ${b}`,
+    apps: (s, n) => `more is what trading apps charge vs Telegram bots. And ${s} of ${n} have no token.`,
+    otros: (p) => `is how many times Render's token is worth what it earns in a year, even though it returns ${p}% to the token.`,
+    th: { vale: "Worth · 24 h", trad: "Traders 24 h", sol: "On Solana", d30: "30 days", cobra: "Charges · 30 d", queda: "Keeps", dep: "Deposited", dev: "Back to the token", tok: "Token", uso: "Usage", cod: "Code" },
+    circ: "in circulation", tokz: "tokenized", cob30: "charges 30 d", vale: "worth", org: (n) => n + " organic", sinCod: "no code", hoy: "changed today", hace: (d) => d + " d ago", parado: (d) => d + " d idle", el: (p) => p + "%",
+  } : {
+    intro: "Los mayores de cada apartado y lo más llamativo de cada uno. Elige uno para verlo entero.",
+    sub: { "Meme": "las memecoins y dónde nacen", "Activos tokenizados": "stablecoins, acciones y fondos", "DeFi": "DEX, préstamos, staking…", "Juegos": "juegos, cartas y azar",
+      "IA": "agentes y proyectos de IA", "Apps y bots": "trading, wallets y datos", "Otros": "DePIN, pagos, privacidad…" },
+    meme: (n) => `de los ${n} tokens nuevos que vimos nacer estaban muertos a las 24 h.`,
+    rwa: (c) => `en stablecoins en Solana (${c} frente al mes anterior). Además, acciones y fondos tokenizados.`,
+    defi: (n) => `De cada 100 $ que cobra la DeFi de Solana, ${n} se los llevan Pump.fun y Jupiter.`, de100: (n) => `${n} de 100`,
+    juegos: (c, m, t) => `personas movieron en 24 h los 3 tokens de juegos que más valen. ${c}, que cobra ${m} al mes, tuvo ${t}.`,
+    ia: "tokens de IA no enseñan código público o lo tienen parado hace más de 6 meses.", de: (a, b) => `${a} de ${b}`,
+    apps: (s, n) => `cobran las apps de trading frente a los bots de Telegram. Y ${s} de ${n} no tienen token.`,
+    otros: (p) => `vale el token de Render lo que ingresa en un año, aunque devuelve al token el ${p} %.`,
+    th: { vale: "Vale · 24 h", trad: "Traders 24 h", sol: "En Solana", d30: "30 días", cobra: "Cobra · 30 d", queda: "Se queda", dep: "Depositado", dev: "Devuelve al token", tok: "Token", uso: "Uso", cod: "Código" },
+    circ: "en circulación", tokz: "tokenizado", cob30: "cobra 30 d", vale: "vale", org: (n) => n + (n === 1 ? " orgánico" : " orgánicos"), sinCod: "sin código", hoy: "cambiado hoy", hace: (d) => "hace " + d + " d", parado: (d) => d + " d parado", el: (p) => "el " + p + sp + "%",
+  };
+  function todosVista() {
+    if (!REG && !regPide) regPide = fetch("https://api.solflag.com/api/lanzaderas").then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { REG = j || {}; if (ap === "Todos") pinta(); });
+    const de = (a) => deApV(a).filter(enTipo).map((r) => Object.assign(r, { cod: (PERF && r.mint && PERF[r.mint] && PERF[r.mint].cod) || null }));
+    const top = (l, n) => l.slice().sort((a, b) => (b.m || 0) - (a.m || 0)).slice(0, n || 4);
+    const sumaM = (l) => sumaV(l, "m");
+    const trad = (r) => `${r.trad != null ? fk(r.trad) : "—"}<small>${r.org != null ? TD.org(r.org) : "&nbsp;"}</small>`;
+    const c24 = (r) => `<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${r.c24 == null ? "&nbsp;" : pc1(r.c24)}</span></small>`;
+    const B = [];
+    { // DeFi, a todo el ancho
+      const l = de("DeFi"), tot = sumaM(l), pf = l.find((r) => r.n === "Pump.fun"), jp = l.find((r) => r.n === "Jupiter");
+      const c2 = pf && jp && tot ? Math.round((pf.m + jp.m) / tot * 100) : null;
+      const dep = (r) => r.tvl ? fm(r.tvl) : r.mano && r.mano.dep ? manoV(r.mano.dep) : SIN_DEP.has(r.gr) || r.n === "HumidiFi" ? `<span class="mz-na">${V.noAplica}</span>` : "—";
+      B.push({ a: "DeFi", ancho: 1, big: c2 != null ? TD.de100(c2) : "", txt: c2 != null ? TD.defi(c2) : "", th: [TD.th.cobra, TD.th.queda, TD.th.dep, TD.th.dev, TD.th.tok], rs: top(l, 6),
+        c: (r) => [`${fmv(r.m)}${cambioV(r)}`, (r.r30 != null ? fmv(r.r30) : "—") + (r.mano ? manoV(r.mano.q) : ""), dep(r), r.h30 ? `${fm(r.h30)}<small>${r.ing ? TD.el(Math.min(100, Math.round(r.h30 / r.ing * 100))) : "&nbsp;"}</small>` : `<span class="mz-na">—</span>`, tokV(r)] });
+    }
+    { const l = de("Meme").filter((r) => r.gr === "Memecoins"), t = REG && REG.total;
+      B.push({ a: "Meme", big: t && t.con ? num(t.muertos / t.con * 100, 1) + sp + "%" : "", txt: t && t.con ? TD.meme(num(t.con)) : "", th: [TD.th.vale, TD.th.trad], rs: top(l), c: (r) => [`${fm(r.m)}${c24(r)}`, trad(r)] }); }
+    { const l = de("Activos tokenizados");
+      B.push({ a: "Activos tokenizados", big: fm(D.totStables), txt: TD.rwa(pc(D.mercado.circ)), th: [TD.th.sol, TD.th.d30], rs: top(l),
+        c: (r) => [`${fm(r.m)}<small>${r.med === "circ" ? TD.circ : TD.tokz}</small>`, r.c == null ? "—" : `<span class="${r.c >= 0 ? "up" : "dn"}">${pc(r.c)}</span>`] }); }
+    { const l = de("Juegos"), t3 = l.filter((r) => r.med === "token" && r.cap).sort((a, b) => b.cap - a.cap).slice(0, 3), cc = l.filter((r) => r.med === "fees").sort((a, b) => (b.m || 0) - (a.m || 0))[0];
+      const ok = t3.length === 3 && cc && cc.trad != null, nT = sumaV(t3, "trad");
+      B.push({ a: "Juegos", big: ok ? num(nT) : "", txt: ok ? TD.juegos(esc(cc.n), fm(cc.m), num(cc.trad)) : "", th: [TD.th.uso, TD.th.trad],
+        rs: l.slice().sort((a, b) => (b.med === "fees") - (a.med === "fees") || (b.m || 0) - (a.m || 0)).slice(0, 4),
+        c: (r) => [r.med === "fees" ? `${fmv(r.m)}<small>${TD.cob30}</small>` : `${fm(r.cap)}<small>${TD.vale}</small>`, trad(r)] }); }
+    { const l = de("IA"), sin = l.filter((r) => !r.cod || r.cod.dias == null || r.cod.dias > 180).length;
+      B.push({ a: "IA", big: PERF && l.length ? TD.de(sin, l.length) : "", txt: PERF && l.length ? TD.ia : "", th: [TD.th.vale, TD.th.cod], rs: top(l),
+        c: (r) => [`${fm(r.m)}${c24(r)}`, !r.cod || r.cod.dias == null ? `<span class="mz-na">${TD.sinCod}</span>` : r.cod.dias <= 30 ? `<span class="up">${r.cod.dias < 1 ? TD.hoy : TD.hace(r.cod.dias)}</span>` : `<span class="mz-na">${TD.parado(r.cod.dias)}</span>`] }); }
+    { const l = de("Apps y bots"), apps = sumaM(l.filter((r) => r.gr === "Apps de trading")), bots = sumaM(l.filter((r) => r.gr === "Bots de Telegram")), v = bots ? Math.round(apps / bots) : 0;
+      B.push({ a: "Apps y bots", big: v >= 2 ? v + "×" : "", txt: v >= 2 ? TD.apps(l.filter((r) => !r.tok).length, l.length) : "", th: [TD.th.cobra, TD.th.tok], rs: top(l),
+        c: (r) => [`${fmv(r.m)}${cambioV(r)}`, r.cad ? `<span class="mz-na">${V.tokEn} ${esc(r.cad)}</span>` : r.tok ? `<b class="td-sy">${esc(r.sym)}</b>` : sinV] }); }
+    { const l = de("Otros"), rn = l.find((r) => /^Render Network/.test(r.n)), ok = rn && rn.vx && rn.h30 && rn.ing;
+      B.push({ a: "Otros", big: ok ? num(rn.vx) + "×" : "", txt: ok ? TD.otros(Math.round(rn.h30 / rn.ing * 100)) : "", th: [TD.th.cobra, TD.th.dev], rs: top(l),
+        c: (r) => [`${fmv(r.m)}${cambioV(r)}`, r.h30 ? fm(r.h30) : `<span class="mz-na">—</span>`] }); }
+    const bloque = (b) => { const cls = b.ancho ? "tdw" : "tdr", nom = apNom(b.a);
+      return `<section class="mz-card td${b.ancho ? " td-ancho" : ""}"><div class="td-cab"><h2>${esc(nom)}, <small>${TD.sub[b.a]}</small></h2><button class="td-ver" data-a="${esc(b.a)}">${T.ver(esc(nom))}</button></div>` +
+        (b.big ? `<p class="td-dato"><b>${b.big}</b> ${b.txt}</p>` : "") +
+        `<div class="mz-t ${cls} mz-h"><span class="mz-i"></span><span></span><span>${EN ? "Project" : "Proyecto"}</span>${b.th.map((h, i) => `<span class="td-c${i}">${h}</span>`).join("")}<span class="go"></span></div>` +
+        (b.rs.length ? b.rs.map((r, i) => { const c = b.c(r); return `<div class="mz-t ${cls}"><span class="mz-i">${i + 1}</span>${av(r)}${nomV(r)}${c.map((x, k) => k === 4 ? x : `<span class="mz-x td-c${k}">${x}</span>`).join("")}${goV(r)}</div>`; }).join("") : `<div class="vacio">${T.ninguno}</div>`) + `</section>`; };
+    $("#apdesc").textContent = TD.intro;
+    $("#lista").innerHTML = `<div class="tds">${B.map(bloque).join("")}</div>`;
+  }
+
   function pinta() {
     cabecera();
     if (navIO && ap !== "DeFi") { navIO.disconnect(); navIO = null; }
@@ -493,17 +565,7 @@
     if ($("#lista")._sfa) $("#lista")._sfa = { };
     $("#bar").style.display = ap === "Todos" || tipo === "nuevo" ? "none" : "";
     if (tipo === "nuevo") { const rs = deAp().filter((r) => r.nuevo).sort((a, b) => b.nuevo.localeCompare(a.nuevo)); $("#lista").innerHTML = rs.length ? tarjetas(rs) : `<div class="tbl"><div class="vacio">${T.ninguno}</div></div>`; return; }
-    if (ap === "Todos") {
-      $("#lista").innerHTML = AP.map(([a, nom]) => {
-        const rs = D.rows.filter((r) => r.ap === a && enTipo(r));
-        if (!D.rows.some((r) => r.ap === a)) return "";
-        // en «Todos», lo que se mide por capitalización y casi nadie usa (menos de 20 traders en 24 h, o sin dato de traders) no entra en los 5 primeros (22/11: Infinity Gaming, 43 M$ y 1 trader)
-        const top = rs.filter((r) => !(r.med === "token" && (r.trad == null || r.trad < 20))).sort((x, y) => (y.m || 0) - (x.m || 0)).slice(0, 5);
-        return `<div class="blq"><div class="cab"><h3>${esc(nom)}</h3><span>${rs.length}${T.proto}</span><button data-a="${esc(a)}">${T.ver(esc(nom))}</button></div>
-          <div class="tbl">${HEAD()}${top.length ? top.map(fila).join("") : `<div class="vacio">${T.ninguno}</div>`}</div></div>`;
-      }).join("");
-      return;
-    }
+    if (ap === "Todos") { todosVista(); return; }
     const rs = ordena(deAp().filter((r) => enTipo(r) && (grupo === "Todos" || r.gr === grupo)));
     $("#lista").innerHTML = `<div class="tbl">${HEAD()}${rs.length ? rs.map(fila).join("") : `<div class="vacio">${T.ninguno}</div>`}</div>`;
   }
@@ -522,7 +584,7 @@
     if (window.SFActivos) window.SFActivos.datos().then((j) => { if (!j || !Array.isArray(j.filas)) return; const reales = D.rows.filter((r) => r.ap === "Activos tokenizados" && r.gr === "Activos reales" && !/mansory/i.test(r.n)).length; nRwa = j.filas.filter((f) => f.precio != null).length + (j.dolares || []).filter((d) => d.enSolana && d.valor).length + reales; cabecera(); });
     $("#mkF").textContent = pc(D.mercado.fees); $("#mkC").textContent = pc(D.mercado.circ);
     $("#aps").onclick = (e) => { const b = e.target.closest("button"); if (b) elegirAp(b.dataset.a); };
-    $("#lista").onclick = (e) => { const b = e.target.closest(".cab button"); if (b) { elegirAp(b.dataset.a); window.scrollTo({ top: $("#aps").offsetTop - 90, behavior: "smooth" }); } };
+    $("#lista").onclick = (e) => { const b = e.target.closest(".cab button, .td-ver"); if (b) { elegirAp(b.dataset.a); window.scrollTo({ top: $("#aps").offsetTop - 90, behavior: "smooth" }); } };
     $("#chips").onclick = (e) => { const b = e.target.closest("button"); if (b) { grupo = b.dataset.g; pinta(); } };
     $("#sort").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; orden = b.dataset.s; [...$("#sort").children].forEach((x) => x.classList.toggle("on", x === b)); pinta(); };
     $(".tabs").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; [...document.querySelectorAll(".tabs button")].forEach((x) => x.classList.toggle("on", x === b)); tipo = b.dataset.k; pinta(); };

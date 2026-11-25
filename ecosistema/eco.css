@@ -225,3 +225,24 @@ footer a:hover{color:#fff}
   .ot{grid-template-columns:28px minmax(0,1fr) auto 66px}.ot .ot-q,.ot .ot-dev,.ot .ot-tk,.ot>.df-tok,.ot>.ab-sin,.ot>.cad,.ot .ot-vx,.ot .ot-sen{display:none}.ot .mz-sen{grid-column:2/-1}
 }
 .nm b a{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(122,184,196,.55)}.nm b a:hover{color:var(--tq);border-bottom-color:var(--tq)}
+
+/* ---------- Pestaña «Todos» (maqueta maquetas/web/ecosistema-todos.html, 25/11): un bloque por apartado ---------- */
+.tds{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.tds .td{margin:0}.tds .td-ancho{grid-column:1/-1}
+.td-cab{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.td-cab h2{margin:0;font-size:1.45rem}.td-cab h2 small{font-size:1rem}
+.td-ver{flex:none;font:700 .84rem Manrope;color:#7ab8c4;background:none;border:0;padding:0;cursor:pointer;white-space:nowrap}.td-ver:hover{text-decoration:underline}
+.td-dato{margin:10px 0 4px;padding:10px 14px;border-left:3px solid #7ab8c4;border-radius:3px 10px 10px 3px;background:linear-gradient(120deg,rgba(122,184,196,.09),rgba(255,255,255,.01) 80%);font-size:.88rem;color:var(--mut);line-height:1.45}
+.td-dato b{font:600 1.25rem Fraunces,serif;color:var(--tx,#f1eeff);margin-right:4px}
+.tdr{grid-template-columns:18px 28px minmax(0,1.7fr) minmax(0,1fr) minmax(0,1fr) 70px}
+.tdw{grid-template-columns:18px 28px minmax(0,1.6fr) .9fr .8fr .9fr .9fr .7fr 70px}
+.mz-h.tdr>span:nth-child(3),.mz-h.tdw>span:nth-child(3),.mz-h.tdw>.td-c4{text-align:left}
+.tdr .go,.tdw .go{justify-self:end;font-size:12.5px;font-weight:700;color:#7ab8c4;text-decoration:none;white-space:nowrap}
+.tdr .go:hover,.tdw .go:hover{text-decoration:underline}
+.tdr .up,.tdw .up{color:var(--ver)}.tdr .dn,.tdw .dn{color:var(--rojo)}
+.td-sy{font:600 .82rem "IBM Plex Mono",monospace}
+@media (max-width:1100px){ .tds{grid-template-columns:1fr} }
+@media (max-width:760px){
+  .tdr{grid-template-columns:28px minmax(0,1fr) auto auto}.tdr .go,.tdw .go{display:none} .td-cab{flex-wrap:wrap}
+  .tdw{grid-template-columns:28px minmax(0,1fr) auto auto}.tdw .td-c2,.tdw .td-c3,.tdw>.df-tok,.tdw>.ab-sin,.tdw>.cad,.tdw .td-c4{display:none}
+}
