@@ -4,9 +4,9 @@ name = "solflag-api"
 main = "worker.js"
 compatibility_date = "2026-11-01"
 
-# reloj de la recogida (lanza .github/workflows/recogida.yml; ver lanzarRecogida en worker.js)
+# reloj de los workflows (lanza recogida.yml y caras.yml; ver lanzarWorkflow en worker.js)
 [triggers]
-crons = ["3,18,33,48 * * * *"]
+crons = ["3,18,33,48 * * * *", "7,37 * * * *"]
 
 [[d1_databases]]
 binding = "DB"

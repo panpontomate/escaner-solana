@@ -417,11 +417,12 @@ export async function handle(req, env) {
   }
 }
 
-// Reloj de la recogida: el horario de GitHub se salta ejecuciones, así que la lanza el Worker cada 15 min.
+// Reloj de los workflows: el horario de GitHub se salta ejecuciones, así que los lanza el Worker:
+// recogida cada 15 min y caras (con el Mapa del momento) a los minutos 7 y 37 (25/11: GitHub solo corrió caras 2 veces en el día).
 // Necesita el secreto GH_DISPATCH_TOKEN (token fino de GitHub, solo este repo, permiso Actions: escritura).
-async function lanzarRecogida(env) {
+async function lanzarWorkflow(env, wf) {
   if (!env.GH_DISPATCH_TOKEN) return;
-  const r = await fetch("https://api.github.com/repos/panpontomate/escaner-solana/actions/workflows/recogida.yml/dispatches", {
+  const r = await fetch("https://api.github.com/repos/panpontomate/escaner-solana/actions/workflows/" + wf + "/dispatches", {
     method: "POST",
     headers: {
       authorization: "Bearer " + env.GH_DISPATCH_TOKEN,
@@ -431,12 +432,12 @@ async function lanzarRecogida(env) {
     },
     body: JSON.stringify({ ref: "main" }),
   });
-  if (r.status !== 204) console.log("recogida: GitHub contestó " + r.status + " " + (await r.text()).slice(0, 200));
+  if (r.status !== 204) console.log(wf + ": GitHub contestó " + r.status + " " + (await r.text()).slice(0, 200));
 }
 
 export default {
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(lanzarRecogida(env));
+    ctx.waitUntil(lanzarWorkflow(env, event.cron === "7,37 * * * *" ? "caras.yml" : "recogida.yml"));
   },
   async fetch(req, env, ctx) {
     const cache = typeof caches !== "undefined" ? caches.default : null;
