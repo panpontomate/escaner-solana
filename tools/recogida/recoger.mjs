@@ -1,7 +1,8 @@
 // Recogida de datos de los tokens de la portada (24/11/2026). Cada 15 min (GitHub Actions, workflow recogida.yml):
 //   · gratis: precio, volumen, compras/ventas y liquidez del pool principal (DexScreener, una petición para todos) y
 //     las operaciones de más de 1.000 $ con su wallet (GeckoTerminal, las nuevas desde la última vista);
-//   · cada 30 min (con SOLANA_RPC de Helius): las 20 mayores cuentas y la cantidad de tokens.
+//   · cada 30 min (con SOLANA_RPC de Helius): las 20 mayores cuentas y la cantidad de tokens;
+//     cada cuenta va como [cuenta, cantidad, dueño] y los dueños ya vistos se guardan en estado.json (25/11).
 // Guarda una línea JSON por foto en <SALIDA>/AAAA-MM-DD.jsonl y la memoria (lo último visto) en <SALIDA>/estado.json.
 // Sirve para el simulador: dos semanas mirando qué se ve antes de los movimientos, sin estrategia fijada.
 import fs from "node:fs";
@@ -56,6 +57,12 @@ export function nuevas(data, desde, mint) {
       usd: Math.round(Number(a.volume_in_usd) || 0), w: a.tx_from_address, tx: a.tx_hash }))
     .filter((x) => x.t > desde && x.lado && x.w).sort((a, b) => a.t - b.t);
 }
+// dueño de cada cuenta de token (respuesta jsonParsed de getMultipleAccounts); las que no existen o no son de token, fuera
+export function duenos(cuentas, valores) {
+  const out = {};
+  cuentas.forEach((c, i) => { const o = valores[i] && valores[i].data && valores[i].data.parsed && valores[i].data.parsed.info && valores[i].data.parsed.info.owner; if (o) out[c] = o; });
+  return out;
+}
 
 async function main() {
   fs.mkdirSync(SALIDA, { recursive: true });
@@ -84,6 +91,14 @@ async function main() {
     }
     filas.push(f);
   }
+  // 3) de quién es cada una de las 20 mayores cuentas: solo las que no estaban ya en estado.json (getMultipleAccounts, 100 por petición)
+  est.duenos = est.duenos || {};
+  const faltan = [...new Set(filas.flatMap((f) => (f.top || []).map((x) => x[0])))].filter((c) => !(c in est.duenos));
+  for (let i = 0; i < faltan.length; i += 100) {
+    const lote = faltan.slice(i, i + 100), r = await rpc("getMultipleAccounts", [lote, { encoding: "jsonParsed" }]);
+    if (r && r.value) Object.assign(est.duenos, duenos(lote, r.value));
+  }
+  for (const f of filas) if (f.top) f.top = f.top.map(([c, n]) => [c, n, est.duenos[c] || null]);
   const dia = new Date(ahora).toISOString().slice(0, 10);
   fs.appendFileSync(path.join(SALIDA, dia + ".jsonl"), filas.map((f) => JSON.stringify(f)).join("\n") + "\n");
   est.ultima = ahora;
