@@ -123,11 +123,24 @@ async function main() {
   const AP = { "DeFi": "defi", "Juegos": "juegos", "Activos tokenizados": "rwa", "IA": "ia", "Otros": "otros", "Apps y bots": "apps", "Meme": "meme" };
   for (const r of ((eco && eco.rows) || []).filter((r) => r.mint && !r.cad))
     if (!LISTA.some((t) => t[1] === r.mint)) LISTA.push([r.sym, r.mint, AP[r.ap] || "otros"]);
+  // los más analizados en la web se siguen de forma FIJA (25/11; antes solo los 20 de las últimas 6 h y solo ballenas):
+  // entra cada token del top 20 de pedidos de las últimas 6 h y se queda mientras alguien lo analice en 14 días (máx. 60)
+  est.fijos = est.fijos || {};
+  const nuevoFijo = new Set();
+  if (D1) try {
+    const r = await d1({ sql: "SELECT m FROM pedidos WHERE t1 > ? ORDER BY n DESC LIMIT 60", params: [ahora - 6 * 3600000] });
+    const top = ((r[0] && r[0].results) || []).map((x) => x.m).filter((m) => !LISTA.some((t) => t[1] === m)).slice(0, 20);
+    for (const m of top) { if (!est.fijos[m]) nuevoFijo.add(m); est.fijos[m] = ahora; }
+  } catch (e) { console.log("pedidos:", e.message); }
+  const fijos = Object.entries(est.fijos).filter(([, t]) => t > ahora - 14 * 864e5).sort((a, b) => b[1] - a[1]).slice(0, 60);
+  est.fijos = Object.fromEntries(fijos);
+  for (const [m] of fijos) if (!LISTA.some((t) => t[1] === m)) LISTA.push([null, m, "web"]);
   const mints = LISTA.map((t) => t[1]);
   // 1) DexScreener: hasta 30 tokens por petición
   let pares = [];
   for (let i = 0; i < mints.length; i += 30) pares = pares.concat((await json("https://api.dexscreener.com/tokens/v1/solana/" + mints.slice(i, i + 30).join(","))) || []);
   const P = pools(pares, mints);
+  for (const t of LISTA) if (!t[0]) { const x = pares.find((p) => p && p.baseToken && p.baseToken.address === t[1]); t[0] = (x && x.baseToken.symbol) || null; }
   // GeckoTerminal con tope de 6 min por vuelta (25/11: con 93 tokens una vuelta llegó a 12 min y GitHub la canceló; sus 429
   // desde GitHub alargan cada llamada): primero los pools con más volumen en la última hora; lo que no dé tiempo, la siguiente vuelta
   const vh = (m) => (P[m] && P[m].vol && P[m].vol.h1) || 0;
@@ -140,7 +153,7 @@ async function main() {
     const p = P[m] || null, f = { t: ahora, sym, m, ap, dx: p };
     if (p && p.pool && !quieto(p) && Date.now() < finGT) {
       const j = await json("https://api.geckoterminal.com/api/v2/networks/solana/pools/" + p.pool + "/trades?trade_volume_in_usd_greater_than=" + MIN_USD);
-      const ops = nuevas(j && j.data, est.ult[p.pool] || ahora - 3600000, m);
+      const ops = nuevas(j && j.data, est.ult[p.pool] || (nuevoFijo.has(m) ? 0 : ahora - 3600000), m);
       if (j) { f.ops = ops; porMint[m] = ops; if (ops.length) est.ult[p.pool] = ops[ops.length - 1].t; else if (!est.ult[p.pool]) est.ult[p.pool] = ahora - 3600000; }
       await espera(2200);   // GeckoTerminal: 30 por minuto
     }
@@ -169,21 +182,6 @@ async function main() {
   }
   const tipo = {}; for (const [d, t] of Object.entries(est.tipo)) tipo[d] = EXCH.has(d) ? "x" : t;
   const quien = filas.map((f) => f.top && f.supply ? [f.m, quienDe(f.top, f.supply, tipo)] : null).filter((x) => x && x[1]);
-  // 4) los más analizados en la web (no van al .jsonl, solo a D1): la primera vez, todas sus operaciones grandes
-  let extra = [];
-  if (D1) try {
-    const r = await d1({ sql: "SELECT m FROM pedidos WHERE t1 > ? ORDER BY n DESC LIMIT 60", params: [ahora - 6 * 3600000] });
-    extra = ((r[0] && r[0].results) || []).map((x) => x.m).filter((m) => !mints.includes(m)).slice(0, 20);
-  } catch (e) { console.log("pedidos:", e.message); }
-  if (extra.length) {
-    const PX = pools(await json("https://api.dexscreener.com/tokens/v1/solana/" + extra.join(",")), extra);
-    for (const m of extra) {
-      const p = PX[m]; if (!p || !p.pool || quieto(p) || Date.now() > finGT) continue;
-      const j = await json("https://api.geckoterminal.com/api/v2/networks/solana/pools/" + p.pool + "/trades?trade_volume_in_usd_greater_than=" + MIN_USD);
-      if (j) { const ops = nuevas(j.data, est.ult[p.pool] || 0, m); porMint[m] = ops; if (ops.length) est.ult[p.pool] = ops[ops.length - 1].t; }
-      await espera(2200);
-    }
-  }
   for (const [k, t] of Object.entries(est.ult)) if (t < ahora - 7 * 864e5) delete est.ult[k];   // pools que ya no se miran
   // la primera vez, también lo que ya estaba en los .jsonl (desde el 24/11)
   if (D1 && !est.opsD1) for (const fi of fs.readdirSync(SALIDA).filter((x) => /^\d{4}-\d\d-\d\d\.jsonl$/.test(x)))
@@ -206,6 +204,6 @@ async function main() {
   fs.appendFileSync(path.join(SALIDA, dia + ".jsonl"), filas.map((f) => JSON.stringify(f)).join("\n") + "\n");
   est.ultima = ahora;
   fs.writeFileSync(fEst, JSON.stringify(est));
-  console.log(`recogida: ${filas.length} tokens · ${filas.filter((f) => f.dx).length} con pool · ${filas.reduce((s, f) => s + (f.ops ? f.ops.length : 0), 0)} operaciones grandes nuevas · Helius ${conHelius ? "sí" : "no"} · ${extra.length} más analizados · ${enD1} operaciones a D1 · quién la tiene: ${quien.length}`);
+  console.log(`recogida: ${filas.length} tokens · ${filas.filter((f) => f.dx).length} con pool · ${filas.reduce((s, f) => s + (f.ops ? f.ops.length : 0), 0)} operaciones grandes nuevas · Helius ${conHelius ? "sí" : "no"} · ${fijos.length} fijos de la web (${nuevoFijo.size} nuevos) · ${enD1} operaciones a D1 · quién la tiene: ${quien.length}`);
 }
 if (import.meta.url === "file://" + process.argv[1] || process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) main();
