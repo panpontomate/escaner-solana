@@ -594,7 +594,7 @@
       if (x.k === "gpu" && x.a > 0 && r.cap) return `<span class="mz-sen mz-r">${DPT.sGpu(fm(r.cap), num(x.a), fm(r.cap / x.a))}</span>`;
       if (x.k === "reg") return `<span class="mz-sen mz-a">${DPT.sReg}</span>`;
       if (x.k === "stake" && x.h) return `<span class="mz-sen mz-v">${DPT.sJobs(nM(x.h))}</span>`;
-      if (x.k === "km" && r.med === "fees") return `<span class="mz-sen mz-a">${DPT.sKm(fm(r.m || 0))}</span>`;
+      if (x.k === "km" && r.med === "fees") return `<span class="mz-sen mz-a">${DPT.sKm(fmv(r.m || 0))}</span>`;
       return senal(r); };
     const dpRed = (r) => { const x = r.red; if (!x) return '<span class="dp-red"><span class="mz-na">—</span></span>';
       const main = { gpu: DPT.gpu, stake: DPT.stake, nodos: DPT.nodos, reg: DPT.reg, km: DPT.km }[x.k];
