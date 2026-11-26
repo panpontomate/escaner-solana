@@ -6581,6 +6581,8 @@ function walletLabel(a,j,face,total){
   var RED="#ff6b6b", TUR="#7ab8c4", LIL="#a78bfa", kw=SRE.knownWallet&&SRE.knownWallet(a);
   if(kw&&kw.t==="exchange") return {ic:"🏦",lbl:"EXCHANGE · "+String(kw.n).toUpperCase(),col:TUR};
   if(kw&&kw.t==="market_maker") return {ic:"🏛️",lbl:"MARKET MAKER · "+String(kw.n).toUpperCase(),col:TUR};
+  if(kw&&kw.t==="custodian") return {ic:"🔐",lbl:"CUSTODIAN · "+String(kw.n).toUpperCase(),col:TUR};
+  if(kw&&kw.t==="project") return {ic:"🏗️",lbl:String(pjRol(kw.r)).toUpperCase()+" · "+String(kw.n).toUpperCase(),col:TUR};
   var AMB="#fbbf24", RR=(j&&j.roles)||{}, res=0, dd=0;
   ["payer","creator","funder"].forEach(function(k){ res+=(RR[k]||{}).resolved||0; dd+=(RR[k]||{}).dead24||0; });
   var bad=res>=3&&dd/res>=.5?RED:AMB;
@@ -6776,7 +6778,7 @@ async function holders(){
     var busy=await markBusy(b.kind,wal,function(c,n){ setProgress("Separating people from bots and exchanges… "+c+"/"+n,0.65+0.15*c/Math.max(1,n)); });
     var hr=holderRows(b,busy), par=b.par;
     await loadBase();
-    hr.rows.forEach(function(r){ var kw=SRE.knownWallet&&SRE.knownWallet(r.owner); if(r.kind==="wallet"&&(baseType(r.owner)==="exchange"||(kw&&kw.t==="exchange"))) r.kind="activa"; });
+    hr.rows.forEach(function(r){ var kw=SRE.knownWallet&&SRE.knownWallet(r.owner); if(r.kind==="wallet"&&(baseType(r.owner)==="exchange"||(kw&&(kw.t==="exchange"||kw.t==="custodian")))) r.kind="activa"; else if(r.kind==="wallet"&&kw&&kw.t==="project") r.kind="proyecto"; });
     // Joven (menos de 14 días) o maduro: en los jóvenes casi todos los holders grandes mueven mucho y el reparto
     // del equipo se esconde entre ellos, así que también se busca el origen de las cuentas muy activas
     var created=(par&&par.pairCreatedAt)||null;
@@ -7127,6 +7129,7 @@ function renderHolders(keep){
   var wallets=rows.filter(function(r){return r.kind==="wallet";});
   var bots=rows.filter(function(r){return r.kind==="activa";});
   var progs=rows.filter(function(r){return r.kind==="programa";});
+  var proys=rows.filter(function(r){return r.kind==="proyecto";});   // wallets del propio proyecto (motor 0.8.3): aparte
   // Una cuenta "muy activa" con mucho supply no se esconde: la etiqueta puede fallar (p. ej. una wallet
   // que solo recibe repartos de comisiones) y, aunque sea un bot, tener tanto ya es un riesgo
   var bigAct=bots.filter(function(r){return r.pct>=10;});
@@ -7153,6 +7156,7 @@ function renderHolders(keep){
       "<div><span>Pools and programs</span><b>"+esc(fmtPct(progs.reduce(function(a,r){return a+r.pct;},0)))+"</b><small>not whales</small></div>"+
       "<div><span>Groups by funder</span><b>"+numGroups+"</b><small"+(numGroups?" class='warnc'":"")+">"+clusteredAddrs.length+" linked wallets</small></div>"+
       "<div><span>Excluded</span><b>"+bots.length+"</b><small>bots or exchanges</small></div>"+
+      (proys.length?"<div><span>The project itself</span><b>"+esc(fmtPct(proys.reduce(function(a,r){return a+r.pct;},0)))+"</b><small>"+esc(proys.map(function(r){ var k=SRE.knownWallet(r.owner); return k.n+" · "+pjRol(k.r); }).join(", "))+"</small></div>":"")+
     "</div>"+
     ((h.signals||[]).length?"<div class='lights hsig'>"+h.signals.map(function(x){ return "<div class='lt lt-"+x.s+"'><i class='ld'></i><div><span>"+esc(SRE.describe(x,"en"))+"</span></div></div>"; }).join("")+"</div>":"")+
     (bigAct.length?"<p class='hbig'>"+(bigAct.length===1?"A single account flagged as very active holds <b>"+esc(fmtPct(bigAct[0].pct))+"</b> of the supply. Looking like a bot or an exchange does not make it harmless":bigAct.length+" accounts flagged as very active hold "+bigAct.map(function(r){ return "<b>"+esc(fmtPct(r.pct))+"</b>"; }).join(", ")+" of the supply. Looking like bots or exchanges does not make them harmless")+": if they sell, the price moves all the same. Open them with Analyse or on Solscan before you trust them.</p>":"")+
@@ -7194,7 +7198,7 @@ function renderHolders(keep){
       "<div style='min-width:0'>"+
         "<div class='hl1'><span class='mono'>"+esc(short(r.owner))+"</span>"+
           "<button class='copy' type='button' data-copy='"+esc(r.owner)+"' title='Copy address'>copy</button>"+
-          "<span class='tag"+(isW?"":" p")+"'>"+(isW?"Person (likely)":(r.kind==="activa"?"Very active":"Program or pool"))+"</span>"+baseTag(r.owner)+(r.kind==="activa"&&r.busy?"<span class='tag seen' title='Many moves in little time: typical of a bot, exchange or market maker'>200+ moves in "+(r.busy<48?r.busy+" h":"2 days")+"</span>":"")+(r.passive?"<span class='tag seen' title='It shows up in many transactions, but it signed none of those checked: it only receives (fee shares, airdrops). It does not behave like a bot'>many transactions, only receives</span>":"")+(clusters[r.owner]?"<a class='tag cluster' style='text-decoration:none' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(clusters[r.owner].funder)+"' title='This wallet and "+(clusters[r.owner].n-1)+" others in the list got their first transaction from the same address ("+esc(short(clusters[r.owner].funder))+"): they could be the same person or team. It is a lead, not proof. Press to see the source on Solscan'>Group "+esc(clusters[r.owner].id)+" · "+clusters[r.owner].n+" wallets ↗</a>":"")+(isW?seenTag(r.owner):"")+"</div>"+
+          "<span class='tag"+(isW?"":" p")+"'>"+(isW?"Person (likely)":(r.kind==="activa"?"Very active":r.kind==="proyecto"?"Project":"Program or pool"))+"</span>"+baseTag(r.owner)+(r.kind==="activa"&&r.busy?"<span class='tag seen' title='Many moves in little time: typical of a bot, exchange or market maker'>200+ moves in "+(r.busy<48?r.busy+" h":"2 days")+"</span>":"")+(r.passive?"<span class='tag seen' title='It shows up in many transactions, but it signed none of those checked: it only receives (fee shares, airdrops). It does not behave like a bot'>many transactions, only receives</span>":"")+(clusters[r.owner]?"<a class='tag cluster' style='text-decoration:none' target='_blank' rel='noopener' href='https://solscan.io/account/"+esc(clusters[r.owner].funder)+"' title='This wallet and "+(clusters[r.owner].n-1)+" others in the list got their first transaction from the same address ("+esc(short(clusters[r.owner].funder))+"): they could be the same person or team. It is a lead, not proof. Press to see the source on Solscan'>Group "+esc(clusters[r.owner].id)+" · "+clusters[r.owner].n+" wallets ↗</a>":"")+(isW?seenTag(r.owner):"")+"</div>"+
         "<div class='hbar'><i style='width:"+Math.max(2,r.pct/max*100)+"%'></i></div>"+
         "<div class='meta'><span>Balance <span class='v'>"+esc(fmtNum(r.tokens))+"</span></span>"+
           (h.price?"<span>Value <span class='v'>"+usd(r.value)+"</span></span>":"")+
@@ -7388,7 +7392,7 @@ function omTok(m){
   var nx=0, np=0;
   hs.forEach(function(h){
     if(used[h.addr]) return;
-    var kw=SRE.knownWallet&&SRE.knownWallet(h.addr), ex=h.type==="exchange"||baseType(h.addr)==="exchange";
+    var kw=SRE.knownWallet&&SRE.knownWallet(h.addr), ex=h.type==="exchange"||baseType(h.addr)==="exchange"||!!(kw&&kw.t==="custodian");
     if(h.type==="pool"){ used[h.addr]=1; out.push({id:"P"+(np++),k:"o",name:"Pool or program",n:1,pct:h.pct,desc:"the token's liquidity: not counted as a holder",pool:1,addr:h.addr}); }
     else if(ex){ used[h.addr]=1; out.push({id:"X"+(nx++),k:"t",name:kw&&kw.n||"Exchange",n:1,pct:h.pct,desc:"exchange: it holds its users funds",exch:1,addr:h.addr}); }
     else if(m.creator===h.addr&&h.pct>=1){ used[h.addr]=1; out.push({id:"C",k:"r",name:"Token creator",n:1,pct:h.pct,desc:note(h.addr),addr:h.addr}); }
