@@ -5888,11 +5888,12 @@ function paintWKind(a){
   // sus números del registro (solo si sale en él); el motivo de la base se omite entonces para no dar dos cifras distintas
   var nums=any?wnumHtml(j,wwhoFace[a]):"";
   var IC={"exchange":"🏦","granja":"🧾","repartidor":"📦","creador en serie":"🚀","sniper":"🎯"}, cls="", head="", lead="", why="";
-  if(kw&&(kw.t==="exchange"||kw.t==="market_maker")){
+  if(kw&&(kw.t==="exchange"||kw.t==="market_maker"||kw.t==="custodian"||kw.t==="project")){
+    var KIC={"exchange":"🏦","market_maker":"🏛️","custodian":"🔐","project":"🏗️"};
     cls=" id"; head="Quién es · Identificada";
-    lead=(kw.t==="exchange"?"🏦 ":"🏛️ ")+esc(kw.n);
-    why=kw.t==="exchange"?"Exchange: guarda fondos de sus usuarios.":"Creador de mercado: es su inventario y lo puede vender.";
-    if($("#wav")){ $("#wav").textContent=kw.t==="exchange"?"🏦":"🏛️"; $("#wav").className="wav id"; }
+    lead=KIC[kw.t]+" "+esc(kw.n)+(kw.t==="project"?" · "+esc(pjRol(kw.r)):"");
+    why=kw.t==="exchange"?"Exchange: guarda fondos de sus usuarios.":kw.t==="custodian"?"Custodio: guarda fondos de instituciones, no es una persona.":kw.t==="project"?"Wallet del propio proyecto: cuenta en la concentración, porque el proyecto lo puede vender.":"Creador de mercado: es su inventario y lo puede vender.";
+    if($("#wav")){ $("#wav").textContent=KIC[kw.t]; $("#wav").className="wav id"; }
   }else if(t){
     cls=t==="exchange"?" id":(res>=3&&dd/res>=.5?" red":"");
     head="Quién es · Por su comportamiento"; lead=(IC[t]||"")+" "+esc(BASE_TXT[t]||t);
@@ -5906,6 +5907,8 @@ function paintWKind(a){
   box.innerHTML="<div class='wkind"+cls+"'><span class='wk-g'>"+esc(head)+"</span>"+(lead?"<b>"+lead+"</b>":"")+"<small>"+esc(why)+"</small>"+nums+"</div>";
 }
 var wwhoFace={};
+// función de una wallet del propio proyecto (motor 0.8.3: r = treasury | issuer | creator)
+function pjRol(r){ return r==="issuer"?"emisor":r==="creator"?"creador del token":"tesorería del proyecto"; }
 // El motivo, con los números de la base de wallets
 function baseWhy(a){
   var w=wbase.data&&wbase.data.wallets&&wbase.data.wallets[a]; if(!w) return "";
@@ -5922,6 +5925,9 @@ function baseTag(a){
   var kw=SRE.knownWallet&&SRE.knownWallet(a);
   if(kw&&kw.t==="exchange") return "<span class='tag kb kb-ex' title='Identificada: wallet de un exchange, comprobada en Solscan. Guarda fondos de sus usuarios'>"+esc(kw.n)+" (exchange)</span>";
   if(kw&&kw.t==="market_maker") return "<span class='tag kb kb-ex' title='Identificada: creador de mercado con nombre público (Solscan o su propio anuncio). Es su inventario y lo puede vender'>"+esc(kw.n)+" (creador de mercado)</span>";
+  // 0.8.3: custodios (no cuentan, como un exchange) y wallets del propio proyecto (sí cuentan)
+  if(kw&&kw.t==="custodian") return "<span class='tag kb kb-ex' title='Identificada: custodio con nombre público en Solscan. Guarda fondos de instituciones'>"+esc(kw.n)+" (custodio)</span>";
+  if(kw&&kw.t==="project") return "<span class='tag kb kb-ex' title='Identificada: wallet del propio proyecto (nombre público en Solscan o financiada por su bóveda). Cuenta, porque el proyecto lo puede vender'>"+esc(kw.n)+" ("+esc(pjRol(kw.r))+")</span>";
   var t=baseType(a); if(!t) return "";
   var why=baseWhy(a);
   return "<span class='tag kb kb-"+(t==="exchange"?"ex":"warn")+"' title='"+esc("Por su comportamiento"+(why?": "+why:"")+". Es un hecho de la cadena, no una acusación. Lo sabe la base de wallets de SolFlag, que crece con cada lanzamiento revisado")+"'>"+esc(BASE_TXT[t]||t)+"</span>";

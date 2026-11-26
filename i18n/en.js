@@ -1260,6 +1260,15 @@ export const TEXT = {
   "{a} de {b}": "{a} of {b}",
   "compradores del lanzamiento han vendido": "launch buyers have sold",
   "Lo que pasó": "What happened",
+  // wallets con nombre nuevas (motor 0.8.3)
+  "Custodio: guarda fondos de instituciones, no es una persona.": "Custodian: keeps funds for institutions, not one person.",
+  "Wallet del propio proyecto: cuenta en la concentración, porque el proyecto lo puede vender.": "The project own wallet: it counts in concentration, as the project can sell it.",
+  "<span class='tag kb kb-ex' title='Identificada: custodio con nombre público en Solscan. Guarda fondos de instituciones'>": "<span class='tag kb kb-ex' title='Identified: custodian with a public name on Solscan. Keeps funds for institutions'>",
+  " (custodio)</span>": " (custodian)</span>",
+  "<span class='tag kb kb-ex' title='Identificada: wallet del propio proyecto (nombre público en Solscan o financiada por su bóveda). Cuenta, porque el proyecto lo puede vender'>": "<span class='tag kb kb-ex' title='Identified: the project own wallet (public name on Solscan or funded by its vault). It counts, as the project can sell it'>",
+  "emisor": "issuer",
+  "creador del token": "token creator",
+  "tesorería del proyecto": "project treasury",
   // Ballenas › historial y avisos (26/11)
   "Hoy a las {h}": "Today at {h}",
   "La mayor wallet": "The largest wallet",

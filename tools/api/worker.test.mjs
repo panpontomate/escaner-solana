@@ -3,7 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
 import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top, caida, salidas, rpcValido, marcas, quienTodos, ballenas } from "./worker.js";
-import { OPS_SCHEMA, opsInsert, QUIEN_SCHEMA, quienDe, HIST_SCHEMA, insertsHist, procesaFoto, avisosDe, porDueno } from "../recogida/recoger.mjs";
+import { OPS_SCHEMA, opsInsert, QUIEN_SCHEMA, quienDe, HIST_SCHEMA, insertsHist, procesaFoto, avisosDe, porDueno, listaConocidas } from "../recogida/recoger.mjs";
 import { SCHEMA } from "../caras/plano.mjs";
 
 const A = "PAY1111111111111111111111111111111", B = "FUND111111111111111111111111111111", C = "BUY1111111111111111111111111111111";
@@ -337,4 +337,13 @@ test("/api/ballenas: historial, avisos y operaciones de 24 h de un token que sig
   assert.deepEqual(r.avisos, [[ahora - 3600000, "envio", A, 34, 17, B, "Ga'te", 17, 0.5]]);
   assert.deepEqual(r.ops, [[ahora - 1000, 1, 5000, A, "t1"]]);
   assert.equal(insertsHist("quienh", "m", [["no es una dirección", 1]]).length, 0);
+});
+
+test("recogida: lista de wallets con nombre del motor (exchanges, custodios y del proyecto)", () => {
+  const txt = `  "${A}": { n: "Gate", t: "exchange" },\n  "${B}": { n: "Fireblocks", t: "custodian" },\n  "${C}": { n: "Raydium", t: "project", r: "treasury" },\n  "${M1}": { n: "Wintermute", t: "market_maker" },`;
+  const k = listaConocidas(txt);
+  assert.deepEqual(k.l, [A, B]);
+  assert.deepEqual(k.n, { [A]: "Gate", [B]: "Fireblocks" });
+  assert.deepEqual(k.pj, { [C]: ["Raydium", "treasury"] });
+  assert.equal(quienDe([["a", "60", C], ["b", "10", A]], "100", { [C]: "w", [A]: "x" }).mo, C);
 });

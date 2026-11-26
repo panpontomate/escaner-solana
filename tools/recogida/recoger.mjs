@@ -95,17 +95,28 @@ export function quienDe(top, supply, tipo) {
   for (const [, n, d] of top) if (d) por[d] = (por[d] || 0) + Number(n);
   const de = (k) => Object.entries(por).filter(([d]) => tipo[d] === k).sort((a, b) => b[1] - a[1]);
   const w = de("w"), x = de("x"), p = de("p"), pc = (v) => Math.round(v / sup * 1000) / 10;
-  return { mayor: w.length ? pc(w[0][1]) : 0, top10w: pc(w.slice(0, 10).reduce((a, y) => a + y[1], 0)), exch: pc(x.reduce((a, y) => a + y[1], 0)), pools: pc(p.reduce((a, y) => a + y[1], 0)) };
+  return { mo: w.length ? w[0][0] : null, mayor: w.length ? pc(w[0][1]) : 0, top10w: pc(w.slice(0, 10).reduce((a, y) => a + y[1], 0)), exch: pc(x.reduce((a, y) => a + y[1], 0)), pools: pc(p.reduce((a, y) => a + y[1], 0)) };
 }
-export const QUIEN_SCHEMA = "CREATE TABLE IF NOT EXISTS quien (m TEXT PRIMARY KEY, t INTEGER, mayor REAL, top10w REAL, exch REAL, pools REAL)";
-// wallets de exchanges conocidos: la lista del motor (src/known.js), leída de jsDelivr una vez al día
+export const QUIEN_SCHEMA = "CREATE TABLE IF NOT EXISTS quien (m TEXT PRIMARY KEY, t INTEGER, mayor REAL, top10w REAL, exch REAL, pools REAL, mn TEXT)";
+// mn (26/11): si la mayor wallet es del propio proyecto, «nombre|función» (Raydium|treasury); si no, null
+// wallets con nombre de la lista del motor (src/known.js), leída de jsDelivr una vez al día: exchanges y custodios
+// (0.8.3: Fireblocks) cuentan como «x»; las del propio proyecto (t: "project", con su función r) se guardan en
+// est.exch.pj para decir de quién es la mayor wallet. Se vuelve a leer si aún no trae lo de la 0.8.3 (Bitget).
+export function listaConocidas(txt) {
+  const l = [], n = {}, pj = {};
+  for (const x of txt.matchAll(/"([1-9A-HJ-NP-Za-km-z]{32,44})":\s*\{([^}]*)\}/g)) {
+    const f = (k) => { const v = new RegExp(k + ':\\s*"([^"]+)"').exec(x[2]); return v ? v[1] : null; }, t = f("t"), nm = f("n");
+    if (t === "exchange" || t === "custodian") { l.push(x[1]); if (nm) n[x[1]] = nm; }
+    else if (t === "project" && nm) pj[x[1]] = [nm, f("r") || "treasury"];
+  }
+  return { l, n, pj };
+}
 async function exchangesConocidos(est, ahora) {
-  if (est.exch && est.exch.n && est.exch.t > ahora - 864e5 && est.exch.l.includes("CLNEVwuSAiGsvPtE74yLhda4beNfd8qfZXVKkUcAJZDL")) return new Set(est.exch.l);
+  if (est.exch && est.exch.n && est.exch.pj && est.exch.t > ahora - 864e5 && est.exch.l.includes("3RtJvxpkok13LGQsQ3Ye4QvCkbP3ioMpra7ccuf9XqsF")) return new Set(est.exch.l);
   const txt = await fetch("https://cdn.jsdelivr.net/npm/solana-risk-engine@latest/src/known.js").then((r) => r.ok ? r.text() : "").catch(() => "");
-  const xs = [...txt.matchAll(/"([1-9A-HJ-NP-Za-km-z]{32,44})":\s*\{([^}]*)t:\s*"exchange"/g)], l = xs.map((x) => x[1]);
-  const n = {}; for (const x of xs) { const nm = /n:\s*"([^"]+)"/.exec(x[2]); if (nm) n[x[1]] = nm[1]; }
-  if (l.length) est.exch = { t: ahora, l, n };
-  return new Set(l.length ? l : (est.exch && est.exch.l) || []);
+  const k = listaConocidas(txt);
+  if (k.l.length) est.exch = { t: ahora, l: k.l, n: k.n, pj: k.pj };
+  return new Set(k.l.length ? k.l : (est.exch && est.exch.l) || []);
 }
 // dueño de cada cuenta de token (respuesta jsonParsed de getMultipleAccounts); las que no existen o no son de token, fuera
 export function duenos(cuentas, valores) {
@@ -199,7 +210,7 @@ async function historial(est, filas, tipo, ahora) {
   if (dests.length) await d1({ sql: "UPDATE avisos SET dn = CASE dest " + dests.map((d) => "WHEN " + sqlVal(d) + " THEN " + sqlVal(nombres[d])).join(" ") + " END WHERE dn IS NULL AND dest IN (" + dests.map(sqlVal).join(",") + ")" });
   for (const m of Object.keys(est.prev)) if (!filas.some((f) => f.m === m)) delete est.prev[m];
   est.histD1 = est.histD1 || ahora;
-  if (est.rehacer) { est.rehacer = false; est.histV = 2; }
+  if (est.rehacer) { est.rehacer = false; est.histV = 3; }
   return [H.length, A.length];
 }
 
@@ -277,7 +288,7 @@ async function main() {
   // del motor ya trae los exchanges nuevos (0.8.2: Gate, Binance, Robinhood, Bybit, Kraken, MEXC), se rehace el historial
   // de «quién la tiene» y sus avisos con los tipos buenos (el 26/11 salió un aviso de Gate moviendo a Gate).
   if (est.tipoV !== 2) { for (const [d, t] of Object.entries(est.tipo)) if (t === "w" && !isOnCurve(d)) est.tipo[d] = "p"; est.tipoV = 2; }
-  if (conHelius && est.histV !== 2 && EXCH.has("CLNEVwuSAiGsvPtE74yLhda4beNfd8qfZXVKkUcAJZDL")) { est.histD1 = null; est.rehacer = true; }
+  if (conHelius && est.histV !== 3 && EXCH.has("3RtJvxpkok13LGQsQ3Ye4QvCkbP3ioMpra7ccuf9XqsF")) { est.histD1 = null; est.rehacer = true; }   // 0.8.3: rehacer otra vez
   const tipo = {}; for (const [d, t] of Object.entries(est.tipo)) tipo[d] = EXCH.has(d) ? "x" : t;
   const quien = filas.map((f) => f.top && f.supply ? [f.m, quienDe(f.top, f.supply, tipo)] : null).filter((x) => x && x[1]);
   for (const [k, t] of Object.entries(est.ult)) if (t < ahora - 7 * 864e5) delete est.ult[k];   // pools que ya no se miran
@@ -293,9 +304,11 @@ async function main() {
   } catch (e) { console.log("ops:", e.message); }
   if (D1 && quien.length) try {
     await d1({ sql: QUIEN_SCHEMA });
-    for (let i = 0; i < quien.length; i += 16) { const l = quien.slice(i, i + 16);
-      await d1({ sql: "INSERT INTO quien (m, t, mayor, top10w, exch, pools) VALUES " + l.map(() => "(?,?,?,?,?,?)").join(",") + " ON CONFLICT(m) DO UPDATE SET t=excluded.t, mayor=excluded.mayor, top10w=excluded.top10w, exch=excluded.exch, pools=excluded.pools",
-        params: l.flatMap(([m, q]) => [m, ahora, q.mayor, q.top10w, q.exch, q.pools]) }); }
+    if (!est.quienMn) { await d1({ sql: "ALTER TABLE quien ADD COLUMN mn TEXT" }).catch(() => {}); est.quienMn = 1; }
+    const PJ = (est.exch && est.exch.pj) || {};
+    for (let i = 0; i < quien.length; i += 14) { const l = quien.slice(i, i + 14);
+      await d1({ sql: "INSERT INTO quien (m, t, mayor, top10w, exch, pools, mn) VALUES " + l.map(() => "(?,?,?,?,?,?,?)").join(",") + " ON CONFLICT(m) DO UPDATE SET t=excluded.t, mayor=excluded.mayor, top10w=excluded.top10w, exch=excluded.exch, pools=excluded.pools, mn=excluded.mn",
+        params: l.flatMap(([m, q]) => [m, ahora, q.mayor, q.top10w, q.exch, q.pools, q.mo && PJ[q.mo] ? PJ[q.mo].join("|") : null]) }); }
   } catch (e) { console.log("quien:", e.message); }
   let hist = null;
   if (D1 && conHelius) try { hist = await historial(est, filas, tipo, ahora); } catch (e) { console.log("historial:", e.message); }

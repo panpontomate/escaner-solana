@@ -265,8 +265,14 @@ export async function caida(env, pool, m, desde, hasta, fetchFn) {
 // compras y ventas de más de 1.000 $ de las últimas 24 h (tabla ops). Sin tablas todavía: vacío
 export async function quienTodos(db, ahora) {
   const out = {}, no = (e) => /no such table/i.test(String(e && e.message));
-  try { for (const r of (await db.prepare("SELECT m, t, mayor, top10w, exch, pools FROM quien").bind().all()).results || []) out[r.m] = { t: r.t, mayor: r.mayor, top10w: r.top10w, exch: r.exch, pools: r.pools }; }
-  catch (e) { if (!no(e)) throw e; }
+  // mn (26/11): «nombre|función» si la mayor wallet es del propio proyecto (tesorería, emisor, creador); sin la columna aún, sin él
+  const fila = (r) => Object.assign({ t: r.t, mayor: r.mayor, top10w: r.top10w, exch: r.exch, pools: r.pools }, r.mn ? { mn: r.mn } : {});
+  try { for (const r of (await db.prepare("SELECT m, t, mayor, top10w, exch, pools, mn FROM quien").bind().all()).results || []) out[r.m] = fila(r); }
+  catch (e) {
+    if (no(e)) { /* sin tabla todavía */ }
+    else if (/no such column/i.test(String(e && e.message))) { for (const r of (await db.prepare("SELECT m, t, mayor, top10w, exch, pools FROM quien").bind().all()).results || []) out[r.m] = fila(r); }
+    else throw e;
+  }
   try {
     const q = "SELECT m, SUM(CASE WHEN sell = 0 THEN usd ELSE 0 END) AS compra, SUM(CASE WHEN sell = 1 THEN usd ELSE 0 END) AS vende, COUNT(*) AS n FROM ops WHERE t > ? GROUP BY m";
     for (const r of (await db.prepare(q).bind(ahora - 864e5).all()).results || []) if (out[r.m]) Object.assign(out[r.m], { compra: r.compra, vende: r.vende, n: r.n });
