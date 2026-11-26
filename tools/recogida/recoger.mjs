@@ -94,11 +94,14 @@ export function quienDe(top, supply, tipo) {
   const por = {};
   for (const [, n, d] of top) if (d) por[d] = (por[d] || 0) + Number(n);
   const de = (k) => Object.entries(por).filter(([d]) => tipo[d] === k).sort((a, b) => b[1] - a[1]);
-  const w = de("w"), x = de("x"), p = de("p"), pc = (v) => Math.round(v / sup * 1000) / 10;
-  return { mo: w.length ? w[0][0] : null, mayor: w.length ? pc(w[0][1]) : 0, top10w: pc(w.slice(0, 10).reduce((a, y) => a + y[1], 0)), exch: pc(x.reduce((a, y) => a + y[1], 0)), pools: pc(p.reduce((a, y) => a + y[1], 0)) };
+  // 26/11: las wallets del propio proyecto («j»: tesorería, emisor, creador, de la lista del motor) no son «la mayor wallet»:
+  // van aparte (proy) y jo dice cuál es la mayor de ellas, para nombrarla
+  const w = de("w"), x = de("x"), p = de("p"), j = de("j"), pc = (v) => Math.round(v / sup * 1000) / 10, suma = (l) => l.reduce((a, y) => a + y[1], 0);
+  return { mo: w.length ? w[0][0] : null, mayor: w.length ? pc(w[0][1]) : 0, top10w: pc(suma(w.slice(0, 10))), exch: pc(suma(x)), pools: pc(suma(p)),
+    proy: pc(suma(j)), jo: j.length ? j[0][0] : null };
 }
-export const QUIEN_SCHEMA = "CREATE TABLE IF NOT EXISTS quien (m TEXT PRIMARY KEY, t INTEGER, mayor REAL, top10w REAL, exch REAL, pools REAL, mn TEXT)";
-// mn (26/11): si la mayor wallet es del propio proyecto, «nombre|función» (Raydium|treasury); si no, null
+export const QUIEN_SCHEMA = "CREATE TABLE IF NOT EXISTS quien (m TEXT PRIMARY KEY, t INTEGER, mayor REAL, top10w REAL, exch REAL, pools REAL, mn TEXT, proy REAL)";
+// proy (26/11): % en wallets del propio proyecto; mn: la mayor de ellas, «nombre|función» (Raydium|treasury), o null
 // wallets con nombre de la lista del motor (src/known.js), leída de jsDelivr una vez al día: exchanges y custodios
 // (0.8.3: Fireblocks) cuentan como «x»; las del propio proyecto (t: "project", con su función r) se guardan en
 // est.exch.pj para decir de quién es la mayor wallet. Se vuelve a leer si aún no trae lo de la 0.8.3 (Bitget).
@@ -136,12 +139,13 @@ export function duenos(cuentas, valores) {
 //   exch  = lo de todos los exchanges conocidos cambió ≥ 3 puntos.
 // Los 3 mayores movimientos de wallet por foto, más el de exchanges. Se guarda para siempre (26/11, pedido del usuario:
 // que el historial no se pierda; ~90 MB al año).
-export const HIST_SCHEMA = ["CREATE TABLE IF NOT EXISTS quienh (m TEXT, t INTEGER, mayor REAL, top10w REAL, exch REAL, pools REAL, precio REAL, PRIMARY KEY (m, t))",
+export const HIST_SCHEMA = ["CREATE TABLE IF NOT EXISTS quienh (m TEXT, t INTEGER, mayor REAL, top10w REAL, exch REAL, pools REAL, precio REAL, proy REAL, PRIMARY KEY (m, t))",
   "CREATE TABLE IF NOT EXISTS avisos (m TEXT, t INTEGER, k TEXT, w TEXT, de REAL, a REAL, dest TEXT, dn TEXT, tok REAL, precio REAL, PRIMARY KEY (m, t, k, w))",
   "CREATE INDEX IF NOT EXISTS avisos_mt ON avisos (m, t)"];
 export function porDueno(top, tipo) {
   const o = { w: {}, x: {}, lim: 0 };
-  for (const [, n, d] of top || []) if (d && (tipo[d] === "w" || tipo[d] === "x")) o[tipo[d]][d] = (o[tipo[d]][d] || 0) + Number(n);
+  // las del propio proyecto («j») también avisan si se mueven (la tesorería que manda tokens a un exchange importa)
+  for (const [, n, d] of top || []) if (d && (tipo[d] === "w" || tipo[d] === "x" || tipo[d] === "j")) { const k = tipo[d] === "x" ? "x" : "w"; o[k][d] = (o[k][d] || 0) + Number(n); }
   if (top && top.length >= 20) o.lim = Math.min(...top.map((x) => Number(x[1]) || 0));
   return o;
 }
@@ -171,7 +175,7 @@ export function procesaFoto(est, m, t, top, sup, precio, tipo, nombres) {
   const act = porDueno(top, tipo), av = avisosDe(est.prev[m], act, sup);
   est.prev[m] = act;
   const p = typeof precio === "number" && precio > 0 ? precio : null;
-  return { h: [m, t, q.mayor, q.top10w, q.exch, q.pools, p],
+  return { h: [m, t, q.mayor, q.top10w, q.exch, q.pools, p, q.proy || 0],
     av: av.map((a) => [m, t, a.k, a.w, a.de, a.a, a.dest, a.dest ? (nombres[a.dest] || null) : null, Math.round(a.tok), p]) };
 }
 // INSERT con los valores escritos (direcciones de Solana, números y nombres de exchanges de known.js): así van cientos
@@ -203,14 +207,15 @@ async function historial(est, filas, tipo, ahora) {
   }
   for (const f of filas) if (f.top && f.supply) mete(procesaFoto(est, f.m, ahora, f.top, f.supply, f.dx && f.dx.precio, tipo, nombres));
   for (const sql of HIST_SCHEMA) await d1({ sql });
-  for (const st of insertsHist("quienh", "m, t, mayor, top10w, exch, pools, precio", H)) await d1(st);
+  if (!est.quienhProy) { await d1({ sql: "ALTER TABLE quienh ADD COLUMN proy REAL" }).catch(() => {}); est.quienhProy = 1; }
+  for (const st of insertsHist("quienh", "m, t, mayor, top10w, exch, pools, precio, proy", H)) await d1(st);
   for (const st of insertsHist("avisos", "m, t, k, w, de, a, dest, dn, tok, precio", A)) await d1(st);
   // avisos guardados sin el nombre del exchange (el 26/11 la lista de nombres aún no estaba): se completan
   const dests = Object.keys(nombres).filter((d) => B58.test(d));
   if (dests.length) await d1({ sql: "UPDATE avisos SET dn = CASE dest " + dests.map((d) => "WHEN " + sqlVal(d) + " THEN " + sqlVal(nombres[d])).join(" ") + " END WHERE dn IS NULL AND dest IN (" + dests.map(sqlVal).join(",") + ")" });
   for (const m of Object.keys(est.prev)) if (!filas.some((f) => f.m === m)) delete est.prev[m];
   est.histD1 = est.histD1 || ahora;
-  if (est.rehacer) { est.rehacer = false; est.histV = 3; }
+  if (est.rehacer) { est.rehacer = false; est.histV = 4; }
   return [H.length, A.length];
 }
 
@@ -288,8 +293,9 @@ async function main() {
   // del motor ya trae los exchanges nuevos (0.8.2: Gate, Binance, Robinhood, Bybit, Kraken, MEXC), se rehace el historial
   // de «quién la tiene» y sus avisos con los tipos buenos (el 26/11 salió un aviso de Gate moviendo a Gate).
   if (est.tipoV !== 2) { for (const [d, t] of Object.entries(est.tipo)) if (t === "w" && !isOnCurve(d)) est.tipo[d] = "p"; est.tipoV = 2; }
-  if (conHelius && est.histV !== 3 && EXCH.has("3RtJvxpkok13LGQsQ3Ye4QvCkbP3ioMpra7ccuf9XqsF")) { est.histD1 = null; est.rehacer = true; }   // 0.8.3: rehacer otra vez
-  const tipo = {}; for (const [d, t] of Object.entries(est.tipo)) tipo[d] = EXCH.has(d) ? "x" : t;
+  if (conHelius && est.histV !== 4 && EXCH.has("3RtJvxpkok13LGQsQ3Ye4QvCkbP3ioMpra7ccuf9XqsF")) { est.histD1 = null; est.rehacer = true; }   // 0.8.3 + «del proyecto» aparte: rehacer
+  const PJT = (est.exch && est.exch.pj) || {};
+  const tipo = {}; for (const [d, t] of Object.entries(est.tipo)) tipo[d] = EXCH.has(d) ? "x" : PJT[d] && t === "w" ? "j" : t;
   const quien = filas.map((f) => f.top && f.supply ? [f.m, quienDe(f.top, f.supply, tipo)] : null).filter((x) => x && x[1]);
   for (const [k, t] of Object.entries(est.ult)) if (t < ahora - 7 * 864e5) delete est.ult[k];   // pools que ya no se miran
   // la primera vez, también lo que ya estaba en los .jsonl (desde el 24/11)
@@ -305,10 +311,11 @@ async function main() {
   if (D1 && quien.length) try {
     await d1({ sql: QUIEN_SCHEMA });
     if (!est.quienMn) { await d1({ sql: "ALTER TABLE quien ADD COLUMN mn TEXT" }).catch(() => {}); est.quienMn = 1; }
+    if (!est.quienProy) { await d1({ sql: "ALTER TABLE quien ADD COLUMN proy REAL" }).catch(() => {}); est.quienProy = 1; }
     const PJ = (est.exch && est.exch.pj) || {};
-    for (let i = 0; i < quien.length; i += 14) { const l = quien.slice(i, i + 14);
-      await d1({ sql: "INSERT INTO quien (m, t, mayor, top10w, exch, pools, mn) VALUES " + l.map(() => "(?,?,?,?,?,?,?)").join(",") + " ON CONFLICT(m) DO UPDATE SET t=excluded.t, mayor=excluded.mayor, top10w=excluded.top10w, exch=excluded.exch, pools=excluded.pools, mn=excluded.mn",
-        params: l.flatMap(([m, q]) => [m, ahora, q.mayor, q.top10w, q.exch, q.pools, q.mo && PJ[q.mo] ? PJ[q.mo].join("|") : null]) }); }
+    for (let i = 0; i < quien.length; i += 12) { const l = quien.slice(i, i + 12);
+      await d1({ sql: "INSERT INTO quien (m, t, mayor, top10w, exch, pools, mn, proy) VALUES " + l.map(() => "(?,?,?,?,?,?,?,?)").join(",") + " ON CONFLICT(m) DO UPDATE SET t=excluded.t, mayor=excluded.mayor, top10w=excluded.top10w, exch=excluded.exch, pools=excluded.pools, mn=excluded.mn, proy=excluded.proy",
+        params: l.flatMap(([m, q]) => [m, ahora, q.mayor, q.top10w, q.exch, q.pools, q.jo && PJ[q.jo] ? PJ[q.jo].join("|") : null, q.proy || 0]) }); }
   } catch (e) { console.log("quien:", e.message); }
   let hist = null;
   if (D1 && conHelius) try { hist = await historial(est, filas, tipo, ahora); } catch (e) { console.log("historial:", e.message); }

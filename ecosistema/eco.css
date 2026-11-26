@@ -163,12 +163,12 @@ footer a:hover{color:#fff}
 }
 
 /* Ecosistema › IA (21/11): misma tabla que Meme, con la columna del código */
-.mz-ia{grid-template-columns:22px 28px minmax(0,1.3fr) .9fr .8fr .9fr minmax(0,1fr) minmax(0,1.4fr)}
+.mz-ia{grid-template-columns:22px 28px minmax(0,1.2fr) .8fr minmax(0,1.3fr) .8fr minmax(0,1fr) minmax(0,1.4fr)}
 .mz-h .mz-codc{text-align:left}
 .mz-cod{font:600 .76rem Manrope;white-space:nowrap}.mz-cod.v{color:var(--ver)}.mz-cod.p{color:var(--ama,#fbbf24)}.mz-cod.s{color:var(--mut2);font-weight:500}
 .mz-cod a{color:inherit;text-decoration:none;border-bottom:1px dotted currentColor}
-@media (max-width:1000px){ .mz-ia{grid-template-columns:22px 28px minmax(0,1.3fr) .9fr .9fr minmax(0,1fr) minmax(0,1.3fr)} .mz-ia .mz-tit{display:none} }
-@media (max-width:760px){ .mz-ia{grid-template-columns:28px minmax(0,1fr) auto 78px}.mz-ia .mz-tit{display:none}.mz-ia .mz-codc,.mz-ia .mz-sen{grid-column:2/-1} .mz-h.mz-ia .mz-codc{display:none} }
+@media (max-width:1000px){ .mz-ia{grid-template-columns:22px 28px minmax(0,1.2fr) .8fr minmax(0,1.2fr) .8fr minmax(0,1.3fr)} .mz-ia .mz-codc{display:none} }
+@media (max-width:760px){ .mz-ia{grid-template-columns:28px minmax(0,1fr) auto 78px}.mz-ia .mz-tit,.mz-h.mz-ia .ia-q{display:none}.mz-ia .mz-codc,.mz-ia .mz-sen,.mz-ia .ia-q{grid-column:2/-1} .mz-h.mz-ia .mz-codc{display:none} }
 
 /* ---------- Vistas propias de DeFi, Juegos, Apps y bots y Otros (maquetas del 23/11, subidas el 25/11) ---------- */
 .mz-card h2{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
@@ -199,10 +199,10 @@ footer a:hover{color:#fff}
 .df-g{scroll-margin-top:140px}
 @media (max-width:1100px){ .df{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr .7fr .95fr .7fr .6fr minmax(0,1.3fr) 74px} .df .df-tvl{display:none} }
 /* Juegos */
-.jg{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr .6fr .9fr .6fr .8fr minmax(0,1.5fr) 74px}
+.jg{grid-template-columns:22px 28px minmax(0,1.1fr) .85fr .55fr .85fr minmax(0,1.35fr) .7fr minmax(0,1.4fr) 74px}
 .mz-h.jg>span:nth-child(3),.mz-h.jg>.jg-tk,.mz-h.jg>.jg-sen{text-align:left}
 .jg-sym{font:600 .82rem "IBM Plex Mono",monospace}
-@media (max-width:1000px){ .jg{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr .6fr .9fr .8fr minmax(0,1.3fr) 74px} .jg .jg-tit{display:none} }
+@media (max-width:1000px){ .jg{grid-template-columns:22px 28px minmax(0,1.1fr) .85fr .55fr minmax(0,1.3fr) .7fr minmax(0,1.3fr) 74px} .jg .jg-dev{display:none} }
 /* Apps y bots */
 .ab{grid-template-columns:22px 28px minmax(0,1.2fr) .9fr .7fr minmax(0,1fr) .7fr .8fr minmax(0,1.5fr) 74px}
 .mz-h.ab>span:nth-child(3),.mz-h.ab>span:nth-child(6),.mz-h.ab>span:nth-child(8),.mz-h.ab>span:nth-child(9){text-align:left}
@@ -220,7 +220,7 @@ footer a:hover{color:#fff}
   .df{grid-template-columns:28px minmax(0,1fr) auto 66px}.df .df-tvl,.df .df-dev,.df .df-tk,.df>.df-tok,.df>.ab-sin,.df>.cad,.df .df-vx,.df .df-sen{display:none}.df .mz-sen{grid-column:2/-1}
   .df-nav{top:64px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px 12px;padding:8px 16px}.df-nav::-webkit-scrollbar{display:none}.df-g{scroll-margin-top:120px}
   .fv{grid-template-columns:24px 60px minmax(0,1fr) 70px}.fv-p{grid-column:2/-1;margin-top:-6px}.df-vuelve .top span{display:block;margin:2px 0 0}
-  .jg{grid-template-columns:28px minmax(0,1fr) auto 70px}.jg .jg-tk,.jg .jg-dev,.jg .jg-tit,.jg .jg-sen{display:none}.jg .mz-sen{grid-column:2/-1}
+  .jg{grid-template-columns:28px minmax(0,1fr) auto 70px}.jg .jg-tk,.jg .jg-dev,.jg .jg-sen,.mz-h.jg .jg-q{display:none}.jg .mz-sen,.jg .jg-q{grid-column:2/-1}
   .ab{grid-template-columns:28px minmax(0,1fr) auto 64px}.ab .ab-q,.ab .ab-cuota,.ab .ab-cuota-h,.ab>.ab-tok,.ab>.ab-sin,.ab>.cad,.ab .ab-tok-h,.ab .ab-sen-h{display:none}.ab .mz-sen{grid-column:2/-1}
   .ot{grid-template-columns:28px minmax(0,1fr) auto 66px}.ot .ot-q,.ot .ot-dev,.ot .ot-tk,.ot>.df-tok,.ot>.ab-sin,.ot>.cad,.ot .ot-vx,.ot .ot-sen{display:none}.ot .mz-sen{grid-column:2/-1}
 }
@@ -275,3 +275,11 @@ footer a:hover{color:#fff}
 .mq-b{display:flex;flex-direction:column;font:600 .8rem "IBM Plex Mono",monospace}.mq-b .up{color:var(--ver)}.mq-b .dn{color:var(--rojo)}
 @media (max-width:1100px){ .mq{grid-template-columns:22px 28px minmax(0,1.2fr) .8fr minmax(0,1.5fr) minmax(0,1fr) minmax(0,1.3fr) 74px} .mq .mq-tit{display:none} }
 @media (max-width:760px){ .mq{grid-template-columns:28px minmax(0,1fr) auto}.mq .mq-tit,.mq .mq-b,.mq .mq-bc,.mq .go,.mz-h.mq>.mq-lq{display:none}.mq .mq-q,.mq .mz-sen,.mq>.mz-na{grid-column:2/-1} }
+
+/* «Quién la tiene» en todos los apartados (26/11): celda en Juegos e IA y barra pequeña bajo el token en DeFi, Apps y Otros */
+.jg-q small,.ia-q small{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}
+.mq-q.jg-q,.mq-q.ia-q{gap:3px}
+.mq-mini{height:5px;margin-top:4px;width:100%;max-width:90px}
+.df-tok,.ab-tok{display:flex;flex-direction:column;align-items:flex-start}
+.mq-bar .j,.mq-ley .j{background:#f0abfc}
+.mq-q small.mq-pj{color:#f0abfc}.mq-q small.mq-pj b{color:#f0abfc}

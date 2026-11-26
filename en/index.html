@@ -2428,7 +2428,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 #whh .whh-f small{grid-column:3;justify-self:end;font-size:.74rem;color:var(--muted)}
 #whh .whh-bar{display:flex;height:10px;border-radius:9px;overflow:hidden;background:rgba(255,255,255,.04)}
 #whh .whh-bar i,#whh .whh-ley i{display:block;height:100%}
-#whh i.w{background:#c4b5fd}#whh i.x{background:#7ab8c4}#whh i.p{background:#fbbf24}#whh i.r{background:rgba(255,255,255,.08)}
+#whh i.w{background:#c4b5fd}#whh i.j{background:#f0abfc}#whh .ln.j{stroke:#f0abfc;stroke-width:1.8}#whh .whh-f i.j{background:#f0abfc}#whh i.x{background:#7ab8c4}#whh i.p{background:#fbbf24}#whh i.r{background:rgba(255,255,255,.08)}
 #whh .whh-ley{display:flex;gap:6px 16px;flex-wrap:wrap;align-items:center;font-size:.78rem;color:var(--muted);margin:8px 0 0}
 #whh .whh-ley span{display:inline-flex;align-items:center;gap:6px}
 #whh .whh-ley i{display:inline-block;width:10px;height:10px;border-radius:3px}
@@ -4570,6 +4570,12 @@ function whhAviso(a,d){
   else if(k==="exch"){ c="tq"; tit=(ya>de?"Exchanges go up from {d0} to {d1}":"Exchanges go down from {d0} to {d1}").replace("{d0}",whPc(de)).replace("{d1}",whPc(ya));
     p=whhCuando(t)+". "+"What all known exchanges hold among the 20 largest accounts."; }
   else return "";
+  // wallet del propio proyecto (motor 0.8.3): se nombra en vez de «la mayor wallet»
+  var kw=w&&SRE.knownWallet&&SRE.knownWallet(w);
+  if(kw&&kw.t==="project"&&k!=="exch"){ var qn="{n} ({rol})".replace("{n}",kw.n).replace("{rol}",pjRol(kw.r));
+    tit=(k==="envio"?"The project wallet {q} sent {p} of the supply to {x}".replace("{p}",whPc(de-(ya||0))).replace("{x}",xn||"an exchange"):
+      k==="baja"?(ya==null?"The project wallet {q} dropped from {d0} and left the top 20":"The project wallet {q} dropped from {d0} to {d1}"):"The project wallet {q} grew to {d1}")
+      .replace("{q}",qn).replace("{d0}",whPc(de||0)).replace("{d1}",whPc(ya||0)); }
   return "<div class='whh-av "+c+"'><b>"+esc(tit)+"</b><p>"+p+"</p></div>";
 }
 function whhHtml(d){
@@ -4586,6 +4592,7 @@ function whhHtml(d){
     mx=Math.min(100,Math.ceil((mx+4)/10)*10);
     var X=function(t){ return (t-t0)/(t1-t0)*W; }, Y=function(v){ return G-v/mx*G; };
     var S=[[1,"The largest wallet","w1"],[2,"The 10 largest wallets","w2"],[3,"Exchanges","x"],[4,"Programs (locks, pools)","p"]];
+    if(H.some(function(h){ return h[6]>0; })) S.splice(2,0,[6,"The project itself","j"]);
     var path=function(k){ return H.map(function(h,i){ return (i?"H"+X(h[0]).toFixed(1)+"V":"M0,")+Y(h[k]).toFixed(1); }).join("")+"H"+W; };
     var grid=[], ejeY=[]; for(var v=0;v<=mx;v+=mx>50?20:10){ grid.push("<line x1='0' x2='"+W+"' y1='"+Y(v)+"' y2='"+Y(v)+"'/>"); ejeY.push("<span style='top:"+(Y(v)/G*100)+"%'>"+v+" %</span>"); }
     var mk=d.avisos.filter(function(x){ return x[1]==="envio"&&x[0]>t0&&x[0]<=t1; }).slice(0,3);
@@ -4600,10 +4607,10 @@ function whhHtml(d){
       "<div class='whh-hs'><div class='whh-g'><div class='whh-y'>"+ejeY.join("")+"</div>"+svg+mkl+"<div class='whh-x'>"+ticks.join("")+"</div></div><div>"+filas+"</div></div></div>";
   }
   // 3) ahora
-  var resto=Math.max(0,100-z[2]-z[3]-z[4]);
+  var resto=Math.max(0,100-z[2]-(z[6]||0)-z[3]-z[4]);
   out+="<div class='whh-b'><h3 class='whh-k'>"+"Who holds it now"+" <small>"+"the 20 largest accounts, by owner"+"</small></h3>"+
-    "<span class='whh-bar'><i class='w' style='width:"+z[2]+"%'></i><i class='x' style='width:"+z[3]+"%'></i><i class='p' style='width:"+z[4]+"%'></i><i class='r' style='width:"+resto+"%'></i></span>"+
-    "<p class='whh-ley'><span><i class='w'></i>"+"10 largest wallets {p}".replace("{p}",whPc(z[2]))+"</span><span><i class='x'></i>"+"exchanges {p}".replace("{p}",whPc(z[3]))+"</span><span><i class='p'></i>"+"programs {p}".replace("{p}",whPc(z[4]))+"</span><span><i class='r'></i>"+"the rest"+"</span></p></div>";
+    "<span class='whh-bar'><i class='w' style='width:"+z[2]+"%'></i><i class='j' style='width:"+(z[6]||0)+"%'></i><i class='x' style='width:"+z[3]+"%'></i><i class='p' style='width:"+z[4]+"%'></i><i class='r' style='width:"+resto+"%'></i></span>"+
+    "<p class='whh-ley'><span><i class='w'></i>"+"10 largest wallets {p}".replace("{p}",whPc(z[2]))+"</span>"+(z[6]>0?"<span><i class='j'></i>"+"the project {p}".replace("{p}",whPc(z[6]))+"</span>":"")+"<span><i class='x'></i>"+"exchanges {p}".replace("{p}",whPc(z[3]))+"</span><span><i class='p'></i>"+"programs {p}".replace("{p}",whPc(z[4]))+"</span><span><i class='r'></i>"+"the rest"+"</span></p></div>";
   // 4) operaciones grandes de 24 h
   var O=d.ops, co=0, ve=0; O.forEach(function(o){ if(o[1]) ve+=o[2]; else co+=o[2]; });
   out+="<div class='whh-b'><h3 class='whh-k'>"+"Large trades"+" <small>"+"over $1,000 · last 24 h"+"</small></h3>"+

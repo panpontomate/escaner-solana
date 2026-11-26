@@ -148,7 +148,7 @@
     vivos: (v, n) => `${v} of ${n} alive`,
     lzSrc: (d) => `Fees: DefiLlama (30 days, vs the previous month; “new” if it barely earned last month). Born and alive after 24 h: SolFlag registry since ${d}, with the launches our collector sees (a sample, not all). “Alive” = still has money in it and trading after 24 h.`,
     mmH: "Memecoins,", mmS: "who holds them and who moves them", mmTh: ["Memecoin", "Worth · 24 h", "Holders", "Who holds it", "Whales 24 h", "Signal"],
-    ley: ["10 largest wallets", "exchanges", "programs (locks, pools)", "the rest"], mayor: (p) => `largest wallet <b${p >= 15 ? ' class="a"' : ""}>${p}%</b>`, top10: (p) => ` · top 10: ${p}%`,
+    ley: ["10 largest wallets", "the project", "exchanges and custodians", "programs (locks, pools)", "the rest"], mayor: (p) => `largest wallet <b${p >= 15 ? ' class="a"' : ""}>${p}%</b>`, top10: (p) => ` · top 10: ${p}%`,
     noSigue: "not tracked yet", sinOps: "no large trades", compran: (v) => "buy " + v, venden: (v) => "sell " + v, trs: " traders",
     unaW: (p) => `One wallet holds ${p}%`, enProg: (p) => `${p}% sits in programs (locks or pools)`, venden2: "Whales are selling more than they buy",
     barT: (w, x, p) => `10 largest wallets ${w}% · exchanges ${x}% · programs ${p}%`,
@@ -166,7 +166,7 @@
     vivos: (v, n) => `${v} de ${n} vivos`,
     lzSrc: (d) => `Comisiones: DefiLlama (30 días, frente al mes anterior; «nuevo» si el mes anterior casi no cobró). Nacieron y vivos a las 24 h: registro de SolFlag desde el ${d}, con los lanzamientos que ve nuestro recolector (una muestra, no todos). «Vivo» = sigue con dinero dentro y movimiento a las 24 h.`,
     mmH: "Memecoins,", mmS: "quién las tiene y quién las mueve", mmTh: ["Memecoin", "Vale · 24 h", "Titulares", "Quién la tiene", "Ballenas 24 h", "Señal"],
-    ley: ["10 mayores wallets", "exchanges", "programas (bloqueos, pools)", "el resto"], mayor: (p) => `la mayor wallet <b${p >= 15 ? ' class="a"' : ""}>${p} %</b>`, top10: (p) => ` · las 10 mayores ${p} %`,
+    ley: ["10 mayores wallets", "del proyecto", "exchanges y custodios", "programas (bloqueos, pools)", "el resto"], mayor: (p) => `la mayor wallet <b${p >= 15 ? ' class="a"' : ""}>${p} %</b>`, top10: (p) => ` · las 10 mayores ${p} %`,
     noSigue: "aún no la seguimos", sinOps: "sin operaciones grandes", compran: (v) => "compran " + v, venden: (v) => "venden " + v, trs: " traders",
     unaW: (p) => `Una sola wallet tiene el ${p} %`, enProg: (p) => `El ${p} % está en programas (bloqueos o pools)`, venden2: "Las ballenas venden más de lo que compran",
     barT: (w, x, p) => `10 mayores wallets ${w} % · exchanges ${x} % · programas ${p} %`,
@@ -181,11 +181,50 @@
   // lanzadera de DefiLlama → plataforma en nuestro registro (launchpad.platform de RugCheck)
   const PLAT = { "Pump.fun": "pump_fun", "BONK.fun": "raydium_launchlab", "Bags": "meteora_dbc", "StonkFun": "stonk_fun", "Rapid Launch": "rapidlaunch" };
   let REG = null, regPide = null, QZ = null, qzPide = null;
+  // «Quién la tiene» en todos los apartados con token (26/11, maqueta maquetas/web/ecosistema-quien-todos.html): la última
+  // foto de la recogida (/api/quien: barra, mayor wallet, mn = «nombre|función» si es del propio proyecto, av = último aviso
+  // de 24 h). La señal pone primero lo de las ballenas.
+  const pideQZ = () => { if (!QZ && !qzPide) qzPide = fetch("https://api.solflag.com/api/quien?v=2").then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { QZ = (j && j.quien) || {}; pinta(); }); };
+  const QB = EN ? {
+    th: "Who holds it", tit: (n) => n + " holders", rol: { treasury: "treasury", issuer: "issuer", creator: "token creator" },
+    proyL: (rol, n, p) => `project: ${n} ${rol} <b>${p}%</b>`,
+    envio: (p, x) => `The largest wallet sent ${p}% to ${x} today`, baja: (de, a) => a == null ? `A top wallet dropped from ${de}% and left the top 20` : `A top wallet dropped from ${de}% to ${a}%`,
+    sube: (a) => `A wallet grew to ${a}%`, entra: (a) => `A wallet enters the top 20 with ${a}%`, unExch: "an exchange",
+    pj: (rol, n, p) => `The ${rol} of ${n} holds ${p}%`, unaW: (p) => `One single wallet holds ${p}%`, venden: "Whales sell more than they buy",
+    src: " «Who holds it»: the 20 largest accounts by owner (wallets, known exchanges and custodians, programs), a snapshot every 2 h (Helius). The project's own wallets (treasury, issuer, creator) are named; the largest wallet can still belong to the project without us knowing.",
+  } : {
+    th: "Quién la tiene", tit: (n) => n + " titulares", rol: { treasury: "tesorería", issuer: "emisor", creator: "creador del token" },
+    proyL: (rol, n, p) => `del proyecto: ${rol} de ${n} <b>${p} %</b>`,
+    envio: (p, x) => `La mayor wallet mandó el ${p} % a ${x} hoy`, baja: (de, a) => a == null ? `Una de las mayores wallets bajó del ${de} % y salió del top 20` : `Una de las mayores wallets bajó del ${de} % al ${a} %`,
+    sube: (a) => `Una wallet sube al ${a} %`, entra: (a) => `Una wallet entra en el top 20 con el ${a} %`, unExch: "un exchange",
+    pj: (rol, n, p) => `La ${rol} de ${n} tiene el ${p} %`.replace("La emisor", "El emisor").replace("La creador", "El creador"), unaW: (p) => `Una sola wallet tiene el ${p} %`, venden: "Las ballenas venden más de lo que compran",
+    src: " «Quién la tiene»: las 20 mayores cuentas de cada token, por dueño (wallets, exchanges y custodios conocidos, programas), foto cada 2 h (Helius). Las wallets del propio proyecto (tesorería, emisor, creador) van con su nombre; la mayor wallet puede ser del proyecto aunque no lo sepamos.",
+  };
+  const qzDe = (r) => QZ && r.mint && QZ[r.mint] ? QZ[r.mint] : null;
+  const n1 = (x) => x.toLocaleString(EN ? "en-US" : "es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const mnDe = (q) => { if (!q || !q.mn) return null; const [n, r] = q.mn.split("|"); return { n, rol: QB.rol[r] || QB.rol.treasury }; };
+  // celda: barra de las 20 mayores, la mayor wallet (o de quién es) y, si se pide, los titulares
+  const quienCel = (r, cls, tit) => { const q = qzDe(r), t = tit && r.tit != null ? `<small>${QB.tit(fk(r.tit))}</small>` : "";
+    if (!QZ) return `<span class="mq-q ${cls}"><span class="mz-na">…</span></span>`;
+    if (!q) return `<span class="mq-q ${cls}"><span class="mz-na">${r.tok && !r.cad ? MZ.noSigue : "—"}</span>${t}</span>`;
+    const resto = Math.max(0, 100 - q.top10w - (q.proy || 0) - q.exch - q.pools), p = mnDe(q);
+    return `<span class="mq-q ${cls}"><span class="mq-bar" title="${esc(MZ.barT(num(q.top10w, 1), num(q.exch, 1), num(q.pools, 1)))}"><i class="w" style="width:${q.top10w}%"></i><i class="j" style="width:${q.proy || 0}%"></i><i class="x" style="width:${q.exch}%"></i><i class="p" style="width:${q.pools}%"></i><i class="r" style="width:${resto}%"></i></span>` +
+      `<small>${MZ.mayor(n1(q.mayor))}</small>${q.proy >= 1 && p ? `<small class="mq-pj">${QB.proyL(esc(p.rol), esc(p.n), n1(q.proy))}</small>` : ""}${t}</span>`; };
+  // señal de las ballenas (o "" si no hay nada que decir)
+  const senalB = (r) => { const q = qzDe(r); if (!q) return "";
+    const a = q.av, p = mnDe(q);
+    if (a && a[1] === "envio") return `<span class="mz-sen mz-a">${QB.envio(n1(a[2] - (a[3] || 0)), esc(a[4] || QB.unExch))}</span>`;
+    if (a && a[1] === "baja") return `<span class="mz-sen mz-a">${QB.baja(n1(a[2]), a[3] == null ? null : n1(a[3]))}</span>`;
+    if (a && (a[1] === "sube" || a[1] === "entra")) return `<span class="mz-sen mz-v">${a[1] === "entra" ? QB.entra(n1(a[3])) : QB.sube(n1(a[3]))}</span>`;
+    if (q.mayor >= 30) return `<span class="mz-sen mz-a">${QB.unaW(n1(q.mayor))}</span>`;
+    if (q.proy >= 30 && p) return `<span class="mz-sen mz-a">${QB.pj(esc(p.rol), esc(p.n), n1(q.proy))}</span>`;
+    if (q.vende > (q.compra || 0) * 1.5 && q.vende >= 5e3) return `<span class="mz-sen mz-r">${QB.venden}</span>`;
+    return ""; };
   const num = (n, d) => n.toLocaleString(EN ? "en-US" : "es-ES", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0, useGrouping: "always" });
   const tok = (r) => /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(r.mint || "") ? (EN ? "/en/" : "/") + "?token=" + r.mint : null;
   function memeVista() {
     if (!REG && !regPide) regPide = fetch("https://api.solflag.com/api/lanzaderas").then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { REG = j || {}; if (ap === "Meme") pinta(); });
-    if (!QZ && !qzPide) qzPide = fetch("https://api.solflag.com/api/quien").then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { QZ = (j && j.quien) || {}; if (ap === "Meme") pinta(); });
+    pideQZ();
     const rs = D.rows.filter((r) => r.ap === "Meme");
     const memes = rs.filter((r) => r.gr === "Memecoins").sort((a, b) => (b.m || 0) - (a.m || 0));
     const lz = rs.filter((r) => r.gr === "Lanzaderas").map((r) => Object.assign({}, r));
@@ -213,14 +252,14 @@
       if (r.org != null && r.trad && r.org / r.trad >= 0.03) return `<span class="mz-sen mz-v">${MZ.orgP(num(r.org / r.trad * 100))}</span>`;
       return "<span></span>"; };
     const quienC = (r) => { const q = qz(r); if (!QZ) return '<span class="mz-na">…</span>'; if (!q) return `<span class="mz-na">${MZ.noSigue}</span>`;
-      const resto = Math.max(0, 100 - q.top10w - q.exch - q.pools);
-      return `<span class="mq-q"><span class="mq-bar" title="${esc(MZ.barT(num(q.top10w, 1), num(q.exch, 1), num(q.pools, 1)))}"><i class="w" style="width:${q.top10w}%"></i><i class="x" style="width:${q.exch}%"></i><i class="p" style="width:${q.pools}%"></i><i class="r" style="width:${resto}%"></i></span>` +
+      const resto = Math.max(0, 100 - q.top10w - (q.proy || 0) - q.exch - q.pools);
+      return `<span class="mq-q"><span class="mq-bar" title="${esc(MZ.barT(num(q.top10w, 1), num(q.exch, 1), num(q.pools, 1)))}"><i class="w" style="width:${q.top10w}%"></i><i class="j" style="width:${q.proy || 0}%"></i><i class="x" style="width:${q.exch}%"></i><i class="p" style="width:${q.pools}%"></i><i class="r" style="width:${resto}%"></i></span>` +
         `<small>${MZ.mayor(num(q.mayor, 1))}${MZ.top10(num(q.top10w))}</small></span>`; };
     const ballC = (r) => { const q = qz(r); if (!q) return '<span class="mz-na mq-bc">—</span>'; if (!q.n) return `<span class="mz-na mq-bc">${MZ.sinOps}</span>`;
       return `<span class="mq-b"><span class="up">${MZ.compran(fm(q.compra || 0))}</span><span class="dn">${MZ.venden(fm(q.vende || 0))}</span></span>`; };
     const mmFila = (r, i) => `<div class="mz-t mq"><span class="mz-i">${i + 1}</span>${av(r)}${nom(r)}<span class="mz-x">${fm(r.m)}<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span></small></span>` +
       `<span class="mz-x mq-tit">${r.tit != null ? fk(r.tit) : "—"}<small>${r.trad != null ? fk(r.trad) + MZ.trs : "&nbsp;"}</small></span>${quienC(r)}${ballC(r)}${senal(r)}${goV(r)}</div>`;
-    const ley = `<p class="mq-ley">${["w", "x", "p", "r"].map((c, k) => `<span><i class="${c}"></i>${MZ.ley[k]}</span>`).join("")}</p>`;
+    const ley = `<p class="mq-ley">${["w", "j", "x", "p", "r"].map((c, k) => `<span><i class="${c}"></i>${MZ.ley[k]}</span>`).join("")}</p>`;
     $("#lista").innerHTML =
       (tot && tot.con ? `<div class="mz-dato"><span class="mz-k">${MZ.datoK}</span><b>${num(tot.muertos / tot.con * 100, 1)}${sp}%</b><p>${MZ.dato(0, num(tot.con), desde, num(tot.con - tot.muertos))}</p></div>` : "") +
       `<section class="mz-card"><h2>${MZ.lzH} <small>${MZ.lzS}</small></h2><div class="mz-t mz-lz mz-h"><span></span><span></span><span>${MZ.lzTh[0]}</span><span>${MZ.lzTh[1]}</span><span class="mz-tok">${MZ.lzTh[2]}</span><span class="mz-nac">${MZ.lzTh[3]}</span><span>${MZ.lzTh[4]}</span></div>` +
@@ -234,7 +273,7 @@
   const IA = EN ? {
     dato: (a, b) => `AI tokens show no public code or haven't touched it in over 6 months. Without code there is no way to check the agent or product exists: only the name is left.`,
     ag: ["AI agents,", "the ones that claim to act on-chain on their own"], pr: ["AI projects,", "networks, data and compute for AI"],
-    th: ["Project", "Worth · 24 h", "Holders", "Traders 24 h", "Code", "Signal"],
+    th: ["Project", "Worth · 24 h", "Who holds it", "Traders 24 h", "Code", "Signal"],
     sinCod: "No public code", cod1: "Changed 1 day ago", codN: (n) => `Changed ${n} days ago`, codP: (n) => `${n} days without changes`,
     bots: (v) => `Worth ${v} and mostly traded by bots`, pocos: (v, n) => `Worth ${v} and ${n} people traded it yesterday`,
     bloq: (b, l) => `${b}% still locked${l ? ", releases " + l + "% this month" : ""}`, vivo: (p) => `Live code and ${p}% organic buyers`,
@@ -243,7 +282,7 @@
   } : {
     dato: (a, b) => `tokens de IA no enseñan código público o lo tienen parado hace más de 6 meses. Sin código no se puede comprobar que el agente o el producto existan: solo queda el nombre.`,
     ag: ["Agentes de IA,", "los que dicen actuar solos en la cadena"], pr: ["Proyectos de IA,", "redes, datos y cómputo para IA"],
-    th: ["Proyecto", "Vale · 24 h", "Titulares", "Traders 24 h", "Código", "Señal"],
+    th: ["Proyecto", "Vale · 24 h", "Quién la tiene", "Traders 24 h", "Código", "Señal"],
     sinCod: "Sin código público", cod1: "Cambiado hace 1 día", codN: (n) => `Cambiado hace ${n} días`, codP: (n) => `${n} días sin cambios`,
     bots: (v) => `Vale ${v} y casi todo lo mueven bots`, pocos: (v, n) => `Vale ${v} y lo movieron ${n} personas ayer`,
     bloq: (b, l) => `${b} % aún bloqueado${l ? ", suelta " + l + " % este mes" : ""}`, vivo: (p) => `Código vivo y ${p} % de compradores orgánicos`,
@@ -254,6 +293,7 @@
   const pidePerf = () => perfPide || (perfPide = fetch("/datos/perfiles.json", { cache: "no-cache" }).then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { PERF = (j && j.t) || {}; }));
   function iaVista() {
     if (!PERF) pidePerf().then(() => { if (ap === "IA") pinta(); });
+    pideQZ();
     const P = PERF || {};
     const rs = D.rows.filter((r) => r.ap === "IA").map((r) => { const p = (r.mint && P[r.mint]) || {}; return Object.assign({}, r, { cod: p.cod || null, dl: p.dl || null, cap: r.mcap || r.m }); }).sort((a, b) => (b.cap || 0) - (a.cap || 0));
     const num = (n, d) => n.toLocaleString(EN ? "en-US" : "es-ES", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0, useGrouping: "always" });
@@ -261,7 +301,7 @@
     const cod = (r) => { if (!PERF) return '<span class="mz-na">…</span>'; if (!r.cod || r.cod.dias == null) return `<span class="mz-cod s">${IA.sinCod}</span>`;
       const t = r.cod.dias <= 1 ? IA.cod1 : r.cod.dias <= 30 ? IA.codN(r.cod.dias) : IA.codP(r.cod.dias);
       return `<span class="mz-cod ${r.cod.dias <= 30 ? "v" : "p"}"><a href="${esc(r.cod.url)}" target="_blank" rel="noopener">${t} ↗</a></span>`; };
-    const senal = (r) => {
+    const senal = (r) => { const sb = senalB(r); if (sb) return sb;
       if (r.trad >= 50 && r.org != null && r.org / r.trad < 0.05) return `<span class="mz-sen mz-r">${IA.bots(fm(r.cap))}</span>`;
       if (r.trad != null && r.trad < 50 && r.cap >= 1e6) return `<span class="mz-sen mz-r">${IA.pocos(fm(r.cap), r.trad)}</span>`;
       if (r.dl && r.dl.bloq >= 20) return `<span class="mz-sen mz-a">${IA.bloq(num(r.dl.bloq), r.dl.lib >= 0.1 ? num(r.dl.lib, 1) : "")}</span>`;
@@ -270,9 +310,9 @@
     const fila = (r, i) => { const h = href(r), n = `${esc(r.n)}${r.sym ? ` <small>${esc(r.sym)}</small>` : ""}`;
       return `<div class="mz-t mz-ia"><span class="mz-i">${i + 1}</span>${av(r)}<span class="mz-n"><b>${h ? `<a href="${h}">${n}</a>` : n}</b></span>` +
         `<span class="mz-x">${fm(r.cap)}<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span></small></span>` +
-        `<span class="mz-x mz-m mz-tit">${r.tit != null ? fk(r.tit) : "—"}<small>${r.titC != null && Math.abs(r.titC) >= 0.0005 ? `<span class="${r.titC >= 0 ? "up" : "dn"}">${pc1(r.titC)}</span>` : "&nbsp;"}</small></span>` +
+        quienCel(r, "ia-q", true) +
         `<span class="mz-x">${r.trad != null ? fk(r.trad) : "—"}<small>${r.org != null ? MZ.org(r.org) : "&nbsp;"}</small></span><span class="mz-codc">${cod(r)}</span>${PERF ? senal(r) : "<span></span>"}</div>`; };
-    const tabla = (t, l) => l.length ? `<section class="mz-card"><h2>${t[0]} <small>${t[1]}</small></h2><div class="mz-t mz-ia mz-h"><span></span><span></span><span>${IA.th[0]}</span><span>${IA.th[1]}</span><span class="mz-tit">${IA.th[2]}</span><span>${IA.th[3]}</span><span class="mz-codc">${IA.th[4]}</span><span>${IA.th[5]}</span></div>${l.map(fila).join("")}</section>` : "";
+    const tabla = (t, l) => l.length ? `<section class="mz-card"><h2>${t[0]} <small>${t[1]}</small></h2><div class="mz-t mz-ia mz-h"><span></span><span></span><span>${IA.th[0]}</span><span>${IA.th[1]}</span><span class="ia-q">${IA.th[2]}</span><span>${IA.th[3]}</span><span class="mz-codc">${IA.th[4]}</span><span>${IA.th[5]}</span></div>${l.map(fila).join("")}</section>` : "";
     const np = rs.filter((r) => !r.cod || r.cod.dias == null || r.cod.dias > 180).length;
     $("#lista").innerHTML = (PERF ? `<div class="mz-dato"><span class="mz-k">${EN ? "Fact" : "Dato"}</span><b>${np} ${EN ? "of" : "de"} ${rs.length}</b><p>${IA.dato()}</p></div>` : "") +
       tabla(IA.ag, rs.filter((r) => r.gr === "Agentes de IA")) + tabla(IA.pr, rs.filter((r) => r.gr !== "Agentes de IA")) +
@@ -302,7 +342,7 @@
       vH: "What goes back to holders", vS: "Buybacks or payouts in the last 30 days: the business money that reaches the token.",
       src: (f) => `“Charges”: fees users pay in 30 days. “Keeps”: the part the protocol keeps (the rest goes to liquidity providers or validators). “Back to the token”: buybacks or payouts to holders in 30 days. “Deposited”: money inside the protocol on Solana. “Value × revenue”: its token's value divided by what it keeps in a year. All from DefiLlama and Solana only; market cap from CoinGecko. Data from ${f}; not recommendations.`,
       queH: "What we check in a DeFi protocol", queS: "Being widely used doesn't mean its token wins:", queL: ["How much of what it charges does it keep?", "Does anything reach the token?", "How much is left to unlock", "Who can change the contracts?", "Audits and hacks"], nav: "DeFi groups" },
-    jg: { th: ["Project", "Usage", "Token", "Back to the token", "Holders", "Traders 24 h", "Signal"],
+    jg: { th: ["Project", "Usage", "Token", "Back to the token", "Who holds it", "Traders 24 h", "Signal"],
       gr: [["Cartas físicas", "Physical cards,", "real cards stored in a vault and turned into tokens"], ["Minería con juego", "Gamified mining,", "mining a token by playing rounds on-chain"], ["Juegos", "Games,", "games with their own token"], ["Azar", "Games of chance,", "casinos, betting and roulettes"]],
       cobra: "charges 30 d", vale: "worth", h24: " 24 h", y: " and ",
       dato: (ns, v, n, c, m, t) => `The 3 most valuable game tokens (${ns}: ${v} together) were traded by ${n} people in 24 h. ${c}, which charges ${m} a month, had ${t}.`,
@@ -341,7 +381,7 @@
       vH: "Lo que vuelve a los titulares", vS: "Recompras o reparto de los últimos 30 días: el dinero del negocio que llega al token.",
       src: (f) => `«Cobra»: comisiones que pagan los usuarios en 30 días. «Se queda»: la parte que se queda el protocolo (el resto va a quien pone la liquidez o a los validadores). «Devuelve al token»: recompras o reparto a titulares en 30 días. «Depositado»: dinero dentro del protocolo en Solana. «Vale × ingresos»: lo que vale su token dividido entre lo que se queda en un año. Todo de DefiLlama y solo en Solana; capitalización de CoinGecko. Datos del ${f}; no son recomendaciones.`,
       queH: "Qué miramos en un protocolo DeFi", queS: "Que se use mucho no significa que su token gane:", queL: ["¿Cuánto se queda de lo que cobra?", "¿Llega algo al token?", "Cuánto queda por desbloquear", "¿Quién puede cambiar los contratos?", "Auditorías y hackeos"], nav: "Grupos de DeFi" },
-    jg: { th: ["Proyecto", "Uso", "Token", "Devuelve al token", "Titulares", "Traders 24 h", "Señal"],
+    jg: { th: ["Proyecto", "Uso", "Token", "Devuelve al token", "Quién la tiene", "Traders 24 h", "Señal"],
       gr: [["Cartas físicas", "Cartas físicas,", "cartas reales guardadas en una cámara y convertidas en tokens"], ["Minería con juego", "Minería con juego,", "minar un token jugando rondas en la cadena"], ["Juegos", "Juegos,", "juegos con su propio token"], ["Azar", "Azar,", "casinos, apuestas y ruletas"]],
       cobra: "cobra 30 d", vale: "vale", h24: " 24 h", y: " y ",
       dato: (ns, v, n, c, m, t) => `Los 3 tokens de juegos que más valen (${ns}: ${v} juntos) los movieron ${n} personas en 24 h. ${c}, que cobra ${m} al mes, tuvo ${t}.`,
@@ -372,7 +412,10 @@
   const nomV = (r) => { const h = tok(r), n = esc(r.n === "Render Network BME" ? "Render Network" : r.n); return `<span class="mz-n"><b>${h ? `<a href="${h}">${n}</a>` : n}</b></span>`; };
   const sinV = `<span class="ab-sin">${T.sinTok}</span>`;
   const cadV = (r) => `<span class="cad"><small>${V.tokEn}</small><b>${esc(r.cad)}</b>${r.gecko ? `<a href="https://www.coingecko.com/${EN ? "en/coins" : "es/monedas"}/${esc(r.gecko)}" target="_blank" rel="noopener">CoinGecko ↗</a>` : ""}</span>`;
-  const tokV = (r) => r.cad ? cadV(r) : r.tok ? `<span class="df-tok"><b>${esc(r.sym)}</b><small>${r.mcap ? fm(r.mcap) : V.sinPrecio}</small></span>` : sinV;
+  const tokV = (r) => r.cad ? cadV(r) : r.tok ? `<span class="df-tok"><b>${esc(r.sym)}</b><small>${r.mcap ? fm(r.mcap) : V.sinPrecio}</small>${qMini(r)}</span>` : sinV;
+  // barra pequeña de «quién la tiene» debajo del token (DeFi, Apps y bots, Otros), con la mayor wallet en el título
+  const qMini = (r) => { const q = qzDe(r); if (!q) return ""; const resto = Math.max(0, 100 - q.top10w - (q.proy || 0) - q.exch - q.pools), p = mnDe(q);
+    return `<span class="mq-bar mq-mini" title="${esc((p ? p.rol + " · " + p.n + ": " : "") + MZ.barT(num(q.top10w, 1), num(q.exch, 1), num(q.pools, 1)))}"><i class="w" style="width:${q.top10w}%"></i><i class="j" style="width:${q.proy || 0}%"></i><i class="x" style="width:${q.exch}%"></i><i class="p" style="width:${q.pools}%"></i><i class="r" style="width:${resto}%"></i></span>`; };
   const manoV = (t) => t ? `<small class="mano" title="${esc(V.mano(t.src))}">${esc(EN ? t.en : t.es)}</small>` : "";
   const cambioV = (r) => `<small><span class="${(r.c || 0) >= 0 ? "up" : "dn"}">${r.c == null ? "&nbsp;" : pcv(r.c) + V.vsMes}</span></small>`;
   const datoV = (b, p) => `<div class="mz-dato"><span class="mz-k">${V.dato}</span><b>${b}</b><p>${p}</p></div>`;
@@ -397,9 +440,10 @@
     if (r.aud) o.push(`<span class="rg rg-a">${V.aud}</span>`);
     return o.length ? `<small class="rgs">${o.join("")}</small>` : ""; };
   function defiVista() {
-    const rs = deApV("DeFi"), q = V.df;
+    const rs = deApV("DeFi"), q = V.df; pideQZ();
     const senal = (r) => {
       const hy = hkAnio(r); if (hy && hy.p >= 1e5) return `<span class="mz-sen mz-r">${V.hack(fechaHk(hy.d), fm(hy.p))}</span>`;
+      const sb = senalB(r); if (sb) return sb;
       if (r.cad) return r.copias ? `<span class="mz-sen mz-a">${V.copias(r.copias)}</span>` : `<span class="mz-sen mz-a">${V.fuera}</span>`;
       if (r.h30 && r.ing && r.h30 / r.ing >= 0.3 && r.h30 >= 50e3) return `<span class="mz-sen mz-v">${V.devQ(Math.min(100, Math.round(r.h30 / r.ing * 100)))}</span>`;
       if (r.tok && MULTI.has(r.sym)) return `<span class="mz-sen mz-a">${V.fuera}</span>`;
@@ -441,8 +485,8 @@
   }
 
   function juegosVista() {
-    const rs = deApV("Juegos"), q = V.jg;
-    const senal = (r) => {
+    const rs = deApV("Juegos"), q = V.jg; pideQZ();
+    const senal = (r) => { const sb = senalB(r); if (sb) return sb;
       if (r.trad != null && r.trad < 50 && r.cap >= 1e6) return `<span class="mz-sen mz-r">${IA.pocos(fm(r.cap), r.trad)}</span>`;
       if (r.trad >= 50 && r.org != null && r.org / r.trad < 0.02) return `<span class="mz-sen mz-r">${IA.bots(fm(r.cap))}</span>`;
       if (r.med === "fees" && r.h30 && r.m && r.h30 / r.m >= 0.5) return `<span class="mz-sen mz-v">${V.devC(Math.round(r.h30 / r.m * 100))}</span>`;
@@ -456,8 +500,8 @@
       const dev = r.med === "fees" && r.h30 && r.m ? `${fm(r.h30)}<small>${V.deCobra(Math.round(r.h30 / r.m * 100))}</small>` : `<span class="mz-na">—</span>`;
       const tk = r.cad ? cadV(r) : r.tok ? `<b class="jg-sym">${esc(r.sym)}</b>` : sinV;
       return `<div class="mz-t jg"><span class="mz-i">${i + 1}</span>${av(r)}${nomV(r)}<span class="mz-x">${uso}</span><span class="jg-tk">${tk}</span><span class="mz-x jg-dev">${dev}</span>` +
-        `<span class="mz-x jg-tit">${r.tit != null ? fk(r.tit) : "—"}</span><span class="mz-x">${r.trad != null ? fk(r.trad) : "—"}<small>${r.org != null ? MZ.org(r.org) : "&nbsp;"}</small></span>${senal(r)}${goV(r)}</div>`; };
-    const head = `<div class="mz-t jg mz-h"><span class="mz-i"></span><span></span><span>${q.th[0]}</span><span>${q.th[1]}</span><span class="jg-tk">${q.th[2]}</span><span class="jg-dev">${q.th[3]}</span><span class="jg-tit">${q.th[4]}</span><span>${q.th[5]}</span><span class="jg-sen">${q.th[6]}</span><span class="go"></span></div>`;
+        quienCel(r, "jg-q", true) + `<span class="mz-x">${r.trad != null ? fk(r.trad) : "—"}<small>${r.org != null ? MZ.org(r.org) : "&nbsp;"}</small></span>${senal(r)}${goV(r)}</div>`; };
+    const head = `<div class="mz-t jg mz-h"><span class="mz-i"></span><span></span><span>${q.th[0]}</span><span>${q.th[1]}</span><span class="jg-tk">${q.th[2]}</span><span class="jg-dev">${q.th[3]}</span><span class="jg-q">${q.th[4]}</span><span>${q.th[5]}</span><span class="jg-sen">${q.th[6]}</span><span class="go"></span></div>`;
     const tarj = q.gr.map(([g, t1, t2]) => {
       const tf = g === "Juegos" || g === "Azar" ? -1 : 1;
       const l = rs.filter((r) => r.gr === g).sort((a, b) => tf * ((b.med === "fees") - (a.med === "fees")) || (b.med === "fees" ? (b.m || 0) - (a.m || 0) : (b.cap || 0) - (a.cap || 0)));
@@ -473,8 +517,8 @@
   }
 
   function appsVista() {
-    const rs = deApV("Apps y bots"), q = V.ab;
-    const senal = (r) => {
+    const rs = deApV("Apps y bots"), q = V.ab; pideQZ();
+    const senal = (r) => { const sb = senalB(r); if (sb) return sb;
       if (r.cad) return r.copias ? `<span class="mz-sen mz-a">${V.copias(r.copias)}</span>` : `<span class="mz-sen mz-a">${V.fuera}</span>`;
       if (r.tok && r.mcap && r.m) { const x = r.mcap / (r.m * 12);
         if (r.m < 5e3) return `<span class="mz-sen mz-a">${V.vxPoco(fm(r.mcap), fmv(r.m))}</span>`;
@@ -483,7 +527,7 @@
       if (r.rel != null && r.rel <= -0.4) return `<span class="mz-sen mz-a">${V.pierde}</span>`;
       return "<span></span>"; };
     const fila = (r, i, tot) => { const cu = tot ? r.m / tot : 0;
-      const tk = r.cad ? cadV(r) : r.tok ? `<span class="ab-tok">${esc(r.sym)}<small>${r.mcap ? fm(r.mcap) : V.sinPrecio}</small></span>` : sinV;
+      const tk = r.cad ? cadV(r) : r.tok ? `<span class="ab-tok">${esc(r.sym)}<small>${r.mcap ? fm(r.mcap) : V.sinPrecio}</small>${qMini(r)}</span>` : sinV;
       return `<div class="mz-t ab"><span class="mz-i">${i + 1}</span>${av(r)}${nomV(r)}<span class="mz-x">${fmv(r.m)}${cambioV(r)}</span><span class="mz-x ab-q">${r.r30 ? fmv(r.r30) : "—"}</span>` +
         `<span class="ab-cuota"><i style="width:${Math.max(2, Math.round(cu * 100))}%"></i><em>${cu >= 0.01 ? Math.round(cu * 100) + sp + "%" : "&lt;1" + sp + "%"}</em></span>` +
         `<span class="ab-relc">${r.rel == null ? "" : `<span class="ab-rel ${r.rel >= 0 ? "up" : "dn"}">${pcv(r.rel)}</span>`}</span>${tk}${senal(r)}${goV(r)}</div>`; };
@@ -497,8 +541,8 @@
   }
 
   function otrosVista() {
-    const rs = deApV("Otros"), q = V.ot;
-    const senal = (r) => {
+    const rs = deApV("Otros"), q = V.ot; pideQZ();
+    const senal = (r) => { const sb = senalB(r); if (sb) return sb;
       if (r.trad != null && r.trad < 50 && r.cap >= 1e6) return `<span class="mz-sen mz-r">${IA.pocos(fm(r.cap), r.trad)}</span>`;
       if (r.h30 && r.ing && r.h30 / r.ing >= 0.3 && r.h30 >= 30e3) return `<span class="mz-sen mz-v">${V.devQ(Math.min(100, Math.round(r.h30 / r.ing * 100)))}</span>`;
       if (r.vx != null && r.vx >= 50) return `<span class="mz-sen mz-r">${V.vx(num(r.vx))}</span>`;

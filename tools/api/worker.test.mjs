@@ -315,7 +315,10 @@ test("recogida: avisos de las 20 mayores (envío a un exchange, sin ruido del bo
   const est = {};
   assert.deepEqual(procesaFoto(est, M1, 1, top(34, 5), "100", 0.5, tipo, { X1: "Gate" }).av, []);
   const r = procesaFoto(est, M1, 2, top(17, 22), "100", 0.5, tipo, { X1: "Gate" });
-  assert.deepEqual(r.h, [M1, 2, 17, 27, 22, 0, 0.5]);
+  assert.deepEqual(r.h, [M1, 2, 17, 27, 22, 0, 0.5, 0]);
+  // la wallet del propio proyecto («j») no es «la mayor wallet»: va aparte, con su nombre
+  const qj = quienDe([["a", "50", "T"], ["b", "20", "W1"]], "100", { T: "j", W1: "w" });
+  assert.deepEqual([qj.mayor, qj.top10w, qj.proy, qj.jo], [20, 20, 50, "T"]);
   assert.deepEqual(r.av[0], [M1, 2, "envio", "W1", 34, 17, "X1", "Gate", 17, 0.5]);
 });
 

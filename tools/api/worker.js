@@ -266,13 +266,18 @@ export async function caida(env, pool, m, desde, hasta, fetchFn) {
 export async function quienTodos(db, ahora) {
   const out = {}, no = (e) => /no such table/i.test(String(e && e.message));
   // mn (26/11): «nombre|función» si la mayor wallet es del propio proyecto (tesorería, emisor, creador); sin la columna aún, sin él
-  const fila = (r) => Object.assign({ t: r.t, mayor: r.mayor, top10w: r.top10w, exch: r.exch, pools: r.pools }, r.mn ? { mn: r.mn } : {});
-  try { for (const r of (await db.prepare("SELECT m, t, mayor, top10w, exch, pools, mn FROM quien").bind().all()).results || []) out[r.m] = fila(r); }
+  const fila = (r) => Object.assign({ t: r.t, mayor: r.mayor, top10w: r.top10w, exch: r.exch, pools: r.pools }, r.mn ? { mn: r.mn } : {}, r.proy ? { proy: r.proy } : {});
+  try { for (const r of (await db.prepare("SELECT m, t, mayor, top10w, exch, pools, mn, proy FROM quien").bind().all()).results || []) out[r.m] = fila(r); }
   catch (e) {
     if (no(e)) { /* sin tabla todavía */ }
     else if (/no such column/i.test(String(e && e.message))) { for (const r of (await db.prepare("SELECT m, t, mayor, top10w, exch, pools FROM quien").bind().all()).results || []) out[r.m] = fila(r); }
     else throw e;
   }
+  // av (26/11): el último aviso de las 20 mayores cuentas de las últimas 24 h (sin el de exchanges): [t, k, de, a, nombre del exchange]
+  try {
+    for (const r of (await db.prepare("SELECT m, t, k, de, a, dn FROM avisos WHERE t > ? AND k <> 'exch' ORDER BY t DESC").bind(ahora - 864e5).all()).results || [])
+      if (out[r.m] && !out[r.m].av) out[r.m].av = [r.t, r.k, r.de, r.a, r.dn || null];
+  } catch (e) { if (!no(e)) throw e; }
   try {
     const q = "SELECT m, SUM(CASE WHEN sell = 0 THEN usd ELSE 0 END) AS compra, SUM(CASE WHEN sell = 1 THEN usd ELSE 0 END) AS vende, COUNT(*) AS n FROM ops WHERE t > ? GROUP BY m";
     for (const r of (await db.prepare(q).bind(ahora - 864e5).all()).results || []) if (out[r.m]) Object.assign(out[r.m], { compra: r.compra, vende: r.vende, n: r.n });
@@ -288,9 +293,9 @@ export async function ballenas(db, m, ahora) {
   const no = (e) => /no such table/i.test(String(e && e.message)), out = { v: V, mint: m, seguido: false, desde: null, hist: [], avisos: [], ops: [] };
   try {
     const corte = ahora - 30 * 864e5;
-    const viejo = (await db.prepare("SELECT t, mayor, top10w, exch, pools, precio FROM quienh WHERE m = ? AND t IN (SELECT MAX(t) FROM quienh WHERE m = ? AND t <= ? GROUP BY t / 86400000) ORDER BY t").bind(m, m, corte).all()).results || [];
-    const nuevo = (await db.prepare("SELECT t, mayor, top10w, exch, pools, precio FROM quienh WHERE m = ? AND t > ? ORDER BY t").bind(m, corte).all()).results || [];
-    out.hist = viejo.concat(nuevo).map((x) => [x.t, x.mayor, x.top10w, x.exch, x.pools, x.precio]);
+    const viejo = (await db.prepare("SELECT t, mayor, top10w, exch, pools, precio, proy FROM quienh WHERE m = ? AND t IN (SELECT MAX(t) FROM quienh WHERE m = ? AND t <= ? GROUP BY t / 86400000) ORDER BY t").bind(m, m, corte).all()).results || [];
+    const nuevo = (await db.prepare("SELECT t, mayor, top10w, exch, pools, precio, proy FROM quienh WHERE m = ? AND t > ? ORDER BY t").bind(m, corte).all()).results || [];
+    out.hist = viejo.concat(nuevo).map((x) => [x.t, x.mayor, x.top10w, x.exch, x.pools, x.precio, x.proy || 0]);
     out.seguido = out.hist.length > 0; out.desde = out.seguido ? out.hist[0][0] : null;
     const a = (await db.prepare("SELECT t, k, w, de, a, dest, dn, tok, precio FROM avisos WHERE m = ? ORDER BY t DESC, tok DESC LIMIT 10").bind(m).all()).results || [];
     out.avisos = a.map((x) => [x.t, x.k, x.w, x.de, x.a, x.dest, x.dn, x.tok, x.precio]);
