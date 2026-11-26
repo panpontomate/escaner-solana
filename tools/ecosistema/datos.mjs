@@ -326,10 +326,16 @@ for (const r of sel) {
 // Código de apartado (apc): lo usa la pestaña Escáner, que en inglés no puede comparar con el nombre en español
 const APC = { "Meme": "meme", "Activos tokenizados": "rwa", "DeFi": "defi", "Juegos": "juegos", "IA": "ia", "Apps y bots": "apps", "Otros": "otros" };
 for (const r of sel) r.apc = APC[r.ap] || "otros";
+// SOL, la red (26/11, maqueta ecosistema-sol.html): precio (CoinGecko), lo que cobra la red y lo depositado en DeFi
+// (DefiLlama), staking y transacciones (la propia cadena, RPC público). Si algo falla, ese dato sale vacío.
+const sol = await solRed().catch((e) => { console.log("sol:", e.message); return null; });
+if (sol) { hist.dias[dia].sol = { pct: sol.pct, tx: sol.tx, fees30: sol.fees30 };
+  const vS = dias.filter((d) => (hoy - new Date(d)) / 864e5 >= 28 && hist.dias[d].sol).pop();
+  if (vS) { const o = hist.dias[vS].sol; sol.c30 = { pct: o.pct != null && sol.pct != null ? sol.pct - o.pct : null, tx: o.tx > 0 && sol.tx ? sol.tx / o.tx - 1 : null, fees30: o.fees30 > 0 && sol.fees30 ? sol.fees30 / o.fees30 - 1 : null }; } }
 const D = {
   fecha: hoy.toISOString(),
   mercado: { fees: totFees60 > 0 ? totFees30 / totFees60 - 1 : null, circ: stPrev > 0 ? stTot / stPrev - 1 : null },
-  totFees30, totStables: stTot,
+  totFees30, totStables: stTot, sol,
   rows: sel,
 };
 if (sel.length < 100) throw new Error("Solo " + sel.length + " filas: algo ha fallado, no se publica");
@@ -506,4 +512,22 @@ async function redDePIN(filas) {
   if ((r = de("hivemapper"))) { const h = await tt("https://beemaps.com/llms.txt"), t = /([\d.]+)M\+? km mapped/i.exec(h), u = /([\d.]+)M unique km/i.exec(h);
     if (u) r.red = { k: "km", a: Math.round(Number(u[1]) * 1e6), t: t ? Math.round(Number(t[1]) * 1e6) : null, emp: true }; }
   console.log("DePIN:", filas.filter((x) => x.red).map((x) => x.n + " " + x.red.a).join(" · "));
+}
+
+async function solRed() {
+  const tj = (u, o) => fetch(u, Object.assign({ signal: AbortSignal.timeout(25000) }, o || {})).then((r) => r.ok ? r.json() : null).catch(() => null);
+  const rpc = (m, p) => tj("https://api.mainnet-beta.solana.com", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: m, params: p || [] }) }).then((x) => x && x.result);
+  const [cg, fees, chains, sup, va, perf] = await Promise.all([
+    cgj("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd&include_market_cap=true&include_24hr_change=true").catch(() => null),
+    tj("https://api.llama.fi/summary/fees/solana?dataType=dailyFees"), tj("https://api.llama.fi/v2/chains"),
+    rpc("getSupply", [{ excludeNonCirculatingAccountsList: true }]), rpc("getVoteAccounts"), rpc("getRecentPerformanceSamples", [60])]);
+  const c = cg && cg.solana, ch = (chains || []).find((x) => x.name === "Solana");
+  const staked = va ? [...va.current, ...va.delinquent].reduce((a, v) => a + v.activatedStake, 0) / 1e9 : null, total = sup ? sup.value.total / 1e9 : null;
+  let tx = 0, secs = 0; for (const s of perf || []) { tx += s.numTransactions; secs += s.samplePeriodSecs; }
+  const out = { precio: c ? c.usd : null, mcap: c ? Math.round(c.usd_market_cap) : null, c24: c && c.usd_24h_change != null ? c.usd_24h_change / 100 : null,
+    fees30: fees && fees.total30d ? Math.round(fees.total30d) : null, tvl: ch ? Math.round(ch.tvl) : null,
+    pct: staked && total ? Math.round(staked / total * 1000) / 10 : null, val: va ? va.current.length : null,
+    tx: secs ? Math.round(tx / secs * 86400) : null, tps: secs ? Math.round(tx / secs) : null };
+  console.log("SOL:", JSON.stringify(out));
+  return out.precio || out.fees30 || out.pct ? out : null;
 }

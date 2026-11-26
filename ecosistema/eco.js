@@ -747,6 +747,22 @@
   }
 
   const elegirAp = (a) => { ap = a; grupo = "Todos"; pinta(); };
+  // SOL, la red (26/11, maqueta ecosistema-sol.html): una tira integrada debajo del título, igual en todas las pestañas
+  function pintaSol() {
+    const box = document.getElementById("solt"), s = D.sol; if (!box || !s) return;
+    const n = (x, d) => x.toLocaleString(EN ? "en-US" : "es-ES", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0, useGrouping: "always" });
+    const ST = EN ? { fees: "the network charges · 30 d", st: "staking", tx: "transactions a day", tvl: "deposited in DeFi", stb: "stablecoins", go: "Analyze SOL ›",
+        dato: (x, r, a) => `The network charges ${r} a month; the DeFi apps on top of it alone charge ${a}.`, src: "SOL: CoinGecko · network fees and DeFi: DefiLlama · staking and transactions: the chain itself. Saved every day for the 30-day change." }
+      : { fees: "la red cobra · 30 d", st: "en staking", tx: "transacciones al día", tvl: "depositado en DeFi", stb: "stablecoins", go: "Analizar SOL ›",
+        dato: (x, r, a) => `La red cobra ${r} al mes; solo las apps de DeFi que van encima cobran ${a}.`, src: "SOL: CoinGecko · la red cobra y DeFi: DefiLlama · staking y transacciones: la propia cadena. Se guarda cada día para el cambio a 30 días." };
+    const it = (lab, v) => v ? `<span class="it"><span>${lab}</span><b>${v}</b></span>` : "";
+    const nM = (x) => x >= 1e6 ? n(x / 1e6, 0) + (EN ? "M" : " M") : n(x);
+    const defi = D.rows.filter((r) => r.ap === "DeFi" && r.med === "fees").reduce((a, r) => a + (r.m || 0), 0), veces = s.fees30 ? Math.round(defi / s.fees30) : 0;
+    box.innerHTML = `<div class="fila"><span class="it sol"><i>◎</i><span class="nm">SOL</span><b>${s.precio != null ? (EN ? "$" + n(s.precio, 2) : n(s.precio, 2) + " $") : "—"}</b>${s.c24 != null ? `<span class="${s.c24 >= 0 ? "up" : "dn"}">${pc1(s.c24)}</span>` : ""}</span>` +
+      it(ST.fees, s.fees30 ? fm(s.fees30) : "") + it(ST.st, s.pct != null ? n(s.pct, 1) + sp + "%" : "") + it(ST.tx, s.tx ? nM(s.tx) : "") + it(ST.tvl, s.tvl ? fm(s.tvl) : "") + it(ST.stb, D.totStables ? fm(D.totStables) : "") + "</div>" +
+      `<p class="dato">${veces >= 2 ? `<b>${veces}×</b>${ST.dato(veces, fm(s.fees30), fm(defi))}` : ""}<a class="go" href="${EN ? "/en/" : "/"}?token=So11111111111111111111111111111111111111112">${ST.go}</a></p><p class="src">${ST.src}</p>`;
+    box.hidden = false;
+  }
   function arrancar(datos) {
     D = datos;
     D.rows.forEach((r) => {
@@ -755,6 +771,7 @@
       r.anios = r.tok && r.mcap && r.r30 ? r.mcap / (r.r30 * 12) : null;
     });
     $("#fecha").textContent = T.fecha(new Date(D.fecha));
+    pintaSol();
     pidePerf().then(() => { D.rows.forEach((r) => { const p = r.tok && r.mint && PERF[r.mint]; r.h30 = p && p.h30 != null ? p.h30 : null; }); pinta(); });
     // el número de Activos tokenizados, desde el principio (lo que enseña su vista completa)
     if (window.SFActivos) window.SFActivos.datos().then((j) => { if (!j || !Array.isArray(j.filas)) return; const reales = D.rows.filter((r) => r.ap === "Activos tokenizados" && r.gr === "Activos reales" && !/mansory/i.test(r.n)).length; nRwa = j.filas.filter((f) => f.precio != null).length + (j.dolares || []).filter((d) => d.enSolana && d.valor).length + reales; cabecera(); });
