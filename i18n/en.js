@@ -27,6 +27,8 @@ export const CODE = [
   ["case \"codigo\": return \"Último cambio hace \"+d+\" días\";", "case \"codigo\": return \"Last change \"+d+\" days ago\";"],
   // el blog tiene versión inglesa (15/11)
   ['<a href="https://solflag.com/blog/">Blog · Avances</a>', '<a href="https://solflag.com/en/blog/">Blog · Updates</a>'],
+  // índice de fichas (26/11)
+  ['<a href="https://token.solflag.com/">Fichas de tokens</a>', '<a href="https://token.solflag.com/en/">Token pages</a>'],
   // Dónde cotiza (14/11): la lista completa en inglés
   ['function quoteAllLink(r){ return "/cotiza/?t="', 'function quoteAllLink(r){ return "/en/markets/?t="'],
   // Dónde cotiza (14/11): porcentajes en formato inglés

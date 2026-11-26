@@ -15,12 +15,13 @@
 //   GET /<mint>  ·  GET /en/<mint>   la ficha
 //   GET /sitemap.xml                 las fichas de nuestra base (con su versión en inglés), para Google
 //   GET /robots.txt
-//   GET /  ·  GET /en                a solflag.com
+//   GET /  ·  GET /en                índice de fichas: las mismas del sitemap, con enlaces (26/11)
 
 export const HOST = "token.solflag.com";
 const ADDR = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 const DAY = 86400000;
-const SITEMAP_MAX = 40000;      // el límite de un sitemap es 50.000 direcciones
+const BUENAS_MAX = 300;         // del sitemap y del índice: más analizados y lanzamientos que pasaron de 100.000 $ (cada grupo)
+const INDICE_MAX = 60;          // de esos dos grupos, cuántos salen en el índice
 const OTHERS = 8;               // otros tokens del creador que se enseñan
 const SERIE = 3;                // desde cuántos lanzamientos se habla de «en serie»
 const REPITE = 10;              // un comprador que entró en el primer bloque de 10 o más lanzamientos más: repetidor
@@ -388,15 +389,80 @@ export function noEncontrado(m, lang, fallo) {
 const HTML_HEAD = { "content-type": "text/html; charset=utf-8", "x-content-type-options": "nosniff", "referrer-policy": "strict-origin-when-cross-origin" };
 const page = (body, status, ttl) => new Response(body, { status: status, headers: Object.assign({}, HTML_HEAD, { "cache-control": ttl ? "public, max-age=" + ttl : "no-store" }) });
 
-export async function sitemap(db) {
-  // Solo las fichas que alguien puede buscar (15/11): las de tokens vivos a las 24 h o que pasaron de 100.000 $, las recién
-  // lanzadas con liquidez de verdad aún sin resultado y las que ha pedido la gente. Unas 28.000 de tokens muertos, casi
-  // iguales, hacían que Google no guardara ninguna; siguen funcionando para quien llegue por un enlace
-  const rows = await all(db, "SELECT m, t FROM lanz WHERE dead24 = 0 OR mc24 >= 100000 OR (dead24 IS NULL AND liq >= 10000) " +
-    "UNION SELECT m, t1 AS t FROM pedidos ORDER BY t DESC LIMIT " + SITEMAP_MAX, []);
-  const alt = (m) => '<xhtml:link rel="alternate" hreflang="es" href="' + fichaUrl(m, "es") + '"/><xhtml:link rel="alternate" hreflang="en" href="' + fichaUrl(m, "en") + '"/>';
+// Las fichas que valen la pena (26/11, SEO): Google conocía ~24.800 por el sitemap y no rastreaba casi ninguna (25/11
+// en Search Console: «Descubierta: actualmente sin indexar»). Ahora solo unos cientos: los tokens del Ecosistema en
+// Solana, los que sigue la recogida (tabla quien), los más analizados en la web (pedidos, 2 veces o más) y los
+// lanzamientos que pasaron de 100.000 $ a las 24 h. Las demás fichas siguen funcionando para quien llegue por un enlace.
+async function tryAll(db, sql, args) { try { return await all(db, sql, args); } catch (e) { return []; } }
+export async function fichasBuenas(db, get) {
+  const eco = await get("https://solflag.com/datos/ecosistema.json", 3600);
+  return {
+    eco: ((eco && eco.rows) || []).filter((r) => r && !r.cad && ADDR.test(r.mint || "")),
+    quien: await tryAll(db, "SELECT m, t FROM quien", []),
+    ped: await tryAll(db, "SELECT m, n, t1 AS t FROM pedidos WHERE n >= 2 ORDER BY n DESC, t1 DESC LIMIT " + BUENAS_MAX, []),
+    lz: await tryAll(db, "SELECT m, t, mc24 FROM lanz WHERE mc24 >= 100000 ORDER BY t DESC LIMIT " + BUENAS_MAX, []),
+  };
+}
+export async function sitemap(db, get) {
+  const b = await fichasBuenas(db, get), vistos = {}, hoy = Date.now();
+  const mete = (m, t) => { if (ADDR.test(m || "") && !(m in vistos)) vistos[m] = t || hoy; };
+  b.eco.forEach((r) => mete(r.mint, hoy)); b.quien.forEach((r) => mete(r.m, r.t)); b.ped.forEach((r) => mete(r.m, r.t)); b.lz.forEach((r) => mete(r.m, r.t));
+  const alt = (u, en) => '<xhtml:link rel="alternate" hreflang="es" href="' + u + '"/><xhtml:link rel="alternate" hreflang="en" href="' + en + '"/>';
+  const url = (u, en, t) => "<url><loc>" + u + "</loc><lastmod>" + new Date(t).toISOString().slice(0, 10) + "</lastmod>" + alt(u, en) + "</url>";
   return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n' +
-    rows.map((r) => "<url><loc>" + fichaUrl(r.m, "es") + "</loc><lastmod>" + new Date(r.t).toISOString().slice(0, 10) + "</lastmod>" + alt(r.m) + "</url>").join("\n") + "\n</urlset>\n";
+    [url("https://" + HOST + "/", "https://" + HOST + "/en/", hoy)].concat(Object.entries(vistos).map(([m, t]) => url(fichaUrl(m, "es"), fichaUrl(m, "en"), t))).join("\n") + "\n</urlset>\n";
+}
+
+// Índice de fichas en token.solflag.com/ (y /en/): las fichas que valen la pena, con enlaces normales para que Google
+// las encuentre desde una página. Nombres: los del Ecosistema y, para el resto, DexScreener (30 por petición, 1 h en caché).
+const AP_ORDEN = ["Meme", "Activos tokenizados", "DeFi", "Juegos", "IA", "Apps y bots", "Otros"];
+const AP_EN = { "Meme": "Meme", "Activos tokenizados": "Tokenized assets", "DeFi": "DeFi", "Juegos": "Games", "IA": "AI", "Apps y bots": "Apps and bots", "Otros": "Other" };
+const IX = {
+  es: { tit: "Fichas de tokens de Solana · SolFlag", h1: "Fichas de tokens de Solana",
+    intro: "Cada ficha cuenta quién lanzó el token, quién lo financió, quién compró primero, cómo acabaron sus otros lanzamientos y dónde cotiza hoy. Son hechos de la cadena, en español y en inglés. Aquí están las de los proyectos del Ecosistema, las más consultadas y los lanzamientos que pasaron de 100.000 $.",
+    desc: "Fichas públicas de tokens de Solana: quién los lanzó, quién los financió, quién compró primero y dónde cotizan.",
+    eco: "Ecosistema de Solana", ped: "Los más analizados en SolFlag", lz: "Lanzamientos que pasaron de 100.000 $ en 24 h", veces: (n) => n + " análisis",
+    scan: "¿No está el tuyo? Analiza cualquier token en el Escáner →" },
+  en: { tit: "Solana token pages · SolFlag", h1: "Solana token pages",
+    intro: "Each page tells who launched the token, who funded it, who bought first, how their other launches ended and where it trades today. On-chain facts, in English and Spanish. Here are the Ecosystem projects, the most checked tokens and the launches that went past $100,000.",
+    desc: "Public pages for Solana tokens: who launched them, who funded them, who bought first and where they trade.",
+    eco: "Solana Ecosystem", ped: "Most analyzed on SolFlag", lz: "Launches that went past $100,000 in 24 h", veces: (n) => n + " checks",
+    scan: "Not here? Check any token in the Scanner →" },
+};
+async function nombres(mints, get) {
+  const out = {};
+  for (let i = 0; i < mints.length; i += 30) {
+    const ps = await get("https://api.dexscreener.com/tokens/v1/solana/" + mints.slice(i, i + 30).join(","), 3600);
+    for (const p of Array.isArray(ps) ? ps : []) if (p && p.baseToken && !out[p.baseToken.address]) out[p.baseToken.address] = { n: p.baseToken.name, s: p.baseToken.symbol };
+  }
+  return out;
+}
+export async function indice(db, get, lang) {
+  const t = T[lang] || T.es, x = IX[lang] || IX.es, en = lang === "en", b = await fichasBuenas(db, get);
+  const enEco = new Set(b.eco.map((r) => r.mint));
+  const ped = b.ped.filter((r) => ADDR.test(r.m) && !enEco.has(r.m)).slice(0, INDICE_MAX);
+  const lz = b.lz.filter((r) => ADDR.test(r.m) && !enEco.has(r.m) && !ped.some((p) => p.m === r.m)).slice(0, INDICE_MAX);
+  const N = await nombres(ped.map((r) => r.m).concat(lz.map((r) => r.m)), get);
+  const li = (m, nom, sim, extra) => '<li><a href="' + fichaUrl(m, lang) + '">' + esc(nom || short(m)) + (sim ? " <small>" + esc(sim) + "</small>" : "") + "</a>" + (extra ? ' <span class="ixn">' + extra + "</span>" : "") + "</li>";
+  const grupo = (h, items) => items.length ? '<section class="ixg"><h2>' + h + '</h2><ul class="ixl">' + items.join("") + "</ul></section>" : "";
+  const porAp = {};
+  for (const r of b.eco) (porAp[r.ap] = porAp[r.ap] || []).push(r);
+  const ecoHtml = AP_ORDEN.concat(Object.keys(porAp).filter((a) => !AP_ORDEN.includes(a))).filter((a) => porAp[a])
+    .map((a) => grupo(x.eco + " · " + esc(en ? AP_EN[a] || a : a), porAp[a].sort((p, q) => (q.m || 0) - (p.m || 0)).map((r) => li(r.mint, r.n, r.sym)))).join("");
+  const otro = "https://" + HOST + (en ? "/" : "/en/");
+  return '<!doctype html><html lang="' + t.lang + '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + x.tit + "</title>" +
+    '<meta name="description" content="' + x.desc + '"><link rel="canonical" href="https://' + HOST + (en ? "/en/" : "/") + '">' +
+    '<link rel="alternate" hreflang="es" href="https://' + HOST + '/"><link rel="alternate" hreflang="en" href="https://' + HOST + '/en/">' +
+    '<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Manrope:wght@400;700&family=Unbounded:wght@700&display=swap" rel="stylesheet"><style>' + CSS +
+    ".ix{max-width:1100px;margin:0 auto;padding:28px 24px 60px}.ix h1{font:600 34px/1.15 Fraunces,serif;margin:0 0 10px}.ix>p{color:var(--dim);max-width:760px;margin:0 0 22px}" +
+    ".ixg{border-top:1px solid var(--line);padding:16px 0 8px}.ixg h2{margin:0 0 10px;font:700 12px Manrope,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--tq)}" +
+    ".ixl{list-style:none;margin:0;padding:0;columns:4 210px;column-gap:24px}.ixl li{break-inside:avoid;padding:4px 0;font-size:14px}.ixl a{color:var(--txt);text-decoration:none}.ixl a:hover{color:var(--tq)}" +
+    ".ixl small{color:var(--dim)}.ixn{color:var(--dim);font-size:12px}</style></head><body>" + cabecera(t, otro) +
+    '<main class="ix"><h1>' + x.h1 + "</h1><p>" + x.intro + "</p>" + ecoHtml +
+    grupo(x.ped, ped.map((r) => li(r.m, N[r.m] && N[r.m].n, N[r.m] && N[r.m].s, x.veces(r.n)))) +
+    grupo(x.lz, lz.map((r) => li(r.m, N[r.m] && N[r.m].n, N[r.m] && N[r.m].s, usd(r.mc24, t.lang)))) +
+    '<p class="como"><a href="' + t.web + '">' + x.scan + "</a></p></main>" +
+    '<script src="https://solflag.com/fondo.js?v=20261111d" defer></script></body></html>';
 }
 
 // fetchJSON(url, ttl) se puede cambiar en los tests
@@ -405,10 +471,13 @@ export async function ficha(req, env, fetchJSON) {
   let path = new URL(req.url).pathname.replace(/\/+$/, ""), lang = "es";
   if (req.method !== "GET" && req.method !== "HEAD") return new Response(null, { status: 405 });
   if (path === "/en" || path.startsWith("/en/")) { lang = "en"; path = path.slice(3); }
-  if (path === "") return Response.redirect(T[lang].web, 302);
+  if (path === "") {
+    try { return page(await indice(env.DB, get, lang), 200, 21600); }   // 6 h en la caché
+    catch (e) { return Response.redirect(T[lang].web, 302); }
+  }
   if (path === "/robots.txt" && lang === "es") return new Response("User-agent: *\nAllow: /\nSitemap: https://" + HOST + "/sitemap.xml\n", { headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "public, max-age=86400" } });
   if (path === "/sitemap.xml" && lang === "es") {
-    try { return new Response(await sitemap(env.DB), { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } }); }
+    try { return new Response(await sitemap(env.DB, get), { headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" } }); }
     catch (e) { return new Response("", { status: 503 }); }
   }
   const m = path.slice(1);

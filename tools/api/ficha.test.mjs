@@ -85,14 +85,20 @@ test("no encontrado y dirección no válida: 404 sin indexar", async () => {
 test("sitemap, robots y la raíz", async () => {
   const s = await get("/sitemap.xml");
   assert.equal(s.status, 200);
-  // solo las que alguien puede buscar: M1 (la pidió la gente); M2 murió y M3 no tiene liquidez
-  assert.equal((s.body.match(/<loc>/g) || []).length, 1);
+  // solo las que valen la pena: M1 (la pidió la gente 3 veces); M2 y M3 no; más el índice de fichas
+  assert.equal((s.body.match(/<loc>https:\/\/token\.solflag\.com\/Mint/g) || []).length, 1);
+  assert.match(s.body, /<loc>https:\/\/token\.solflag\.com\/<\/loc>/);
   assert.match(s.body, /<loc>https:\/\/token\.solflag\.com\/Mint1111/);
   assert.doesNotMatch(s.body, /Mint3333/);
   const r = await get("/robots.txt");
   assert.match(r.body, /Sitemap: https:\/\/token\.solflag\.com\/sitemap\.xml/);
-  const root = await ficha(new Request("https://token.solflag.com/"), env, fakeFetch({}));
-  assert.equal(root.status, 302);
+  // la raíz es el índice de fichas, con enlaces a las mismas del sitemap
+  const root = await ficha(new Request("https://token.solflag.com/"), env, fakeFetch({ [M1]: [pair(M1)] }));
+  assert.equal(root.status, 200);
+  const ix = await root.text();
+  assert.match(ix, /<h1>Fichas de tokens de Solana<\/h1>/);
+  assert.match(ix, /href="https:\/\/token\.solflag\.com\/Mint1111[^"]*">Slignal Coin <small>SLIGNAL<\/small><\/a> <span class="ixn">3 análisis/);
+  assert.doesNotMatch(ix, /Mint3333/);
 });
 
 test("el Worker manda token.solflag.com a la ficha y api.solflag.com a la API", async () => {
@@ -142,7 +148,9 @@ test("la ficha en español enlaza a su versión en inglés; el sitemap lleva las
   assert.equal(nf.status, 404);
   assert.match(nf.body, /We couldn't find this token/);
   const root = await ficha(new Request("https://token.solflag.com/en"), env, fakeFetch({}));
-  assert.equal(root.headers.get("location"), "https://solflag.com/en/");
+  const ixen = await root.text();
+  assert.match(ixen, /<h1>Solana token pages<\/h1>/);
+  assert.match(ixen, /href="https:\/\/token\.solflag\.com\/en\/Mint1111/);
 });
 
 test("topes de lectura: un comprador con muchos lanzamientos sale como «200+» y no se leen más filas", async () => {
