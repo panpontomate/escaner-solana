@@ -325,14 +325,15 @@ test("/api/ballenas: historial, avisos y operaciones de 24 h de un token que sig
   const ahora = 40 * 864e5;
   assert.equal((await ballenas(mk, M1, ahora)).seguido, false);          // sin tablas todavía
   HIST_SCHEMA.forEach((s) => db.exec(s)); OPS_SCHEMA.forEach((s) => db.exec(s));
-  const H = [[M1, ahora - 7200000, 34, 66, 5, 0, 0.5], [M1, ahora - 3600000, 17, 49, 22, 0, 0.5], [M1, 1, 50, 80, 0, 0, 1], [M2, ahora - 100, 1, 2, 3, 4, 5]];
+  const H = [[M1, ahora - 7200000, 34, 66, 5, 0, 0.5], [M1, ahora - 3600000, 17, 49, 22, 0, 0.5], [M1, 1, 50, 80, 0, 0, 1], [M1, 0, 51, 80, 0, 0, 1], [M2, ahora - 100, 1, 2, 3, 4, 5]];
   for (const st of insertsHist("quienh", "m, t, mayor, top10w, exch, pools, precio", H.concat(H))) db.exec(st.sql);   // repetidas: no se duplican
   for (const st of insertsHist("avisos", "m, t, k, w, de, a, dest, dn, tok, precio", [[M1, ahora - 3600000, "envio", A, 34, 17, B, "Ga'te", 17, 0.5]])) db.exec(st.sql);
   for (const st of opsInsert(M1, [{ t: ahora - 1000, lado: "vende", usd: 5000, w: A, tx: "t1" }, { t: 5, lado: "compra", usd: 1, w: A, tx: "viejo" }])) db.prepare(st.sql).run(...st.params);
   const r = await ballenas(mk, M1, ahora);
   assert.equal(r.seguido, true);
-  assert.deepEqual(r.hist.map((h) => h[0]), [ahora - 7200000, ahora - 3600000]);   // 30 días, de la más vieja a la más nueva
-  assert.equal(r.desde, ahora - 7200000);
+  // para siempre: lo de hace más de 30 días, la última foto de cada día; lo reciente, todas; de la más vieja a la más nueva
+  assert.deepEqual(r.hist.map((h) => h[0]), [1, ahora - 7200000, ahora - 3600000]);
+  assert.equal(r.desde, 1);
   assert.deepEqual(r.avisos, [[ahora - 3600000, "envio", A, 34, 17, B, "Ga'te", 17, 0.5]]);
   assert.deepEqual(r.ops, [[ahora - 1000, 1, 5000, A, "t1"]]);
   assert.equal(insertsHist("quienh", "m", [["no es una dirección", 1]]).length, 0);

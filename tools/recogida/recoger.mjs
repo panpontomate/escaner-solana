@@ -64,7 +64,8 @@ export function nuevas(data, desde, mint) {
 }
 // Marcas de la gráfica que no se pierden (25/11): las operaciones grandes de los 27 y de hasta 20 tokens de los más
 // analizados en la web en las últimas 6 h (tabla pedidos, la llena /api/visto) van a D1, tabla ops; la web las lee con
-// /api/marcas/<mint>. Se guardan 30 días. Necesita CF_API_TOKEN, CF_ACCOUNT_ID y CF_D1_ID (sin ellos no se guarda nada).
+// /api/marcas/<mint>. Se guardan para siempre (desde el 26/11; antes 30 días): si D1 se acerca a su límite,
+// archivar las viejas (ya están también en los .jsonl de la rama «recogida»). Necesita CF_API_TOKEN, CF_ACCOUNT_ID y CF_D1_ID (sin ellos no se guarda nada).
 export const OPS_SCHEMA = ["CREATE TABLE IF NOT EXISTS ops (m TEXT, tx TEXT, t INTEGER, sell INTEGER, usd INTEGER, w TEXT, amt REAL, PRIMARY KEY (m, tx))",
   "CREATE INDEX IF NOT EXISTS ops_mt ON ops (m, t)"];
 // D1 admite 100 parámetros por consulta: 14 filas de 7
@@ -121,7 +122,8 @@ export function duenos(cuentas, valores) {
 //   Si sale o entra de las 20 mayores, solo se cuenta lo seguro: hasta la cuenta más pequeña de las 20 (lim), porque
 //   fuera del top 20 no sabemos cuánto tiene (las de ~1 % entran y salen del borde y no son movimientos).
 //   exch  = lo de todos los exchanges conocidos cambió ≥ 3 puntos.
-// Los 3 mayores movimientos de wallet por foto, más el de exchanges. Todo se guarda 30 días.
+// Los 3 mayores movimientos de wallet por foto, más el de exchanges. Se guarda para siempre (26/11, pedido del usuario:
+// que el historial no se pierda; ~90 MB al año).
 export const HIST_SCHEMA = ["CREATE TABLE IF NOT EXISTS quienh (m TEXT, t INTEGER, mayor REAL, top10w REAL, exch REAL, pools REAL, precio REAL, PRIMARY KEY (m, t))",
   "CREATE TABLE IF NOT EXISTS avisos (m TEXT, t INTEGER, k TEXT, w TEXT, de REAL, a REAL, dest TEXT, dn TEXT, tok REAL, precio REAL, PRIMARY KEY (m, t, k, w))",
   "CREATE INDEX IF NOT EXISTS avisos_mt ON avisos (m, t)"];
@@ -193,8 +195,6 @@ async function historial(est, filas, tipo, ahora) {
   // avisos guardados sin el nombre del exchange (el 26/11 la lista de nombres aún no estaba): se completan
   const dests = Object.keys(nombres).filter((d) => B58.test(d));
   if (dests.length) await d1({ sql: "UPDATE avisos SET dn = CASE dest " + dests.map((d) => "WHEN " + sqlVal(d) + " THEN " + sqlVal(nombres[d])).join(" ") + " END WHERE dn IS NULL AND dest IN (" + dests.map(sqlVal).join(",") + ")" });
-  await d1({ sql: "DELETE FROM quienh WHERE t < ?", params: [ahora - 30 * 864e5] });
-  await d1({ sql: "DELETE FROM avisos WHERE t < ?", params: [ahora - 30 * 864e5] });
   for (const m of Object.keys(est.prev)) if (!filas.some((f) => f.m === m)) delete est.prev[m];
   est.histD1 = est.histD1 || ahora;
   return [H.length, A.length];
@@ -280,7 +280,6 @@ async function main() {
     for (const sql of OPS_SCHEMA) await d1({ sql });
     for (const [m, ops] of Object.entries(porMint)) for (const st of opsInsert(m, ops)) { await d1(st); }
     enD1 = Object.values(porMint).reduce((s, o) => s + o.length, 0);
-    await d1({ sql: "DELETE FROM ops WHERE t < ?", params: [ahora - 30 * 864e5] });
     est.opsD1 = est.opsD1 || ahora;
   } catch (e) { console.log("ops:", e.message); }
   if (D1 && quien.length) try {

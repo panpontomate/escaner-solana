@@ -274,17 +274,19 @@ export async function quienTodos(db, ahora) {
   return { v: V, quien: out };
 }
 
-// Ballenas de un token que sigue la recogida (26/11): historial de «quién la tiene» de 30 días (tabla quienh:
-// [t, mayor, top10w, exch, pools, precio], hasta 800 fotos), los 10 avisos más nuevos (tabla avisos: [t, k, w, de, a,
+// Ballenas de un token que sigue la recogida (26/11): historial de «quién la tiene» desde que lo seguimos (tabla quienh:
+// [t, mayor, top10w, exch, pools, precio]; los últimos 30 días todas las fotos y, antes, la última de cada día), los 10 avisos más nuevos (tabla avisos: [t, k, w, de, a,
 // dest, nombre del exchange, tokens, precio]) y las operaciones de más de 1.000 $ de 24 h ([t, vende 1/0, usd, w, tx],
 // hasta 40, la más nueva primero). seguido = false si la recogida aún no tiene fotos de ese token.
 export async function ballenas(db, m, ahora) {
   const no = (e) => /no such table/i.test(String(e && e.message)), out = { v: V, mint: m, seguido: false, desde: null, hist: [], avisos: [], ops: [] };
   try {
-    const h = (await db.prepare("SELECT t, mayor, top10w, exch, pools, precio FROM quienh WHERE m = ? AND t > ? ORDER BY t DESC LIMIT 800").bind(m, ahora - 30 * 864e5).all()).results || [];
-    out.hist = h.reverse().map((x) => [x.t, x.mayor, x.top10w, x.exch, x.pools, x.precio]);
+    const corte = ahora - 30 * 864e5;
+    const viejo = (await db.prepare("SELECT t, mayor, top10w, exch, pools, precio FROM quienh WHERE m = ? AND t IN (SELECT MAX(t) FROM quienh WHERE m = ? AND t <= ? GROUP BY t / 86400000) ORDER BY t").bind(m, m, corte).all()).results || [];
+    const nuevo = (await db.prepare("SELECT t, mayor, top10w, exch, pools, precio FROM quienh WHERE m = ? AND t > ? ORDER BY t").bind(m, corte).all()).results || [];
+    out.hist = viejo.concat(nuevo).map((x) => [x.t, x.mayor, x.top10w, x.exch, x.pools, x.precio]);
     out.seguido = out.hist.length > 0; out.desde = out.seguido ? out.hist[0][0] : null;
-    const a = (await db.prepare("SELECT t, k, w, de, a, dest, dn, tok, precio FROM avisos WHERE m = ? AND t > ? ORDER BY t DESC, tok DESC LIMIT 10").bind(m, ahora - 30 * 864e5).all()).results || [];
+    const a = (await db.prepare("SELECT t, k, w, de, a, dest, dn, tok, precio FROM avisos WHERE m = ? ORDER BY t DESC, tok DESC LIMIT 10").bind(m).all()).results || [];
     out.avisos = a.map((x) => [x.t, x.k, x.w, x.de, x.a, x.dest, x.dn, x.tok, x.precio]);
   } catch (e) { if (!no(e)) throw e; }
   try {
