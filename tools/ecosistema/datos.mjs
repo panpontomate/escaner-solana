@@ -206,6 +206,14 @@ for (const [cat, apN, grN] of CG_APS) {
   }
 }
 console.log("IA y juegos de CoinGecko en Solana:", tk.length);
+// 3c) DePIN (26/11, decidido por el usuario): io.net y Nosana pasan de IA a Otros › DePIN (son redes de GPUs) y entra Helium,
+//     que no está en ninguna de esas categorías. Su «uso real» es la red: ver redDePIN más abajo.
+for (const r of tk) if (r.gecko === "io" || r.gecko === "nosana") { r.ap = "Otros"; r.gr = "DePIN"; }
+if (!yaEsta.has("helium")) {
+  const hl = await cgj("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=helium&price_change_percentage=24h").catch(() => []);
+  for (const c of hl) tk.push({ n: "Helium", ap: "Otros", gr: "DePIN", med: "token", m: c.market_cap, c: null, r30: null, tvl: null, tok: true, sym: (c.symbol || "").toUpperCase(),
+    gecko: c.id, mcap: c.market_cap, vol: c.total_volume, precio: c.current_price, c24: c.price_change_percentage_24h != null ? c.price_change_percentage_24h / 100 : null, logo: c.image || "" });
+}
 const todas = [...sinHylo, ...st, ...tk];
 mover(todas);   // los de CoinGecko (Infinity Gaming, SOLPUMP) llegan después
 
@@ -293,12 +301,16 @@ for (let i = 0; i < conMintSel.length; i += 100) {
   const r = await j(RPC_SUP, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getMultipleAccounts", params: [lote.map((x) => x.mint), { encoding: "jsonParsed" }] }) }).catch(() => null);
   (r && r.result ? r.result.value : []).forEach((a, k) => { const inf = a && a.data && a.data.parsed && a.data.parsed.info; if (inf) { sup[lote[k].mint] = Number(inf.supply) / 10 ** inf.decimals; supplyCrudo[lote[k].mint] = Number(inf.supply); } });
 }
-hist.dias[dia] = { m: Object.fromEntries(sel.filter((r) => r.m > 0).map((r) => [r.n, Math.round(r.m)])), sin: sel.filter((r) => !r.tok).map((r) => r.n), sup };
+// DePIN: lo que hace cada red hoy, de su fuente pública (sin Helius). a = la cifra principal; se guarda cada día para el cambio a 30 d
+await redDePIN(sel);
+hist.dias[dia] = { m: Object.fromEntries(sel.filter((r) => r.m > 0).map((r) => [r.n, Math.round(r.m)])), sin: sel.filter((r) => !r.tok).map((r) => r.n), sup,
+  red: Object.fromEntries(sel.filter((r) => r.red && r.red.a > 0).map((r) => [r.n, r.red.a])) };
 for (const d of Object.keys(hist.dias)) if ((hoy - new Date(d)) / 864e5 > 400) delete hist.dias[d];
 const dias = Object.keys(hist.dias).sort();
 const viejo = dias.filter((d) => (hoy - new Date(d)) / 864e5 >= 28).pop();
 // IA y Memes (medidos por capitalización, «token»): solo con nuestro historial desde el 1/12 (decisión del 24/11),
 // así que el cambio a 30 días no sale hasta el 31/12; antes, «sin dato a 30 días»
+if (viejo) for (const r of sel) if (r.red && hist.dias[viejo].red && hist.dias[viejo].red[r.n] > 0) r.red.c30 = r.red.a / hist.dias[viejo].red[r.n] - 1;
 if (viejo) for (const r of sel) if (r.c == null && (r.med !== "token" || viejo >= "2026-12-01") && hist.dias[viejo].m[r.n] > 0 && r.m > 0) r.c = r.m / hist.dias[viejo].m[r.n] - 1;
 // Emisión a 30 días: cambio del supply frente a hace ≥28 días (positivo = se crearon tokens; negativo = se quemaron)
 const viejoSup = dias.filter((d) => (hoy - new Date(d)) / 864e5 >= 28 && hist.dias[d].sup).pop();
@@ -459,4 +471,28 @@ async function hacerPerfiles(sel) {
   for (const e of Object.values(t)) delete e.gecko;
   console.log("perfiles:", Object.keys(t).length, "tokens ·", Object.values(t).filter((e) => e.dl).length, "con desbloqueos ·", Object.values(t).filter((e) => e.cod && e.cod.dias != null).length, "con código");
   return { fecha: new Date().toISOString(), t };
+}
+
+// «La red hoy» de las redes DePIN (26/11). Cada fuente por separado: si una falla, esa fila sale sin el dato.
+//   io.net    explorador público: GPUs activas (a), registradas (t), verificadas (v)
+//   Nosana    panel público: wallets en staking (a), trabajos de GPU hechos (h) y dólares pagados a los nodos (p)
+//   Render    estadísticas de la fundación (JSON dentro de la página): nodos (a) y fotogramas renderizados (h)
+//   Helium    API de entidades: puntos de acceso registrados (a = IoT + móvil); los activos ya no los publica
+//   Hivemapper  lo que publica la empresa en beemaps.com/llms.txt (km únicos y totales); emp = cifra de la empresa
+async function redDePIN(filas) {
+  const de = (g) => filas.find((r) => r.gecko === g);
+  const tj = (u) => fetch(u, { headers: { "user-agent": "SolFlag/1.0 (+https://solflag.com)" }, signal: AbortSignal.timeout(20000) }).then((r) => r.ok ? r.json() : null).catch(() => null);
+  const tt = (u) => fetch(u, { headers: { "user-agent": "SolFlag/1.0 (+https://solflag.com)" }, signal: AbortSignal.timeout(20000) }).then((r) => r.ok ? r.text() : "").catch(() => "");
+  let r;
+  if ((r = de("io"))) { const x = await tj("https://api.io.solutions/v1/io-explorer/network/info"), d = x && x.data && x.data[0];
+    if (d && d.active_gpu >= 0) r.red = { k: "gpu", a: d.active_gpu, t: d.total_gpu, v: d.verified_gpu }; }
+  if ((r = de("nosana"))) { const [st, jb] = await Promise.all([tj("https://dashboard.k8s.prd.nos.ci/api/stats"), tj("https://dashboard.k8s.prd.nos.ci/api/jobs/stats")]);
+    if (st && st.stakers > 0) r.red = { k: "stake", a: st.stakers, h: jb && jb.completed ? Number(jb.completed) : null, p: jb && jb.usdReward ? Math.round(Number(jb.usdReward)) : null }; }
+  if ((r = de("render-token"))) { const h = await tt("https://stats.renderfoundation.com"), m = /frames\\?":(\d+),\\?"nodes\\?":(\d+)/.exec(h);
+    if (m) r.red = { k: "nodos", a: Number(m[2]), h: Number(m[1]) }; }
+  if ((r = de("helium"))) { const [i, mo] = await Promise.all(["iot", "mobile"].map((n) => tj("https://entities.nft.helium.io/v2/hotspots/pagination-metadata?subnetwork=" + n)));
+    if (i && mo && i.totalItems > 0) r.red = { k: "reg", a: i.totalItems + mo.totalItems, iot: i.totalItems, mob: mo.totalItems }; }
+  if ((r = de("hivemapper"))) { const h = await tt("https://beemaps.com/llms.txt"), t = /([\d.]+)M\+? km mapped/i.exec(h), u = /([\d.]+)M unique km/i.exec(h);
+    if (u) r.red = { k: "km", a: Math.round(Number(u[1]) * 1e6), t: t ? Math.round(Number(t[1]) * 1e6) : null, emp: true }; }
+  console.log("DePIN:", filas.filter((x) => x.red).map((x) => x.n + " " + x.red.a).join(" · "));
 }

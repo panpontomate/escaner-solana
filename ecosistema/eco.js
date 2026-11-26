@@ -349,13 +349,13 @@
       src: (f) => `“Usage”: what it charges in 30 days (DefiLlama, Solana only) or, if it charges nothing measurable, what its token is worth (CoinGecko). “Back to the token”: buybacks or payouts to holders in 30 days (DefiLlama). Holders and traders: Jupiter (organic = buyers that don't look like bots). Unlocks: Streamflow. Data from ${f}; not recommendations.`,
       queH: "What we check in a game token", queS: "Many have a token and hardly any players:", queL: ["Can you play it today?", "How many people really trade it", "How much is left to unlock", "If it charges, does the token gain from it?", "Is it a game or a casino?"] },
     ab: { th: ["Project", "Charges · 30 d", "Keeps", "Share of group", "Vs. market", "Token", "Signal"],
-      gr: [["Apps de trading", "Trading apps,", "web terminals to buy and sell"], ["Bots de Telegram", "Telegram bots,", "buy and sell from the chat"], ["Wallets", "Wallets,", "where you keep your tokens and sign"], ["Datos", "Data,", "charts and token lists"]],
+      gr: [["Apps de trading", "Trading apps,", "web terminals to buy and sell"], ["Bots de Telegram", "Telegram bots,", 'buy and sell from the chat <span class="ab-clave">🔑 the bot keeps your wallet key</span>'], ["Wallets", "Wallets,", 'where you keep your tokens and sign <span class="ab-clave v">🔑 you keep the key</span>'], ["Datos", "Data,", "charts and token lists"]],
       tot: (m, n) => `${m} in 30 days among ${n}`,
       dato: (v, a, b, s, n) => `Trading apps charge ${v} times more than Telegram bots: ${a} vs ${b} in 30 days. And ${s} of ${n} have no token: using them has nothing to do with buying one.`,
       src: (mk, f) => `Fees and what each one keeps: DefiLlama (only what's charged on Solana). “Share of group”: its part of what the whole group charges. “Vs. market”: how much it changed in 30 days compared with all Solana fees (${mk}). Market cap: CoinGecko. Data from ${f}; not recommendations.`,
       queH: "What we check in an app or a bot", queS: "Using it means giving it power over your money:", queL: ["Who holds your keys?", "How much it charges per trade", "If it has a token, does it gain from the business?", "Hacks and key leaks", "Copy trading: who's on the other side"] },
     ot: { th: ["Project", "Charges · 30 d", "Keeps", "Back to the token", "Token", "Traders 24 h", "Value × revenue", "Signal"],
-      sub: { DePIN: "networks of real devices paid for their use", "Privacidad": "hide balances and transfers", Pagos: "get paid, pay and distribute tokens", Herramientas: "what other projects use to work", Social: "news and networks" },
+      sub: { DePIN: "networks of devices and GPUs that people run", "Privacidad": "hide balances and transfers", Pagos: "get paid, pay and distribute tokens", Herramientas: "what other projects use to work", Social: "news and networks" },
       dato: (m, p, v, x) => `Render Network charges the most in this section (${m} in 30 days) and returns ${p}% to the token. Even so, its token is worth ${v}: ${x} times what it earns in a year.`,
       src: (f) => `“Charges”: fees users pay in 30 days. “Keeps”: the part the protocol keeps. “Back to the token”: buybacks or payouts to holders in 30 days. “Value × revenue”: its token's value divided by what it keeps in a year. Fees: DefiLlama (Solana only). Market cap: CoinGecko. Traders: Jupiter. Data from ${f}; not recommendations.`,
       queH: "What we check here", queS: "Each group is a different business:", queL: ["Are there real devices or users behind it?", "Does anything reach the token?", "Privacy: who controls the contract?", "How much is left to unlock", "How many people really trade it"] },
@@ -388,13 +388,13 @@
       src: (f) => `«Uso»: lo que cobra en 30 días (DefiLlama, solo en Solana) o, si no cobra nada medible, lo que vale su token (CoinGecko). «Devuelve al token»: recompras o reparto a titulares en 30 días (DefiLlama). Titulares y traders: Jupiter (orgánicos = compradores que no parecen bots). Desbloqueos: Streamflow. Datos del ${f}; no son recomendaciones.`,
       queH: "Qué miramos en un token de juego", queS: "Muchos tienen token y casi ningún jugador:", queL: ["¿Se puede jugar hoy?", "Cuánta gente lo mueve de verdad", "Cuánto queda por desbloquear", "Si cobra, ¿gana el token con ello?", "¿Es un juego o un casino?"] },
     ab: { th: ["Proyecto", "Cobra · 30 d", "Se queda", "Cuota del grupo", "Vs. mercado", "Token", "Señal"],
-      gr: [["Apps de trading", "Apps de trading,", "terminales web para comprar y vender"], ["Bots de Telegram", "Bots de Telegram,", "comprar y vender desde el chat"], ["Wallets", "Wallets,", "donde guardas tus tokens y firmas"], ["Datos", "Datos,", "gráficas y listas de tokens"]],
+      gr: [["Apps de trading", "Apps de trading,", "terminales web para comprar y vender"], ["Bots de Telegram", "Bots de Telegram,", 'comprar y vender desde el chat <span class="ab-clave">🔑 el bot guarda la clave de tu wallet</span>'], ["Wallets", "Wallets,", 'donde guardas tus tokens y firmas <span class="ab-clave v">🔑 la clave la guardas tú</span>'], ["Datos", "Datos,", "gráficas y listas de tokens"]],
       tot: (m, n) => `${m} en 30 días entre ${n}`,
       dato: (v, a, b, s, n) => `Las apps de trading cobran ${v} veces más que los bots de Telegram: ${a} frente a ${b} en 30 días. Y ${s} de ${n} no tienen token: usarlas no tiene nada que ver con comprar uno.`,
       src: (mk, f) => `Comisiones y lo que se queda cada uno: DefiLlama (solo lo cobrado en Solana). «Cuota del grupo»: su parte de lo que cobra todo el grupo. «Vs. mercado»: cuánto cambió en 30 días comparado con todas las comisiones de Solana (${mk}). Capitalización: CoinGecko. Datos del ${f}; no son recomendaciones.`,
       queH: "Qué miramos en una app o un bot", queS: "Usarla es darle permiso sobre tu dinero:", queL: ["¿Quién guarda tus claves?", "Cuánto cobra por operación", "Si tiene token, ¿gana con el negocio?", "Hackeos y fugas de claves", "Copiar operaciones: quién está al otro lado"] },
     ot: { th: ["Proyecto", "Cobra · 30 d", "Se queda", "Devuelve al token", "Token", "Traders 24 h", "Vale × ingresos", "Señal"],
-      sub: { DePIN: "redes de aparatos reales que cobran por su uso", "Privacidad": "esconder saldos y movimientos", Pagos: "cobrar, pagar y repartir tokens", Herramientas: "lo que usan otros proyectos para funcionar", Social: "noticias y redes" },
+      sub: { DePIN: "redes de aparatos y GPUs que pone la gente", "Privacidad": "esconder saldos y movimientos", Pagos: "cobrar, pagar y repartir tokens", Herramientas: "lo que usan otros proyectos para funcionar", Social: "noticias y redes" },
       dato: (m, p, v, x) => `Render Network es el que más cobra de este apartado (${m} en 30 días) y devuelve al token el ${p} %. Aun así, su token vale ${v}: ${x} veces lo que ingresa en un año.`,
       src: (f) => `«Cobra»: comisiones que pagan los usuarios en 30 días. «Se queda»: la parte que se queda el protocolo. «Devuelve al token»: recompras o reparto a titulares en 30 días. «Vale × ingresos»: lo que vale su token dividido entre lo que se queda en un año. Comisiones: DefiLlama (solo Solana). Capitalización: CoinGecko. Traders: Jupiter. Datos del ${f}; no son recomendaciones.`,
       queH: "Qué miramos aquí", queS: "Cada grupo es un negocio distinto:", queL: ["¿Hay aparatos o usuarios reales detrás?", "¿Llega algo al token?", "Privacidad: ¿quién controla el contrato?", "Cuánto queda por desbloquear", "Cuánta gente lo mueve de verdad"] },
@@ -418,6 +418,42 @@
     return `<span class="mq-bar mq-mini" title="${esc((p ? p.rol + " · " + p.n + ": " : "") + MZ.barT(num(q.top10w, 1), num(q.exch, 1), num(q.pools, 1)))}"><i class="w" style="width:${q.top10w}%"></i><i class="j" style="width:${q.proy || 0}%"></i><i class="x" style="width:${q.exch}%"></i><i class="p" style="width:${q.pools}%"></i><i class="r" style="width:${resto}%"></i></span>`; };
   const manoV = (t) => t ? `<small class="mano" title="${esc(V.mano(t.src))}">${esc(EN ? t.en : t.es)}</small>` : "";
   const cambioV = (r) => `<small><span class="${(r.c || 0) >= 0 ? "up" : "dn"}">${r.c == null ? "&nbsp;" : pcv(r.c) + V.vsMes}</span></small>`;
+  // Apps y bots › hackeos y fugas de claves (26/11, maqueta ecosistema-apps-riesgos): DefiLlama, api.llama.fi/hacks
+  const HK = [{ n: "Bloom Trading Bot", d: "2026-10-26", cad: "Solana", p: 953000, dev: 0, c: 0 }, { n: "Banana Gun", d: "2024-09-19", cad: "Ethereum", p: 3000000, dev: 3000000, c: 1 },
+    { n: "Maestro", d: "2023-10-23", cad: "Ethereum", p: 500000, dev: 465000, c: 2 }];
+  const HK_FUERA = [{ n: "Solareum", q: 0, d: "2024-03-29", p: 1400000, c: 3 }, { n: "Slope Wallet", q: 1, d: "2022-08-02", p: 4100000, c: 4 }];
+  const HKT = EN ? { h: "Hacks and key leaks", s: "What happened to apps, bots and wallets: when something keeps your key or signs for you, its failure is your money.",
+      lista: "⚠ From this list", fuera: "🔒 Solana cases no longer here", perd: (v) => v + " lost", dev: "returned", devP: (v) => v + " returned", q: ["Telegram bot", "wallet"],
+      como: ["supply chain attack", "website compromised", "permission flaw in its contract", "accounts taken over; it shut down", "kept its users' keys on a server"],
+      sen: (f, cad, v, ok) => `Hacked on ${f}${cad !== "Solana" ? " (on " + cad + ")" : ""}: ${v} lost${ok ? " and returned" : ""}`, src: "Hacks: DefiLlama, with what was lost and returned. " }
+    : { h: "Hackeos y fugas de claves", s: "Lo que ha pasado con apps, bots y wallets: cuando algo guarda tu clave o firma por ti, un fallo suyo es tu dinero.",
+      lista: "⚠ De esta lista", fuera: "🔒 Casos de Solana que ya no están", perd: (v) => v + " perdidos", dev: "devueltos", devP: (v) => v + " devueltos", q: ["bot de Telegram", "wallet"],
+      como: ["ataque a la cadena de suministro", "web comprometida", "fallo de permisos en su contrato", "robo de cuentas; cerró", "guardaba las claves de sus usuarios en un servidor"],
+      sen: (f, cad, v, ok) => `Hackeado el ${f}${cad !== "Solana" ? " (en " + cad + ")" : ""}: ${v} ${ok ? "perdidos y devueltos" : "perdidos"}`, src: "Hackeos: DefiLlama, con lo perdido y lo devuelto que publica. " };
+  const fHk = (d) => new Date(d + "T12:00:00Z").toLocaleDateString(EN ? "en-GB" : "es-ES", { day: "numeric", month: "short", year: "numeric" });
+  const hkSen = (r) => { const h = HK.find((x) => x.n === r.n); if (!h) return ""; const ok = h.dev >= h.p * 0.9;
+    return `<span class="mz-sen ${ok ? "mz-a" : "mz-r"}">${HKT.sen(fHk(h.d), h.cad, fm(h.p), ok)}</span>`; };
+  const hkTira = () => `<section class="df-riesgo ab-riesgo"><div class="top"><b>${HKT.h}</b><span>${HKT.s}</span></div><div class="rcols">` +
+    `<div><h4>${HKT.lista}</h4>${HK.map((h) => `<div class="ri"><span class="av">${esc(h.n.slice(0, 2).toUpperCase())}</span><b>${esc(h.n)}</b><span>${fHk(h.d)} · ${h.cad} · <em class="r">${HKT.perd(fm(h.p))}</em>${h.dev ? " · " + (h.dev >= h.p * 0.9 ? HKT.dev : HKT.devP(fm(h.dev))) : ""}<small>${HKT.como[h.c]}</small></span></div>`).join("")}</div>` +
+    `<div><h4>${HKT.fuera}</h4>${HK_FUERA.map((h) => `<div class="ri"><span class="av">${esc(h.n.slice(0, 2).toUpperCase())}</span><b>${esc(h.n)}</b><span>${HKT.q[h.q]} · ${fHk(h.d)} · <em class="r">${HKT.perd(fm(h.p))}</em><small>${HKT.como[h.c]}</small></span></div>`).join("")}</div></div></section>`;
+  // Otros › DePIN (26/11, maqueta ecosistema-depin): «la red hoy» de cada red (datos.mjs › redDePIN)
+  const DPT = EN ? { th: ["Project", "Worth · 24 h", "Charges · 30 d", "The network today", "Work done", "Signal"], cobra: "charges 30 d", sinDato: "no data",
+      gpu: "active GPUs", gpuS: (t, v) => `of ${t} registered · ${v} verified`, stake: "staking", stakeS: "NOS holders staking", nodos: "nodes", nodosS: "Render Foundation figure",
+      reg: "hotspots registered", regS: (i, m) => `${i} IoT · ${m} mobile · Helium no longer publishes how many are active`, km: "unique km mapped", kmS: (t) => (t ? t + " km in total · " : "") + "company figure",
+      jobs: "GPU jobs done", jobsS: (p) => p + " paid to GPU providers", frames: "frames rendered", framesS: "since it started", c30: (p) => p + " in 30 d",
+      sGpu: (v, n, x) => `Worth ${v} with ${n} active GPUs: ${x} per GPU`, sReg: "Registered is not active: Helium stopped publishing it",
+      sJobs: (n) => `Pays nodes for real work: ${n} jobs done`, sKm: (m) => `On-chain it charges ${m} in 30 days: it sells its maps off-chain`,
+      dato: (r, a, t, v) => `Of the ${t} GPUs registered on io.net, ${a} are active today. Its token is worth ${v}.`, de: (a, b) => `1 of ${b}`,
+      src: "«The network today» and «Work done»: each network's public source (io.net explorer, Nosana dashboard, Render Foundation stats, Helium entity API; Hivemapper: what the company publishes). Saved every day for the 30-day change. " }
+    : { th: ["Proyecto", "Vale · 24 h", "Cobra · 30 d", "La red hoy", "Trabajo hecho", "Señal"], cobra: "cobra 30 d", sinDato: "sin dato",
+      gpu: "GPUs activas", gpuS: (t, v) => `de ${t} registradas · ${v} verificadas`, stake: "en staking", stakeS: "titulares de NOS que bloquean", nodos: "nodos", nodosS: "dato de la fundación de Render",
+      reg: "puntos de acceso registrados", regS: (i, m) => `${i} IoT · ${m} móvil · Helium ya no publica cuántos están activos`, km: "km únicos mapeados", kmS: (t) => (t ? t + " km en total · " : "") + "cifra de la empresa",
+      jobs: "trabajos de GPU hechos", jobsS: (p) => p + " pagados a quien pone las GPUs", frames: "fotogramas renderizados", framesS: "desde que empezó", c30: (p) => p + " en 30 d",
+      sGpu: (v, n, x) => `Vale ${v} con ${n} GPUs activas: ${x} por GPU`, sReg: "Registrados no es lo mismo que activos: Helium dejó de publicarlo",
+      sJobs: (n) => `Paga a los nodos con trabajos de verdad: ${n} hechos`, sKm: (m) => `En la cadena cobra ${m} en 30 días: vende sus mapas fuera de ella`,
+      dato: (r, a, t, v) => `De las ${t} GPUs registradas en io.net, hoy están activas ${a}. Su token vale ${v}.`, de: (a, b) => `1 de ${b}`,
+      src: "«La red hoy» y «Trabajo hecho»: la fuente pública de cada red (explorador de io.net, panel de Nosana, estadísticas de la fundación de Render, API de entidades de Helium; Hivemapper: lo que publica la empresa). Se guarda cada día para el cambio a 30 días. " };
+  const nM = (n) => n >= 1e6 ? num(n / 1e6, n >= 1e7 ? 0 : 1) + (EN ? "M" : " M") : num(n);
   const datoV = (b, p) => `<div class="mz-dato"><span class="mz-k">${V.dato}</span><b>${b}</b><p>${p}</p></div>`;
   const queV = (q) => `<div class="mz-que"><div class="top"><b>${q.queH}</b><span>${q.queS}</span></div><ul>${q.queL.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
   const tit2 = (t, s, tot) => `<h2>${t} <small>${s}</small><span class="ab-tot">${tot}</span></h2>`;
@@ -518,7 +554,7 @@
 
   function appsVista() {
     const rs = deApV("Apps y bots"), q = V.ab; pideQZ();
-    const senal = (r) => { const sb = senalB(r); if (sb) return sb;
+    const senal = (r) => { const hs = hkSen(r); if (hs) return hs; const sb = senalB(r); if (sb) return sb;
       if (r.cad) return r.copias ? `<span class="mz-sen mz-a">${V.copias(r.copias)}</span>` : `<span class="mz-sen mz-a">${V.fuera}</span>`;
       if (r.tok && r.mcap && r.m) { const x = r.mcap / (r.m * 12);
         if (r.m < 5e3) return `<span class="mz-sen mz-a">${V.vxPoco(fm(r.mcap), fmv(r.m))}</span>`;
@@ -536,8 +572,8 @@
       return l.length ? `<section class="mz-card">${tit2(t1, t2, q.tot(fm(tot), l.length))}${head}${l.map((r, i) => fila(r, i, tot)).join("")}</section>` : ""; }).join("");
     const apps = sumaV(rs.filter((r) => r.gr === "Apps de trading"), "m"), bots = sumaV(rs.filter((r) => r.gr === "Bots de Telegram"), "m");
     const veces = bots ? Math.round(apps / bots) : 0;
-    $("#lista").innerHTML = (veces >= 2 ? datoV(veces + "×", q.dato(veces, fm(apps), fm(bots), rs.filter((r) => !r.tok).length, rs.length)) : "") + tarj +
-      `<p class="mz-src">${q.src(MK(), fechaV())}</p>` + queV(q);
+    $("#lista").innerHTML = (veces >= 2 ? datoV(veces + "×", q.dato(veces, fm(apps), fm(bots), rs.filter((r) => !r.tok).length, rs.length)) : "") + hkTira() + tarj +
+      `<p class="mz-src">${HKT.src}${q.src(MK(), fechaV())}</p>` + queV(q);
   }
 
   function otrosVista() {
@@ -554,7 +590,24 @@
       `<span class="mz-x ot-tr">${r.trad != null ? fk(r.trad) : "—"}<small>${r.org != null ? MZ.org(r.org) : "&nbsp;"}</small></span><span class="mz-x ot-vx">${vxV(r)}</span>${senal(r)}${goV(r)}</div>`;
     const head = `<div class="mz-t ot mz-h"><span class="mz-i"></span><span></span><span>${q.th[0]}</span><span>${q.th[1]}</span><span class="ot-q">${q.th[2]}</span><span class="ot-dev">${q.th[3]}</span><span class="ot-tk">${q.th[4]}</span><span class="ot-tr">${q.th[5]}</span><span class="ot-vx">${q.th[6]}</span><span class="ot-sen">${q.th[7]}</span><span class="go"></span></div>`;
     const grupos = [...new Set(rs.map((r) => r.gr))].map((g) => ({ g, l: rs.filter((r) => r.gr === g).sort((a, b) => (b.m || 0) - (a.m || 0)) })).sort((a, b) => sumaV(b.l, "m") - sumaV(a.l, "m"));
-    const tarj = grupos.map(({ g, l }) => `<section class="mz-card">${tit2(esc(grNom(g)) + ",", q.sub[g] || "", V.proy(l.length) + V.cobran(fm(sumaV(l, "m"))))}${head}${l.map(fila).join("")}</section>`).join("");
+    const dpSen = (r) => { const x = r.red; if (!x) return senal(r);
+      if (x.k === "gpu" && x.a > 0 && r.cap) return `<span class="mz-sen mz-r">${DPT.sGpu(fm(r.cap), num(x.a), fm(r.cap / x.a))}</span>`;
+      if (x.k === "reg") return `<span class="mz-sen mz-a">${DPT.sReg}</span>`;
+      if (x.k === "stake" && x.h) return `<span class="mz-sen mz-v">${DPT.sJobs(nM(x.h))}</span>`;
+      if (x.k === "km" && r.med === "fees") return `<span class="mz-sen mz-a">${DPT.sKm(fm(r.m || 0))}</span>`;
+      return senal(r); };
+    const dpRed = (r) => { const x = r.red; if (!x) return '<span class="dp-red"><span class="mz-na">—</span></span>';
+      const main = { gpu: DPT.gpu, stake: DPT.stake, nodos: DPT.nodos, reg: DPT.reg, km: DPT.km }[x.k];
+      const sub = x.k === "gpu" ? DPT.gpuS(num(x.t), num(x.v)) : x.k === "stake" ? DPT.stakeS : x.k === "nodos" ? DPT.nodosS : x.k === "reg" ? DPT.regS(num(x.iot), num(x.mob)) : DPT.kmS(x.t ? nM(x.t) : "");
+      return `<span class="dp-red"><b>${x.k === "km" ? nM(x.a) : num(x.a)}</b> ${main}${x.c30 != null ? ` <em class="${x.c30 >= 0 ? "up" : "dn"}">${DPT.c30(pcv(x.c30))}</em>` : ""}<small>${sub}</small></span>`; };
+    const dpHecho = (r) => { const x = r.red; if (!x || !x.h) return '<span class="dp-red dp-hecho"><span class="mz-na">—</span></span>';
+      return x.k === "stake" ? `<span class="dp-red dp-hecho"><b>${num(x.h)}</b> ${DPT.jobs}<small>${x.p ? DPT.jobsS(fm(x.p)) : ""}</small></span>` : `<span class="dp-red dp-hecho"><b>${num(x.h)}</b> ${DPT.frames}<small>${DPT.framesS}</small></span>`; };
+    const dpFila = (r, i) => `<div class="mz-t dp"><span class="mz-i">${i + 1}</span>${av(r)}${nomV(r)}<span class="mz-x">${fm(r.cap || r.mcap)}<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${r.c24 == null ? "" : pcv(r.c24) + (EN ? " 24h" : " 24 h")}</span></small></span>` +
+      `<span class="mz-x dp-cob">${r.med === "fees" ? fmv(r.m) : "—"}<small>${r.med === "fees" ? DPT.cobra : DPT.sinDato}</small></span>${dpRed(r)}${dpHecho(r)}${dpSen(r)}${goV(r)}</div>`;
+    const dpHead = `<div class="mz-t dp mz-h"><span class="mz-i"></span><span></span>${DPT.th.map((h, k) => `<span class="${k === 2 ? "dp-cob" : k === 4 ? "dp-hecho" : ""}">${h}</span>`).join("")}<span class="go"></span></div>`;
+    const tarj = grupos.map(({ g, l }) => g === "DePIN"
+      ? `<section class="mz-card">${tit2(esc(grNom(g)) + ",", q.sub[g] || "", V.proy(l.length))}${dpHead}${l.slice().sort((a, b) => (b.cap || b.mcap || 0) - (a.cap || a.mcap || 0)).map(dpFila).join("")}<p class="mz-src">${DPT.src}</p></section>`
+      : `<section class="mz-card">${tit2(esc(grNom(g)) + ",", q.sub[g] || "", V.proy(l.length) + V.cobran(fm(sumaV(l, "m"))))}${head}${l.map(fila).join("")}</section>`).join("");
     const rn = rs.find((r) => /^Render Network/.test(r.n));
     const dato = rn && rn.vx && rn.h30 && rn.ing ? datoV(num(rn.vx) + "×", q.dato(fm(rn.m), Math.round(rn.h30 / rn.ing * 100), fm(rn.mcap), num(rn.vx))) : "";
     $("#lista").innerHTML = dato + tarj + `<p class="mz-src">${q.src(fechaV())}</p>` + queV(q);
