@@ -418,7 +418,8 @@ export async function handle(req, env) {
 }
 
 // Reloj de los workflows: el horario de GitHub se salta ejecuciones, así que los lanza el Worker:
-// recogida cada 15 min y caras (con el Mapa del momento) a los minutos 7 y 37 (25/11: GitHub solo corrió caras 2 veces en el día).
+// recogida cada 15 min y caras (con el Mapa del momento) cada hora al minuto 7 (25/11: GitHub solo corrió caras 2 veces en el día;
+// 26/11: de cada 30 min a cada hora, por el gasto de Helius).
 // Necesita el secreto GH_DISPATCH_TOKEN (token fino de GitHub, solo este repo, permiso Actions: escritura).
 async function lanzarWorkflow(env, wf) {
   if (!env.GH_DISPATCH_TOKEN) return;
@@ -437,7 +438,7 @@ async function lanzarWorkflow(env, wf) {
 
 export default {
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(lanzarWorkflow(env, event.cron === "7,37 * * * *" ? "caras.yml" : "recogida.yml"));
+    ctx.waitUntil(lanzarWorkflow(env, event.cron === "7 * * * *" ? "caras.yml" : "recogida.yml"));
   },
   async fetch(req, env, ctx) {
     const cache = typeof caches !== "undefined" ? caches.default : null;

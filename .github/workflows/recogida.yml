@@ -1,5 +1,5 @@
 # Recogida de datos de los tokens de la portada (24/11/2026): cada 15 min, fotos de precio, volumen, compras/ventas y
-# operaciones grandes con su wallet (gratis) y, cada 30 min, las 20 mayores cuentas y la cantidad de tokens (Helius).
+# operaciones grandes con su wallet (gratis) y, cada 2 horas, las 20 mayores cuentas y la cantidad de tokens (Helius).
 # Va a su propia rama «recogida» (un archivo por día), así no llena main de commits ni toca los datos de la web.
 # Si GitHub se salta ejecuciones, la siguiente recoge las operaciones grandes desde la última vista (hasta 300).
 name: recogida

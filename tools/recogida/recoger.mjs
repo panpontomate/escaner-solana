@@ -1,7 +1,7 @@
 // Recogida de datos de los tokens de la portada (24/11/2026). Cada 15 min (GitHub Actions, workflow recogida.yml):
 //   · gratis: precio, volumen, compras/ventas y liquidez del pool principal (DexScreener, una petición para todos) y
 //     las operaciones de más de 1.000 $ con su wallet (GeckoTerminal, las nuevas desde la última vista);
-//   · cada 30 min (con SOLANA_RPC de Helius): las 20 mayores cuentas y la cantidad de tokens;
+//   · cada 2 horas (con SOLANA_RPC de Helius; 26/11, antes cada 30 min y gastaba demasiado): las 20 mayores cuentas y la cantidad de tokens;
 //     cada cuenta va como [cuenta, cantidad, dueño] y los dueños ya vistos se guardan en estado.json (25/11).
 // Guarda una línea JSON por foto en <SALIDA>/AAAA-MM-DD.jsonl y la memoria (lo último visto) en <SALIDA>/estado.json.
 // Sirve para el simulador: dos semanas mirando qué se ve antes de los movimientos, sin estrategia fijada.
@@ -146,8 +146,8 @@ async function main() {
   const vh = (m) => (P[m] && P[m].vol && P[m].vol.h1) || 0;
   LISTA.sort((x, y) => vh(y[1]) - vh(x[1]));
   const finGT = Date.now() + 6 * 60000;
-  // 2) Helius cada 30 min (la foto de los minutos 0–14 y 30–44)
-  const conHelius = !!RPC && Math.floor(new Date(ahora).getUTCMinutes() / 15) % 2 === 0;
+  // 2) Helius cada 2 horas (la foto de los minutos 0–14 de las horas pares UTC)
+  const conHelius = !!RPC && new Date(ahora).getUTCHours() % 2 === 0 && new Date(ahora).getUTCMinutes() < 15;
   const filas = [], porMint = {};
   for (const [sym, m, ap] of LISTA) {
     const p = P[m] || null, f = { t: ahora, sym, m, ap, dx: p };

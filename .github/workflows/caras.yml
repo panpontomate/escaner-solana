@@ -1,11 +1,9 @@
-# Caras conocidas, base de wallets y registro de tokens: cada 30 minutos apunta tokens nuevos, mira cómo acabaron
+# Caras conocidas, base de wallets y registro de tokens: cada hora (lo lanza el Worker solflag-api) apunta tokens nuevos, mira cómo acabaron
 # los de hace 24 h (y 7 días en el registro) y publica caras.json y datos/ en solflag.com: van en la rama "datos" y
 # pages.yml los junta con la web, así no llenan de commits la rama main. La memoria entre ejecuciones va en
 # Cloudflare KV (tools/caras/nube.mjs) con la caché de Actions de respaldo.
 name: caras
 on:
-  schedule:
-    - cron: "7,37 * * * *"
   workflow_dispatch:
 permissions:
   contents: write
