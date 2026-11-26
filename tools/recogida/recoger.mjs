@@ -98,7 +98,7 @@ export function quienDe(top, supply, tipo) {
 export const QUIEN_SCHEMA = "CREATE TABLE IF NOT EXISTS quien (m TEXT PRIMARY KEY, t INTEGER, mayor REAL, top10w REAL, exch REAL, pools REAL)";
 // wallets de exchanges conocidos: la lista del motor (src/known.js), leída de jsDelivr una vez al día
 async function exchangesConocidos(est, ahora) {
-  if (est.exch && est.exch.t > ahora - 864e5) return new Set(est.exch.l);
+  if (est.exch && est.exch.n && est.exch.t > ahora - 864e5) return new Set(est.exch.l);
   const txt = await fetch("https://cdn.jsdelivr.net/npm/solana-risk-engine@latest/src/known.js").then((r) => r.ok ? r.text() : "").catch(() => "");
   const xs = [...txt.matchAll(/"([1-9A-HJ-NP-Za-km-z]{32,44})":\s*\{([^}]*)t:\s*"exchange"/g)], l = xs.map((x) => x[1]);
   const n = {}; for (const x of xs) { const nm = /n:\s*"([^"]+)"/.exec(x[2]); if (nm) n[x[1]] = nm[1]; }
@@ -190,6 +190,9 @@ async function historial(est, filas, tipo, ahora) {
   for (const sql of HIST_SCHEMA) await d1({ sql });
   for (const st of insertsHist("quienh", "m, t, mayor, top10w, exch, pools, precio", H)) await d1(st);
   for (const st of insertsHist("avisos", "m, t, k, w, de, a, dest, dn, tok, precio", A)) await d1(st);
+  // avisos guardados sin el nombre del exchange (el 26/11 la lista de nombres aún no estaba): se completan
+  const dests = Object.keys(nombres).filter((d) => B58.test(d));
+  if (dests.length) await d1({ sql: "UPDATE avisos SET dn = CASE dest " + dests.map((d) => "WHEN " + sqlVal(d) + " THEN " + sqlVal(nombres[d])).join(" ") + " END WHERE dn IS NULL AND dest IN (" + dests.map(sqlVal).join(",") + ")" });
   await d1({ sql: "DELETE FROM quienh WHERE t < ?", params: [ahora - 30 * 864e5] });
   await d1({ sql: "DELETE FROM avisos WHERE t < ?", params: [ahora - 30 * 864e5] });
   for (const m of Object.keys(est.prev)) if (!filas.some((f) => f.m === m)) delete est.prev[m];

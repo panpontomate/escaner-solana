@@ -2391,6 +2391,57 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 .mktl{list-style:none;margin:0;padding:0}
 .mkall{margin:10px 0 2px}
 #t-hold .mkstory{margin:4px 0 18px}
+/* Ballenas › historial y avisos (26/11) */
+#whh:empty{display:none}
+#whh{margin:0 0 6px}
+#whh .whh-b{border-top:1px solid rgba(196,181,253,.16);padding:16px 0 18px}
+#whh .whh-k{margin:0 0 10px;color:#f0abfc;font:700 .74rem/1.4 Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase}
+#whh .whh-k small{letter-spacing:0;text-transform:none;font-weight:500;color:var(--muted);font-size:.8rem;margin-left:6px}
+#whh .whh-v{margin:0;color:var(--muted);font-size:.9rem}
+#whh .whh-av{border-left:3px solid #fbbf24;padding:8px 0 8px 14px;margin:0 0 10px}
+#whh .whh-av:last-child{margin-bottom:0}
+#whh .whh-av>b{font-size:1rem;color:#fbbf24}
+#whh .whh-av.tq{border-color:#7ab8c4}#whh .whh-av.tq>b{color:var(--fg)}
+#whh .whh-av p{margin:3px 0 0;color:var(--muted);font-size:.88rem}
+#whh .whh-av a{color:#7ab8c4}
+#whh .whh-hs{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px 28px;align-items:center}
+#whh .whh-g{position:relative;padding:0 0 22px 36px}
+#whh .whh-svg{display:block;width:100%;height:170px;overflow:visible}
+#whh .whh-svg .gr line{stroke:rgba(196,181,253,.08);stroke-width:1;vector-effect:non-scaling-stroke}
+#whh .whh-svg .mk{stroke:#fbbf24;stroke-dasharray:4 4;stroke-width:1;vector-effect:non-scaling-stroke}
+#whh .ln{fill:none;stroke-width:2.2;stroke-linejoin:round}
+#whh .ln.w1{stroke:#c4b5fd}#whh .ln.w2{stroke:rgba(196,181,253,.45);stroke-dasharray:6 4}#whh .ln.x{stroke:#7ab8c4}#whh .ln.p{stroke:#fbbf24;stroke-width:1.6}
+#whh .whh-y{position:absolute;left:0;top:0;width:34px;height:170px}
+#whh .whh-y span,#whh .whh-x span{position:absolute;font-size:.7rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+#whh .whh-y span{left:0;transform:translateY(-50%)}
+#whh .whh-x{position:absolute;left:36px;right:0;bottom:0;height:16px}
+#whh .whh-x span{transform:translateX(-50%);top:0}
+#whh .whh-x span:first-child{transform:none}#whh .whh-x span:last-child{transform:translateX(-100%)}
+#whh .whh-mk{position:absolute;top:-6px;transform:translateX(-50%);font-size:.7rem;font-weight:700;color:#fbbf24;background:#09071c;padding:0 4px;white-space:nowrap}
+#whh .whh-f{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:2px 10px;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(196,181,253,.16)}
+#whh .whh-f:last-child{border:0}
+#whh .whh-f i{width:12px;height:3px;border-radius:2px;align-self:center}
+#whh .whh-f i.w1{background:#c4b5fd}#whh .whh-f i.w2{background:rgba(196,181,253,.45)}#whh .whh-f i.x{background:#7ab8c4}#whh .whh-f i.p{background:#fbbf24}
+#whh .whh-f span{font-size:.88rem;color:var(--muted)}
+#whh .whh-f b{font-variant-numeric:tabular-nums;font-size:.92rem;white-space:nowrap}
+#whh .whh-f b em{font-style:normal;color:var(--muted)}
+#whh .whh-f small{grid-column:3;justify-self:end;font-size:.74rem;color:var(--muted)}
+#whh .whh-bar{display:flex;height:10px;border-radius:9px;overflow:hidden;background:rgba(255,255,255,.04)}
+#whh .whh-bar i,#whh .whh-ley i{display:block;height:100%}
+#whh i.w{background:#c4b5fd}#whh i.x{background:#7ab8c4}#whh i.p{background:#fbbf24}#whh i.r{background:rgba(255,255,255,.08)}
+#whh .whh-ley{display:flex;gap:6px 16px;flex-wrap:wrap;align-items:center;font-size:.78rem;color:var(--muted);margin:8px 0 0}
+#whh .whh-ley span{display:inline-flex;align-items:center;gap:6px}
+#whh .whh-ley i{display:inline-block;width:10px;height:10px;border-radius:3px}
+#whh .su{color:#4ade80}#whh .ba{color:#ff6b6b}
+#whh .whh-or{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 6px;font-size:.92rem}
+#whh .whh-or b{font-variant-numeric:tabular-nums}#whh .whh-or .n{color:var(--muted)}
+#whh .whh-ops{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px}
+#whh .whh-op{display:grid;grid-template-columns:44px 58px 70px 1fr;gap:8px;align-items:baseline;padding:6px 0;border-bottom:1px solid rgba(196,181,253,.16);font-size:.86rem;font-variant-numeric:tabular-nums}
+#whh .whh-op .h{color:var(--muted)}
+#whh .whh-op a{justify-self:end;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.78rem;color:#7ab8c4}
+#whh .whh-pie{margin:0 0 14px;font-size:.76rem;color:var(--muted)}
+@media (max-width:760px){#whh .whh-hs,#whh .whh-ops{grid-template-columns:1fr}}
+@media (max-width:380px){#whh .whh-op{grid-template-columns:40px 52px 62px 1fr;font-size:.8rem}#whh .whh-g{padding-left:30px}#whh .whh-x{left:30px}}
 /* tira de Dato (maqueta web/escaner-meme.html, 21/11) */
 .dato{margin-top:16px;display:grid;grid-template-columns:auto 1fr;column-gap:18px;align-items:center;border-left:3px solid var(--ac,#7ab8c4);border-radius:4px 14px 14px 4px;padding:14px 18px;background:linear-gradient(120deg,var(--acb,rgba(122,184,196,.1)),rgba(255,255,255,.015) 75%)}
 .dato .kick{grid-column:1/-1;margin:0 0 6px;color:var(--ac,#7ab8c4);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase}
@@ -4459,7 +4510,7 @@ function tokenDetail(r){
       "<div id='whobox'><p class='hint'>Buscando en el registro de SolFlag…</p></div>"+
       "<p class='wsrc'>Hechos del registro de SolFlag (desde el 29/10/2026): quién pagó, creó y financió cada lanzamiento y cómo acabó a las 24 h. Son datos, no acusaciones. ¿Un dato mal? <a href='mailto:solflag.team@gmail.com'>Escríbenos</a>.</p></section>"+
     (r.emisor?"":"<section class='card tdc hcompact' id='t-hold'><h2>Ballenas <small>las cuentas con más saldo</small></h2>"+
-      "<div class='mkstory' id='mkstory'></div>"+
+      "<div class='mkstory' id='mkstory'></div><div class='whh' id='whh'></div>"+
       "<div class='tlazy' id='thlazy'><span>Mira quién tiene más de este token: personas, exchanges, pools y grupos que comparten financiador.</span><button type='button' class='btn small' data-hold='"+esc(r.mint)+"'>Ver las ballenas</button></div>"+
       "<button type='button' class='btn small hfull' id='hfull' hidden>Ver todas las ballenas →</button></section>")+
     "<div class='pie-ci'><span>!</span><p><b>SolFlag da datos, no consejos de inversión.</b> Nada de esta página es una recomendación para comprar, vender o mantener ningún token. El nivel y las banderas resumen lo que vemos en la cadena y en fuentes públicas en este momento, y pueden cambiar. Comprueba siempre por tu cuenta y no pongas dinero que no puedas permitirte perder.</p></div>";
@@ -4472,6 +4523,7 @@ function tokenDetail(r){
   if(!r.img) tokenLogo(r);
   tnavSpy();
   holdAuto(r);
+  whhLoad(r);
 }
 // Ballenas solas (15/11): la búsqueda empieza cuando el apartado aparece en pantalla y enseña el resumen y las 3
 // primeras; «Ver todas» abre el resto. Va desde el navegador con los servicios públicos (o tu Helius), como el botón.
@@ -4487,6 +4539,77 @@ function holdAuto(r){
     state.holdAuto=true; whalesInline(r.mint).finally(function(){ state.holdAuto=false; showHfull(); });
   },{rootMargin:"0px 0px 200px 0px"});
   holdObs.observe(box);
+}
+// Ballenas › historial y avisos (26/11, maqueta escaner-ballenas): de los tokens que sigue la recogida (los del
+// Ecosistema y los más analizados), /api/ballenas/<mint> da la foto de las 20 mayores cuentas cada 2 h (30 días), los
+// avisos sacados de comparar una foto con la anterior y las operaciones de más de 1.000 $ de 24 h. Son hechos de la cadena.
+function whPc(x){ return sapN(x,1)+" %"; }
+function whhLoad(r){
+  var box=$("#whh"); if(!box) return; box.innerHTML="";
+  fetch(API+"ballenas/"+r.mint).then(function(x){ return x.ok?x.json():null; }).then(function(d){
+    if(state.token!==r||!d) return; var b=$("#whh"); if(b) b.innerHTML=whhHtml(d);
+  }).catch(function(){});
+}
+function whhCuando(t){ return new Date(t).toDateString()===new Date().toDateString()?"Hoy a las {h}".replace("{h}",ftime(t)):fdate(t)+" "+ftime(t); }
+function whhAviso(a,d){
+  var t=a[0],k=a[1],w=a[2],de=a[3],ya=a[4],xn=a[6],tok=a[7],pr=a[8];
+  var antes=null; d.hist.forEach(function(h){ if(h[0]<t) antes=h; });
+  var quien=antes&&de!=null&&Math.abs(antes[1]-de)<0.15?"La mayor wallet":"Una wallet";
+  var wl="<a href='https://solscan.io/account/"+esc(w)+"' target='_blank' rel='noopener'>"+esc(short(w||"????????"))+"</a>";
+  var val=pr&&tok?" · "+"unos {v} al precio de entonces".replace("{v}",sapM(tok*pr)):"";
+  var ult=d.hist.length?d.hist[d.hist.length-1][5]:null;
+  var desde=pr&&ult&&d.hist[d.hist.length-1][0]>t?" "+"Desde entonces el precio va {p}.".replace("{p}",(ult>=pr?"+":"−")+whPc(Math.abs(ult/pr-1)*100)):"";
+  var c="am",tit,p;
+  if(k==="envio"){ tit=(quien==="La mayor wallet"?"La mayor wallet mandó el {p} del total a {x}":"Una wallet mandó el {p} del total a {x}").replace("{p}",whPc(de-(ya||0))).replace("{x}",xn||"un exchange");
+    p=whhCuando(t)+val+". "+"Es la wallet {w}, que tenía el {d0} y ahora el {d1}.".replace("{d0}",whPc(de)).replace("{d1}",whPc(ya||0)).replace("{w}",wl)+" "+"En un exchange se pueden vender sin pasar por la cadena."+desde; }
+  else if(k==="baja"){ tit=ya==null?(quien==="La mayor wallet"?"La mayor wallet bajó del {d0} y salió de las 20 mayores":"Una wallet bajó del {d0} y salió de las 20 mayores").replace("{d0}",whPc(de)):(quien==="La mayor wallet"?"La mayor wallet bajó del {d0} al {d1}":"Una wallet bajó del {d0} al {d1}").replace("{d0}",whPc(de)).replace("{d1}",whPc(ya));
+    p=whhCuando(t)+val+". "+"Wallet {w}.".replace("{w}",wl)+desde; }
+  else if(k==="sube"||k==="entra"){ c="tq"; tit=k==="entra"?"Una wallet entra en las 20 mayores con el {d1}".replace("{d1}",whPc(ya)):"Una wallet subió del {d0} al {d1}".replace("{d0}",whPc(de)).replace("{d1}",whPc(ya));
+    p=whhCuando(t)+val+". "+"Wallet {w}.".replace("{w}",wl)+desde; }
+  else if(k==="exch"){ c="tq"; tit=(ya>de?"Los exchanges suben del {d0} al {d1}":"Los exchanges bajan del {d0} al {d1}").replace("{d0}",whPc(de)).replace("{d1}",whPc(ya));
+    p=whhCuando(t)+". "+"Lo que tienen todos los exchanges conocidos entre las 20 mayores cuentas."; }
+  else return "";
+  return "<div class='whh-av "+c+"'><b>"+esc(tit)+"</b><p>"+p+"</p></div>";
+}
+function whhHtml(d){
+  if(!d.seguido) return "<div class='whh-b'><h3 class='whh-k'>"+"Desde que lo seguimos"+"</h3><p class='whh-v'>"+"Aún no seguimos este token. Seguimos los del Ecosistema y los más analizados en SolFlag (hasta 60, durante 14 días): si entra en la lista, aquí verás quién la tiene, cómo cambia y sus operaciones grandes."+"</p></div>";
+  var H=d.hist, a=H[0], z=H[H.length-1], out="";
+  // 1) avisos
+  var av=d.avisos.slice().sort(function(x,y){ return y[0]-x[0]||(x[1]==="exch")-(y[1]==="exch"); }).slice(0,4).map(function(x){ return whhAviso(x,d); }).join("");
+  out+="<div class='whh-b'><h3 class='whh-k'>"+"Lo que ha cambiado"+" <small>"+"avisos de las 20 mayores cuentas"+"</small></h3>"+
+    (av||"<p class='whh-v'>"+"Sin movimientos grandes en las 20 mayores cuentas desde el {f}.".replace("{f}",fdate(d.desde))+"</p>")+"</div>";
+  // 2) historial
+  if(H.length>=2){
+    var W=1000,G=170,t0=a[0],t1=z[0],mx=10;
+    H.forEach(function(h){ for(var i=1;i<5;i++) if(h[i]>mx) mx=h[i]; });
+    mx=Math.min(100,Math.ceil((mx+4)/10)*10);
+    var X=function(t){ return (t-t0)/(t1-t0)*W; }, Y=function(v){ return G-v/mx*G; };
+    var S=[[1,"La mayor wallet","w1"],[2,"Las 10 mayores wallets","w2"],[3,"Exchanges","x"],[4,"Programas (bloqueos, pools)","p"]];
+    var path=function(k){ return H.map(function(h,i){ return (i?"H"+X(h[0]).toFixed(1)+"V":"M0,")+Y(h[k]).toFixed(1); }).join("")+"H"+W; };
+    var grid=[], ejeY=[]; for(var v=0;v<=mx;v+=mx>50?20:10){ grid.push("<line x1='0' x2='"+W+"' y1='"+Y(v)+"' y2='"+Y(v)+"'/>"); ejeY.push("<span style='top:"+(Y(v)/G*100)+"%'>"+v+" %</span>"); }
+    var mk=d.avisos.filter(function(x){ return x[1]==="envio"&&x[0]>t0&&x[0]<=t1; }).slice(0,3);
+    var svg="<svg class='whh-svg' viewBox='0 0 "+W+" "+G+"' preserveAspectRatio='none' aria-hidden='true'><g class='gr'>"+grid.join("")+"</g>"+
+      mk.map(function(x){ return "<line class='mk' x1='"+X(x[0])+"' x2='"+X(x[0])+"' y1='0' y2='"+G+"'/>"; }).join("")+
+      S.map(function(s){ return "<path class='ln "+s[2]+"' d='"+path(s[0])+"' vector-effect='non-scaling-stroke'/>"; }).join("")+"</svg>";
+    var mkl=mk.map(function(x){ return "<span class='whh-mk' style='left:calc(36px + (100% - 36px) * "+(X(x[0])/W).toFixed(4)+")'>"+esc(ftime(x[0])+" → "+(x[6]||"exchange"))+"</span>"; }).join("");
+    var largo=t1-t0>1.5*864e5, ticks=[]; for(var i=0;i<=4;i++){ var tt=t0+(t1-t0)*i/4; ticks.push("<span style='left:"+(i*25)+"%'>"+esc(largo?fdate(tt):ftime(tt))+"</span>"); }
+    var filas=S.map(function(s){ var df=z[s[0]]-a[s[0]];
+      return "<div class='whh-f'><i class='"+s[2]+"'></i><span>"+esc(s[1])+"</span><b>"+whPc(a[s[0]])+" <em>→</em> "+whPc(z[s[0]])+"</b><small>"+(Math.abs(df)<0.5?"igual":"{d} puntos".replace("{d}",(df>0?"+":"−")+sapN(Math.abs(df),1)))+"</small></div>"; }).join("");
+    out+="<div class='whh-b'><h3 class='whh-k'>"+"Desde que lo seguimos"+" <small>"+"{d1} → {b} · qué parte del total tiene cada grupo".replace("{d1}",fdate(t0)+" "+ftime(t0)).replace("{b}",fdate(t1)+" "+ftime(t1))+"</small></h3>"+
+      "<div class='whh-hs'><div class='whh-g'><div class='whh-y'>"+ejeY.join("")+"</div>"+svg+mkl+"<div class='whh-x'>"+ticks.join("")+"</div></div><div>"+filas+"</div></div></div>";
+  }
+  // 3) ahora
+  var resto=Math.max(0,100-z[2]-z[3]-z[4]);
+  out+="<div class='whh-b'><h3 class='whh-k'>"+"Quién la tiene ahora"+" <small>"+"las 20 mayores cuentas, por dueño"+"</small></h3>"+
+    "<span class='whh-bar'><i class='w' style='width:"+z[2]+"%'></i><i class='x' style='width:"+z[3]+"%'></i><i class='p' style='width:"+z[4]+"%'></i><i class='r' style='width:"+resto+"%'></i></span>"+
+    "<p class='whh-ley'><span><i class='w'></i>"+"10 mayores wallets {p}".replace("{p}",whPc(z[2]))+"</span><span><i class='x'></i>"+"exchanges {p}".replace("{p}",whPc(z[3]))+"</span><span><i class='p'></i>"+"programas {p}".replace("{p}",whPc(z[4]))+"</span><span><i class='r'></i>"+"el resto"+"</span></p></div>";
+  // 4) operaciones grandes de 24 h
+  var O=d.ops, co=0, ve=0; O.forEach(function(o){ if(o[1]) ve+=o[2]; else co+=o[2]; });
+  out+="<div class='whh-b'><h3 class='whh-k'>"+"Operaciones grandes"+" <small>"+"más de 1.000 $ · últimas 24 h"+"</small></h3>"+
+    (O.length?"<p class='whh-or'><span>"+"Compran"+" <b class='su'>"+sapM(co)+"</b></span><span>"+"Venden"+" <b class='ba'>"+sapM(ve)+"</b></span><span class='n'>"+"{n} operaciones".replace("{n}",O.length)+"</span></p>"+
+      "<div class='whh-ops'>"+O.slice(0,8).map(function(o){ return "<div class='whh-op'><span class='h'>"+esc(ftime(o[0]))+"</span><span class='"+(o[1]?"ba":"su")+"'>"+(o[1]?"vende":"compra")+"</span><b>"+sapM(o[2])+"</b><a href='https://solscan.io/tx/"+esc(o[4])+"' target='_blank' rel='noopener'>"+esc(short(o[3]))+"</a></div>"; }).join("")+"</div>"
+    :"<p class='whh-v'>"+"Ninguna en las últimas 24 h."+"</p>")+"</div>";
+  return out+"<p class='whh-pie'>"+"Lo guarda SolFlag desde el {f}: una foto de las 20 mayores cuentas cada 2 h (Helius) y las operaciones de más de 1.000 $ cada 15 min (GeckoTerminal). Exchanges conocidos de nuestra lista revisada a mano. Son hechos de la cadena, no acusaciones.".replace("{f}",fdate(d.desde))+"</p>";
 }
 function showHfull(){ var b=$("#hfull"), box=$("#t-hold"); if(b&&box&&state.hold&&state.token&&state.hold.mint===state.token.mint) b.hidden=!box.classList.contains("hcompact"); }
 // Sin logo en DexScreener (casi todos los de Pump.fun): se pide a GeckoTerminal y se pone en el resumen
