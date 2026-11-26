@@ -209,6 +209,9 @@ console.log("IA y juegos de CoinGecko en Solana:", tk.length);
 // 3c) DePIN (26/11, decidido por el usuario): io.net y Nosana pasan de IA a Otros › DePIN (son redes de GPUs) y entra Helium,
 //     que no está en ninguna de esas categorías. Su «uso real» es la red: ver redDePIN más abajo.
 for (const r of tk) if (r.gecko === "io" || r.gecko === "nosana") { r.ap = "Otros"; r.gr = "DePIN"; }
+// 26/11 (usuario, maqueta ecosistema-ia-aporta): Grass y NATIX son redes de aparatos o internet de la gente → DePIN;
+// clawpump.tech es una lanzadera de tokens de agentes → Meme
+for (const r of tk) if (r.gecko === "grass" || r.gecko === "natix-network") { r.ap = "Otros"; r.gr = "DePIN"; } else if (r.gecko === "clawpump-tech") { r.ap = "Meme"; r.gr = "Memecoins"; }
 if (!yaEsta.has("helium")) {
   const hl = await cgj("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=helium&price_change_percentage=24h").catch(() => []);
   for (const c of hl) tk.push({ n: "Helium", ap: "Otros", gr: "DePIN", med: "token", m: c.market_cap, c: null, r30: null, tvl: null, tok: true, sym: (c.symbol || "").toUpperCase(),
@@ -420,18 +423,26 @@ async function hacerPerfiles(sel) {
     delete e.ids; delete e.pids; delete e.top; delete e.f60;
   }
   // IA: ¿hay código público y se mueve? (GitHub enlazado desde CoinGecko; con GITHUB_TOKEN en Actions, 1.000/h)
+  const WEB_MANO = { "alchemist-ai": "https://alchemistai.app", "virtual-protocol": "https://app.virtuals.io", "perle": "https://www.perle.ai", "kled-ai": "https://kled.ai", "tokenos-ai": "https://tokenos.ai" };
   const GH = process.env.GITHUB_TOKEN ? { headers: { authorization: "Bearer " + process.env.GITHUB_TOKEN } } : undefined;
   for (const e of Object.values(t).filter((x) => x.ap === "ia" && x.gecko)) {
     const c = await cgj(`https://api.coingecko.com/api/v3/coins/${e.gecko}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false`).catch(() => null);
     await espera(2500);
-    const u = ((((c || {}).links || {}).repos_url || {}).github || []).find((x) => /github\.com\/[^/]+/.test(x));
+    // GitHub a mano cuando CoinGecko no lo enlaza (26/11: ARC es el token de Rig, la librería de 0xPlaygrounds)
+    const GH_MANO = { "ai-rig-complex": "https://github.com/0xPlaygrounds/rig" };
+    const u = GH_MANO[e.gecko] || ((((c || {}).links || {}).repos_url || {}).github || []).find((x) => /github\.com\/[^/]+/.test(x));
+    // ¿su web carga hoy? (la de CoinGecko o la de la lista; 26/11: alchemistai.app daba error 500)
+    const web = WEB_MANO[e.gecko] || (((c || {}).links || {}).homepage || []).find((x) => /^https?:\/\//.test(x || ""));
+    if (web) { const r = await fetch(web, { redirect: "follow", signal: AbortSignal.timeout(15000), headers: { "user-agent": "Mozilla/5.0 (compatible; SolFlag/1.0; +https://solflag.com)" } }).catch(() => null);
+      e.web = { u: web, ok: !!(r && r.status < 400), s: r ? r.status : 0 }; }
     if (!u) { e.cod = { dias: null }; continue; }
     const [, own, repo] = u.match(/github\.com\/([^/#?]+)\/?([^/#?]*)/);
     let lista = [];
     if (repo) { const r = await fetch("https://api.github.com/repos/" + own + "/" + repo, GH).catch(() => null); if (r && r.ok) lista = [await r.json()]; }
     if (!lista.length) for (const tipo of ["orgs", "users"]) { const r = await fetch("https://api.github.com/" + tipo + "/" + own + "/repos?sort=pushed&per_page=30", GH).catch(() => null); if (r && r.ok) { lista = await r.json(); break; } }
     const ult = lista.filter((x) => !x.fork).map((x) => x.pushed_at).sort().pop();
-    e.cod = ult ? { dias: Math.round((Date.now() - Date.parse(ult)) / 864e5), repos: lista.length, url: u } : { dias: null };
+    const st = lista.length === 1 ? lista[0].stargazers_count : null;   // estrellas, cuando es un solo repositorio
+    e.cod = ult ? Object.assign({ dias: Math.round((Date.now() - Date.parse(ult)) / 864e5), repos: lista.length, url: u }, st != null ? { st } : {}) : { dias: null };
   }
   // Desbloqueos de Streamflow (% del supply que se libera en 30 días y lo que sigue bloqueado): solo proyectos y solo
   // con el RPC de Helius (getProgramAccounts es pesado para el RPC público)

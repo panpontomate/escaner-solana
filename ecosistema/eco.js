@@ -291,33 +291,66 @@
   };
   let PERF = null, perfPide = null;
   const pidePerf = () => perfPide || (perfPide = fetch("/datos/perfiles.json", { cache: "no-cache" }).then((r) => r.ok ? r.json() : null).catch(() => null).then((j) => { PERF = (j && j.t) || {}; }));
+  // IA › qué aporta cada proyecto al ecosistema (26/11, maqueta maquetas/web/ecosistema-ia-aporta.html): qué hace (fuentes
+  // públicas, revisado a mano el 26/11), la prueba que se comprueba cada día (código en GitHub y si su web carga: perfiles.json)
+  // y la señal. Lo que solo dice la empresa o una sola fuente va marcado en el texto.
+  const IAQ = EN ? {
+    "ai-rig-complex": ["The token of Rig, an open-source library (Rust) to build AI apps and agents. Launched on pump.fun; Rig works without the token.", "v", "Live, widely used code (Rig)"],
+    "swarms": ["Open-source library (Python) for several AI agents to work together. According to several sources, the library does not use the token.", "a", "The code does not need the token"],
+    "virtual-protocol": ["Platform to launch AI agents, each with its own token. Born on Base; on Solana there is a copy of the token.", "a", "Its home is Base: Solana is secondary"],
+    "alchemist-ai": ["Build apps by describing them in words, without coding. Everything runs on its servers; only the token is on Solana.", "a", ""],
+    "perle": ["Marketplace of experts who label and review data to train AI. It records contributions on Solana.", "a", "Token since Mar 2026; the business is mostly off-chain"],
+    "kled-ai": ["App where people sell their photos, videos and audio to AI companies; it stores a fingerprint of each item on Solana.", "a", "Claims a $12M contract: company figure"],
+    "tokenos-ai": ["Says it turns text into contracts, tokens and apps. There is very little public information about what it does.", "a", "Almost no public information about its product"],
+  } : {
+    "ai-rig-complex": ["Es el token de Rig, una librería de código abierto (Rust) para crear apps y agentes de IA. Nació en pump.fun; Rig funciona sin el token.", "v", "Código vivo y muy usado (Rig)"],
+    "swarms": ["Librería de código abierto (Python) para que varios agentes de IA trabajen juntos. Según varias fuentes, la librería no usa el token.", "a", "El código no necesita el token"],
+    "virtual-protocol": ["Plataforma para lanzar agentes de IA, cada uno con su token. Nació en Base; en Solana está una copia del token.", "a", "Su casa es Base: en Solana es secundario"],
+    "alchemist-ai": ["Crear apps describiéndolas con palabras, sin programar. Todo corre en sus servidores; en Solana solo está el token.", "a", ""],
+    "perle": ["Mercado de expertos que etiquetan y revisan datos para entrenar IA. Apunta las aportaciones en Solana.", "a", "Token desde mar 2026; el negocio va sobre todo fuera de la cadena"],
+    "kled-ai": ["App donde la gente vende sus fotos, vídeos y audio a empresas de IA; guarda una huella de cada dato en Solana.", "a", "Dice tener un contrato de 12 M$: dato de la empresa"],
+    "tokenos-ai": ["Dice convertir texto en contratos, tokens y apps. Hay muy poca información pública de lo que hace.", "a", "Casi no hay información pública de su producto"],
+  };
+  const IAT = EN ? { th: ["Project", "Worth · 24 h", "What it brings", "The proof", "Signal"], h: ["AI,", "what each project brings and how to check it"],
+      codHoy: "code changed today", codN: (d) => "code changed " + d + " days ago", codP: (d) => "code idle for " + d + " days", sinCod: "no public code", st: (n) => " · " + n + " ★",
+      webOk: "its website loads", webMal: (s) => "its website fails today" + (s ? " (" + s + ")" : ""), sinWeb: "no website checked", caida: (v) => "Worth " + v + " and its app does not load",
+      sinQue: "No description checked by hand yet.", dato: (a, b) => `Of the ${b} AI projects, only ${a} show public code that is moving.`, de: (a, b) => a + " of " + b,
+      src: "«What it brings»: what the project itself and public sources say (Crypto.com, CoinMarketCap, Solana Compass), told without adjectives; what only the company or one source claims is marked. «The proof»: code on GitHub (last change) and whether its website loads, checked every day. Facts, not recommendations." }
+    : { th: ["Proyecto", "Vale · 24 h", "Qué aporta", "La prueba", "Señal"], h: ["IA,", "qué aporta cada proyecto y cómo comprobarlo"],
+      codHoy: "código cambiado hoy", codN: (d) => "código cambiado hace " + d + " días", codP: (d) => "código parado hace " + d + " días", sinCod: "sin código público", st: (n) => " · " + n + " ★",
+      webOk: "su web carga", webMal: (s) => "su web da error hoy" + (s ? " (" + s + ")" : ""), sinWeb: "web sin comprobar", caida: (v) => "Vale " + v + " y su app no carga",
+      sinQue: "Aún sin descripción revisada a mano.", dato: (a, b) => `De los ${b} proyectos de IA, solo ${a} enseñan código público que se mueve.`, de: (a, b) => a + " de " + b,
+      src: "«Qué aporta»: lo que dicen el propio proyecto y fuentes públicas (Crypto.com, CoinMarketCap, Solana Compass), contado sin adjetivos; lo que solo afirma la empresa o una sola fuente va marcado. «La prueba»: código en GitHub (último cambio) y si su web carga, comprobado cada día. Son hechos, no recomendaciones." };
   function iaVista() {
     if (!PERF) pidePerf().then(() => { if (ap === "IA") pinta(); });
     pideQZ();
     const P = PERF || {};
-    const rs = D.rows.filter((r) => r.ap === "IA").map((r) => { const p = (r.mint && P[r.mint]) || {}; return Object.assign({}, r, { cod: p.cod || null, dl: p.dl || null, cap: r.mcap || r.m }); }).sort((a, b) => (b.cap || 0) - (a.cap || 0));
+    const rs = D.rows.filter((r) => r.ap === "IA").map((r) => { const p = (r.mint && P[r.mint]) || {}; return Object.assign({}, r, { cod: p.cod || null, web: p.web || null, cap: r.mcap || r.m }); }).sort((a, b) => (b.cap || 0) - (a.cap || 0));
     const num = (n, d) => n.toLocaleString(EN ? "en-US" : "es-ES", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0, useGrouping: "always" });
     const href = (r) => /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(r.mint || "") ? (EN ? "/en/" : "/") + "?token=" + r.mint : null;
-    const cod = (r) => { if (!PERF) return '<span class="mz-na">…</span>'; if (!r.cod || r.cod.dias == null) return `<span class="mz-cod s">${IA.sinCod}</span>`;
-      const t = r.cod.dias <= 1 ? IA.cod1 : r.cod.dias <= 30 ? IA.codN(r.cod.dias) : IA.codP(r.cod.dias);
-      return `<span class="mz-cod ${r.cod.dias <= 30 ? "v" : "p"}"><a href="${esc(r.cod.url)}" target="_blank" rel="noopener">${t} ↗</a></span>`; };
-    const senal = (r) => { const sb = senalB(r); if (sb) return sb;
+    const chip = (k, t, u) => `<span class="pr ${k}"><i></i>${u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${t} ↗</a>` : t}</span>`;
+    const prueba = (r) => { if (!PERF) return '<span class="ia-pr"><span class="mz-na">…</span></span>';
+      const c = r.cod, w = r.web;
+      const cod = !c || c.dias == null ? chip("n", IAT.sinCod) : chip(c.dias <= 30 ? "v" : "p", (c.dias <= 1 ? IAT.codHoy : c.dias <= 30 ? IAT.codN(c.dias) : IAT.codP(c.dias)) + (c.st ? IAT.st(num(c.st)) : ""), c.url);
+      const web = !w ? chip("n", IAT.sinWeb) : w.ok ? chip("v", IAT.webOk, w.u) : chip("x", IAT.webMal(w.s), w.u);
+      return `<span class="ia-pr">${cod}${web}</span>`; };
+    const senal = (r) => { const sb = senalB(r); if (sb && /mz-a|mz-r/.test(sb) && QZ && qzDe(r) && qzDe(r).av) return sb;
+      if (r.web && !r.web.ok) return `<span class="mz-sen mz-r">${IAT.caida(fm(r.cap))}</span>`;
+      const q = IAQ[r.gecko]; if (q && q[2]) return `<span class="mz-sen mz-${q[1]}">${q[2]}</span>`;
+      if (sb) return sb;
       if (r.trad >= 50 && r.org != null && r.org / r.trad < 0.05) return `<span class="mz-sen mz-r">${IA.bots(fm(r.cap))}</span>`;
-      if (r.trad != null && r.trad < 50 && r.cap >= 1e6) return `<span class="mz-sen mz-r">${IA.pocos(fm(r.cap), r.trad)}</span>`;
-      if (r.dl && r.dl.bloq >= 20) return `<span class="mz-sen mz-a">${IA.bloq(num(r.dl.bloq), r.dl.lib >= 0.1 ? num(r.dl.lib, 1) : "")}</span>`;
-      if (r.cod && r.cod.dias != null && r.cod.dias <= 30 && r.org != null && r.trad && r.org / r.trad >= 0.05) return `<span class="mz-sen mz-v">${IA.vivo(num(r.org / r.trad * 100))}</span>`;
       return "<span></span>"; };
-    const fila = (r, i) => { const h = href(r), n = `${esc(r.n)}${r.sym ? ` <small>${esc(r.sym)}</small>` : ""}`;
-      return `<div class="mz-t mz-ia"><span class="mz-i">${i + 1}</span>${av(r)}<span class="mz-n"><b>${h ? `<a href="${h}">${n}</a>` : n}</b></span>` +
+    const fila = (r, i) => { const h = href(r), n = `${esc(r.n)}${r.sym ? ` <small>${esc(r.sym)}</small>` : ""}`, q = IAQ[r.gecko];
+      return `<div class="mz-t ia2"><span class="mz-i">${i + 1}</span>${av(r)}<span class="mz-n"><b>${h ? `<a href="${h}">${n}</a>` : n}</b></span>` +
         `<span class="mz-x">${fm(r.cap)}<small><span class="${(r.c24 || 0) >= 0 ? "up" : "dn"}">${pc1(r.c24)}</span></small></span>` +
-        quienCel(r, "ia-q", true) +
-        `<span class="mz-x">${r.trad != null ? fk(r.trad) : "—"}<small>${r.org != null ? MZ.org(r.org) : "&nbsp;"}</small></span><span class="mz-codc">${cod(r)}</span>${PERF ? senal(r) : "<span></span>"}</div>`; };
-    const tabla = (t, l) => l.length ? `<section class="mz-card"><h2>${t[0]} <small>${t[1]}</small></h2><div class="mz-t mz-ia mz-h"><span></span><span></span><span>${IA.th[0]}</span><span>${IA.th[1]}</span><span class="ia-q">${IA.th[2]}</span><span>${IA.th[3]}</span><span class="mz-codc">${IA.th[4]}</span><span>${IA.th[5]}</span></div>${l.map(fila).join("")}</section>` : "";
-    const np = rs.filter((r) => !r.cod || r.cod.dias == null || r.cod.dias > 180).length;
-    $("#lista").innerHTML = (PERF ? `<div class="mz-dato"><span class="mz-k">${EN ? "Fact" : "Dato"}</span><b>${np} ${EN ? "of" : "de"} ${rs.length}</b><p>${IA.dato()}</p></div>` : "") +
-      tabla(IA.ag, rs.filter((r) => r.gr === "Agentes de IA")) + tabla(IA.pr, rs.filter((r) => r.gr !== "Agentes de IA")) +
-      `<p class="mz-src">${IA.src}</p><div class="mz-que"><div class="top"><b>${IA.queH}</b><span>${IA.queS}</span></div><ul>${IA.queL.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
+        `<span class="ia-que">${esc(q ? q[0] : IAT.sinQue)}</span>${prueba(r)}${senal(r)}${goV(r)}</div>`; };
+    const head = `<div class="mz-t ia2 mz-h"><span class="mz-i"></span><span></span>${IAT.th.map((t) => `<span>${t}</span>`).join("")}<span class="go"></span></div>`;
+    const vivos = rs.filter((r) => r.cod && r.cod.dias != null && r.cod.dias <= 30).length;
+    $("#lista").innerHTML = (PERF ? `<div class="mz-dato"><span class="mz-k">${EN ? "Fact" : "Dato"}</span><b>${IAT.de(vivos, rs.length)}</b><p>${IAT.dato(vivos, rs.length)}</p></div>` : "") +
+      `<section class="mz-card"><h2>${IAT.h[0]} <small>${IAT.h[1]}</small></h2>${head}${rs.map(fila).join("")}</section>` +
+      `<p class="mz-src">${IAT.src}</p><div class="mz-que"><div class="top"><b>${IA.queH}</b><span>${IA.queS}</span></div><ul>${IA.queL.map((x) => `<li>${x}</li>`).join("")}</ul></div>`;
   }
+
 
   // ---------- DeFi, Juegos, Apps y bots y Otros (maquetas del 23/11 en maquetas/web/ecosistema-*.html, subidas el 25/11) ----------
   const V = EN ? {
