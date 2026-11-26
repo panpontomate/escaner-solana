@@ -7,6 +7,7 @@
 // Sirve para el simulador: dos semanas mirando qué se ve antes de los movimientos, sin estrategia fijada.
 import fs from "node:fs";
 import path from "node:path";
+import { isOnCurve } from "./curva.mjs";
 
 export const TOKENS = [
   ["PUMP", "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn", "defi"], ["JUP", "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", "defi"],
@@ -99,7 +100,7 @@ export function quienDe(top, supply, tipo) {
 export const QUIEN_SCHEMA = "CREATE TABLE IF NOT EXISTS quien (m TEXT PRIMARY KEY, t INTEGER, mayor REAL, top10w REAL, exch REAL, pools REAL)";
 // wallets de exchanges conocidos: la lista del motor (src/known.js), leída de jsDelivr una vez al día
 async function exchangesConocidos(est, ahora) {
-  if (est.exch && est.exch.n && est.exch.t > ahora - 864e5) return new Set(est.exch.l);
+  if (est.exch && est.exch.n && est.exch.t > ahora - 864e5 && est.exch.l.includes("CLNEVwuSAiGsvPtE74yLhda4beNfd8qfZXVKkUcAJZDL")) return new Set(est.exch.l);
   const txt = await fetch("https://cdn.jsdelivr.net/npm/solana-risk-engine@latest/src/known.js").then((r) => r.ok ? r.text() : "").catch(() => "");
   const xs = [...txt.matchAll(/"([1-9A-HJ-NP-Za-km-z]{32,44})":\s*\{([^}]*)t:\s*"exchange"/g)], l = xs.map((x) => x[1]);
   const n = {}; for (const x of xs) { const nm = /n:\s*"([^"]+)"/.exec(x[2]); if (nm) n[x[1]] = nm[1]; }
@@ -178,6 +179,7 @@ export function insertsHist(tabla, cols, filas, porLote = 300) {
 }
 async function historial(est, filas, tipo, ahora) {
   const nombres = (est.exch && est.exch.n) || {}, H = [], A = [];
+  if (est.rehacer) { await d1({ sql: "DELETE FROM quienh" }).catch(() => {}); await d1({ sql: "DELETE FROM avisos" }).catch(() => {}); }
   const mete = (r) => { if (r) { H.push(r.h); A.push(...r.av); } };
   // la primera vez, lo que ya estaba en los .jsonl (fotos con dueño, desde el 25/11), en orden
   if (!est.histD1) {
@@ -197,6 +199,7 @@ async function historial(est, filas, tipo, ahora) {
   if (dests.length) await d1({ sql: "UPDATE avisos SET dn = CASE dest " + dests.map((d) => "WHEN " + sqlVal(d) + " THEN " + sqlVal(nombres[d])).join(" ") + " END WHERE dn IS NULL AND dest IN (" + dests.map(sqlVal).join(",") + ")" });
   for (const m of Object.keys(est.prev)) if (!filas.some((f) => f.m === m)) delete est.prev[m];
   est.histD1 = est.histD1 || ahora;
+  if (est.rehacer) { est.rehacer = false; est.histV = 2; }
   return [H.length, A.length];
 }
 
@@ -267,8 +270,14 @@ async function main() {
   const nuevosD = [...new Set(filas.flatMap((f) => (f.top || []).map((x) => x[2]).filter(Boolean)))].filter((d) => !(d in est.tipo));
   for (let i = 0; i < nuevosD.length; i += 100) {
     const lote = nuevosD.slice(i, i + 100), r = await rpc("getMultipleAccounts", [lote, { encoding: "base64", dataSlice: { offset: 0, length: 0 } }]);
-    if (r && r.value) lote.forEach((d, k) => { const a = r.value[k]; est.tipo[d] = !a || a.owner === "11111111111111111111111111111111" ? "w" : "p"; });
+    if (r && r.value) lote.forEach((d, k) => { const a = r.value[k]; est.tipo[d] = (!a || a.owner === "11111111111111111111111111111111") && isOnCurve(d) ? "w" : "p"; });
   }
+  // 26/11: las cuentas fuera de la curva (Raydium Authority V4, Meteora Pool Authority, bóvedas de Squads…) son del System
+  // Program pero no son de nadie: programa. Una vez, se corrigen las que ya estaban guardadas como wallet; y cuando la lista
+  // del motor ya trae los exchanges nuevos (0.8.2: Gate, Binance, Robinhood, Bybit, Kraken, MEXC), se rehace el historial
+  // de «quién la tiene» y sus avisos con los tipos buenos (el 26/11 salió un aviso de Gate moviendo a Gate).
+  if (est.tipoV !== 2) { for (const [d, t] of Object.entries(est.tipo)) if (t === "w" && !isOnCurve(d)) est.tipo[d] = "p"; est.tipoV = 2; }
+  if (conHelius && est.histV !== 2 && EXCH.has("CLNEVwuSAiGsvPtE74yLhda4beNfd8qfZXVKkUcAJZDL")) { est.histD1 = null; est.rehacer = true; }
   const tipo = {}; for (const [d, t] of Object.entries(est.tipo)) tipo[d] = EXCH.has(d) ? "x" : t;
   const quien = filas.map((f) => f.top && f.supply ? [f.m, quienDe(f.top, f.supply, tipo)] : null).filter((x) => x && x[1]);
   for (const [k, t] of Object.entries(est.ult)) if (t < ahora - 7 * 864e5) delete est.ult[k];   // pools que ya no se miran
