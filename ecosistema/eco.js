@@ -645,7 +645,10 @@
     if (rwa) {
       $("#bar").style.display = "none";
       const reales = D.rows.filter((r) => r.ap === ap && r.gr === "Activos reales" && !/mansory/i.test(r.n)).sort((a, b) => (b.m || 0) - (a.m || 0));
-      window.SFActivos.pinta($("#lista"), { en: EN, reales, alContar: (n) => { if (nRwa !== n) { nRwa = n; cabecera(); } } });
+      pideQZ();
+      // «Quién la tiene» (26/11): debajo de cada dólar digital y activo real, la barra y la mayor wallet o lo del proyecto (Paxos en PYUSD)
+      const qcel = (m) => qzDe({ mint: m }) ? quienCel({ mint: m, tok: true }, "sfa-q", false) : "";
+      window.SFActivos.pinta($("#lista"), { en: EN, reales, qcel, alContar: (n) => { if (nRwa !== n) { nRwa = n; cabecera(); } } });
       return;
     }
     $("#lista").classList.remove("sfa");
