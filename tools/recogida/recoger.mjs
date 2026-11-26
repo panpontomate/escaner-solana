@@ -100,8 +100,9 @@ export const QUIEN_SCHEMA = "CREATE TABLE IF NOT EXISTS quien (m TEXT PRIMARY KE
 async function exchangesConocidos(est, ahora) {
   if (est.exch && est.exch.t > ahora - 864e5) return new Set(est.exch.l);
   const txt = await fetch("https://cdn.jsdelivr.net/npm/solana-risk-engine@latest/src/known.js").then((r) => r.ok ? r.text() : "").catch(() => "");
-  const l = [...txt.matchAll(/"([1-9A-HJ-NP-Za-km-z]{32,44})":\s*\{[^}]*t:\s*"exchange"/g)].map((x) => x[1]);
-  if (l.length) est.exch = { t: ahora, l };
+  const xs = [...txt.matchAll(/"([1-9A-HJ-NP-Za-km-z]{32,44})":\s*\{([^}]*)t:\s*"exchange"/g)], l = xs.map((x) => x[1]);
+  const n = {}; for (const x of xs) { const nm = /n:\s*"([^"]+)"/.exec(x[2]); if (nm) n[x[1]] = nm[1]; }
+  if (l.length) est.exch = { t: ahora, l, n };
   return new Set(l.length ? l : (est.exch && est.exch.l) || []);
 }
 // dueño de cada cuenta de token (respuesta jsonParsed de getMultipleAccounts); las que no existen o no son de token, fuera
@@ -109,6 +110,91 @@ export function duenos(cuentas, valores) {
   const out = {};
   cuentas.forEach((c, i) => { const o = valores[i] && valores[i].data && valores[i].data.parsed && valores[i].data.parsed.info && valores[i].data.parsed.info.owner; if (o) out[c] = o; });
   return out;
+}
+
+// Historial de «Quién la tiene» y avisos de las 20 mayores cuentas (26/11; lo enseña el Escáner en Ballenas con
+// /api/ballenas/<mint>). En cada foto de Helius se suma lo de cada dueño (wallets «w» y exchanges conocidos «x») y se
+// compara con la foto anterior del mismo token (est.prev). Avisos, en % del total:
+//   envio = una wallet bajó ≥ 2 puntos y un exchange subió al menos el 80 % de eso (dest = ese exchange);
+//   baja  = una wallet bajó ≥ 2 puntos (a = null si ya no está entre las 20 mayores);
+//   sube / entra = una wallet subió ≥ 2 puntos (entra = no estaba entre las 20 mayores).
+//   Si sale o entra de las 20 mayores, solo se cuenta lo seguro: hasta la cuenta más pequeña de las 20 (lim), porque
+//   fuera del top 20 no sabemos cuánto tiene (las de ~1 % entran y salen del borde y no son movimientos).
+//   exch  = lo de todos los exchanges conocidos cambió ≥ 3 puntos.
+// Los 3 mayores movimientos de wallet por foto, más el de exchanges. Todo se guarda 30 días.
+export const HIST_SCHEMA = ["CREATE TABLE IF NOT EXISTS quienh (m TEXT, t INTEGER, mayor REAL, top10w REAL, exch REAL, pools REAL, precio REAL, PRIMARY KEY (m, t))",
+  "CREATE TABLE IF NOT EXISTS avisos (m TEXT, t INTEGER, k TEXT, w TEXT, de REAL, a REAL, dest TEXT, dn TEXT, tok REAL, precio REAL, PRIMARY KEY (m, t, k, w))",
+  "CREATE INDEX IF NOT EXISTS avisos_mt ON avisos (m, t)"];
+export function porDueno(top, tipo) {
+  const o = { w: {}, x: {}, lim: 0 };
+  for (const [, n, d] of top || []) if (d && (tipo[d] === "w" || tipo[d] === "x")) o[tipo[d]][d] = (o[tipo[d]][d] || 0) + Number(n);
+  if (top && top.length >= 20) o.lim = Math.min(...top.map((x) => Number(x[1]) || 0));
+  return o;
+}
+export function avisosDe(ant, act, sup) {
+  sup = Number(sup); if (!(sup > 0) || !ant || !act) return [];
+  const pc = (n) => Math.round(n / sup * 1000) / 10, out = [];
+  const subeX = Object.entries(act.x).map(([d, n]) => [d, n - (ant.x[d] || 0)]).sort((a, b) => b[1] - a[1])[0];
+  for (const [d, n] of Object.entries(ant.w)) {
+    const ya = act.w[d] || 0, baja = n - (d in act.w ? ya : act.lim || 0);
+    if (baja / sup < 0.02) continue;
+    const dest = subeX && subeX[1] >= baja * 0.8 ? subeX[0] : null;
+    out.push({ k: dest ? "envio" : "baja", w: d, de: pc(n), a: d in act.w ? pc(ya) : null, dest, tok: baja });
+  }
+  for (const [d, n] of Object.entries(act.w)) {
+    const sube = n - (d in ant.w ? ant.w[d] : ant.lim || 0);
+    if (sube / sup >= 0.02) out.push({ k: d in ant.w ? "sube" : "entra", w: d, de: d in ant.w ? pc(ant.w[d]) : null, a: pc(n), dest: null, tok: sube });
+  }
+  const res = out.sort((a, b) => b.tok - a.tok).slice(0, 3);
+  const sx = (o) => Object.values(o.x).reduce((a, b) => a + b, 0), xa = sx(ant), xb = sx(act);
+  if (Math.abs(xb - xa) / sup >= 0.03) res.push({ k: "exch", w: "", de: pc(xa), a: pc(xb), dest: null, tok: xb - xa });
+  return res;
+}
+// una foto de un token: fila del historial y sus avisos; deja la suma por dueño en est.prev para la siguiente
+export function procesaFoto(est, m, t, top, sup, precio, tipo, nombres) {
+  const q = quienDe(top, sup, tipo); if (!q) return null;
+  est.prev = est.prev || {};
+  const act = porDueno(top, tipo), av = avisosDe(est.prev[m], act, sup);
+  est.prev[m] = act;
+  const p = typeof precio === "number" && precio > 0 ? precio : null;
+  return { h: [m, t, q.mayor, q.top10w, q.exch, q.pools, p],
+    av: av.map((a) => [m, t, a.k, a.w, a.de, a.a, a.dest, a.dest ? (nombres[a.dest] || null) : null, Math.round(a.tok), p]) };
+}
+// INSERT con los valores escritos (direcciones de Solana, números y nombres de exchanges de known.js): así van cientos
+// de filas por petición a la API de D1 (con parámetros, solo 100 por consulta). Solo filas cuyo mint es una dirección.
+const B58 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+export function sqlVal(v) {
+  if (v == null) return "NULL";
+  if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NULL";
+  return "'" + String(v).replace(/'/g, "''") + "'";
+}
+export function insertsHist(tabla, cols, filas, porLote = 300) {
+  const out = [], ok = filas.filter((f) => B58.test(f[0]));
+  for (let i = 0; i < ok.length; i += porLote)
+    out.push({ sql: "INSERT INTO " + tabla + " (" + cols + ") VALUES " + ok.slice(i, i + porLote).map((f) => "(" + f.map(sqlVal).join(",") + ")").join(",") + " ON CONFLICT DO NOTHING" });
+  return out;
+}
+async function historial(est, filas, tipo, ahora) {
+  const nombres = (est.exch && est.exch.n) || {}, H = [], A = [];
+  const mete = (r) => { if (r) { H.push(r.h); A.push(...r.av); } };
+  // la primera vez, lo que ya estaba en los .jsonl (fotos con dueño, desde el 25/11), en orden
+  if (!est.histD1) {
+    est.prev = {};
+    const viejas = [];
+    for (const fi of fs.readdirSync(SALIDA).filter((x) => /^\d{4}-\d\d-\d\d\.jsonl$/.test(x)).sort())
+      for (const l of fs.readFileSync(path.join(SALIDA, fi), "utf8").split("\n")) { if (!l) continue; const f = JSON.parse(l); if (f.top && f.supply && f.top.some((x) => x[2])) viejas.push(f); }
+    viejas.sort((a, b) => a.t - b.t);
+    for (const f of viejas) mete(procesaFoto(est, f.m, f.t, f.top, f.supply, f.dx && f.dx.precio, tipo, nombres));
+  }
+  for (const f of filas) if (f.top && f.supply) mete(procesaFoto(est, f.m, ahora, f.top, f.supply, f.dx && f.dx.precio, tipo, nombres));
+  for (const sql of HIST_SCHEMA) await d1({ sql });
+  for (const st of insertsHist("quienh", "m, t, mayor, top10w, exch, pools, precio", H)) await d1(st);
+  for (const st of insertsHist("avisos", "m, t, k, w, de, a, dest, dn, tok, precio", A)) await d1(st);
+  await d1({ sql: "DELETE FROM quienh WHERE t < ?", params: [ahora - 30 * 864e5] });
+  await d1({ sql: "DELETE FROM avisos WHERE t < ?", params: [ahora - 30 * 864e5] });
+  for (const m of Object.keys(est.prev)) if (!filas.some((f) => f.m === m)) delete est.prev[m];
+  est.histD1 = est.histD1 || ahora;
+  return [H.length, A.length];
 }
 
 async function main() {
@@ -200,10 +286,12 @@ async function main() {
       await d1({ sql: "INSERT INTO quien (m, t, mayor, top10w, exch, pools) VALUES " + l.map(() => "(?,?,?,?,?,?)").join(",") + " ON CONFLICT(m) DO UPDATE SET t=excluded.t, mayor=excluded.mayor, top10w=excluded.top10w, exch=excluded.exch, pools=excluded.pools",
         params: l.flatMap(([m, q]) => [m, ahora, q.mayor, q.top10w, q.exch, q.pools]) }); }
   } catch (e) { console.log("quien:", e.message); }
+  let hist = null;
+  if (D1 && conHelius) try { hist = await historial(est, filas, tipo, ahora); } catch (e) { console.log("historial:", e.message); }
   const dia = new Date(ahora).toISOString().slice(0, 10);
   fs.appendFileSync(path.join(SALIDA, dia + ".jsonl"), filas.map((f) => JSON.stringify(f)).join("\n") + "\n");
   est.ultima = ahora;
   fs.writeFileSync(fEst, JSON.stringify(est));
-  console.log(`recogida: ${filas.length} tokens · ${filas.filter((f) => f.dx).length} con pool · ${filas.reduce((s, f) => s + (f.ops ? f.ops.length : 0), 0)} operaciones grandes nuevas · Helius ${conHelius ? "sí" : "no"} · ${fijos.length} fijos de la web (${nuevoFijo.size} nuevos) · ${enD1} operaciones a D1 · quién la tiene: ${quien.length}`);
+  console.log(`recogida: ${filas.length} tokens · ${filas.filter((f) => f.dx).length} con pool · ${filas.reduce((s, f) => s + (f.ops ? f.ops.length : 0), 0)} operaciones grandes nuevas · Helius ${conHelius ? "sí" : "no"} · ${fijos.length} fijos de la web (${nuevoFijo.size} nuevos) · ${enD1} operaciones a D1 · quién la tiene: ${quien.length}${hist ? ` · historial ${hist[0]} fotos, ${hist[1]} avisos` : ""}`);
 }
 if (import.meta.url === "file://" + process.argv[1] || process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) main();

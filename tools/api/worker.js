@@ -17,6 +17,8 @@
 //   GET  /api/top/<mint>           mayores cuentas del token (Helius, 10 min en caché, 30/min por conexión)
 //   GET  /api/marcas/<mint>?desde= operaciones de más de 1.000 $ guardadas por la recogida (marcas de la gráfica, 5 min en caché)
 //   GET  /api/quien                quién tiene las memecoins (top 20) y ballenas de 24 h, de la recogida (5 min en caché)
+//   GET  /api/ballenas/<mint>      de un token que sigue la recogida: historial de «quién la tiene», avisos de las 20 mayores
+//                                  cuentas y operaciones grandes de 24 h (Escáner › Ballenas, 5 min en caché)
 //   POST /api/rpc                  plan B de RPC de la web (Helius; solo lectura, 120/min por conexión)
 //   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
 //   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
@@ -272,6 +274,26 @@ export async function quienTodos(db, ahora) {
   return { v: V, quien: out };
 }
 
+// Ballenas de un token que sigue la recogida (26/11): historial de «quién la tiene» de 30 días (tabla quienh:
+// [t, mayor, top10w, exch, pools, precio], hasta 800 fotos), los 10 avisos más nuevos (tabla avisos: [t, k, w, de, a,
+// dest, nombre del exchange, tokens, precio]) y las operaciones de más de 1.000 $ de 24 h ([t, vende 1/0, usd, w, tx],
+// hasta 40, la más nueva primero). seguido = false si la recogida aún no tiene fotos de ese token.
+export async function ballenas(db, m, ahora) {
+  const no = (e) => /no such table/i.test(String(e && e.message)), out = { v: V, mint: m, seguido: false, desde: null, hist: [], avisos: [], ops: [] };
+  try {
+    const h = (await db.prepare("SELECT t, mayor, top10w, exch, pools, precio FROM quienh WHERE m = ? AND t > ? ORDER BY t DESC LIMIT 800").bind(m, ahora - 30 * 864e5).all()).results || [];
+    out.hist = h.reverse().map((x) => [x.t, x.mayor, x.top10w, x.exch, x.pools, x.precio]);
+    out.seguido = out.hist.length > 0; out.desde = out.seguido ? out.hist[0][0] : null;
+    const a = (await db.prepare("SELECT t, k, w, de, a, dest, dn, tok, precio FROM avisos WHERE m = ? AND t > ? ORDER BY t DESC, tok DESC LIMIT 10").bind(m, ahora - 30 * 864e5).all()).results || [];
+    out.avisos = a.map((x) => [x.t, x.k, x.w, x.de, x.a, x.dest, x.dn, x.tok, x.precio]);
+  } catch (e) { if (!no(e)) throw e; }
+  try {
+    const o = (await db.prepare("SELECT t, sell, usd, w, tx FROM ops WHERE m = ? AND t > ? ORDER BY t DESC LIMIT 40").bind(m, ahora - 864e5).all()).results || [];
+    out.ops = o.map((x) => [x.t, x.sell, x.usd, x.w, x.tx]);
+  } catch (e) { if (!no(e)) throw e; }
+  return out;
+}
+
 // Operaciones guardadas de un token: [t ms, vende 1/0, usd, wallet, tx, cantidad], de la más antigua a la más nueva (las
 // 3.000 últimas). «desde» = la primera que tenemos de ese token. Sin tabla todavía: lista vacía
 export async function marcas(db, m, desde) {
@@ -358,6 +380,12 @@ export async function handle(req, env) {
   // «Quién la tiene» y ballenas de 24 h de lo que sigue la recogida (25/11, vista de Meme del Ecosistema)
   if (p.length === 3 && p[1] === "api" && p[2] === "quien") {
     try { const res = json(await quienTodos(env.DB, Date.now())); res.headers.set("cache-control", "public, max-age=300"); return res; }
+    catch (e) { return fail(503, "database unavailable"); }
+  }
+  // Escáner › Ballenas (26/11): historial, avisos y operaciones grandes de un token que sigue la recogida
+  if (p.length === 4 && p[1] === "api" && p[2] === "ballenas") {
+    if (!ADDR.test(p[3])) return fail(400, "not a Solana address");
+    try { const res = json(await ballenas(env.DB, p[3], Date.now())); res.headers.set("cache-control", "public, max-age=300"); return res; }
     catch (e) { return fail(503, "database unavailable"); }
   }
   // marcas de la gráfica que no se pierden (25/11): operaciones de más de 1.000 $ que guarda la recogida (tabla ops)

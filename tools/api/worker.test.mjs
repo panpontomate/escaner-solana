@@ -2,8 +2,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { DatabaseSync } from "node:sqlite";
-import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top, caida, salidas, rpcValido, marcas, quienTodos } from "./worker.js";
-import { OPS_SCHEMA, opsInsert, QUIEN_SCHEMA, quienDe } from "../recogida/recoger.mjs";
+import { handle, V, portada, DAY, logo, LOGO_CDN, ventas, cambio, top, caida, salidas, rpcValido, marcas, quienTodos, ballenas } from "./worker.js";
+import { OPS_SCHEMA, opsInsert, QUIEN_SCHEMA, quienDe, HIST_SCHEMA, insertsHist, procesaFoto, avisosDe, porDueno } from "../recogida/recoger.mjs";
 import { SCHEMA } from "../caras/plano.mjs";
 
 const A = "PAY1111111111111111111111111111111", B = "FUND111111111111111111111111111111", C = "BUY1111111111111111111111111111111";
@@ -301,4 +301,39 @@ test("/api/quien: última foto de quién la tiene y ballenas de 24 h", async () 
   const r = (await quienTodos(mk, 2e8)).quien[M1];
   assert.deepEqual([r.mayor, r.top10w, r.exch, r.pools], [40, 40, 20, 10]);
   assert.deepEqual([r.compra, r.vende, r.n], [3000, 5000, 2]);     // la de hace más de 24 h no cuenta
+});
+
+test("recogida: avisos de las 20 mayores (envío a un exchange, sin ruido del borde del top 20)", () => {
+  const tipo = { W1: "w", W2: "w", W3: "w", X1: "x" };
+  const top = (w1, x1, w3) => [["a", String(w1), "W1"], ["b", String(x1), "X1"], ["c", "10", "W2"]].concat(w3 ? [["d", String(w3), "W3"]] : []).concat(Array(17).fill(["z", "1", "P"]));
+  const ant = porDueno(top(34, 5, 0), tipo), act = porDueno(top(17, 22, 0), tipo);
+  const av = avisosDe(ant, act, 100);
+  assert.deepEqual(av.map((a) => [a.k, a.w, a.de, a.a, a.dest]), [["envio", "W1", 34, 17, "X1"], ["exch", "", 5, 22, null]]);
+  // una wallet de ~1 % que sale del top 20 no es un aviso (lo seguro es hasta la cuenta más pequeña)
+  assert.deepEqual(avisosDe(porDueno(top(34, 5, 1.5), tipo), porDueno(top(34, 5, 0), tipo), 100), []);
+  // la primera foto no tiene avisos; la segunda sí, y va a filas de D1
+  const est = {};
+  assert.deepEqual(procesaFoto(est, M1, 1, top(34, 5), "100", 0.5, tipo, { X1: "Gate" }).av, []);
+  const r = procesaFoto(est, M1, 2, top(17, 22), "100", 0.5, tipo, { X1: "Gate" });
+  assert.deepEqual(r.h, [M1, 2, 17, 27, 22, 0, 0.5]);
+  assert.deepEqual(r.av[0], [M1, 2, "envio", "W1", 34, 17, "X1", "Gate", 17, 0.5]);
+});
+
+test("/api/ballenas: historial, avisos y operaciones de 24 h de un token que sigue la recogida", async () => {
+  const db = new DatabaseSync(":memory:");
+  const mk = { prepare: (sql) => ({ bind: (...a) => ({ all: async () => ({ results: db.prepare(sql).all(...a) }) }) }) };
+  const ahora = 40 * 864e5;
+  assert.equal((await ballenas(mk, M1, ahora)).seguido, false);          // sin tablas todavía
+  HIST_SCHEMA.forEach((s) => db.exec(s)); OPS_SCHEMA.forEach((s) => db.exec(s));
+  const H = [[M1, ahora - 7200000, 34, 66, 5, 0, 0.5], [M1, ahora - 3600000, 17, 49, 22, 0, 0.5], [M1, 1, 50, 80, 0, 0, 1], [M2, ahora - 100, 1, 2, 3, 4, 5]];
+  for (const st of insertsHist("quienh", "m, t, mayor, top10w, exch, pools, precio", H.concat(H))) db.exec(st.sql);   // repetidas: no se duplican
+  for (const st of insertsHist("avisos", "m, t, k, w, de, a, dest, dn, tok, precio", [[M1, ahora - 3600000, "envio", A, 34, 17, B, "Ga'te", 17, 0.5]])) db.exec(st.sql);
+  for (const st of opsInsert(M1, [{ t: ahora - 1000, lado: "vende", usd: 5000, w: A, tx: "t1" }, { t: 5, lado: "compra", usd: 1, w: A, tx: "viejo" }])) db.prepare(st.sql).run(...st.params);
+  const r = await ballenas(mk, M1, ahora);
+  assert.equal(r.seguido, true);
+  assert.deepEqual(r.hist.map((h) => h[0]), [ahora - 7200000, ahora - 3600000]);   // 30 días, de la más vieja a la más nueva
+  assert.equal(r.desde, ahora - 7200000);
+  assert.deepEqual(r.avisos, [[ahora - 3600000, "envio", A, 34, 17, B, "Ga'te", 17, 0.5]]);
+  assert.deepEqual(r.ops, [[ahora - 1000, 1, 5000, A, "t1"]]);
+  assert.equal(insertsHist("quienh", "m", [["no es una dirección", 1]]).length, 0);
 });
