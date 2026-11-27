@@ -36,6 +36,8 @@ jobs:
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CF_D1_ID: ${{ secrets.CF_D1_ID }}
+          # Radar del canal t.me/SolFlagRadar (27/11, tools/recogida/radar.mjs): publica @SolFlagBot, solo sendMessage
+          RADAR_TELEGRAM_TOKEN: ${{ secrets.RADAR_TELEGRAM_TOKEN }}
           SALIDA: rama
         run: node tools/recogida/recoger.mjs
       - name: Guardar

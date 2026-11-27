@@ -8,6 +8,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { isOnCurve } from "./curva.mjs";
+import { avisosBallenas, volumenes, avisoVolumen, avisosDiarios, elegir, resumenDia } from "./radar.mjs";
+import { enviar as enviarTG, madrid } from "../caras/radar.mjs";
 
 export const TOKENS = [
   ["PUMP", "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn", "defi"], ["JUP", "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN", "defi"],
@@ -216,7 +218,7 @@ async function historial(est, filas, tipo, ahora) {
   for (const m of Object.keys(est.prev)) if (!filas.some((f) => f.m === m)) delete est.prev[m];
   est.histD1 = est.histD1 || ahora;
   if (est.rehacer) { est.rehacer = false; est.histV = 4; }
-  return [H.length, A.length];
+  return [H.length, A.length, A.filter((a) => a[1] === ahora)];
 }
 
 async function main() {
@@ -319,10 +321,43 @@ async function main() {
   } catch (e) { console.log("quien:", e.message); }
   let hist = null;
   if (D1 && conHelius) try { hist = await historial(est, filas, tipo, ahora); } catch (e) { console.log("historial:", e.message); }
+  try { await radar(est, ahora, eco, pares, hist ? hist[2] : [], tipo); } catch (e) { console.log("radar:", e.message); }
   const dia = new Date(ahora).toISOString().slice(0, 10);
   fs.appendFileSync(path.join(SALIDA, dia + ".jsonl"), filas.map((f) => JSON.stringify(f)).join("\n") + "\n");
   est.ultima = ahora;
   fs.writeFileSync(fEst, JSON.stringify(est));
   console.log(`recogida: ${filas.length} tokens · ${filas.filter((f) => f.dx).length} con pool · ${filas.reduce((s, f) => s + (f.ops ? f.ops.length : 0), 0)} operaciones grandes nuevas · Helius ${conHelius ? "sí" : "no"} · ${fijos.length} fijos de la web (${nuevoFijo.size} nuevos) · ${enD1} operaciones a D1 · quién la tiene: ${quien.length}${hist ? ` · historial ${hist[0]} fotos, ${hist[1]} avisos` : ""}`);
+}
+// Radar del canal t.me/SolFlagRadar (27/11, radar.mjs): ballenas, volumen, uso real, novedades y resumen de las 21:00.
+// Sin RADAR_TELEGRAM_TOKEN no hace nada; con RADAR_PRUEBA=1 solo escribe en el log lo que mandaría.
+const EXTRA = { MEFNBXixkEbait3xn9bkm8WsJzXtVsaJEn4c8Sam21u: "Magic Eden", TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6: "Tensor", SKRbvo6Gf7GondiT3BbTfuRDPqLWei4j2Qy2NPGZhW3: "Seeker" };
+const RADAR_DESDE = Date.UTC(2026, 10, 28, 8, 0);
+async function radar(est, ahora, eco, pares, avNuevos, tipo) {
+  const TOK = process.env.RADAR_TELEGRAM_TOKEN, CHAT = process.env.RADAR_TELEGRAM_CHAT || "@SolFlagRadar", prueba = process.env.RADAR_PRUEBA === "1";
+  if (!TOK && !prueba) return;
+  if (ahora < RADAR_DESDE && !prueba) return;   // empieza el sábado 28/11 a las 9:00 de Madrid (decidido 27/11)
+  const st = est.radar2 = est.radar2 || {};
+  const info = {};
+  for (const [sym, m, ap] of TOKENS) { const r = ((eco && eco.rows) || []).find((x) => x.mint === m); info[m] = { sym, n: (r && r.n) || EXTRA[m] || sym, ap }; }
+  const cands = avisosBallenas(avNuevos, info, tipo, (est.exch && est.exch.pj) || {});
+  const normal = await json("https://solflag.com/datos/normal.json");
+  const top = volumenes(normal, pares, info);
+  for (const t of top.filter((x) => x.x >= 3)) {
+    let ops = [];
+    if (D1) try { const r = await d1({ sql: "SELECT t, sell, usd FROM ops WHERE m = ? AND t > ?", params: [t.m, ahora - 864e5] }); ops = ((r[0] && r[0].results) || []).map((o) => [o.t, o.sell, o.usd]); } catch {}
+    cands.push(avisoVolumen(t, ops));
+  }
+  // una vez al día, con el Ecosistema nuevo (sale a las ~07:45 de Madrid)
+  if (eco && eco.fecha && st.diario !== eco.fecha && madrid(ahora).hora >= 9) {
+    st.diario = eco.fecha;
+    cands.push(...avisosDiarios(eco, await json("https://solflag.com/datos/perfiles.json"), ahora));
+  }
+  const msgs = elegir(cands, st, ahora);
+  const res = resumenDia(st, top, ahora); if (res) msgs.push(res);
+  for (const msg of msgs) {
+    if (prueba) { console.log("RADAR (prueba): " + JSON.stringify(msg.botones || []) + "\n" + msg.text + "\n"); continue; }
+    try { await enviarTG(TOK, CHAT, msg); await espera(1500); } catch (e) { console.log("::warning::Radar: " + e.message); }
+  }
+  if (msgs.length) console.log("radar: " + msgs.length + " mensajes");
 }
 if (import.meta.url === "file://" + process.argv[1] || process.argv[1] && import.meta.url.endsWith(path.basename(process.argv[1]))) main();
