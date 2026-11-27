@@ -1828,6 +1828,42 @@ body.landing #adv{margin-top:10px}
 #hot .pe-nota{margin:0;font-size:.84rem;color:#e6e0ff}
 #hot .pe-ver{font-size:.82rem;font-weight:700;color:var(--accent);text-decoration:none}
 @media (max-width:900px){#hot .pe-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#hot .pe-big{grid-row:span 1}}
+/* «Los 3 que más se mueven hoy» (27/11, maqueta portada-se-mueven) */
+#semueven{padding-top:20px}
+#semueven .sm-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+#semueven .sm-t{display:flex;flex-direction:column;gap:12px;padding:22px 24px 20px;border-left:1px solid var(--line)}
+#semueven .sm-t:first-child{border-left:0;padding-left:0}
+#semueven .sm-t header{display:flex;align-items:center;gap:12px}
+#semueven .sm-n{font:600 .78rem "IBM Plex Mono",ui-monospace,monospace;color:var(--mut2)}
+#semueven .sm-nom{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;min-width:0}
+#semueven .sm-nom:hover b{text-decoration:underline}
+#semueven .sm-nom img,#semueven .sm-ini{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#1c1640;display:grid;place-items:center;font:700 .75rem var(--f-body);color:#c4b5fd;font-style:normal;flex:none}
+#semueven .sm-nom div{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+#semueven .sm-nom b{color:var(--fg);font-size:1.02rem}
+#semueven .sm-nom .kick{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:#8ec5cf;font-weight:700;margin:0}
+#semueven .sm-x{margin:4px 0 0;display:flex;align-items:baseline;gap:10px}
+#semueven .sm-x b{font:700 2.8rem/1 Fraunces,Georgia,serif;letter-spacing:-.02em;color:var(--fg)}
+#semueven .sm-x span{color:#d6cff2;font-size:.92rem}
+#semueven .sm-bar{position:relative;height:8px;border-radius:99px;background:rgba(196,181,253,.08);overflow:hidden}
+#semueven .sm-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+#semueven .sm-bar .hoy{width:100%;background:linear-gradient(90deg,#7ab8c4,#8ec5cf)}
+#semueven .sm-bar .nor{background:#c4b5fd;box-shadow:2px 0 0 #05040d}
+#semueven .sm-cmp{display:flex;justify-content:space-between;gap:10px;margin:0;font-size:.8rem;color:var(--muted)}
+#semueven .sm-cmp b{color:var(--fg);font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;margin-left:4px}
+#semueven .sm-cmp .d{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+#semueven .sm-cmp .d.hoy{background:#8ec5cf}#semueven .sm-cmp .d.nor{background:#c4b5fd}
+#semueven .sm-por{list-style:none;margin:6px 0 0;padding:0;border-top:1px solid var(--line)}
+#semueven .sm-por li{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;padding:10px 0;border-bottom:1px solid rgba(196,181,253,.1);font-size:.86rem}
+#semueven .sm-por li span{color:var(--muted)}
+#semueven .sm-por li b{text-align:right;color:var(--fg)}
+#semueven .sm-por li b.sm-up{color:var(--bajo)}#semueven .sm-por li b.sm-dn{color:var(--alto)}
+#semueven .sm-por li small{grid-column:1/-1;text-align:right;color:var(--mut2);font-size:.76rem}
+#semueven .sm-go{margin-top:auto;font-size:.84rem;font-weight:700;color:var(--accent);text-decoration:none}
+#semueven .sm-go:hover{text-decoration:underline}
+#semueven .sm-resto{display:flex;flex-wrap:wrap;gap:6px 18px;margin:14px 0 0;font-size:.82rem;color:var(--mut2)}
+#semueven .sm-resto a{color:inherit;text-decoration:none}#semueven .sm-resto a:hover{color:var(--fg);text-decoration:underline}
+#semueven .sm-resto b{color:#d6cff2;font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600}
+@media (max-width:860px){#semueven .sm-g{grid-template-columns:minmax(0,1fr)}#semueven .sm-t{border-left:0;padding:20px 0;border-top:1px solid var(--line)}#semueven .sm-t:first-child{border-top:0}#semueven .sm-x b{font-size:2.3rem}}
 @media (max-width:560px){#hot .pe-grid{grid-template-columns:minmax(0,1fr)}#hot .pe-big,#hot .pe-an{grid-column:auto}#hot .pe-big .pe-ej .pe-dato{font-size:1.5rem}#hot .pe-lista a{grid-template-columns:22px minmax(0,1fr) auto}#hot .pe-lista small{display:none}}
 @media (prefers-reduced-motion:reduce){#hot .pe-t::before,#hot .pe-t::after{animation:none}}
 .dx{border:1px solid var(--line);border-radius:20px;padding:10px 24px;background:rgba(14,10,36,.35)}
@@ -2661,6 +2697,13 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
       <div class="sec-head"><h2>The ecosystem<span class="thin">right now.</span></h2></div>
       <div class="pe-grid" id="pegrid"><p class="hint">Loading the ecosystem…</p></div>
       <p class="syn" id="pesrc"></p>
+    </section>
+    <div class="seam" id="smseam" hidden><canvas data-seam="3" aria-hidden="true"></canvas></div>
+    <section class="lblk" id="semueven" hidden>
+      <div class="sec-head"><h2>The 3 moving most<span class="thin">today.</span></h2><p>Of the 27 in the ecosystem, the ones trading the most today compared with what they usually trade, and why.</p></div>
+      <div class="sm-g" id="smg"></div>
+      <p class="sm-resto" id="smresto"></p>
+      <p class="syn" id="smfuente"></p>
     </section>
     <section class="lblk" id="hotw" hidden style="padding-top:20px">
       <div class="sec-head"><h2>Hot wallets<span class="thin">of the day.</span></h2><p>The wallets that launch, buy or fund the most in the last 24 hours according to our registry. These are facts, not accusations.</p></div>
@@ -5358,6 +5401,53 @@ function peCrec(rows,ap){
 // apps con token que el Ecosistema no tiene (DefiLlama no las mide): nombre, símbolo y qué son (25/11: + Seeker)
 var PE_EXTRA={MEFNBXixkEbait3xn9bkm8WsJzXtVsaJEn4c8Sam21u:["Magic Eden","ME","NFT marketplace"],TNSRxcUxoT9xBG3de7PiJyTDYu7kskLqcpddxnEJAS6:["Tensor","TNSR","NFT marketplace"],
   SKRbvo6Gf7GondiT3BbTfuRDPqLWei4j2Qy2NPGZhW3:["Seeker","SKR","Solana phone and app store"]};
+/* «Los 3 que más se mueven hoy» (27/11, maqueta aprobada maquetas/web/portada-se-mueven.html): de la lista fija, las
+   últimas 24 h del pool principal (DexScreener, en el momento) frente a lo que suele mover (datos/normal.json, media
+   diaria de 7 días de GeckoTerminal, una vez al día) y el porqué de /api/ballenas (operaciones de más de 1.000 $ y
+   avisos de las 20 mayores). Por debajo de 50 k$ al día no entra (un token parado da multiplicadores enormes). */
+var SM_LOC=document.documentElement.lang==="en"?"en-US":"en-US";
+var SM_AP={defi:"DeFi",juegos:"Games",apps:"Apps and bots",rwa:"Tokenized assets",ia:"AI",otros:"Other",meme:"Memes"};
+function smX(v){ return v.toLocaleString(SM_LOC,{maximumFractionDigits:v>=10?0:1})+"×"; }
+function smPc(v){ return (v||0).toLocaleString(SM_LOC,{maximumFractionDigits:1})+(SM_LOC==="en-US"?"%":" %"); }
+function smHora(t){ var d=new Date(t), h=d.toLocaleTimeString(SM_LOC,{hour:"2-digit",minute:"2-digit"}); return (d.toDateString()!==new Date().toDateString()?"yesterday at ":"at ")+h; }
+function smCorta(w){ return w?w.slice(0,4)+"…"+w.slice(-4):""; }
+function smFila(t,i){
+  var u=PE_BASE+"?token="+esc(t.m), ops=t.ops||[], dia=Date.now()-864e5;
+  ops=ops.filter(function(o){ return o[0]>dia; });
+  var big=ops.slice().sort(function(a,b){ return b[2]-a[2]; })[0], W=ops.filter(function(o){ return o[2]>=10000; });
+  var com=W.filter(function(o){ return !o[1]; }).reduce(function(s,o){ return s+o[2]; },0), ven=W.filter(function(o){ return o[1]; }).reduce(function(s,o){ return s+o[2]; },0), neto=com-ven;
+  var li=[];
+  if(big) li.push("<li><span>"+"Largest trade"+"</span><b class='"+(big[1]?"sm-dn":"sm-up")+"'>"+(big[1]?"{v} sell":"{v} buy").replace("{v}",peUsd(big[2]))+"</b><small>"+smHora(big[0])+" · wallet "+esc(smCorta(big[3]))+"</small></li>");
+  li.push(W.length?"<li><span>"+"Whales ($10k+)"+"</span><b class='"+(neto>=0?"sm-up":"sm-dn")+"'>"+(neto>=0?"buy {v} net":"sell {v} net").replace("{v}",peUsd(Math.abs(neto)))+"</b><small>"+"{c} buys · {v} sells".replace("{c}",peUsd(com)).replace("{v}",peUsd(ven))+"</small></li>"
+    :"<li><span>"+"Whales ($10k+)"+"</span><b>"+"no trades today"+"</b></li>");
+  var av=(t.av||[]).filter(function(a){ return a[0]>dia; })[0], at="";
+  if(av) at=av[1]==="entra"?"a new wallet comes in with {p}".replace("{p}",smPc(av[4])):av[1]==="sube"?"one goes from {a} to {p}".replace("{a}",smPc(av[3])).replace("{p}",smPc(av[4])):av[1]==="baja"?"one drops from {a} to {p}".replace("{a}",smPc(av[3])).replace("{p}",smPc(av[4])):av[1]==="exchange"?"one sends tokens to an exchange":"";
+  if(at) li.push("<li><span>"+"Top 20 holders"+"</span><b class='"+(av[1]==="baja"||av[1]==="exchange"?"sm-dn":"sm-up")+"'>"+at+"</b><small>"+smHora(av[0])+" · wallet "+esc(smCorta(av[2]))+"</small></li>");
+  return "<article class='sm-t'><header><span class='sm-n'>"+(i+1)+"</span><a class='sm-nom' href='"+u+"'>"+(t.logo?"<img src='"+esc(t.logo)+"' alt=''>":"<i class='sm-ini'>"+esc(t.sym.slice(0,2))+"</i>")+
+    "<div><b>"+esc(t.n)+"</b><span class='kick'>"+esc(SM_AP[t.ap]||"")+"</span></div></a></header>"+
+    "<p class='sm-x'><b>"+smX(t.x)+"</b><span>"+"its usual volume"+"</span></p>"+
+    "<div class='sm-bar' aria-hidden='true'><i class='hoy'></i><i class='nor' style='width:"+Math.round(100/Math.max(t.x,1))+"%'></i></div>"+
+    "<p class='sm-cmp'><span><i class='d hoy'></i>"+"Last 24 h"+" <b>"+peUsd(t.hoy)+"</b></span><span><i class='d nor'></i>"+"Usual"+" <b>"+peUsd(t.nor)+"</b></span></p>"+
+    "<ul class='sm-por'>"+li.join("")+"</ul><a class='sm-go' href='"+u+"'>"+"Analyze {s} ›".replace("{s}",esc(t.sym))+"</a></article>";
+}
+async function seMueven(eco){
+  try{
+    var j=function(u){ return fetch(u,{cache:"no-cache"}).then(function(x){ return x.ok?x.json():null; }).catch(function(){ return null; }); };
+    var nr=await j("/datos/normal.json"); if(!nr||!nr.t) return;
+    var ms=Object.keys(nr.t), pares=await j("https://api.dexscreener.com/tokens/v1/solana/"+ms.join(",")); if(!pares||!pares.length) return;
+    var L=ms.map(function(m){ var a=nr.t[m], p=pares.filter(function(x){ return x.pairAddress===a[2]; })[0], v=p&&p.volume?p.volume.h24:0,
+        r=eco.rows.filter(function(x){ return x.mint===m; })[0], ex=PE_EXTRA[m];
+      return {m:m,sym:a[0],ap:a[1],hoy:v||0,nor:a[3],x:a[3]>0&&v?v/a[3]:0,n:r?r.n:ex?ex[0]:a[0],logo:(r&&r.logo)||(p&&p.info&&p.info.imageUrl)||""}; })
+      .filter(function(t){ return t.x>0&&t.hoy>=50000; }).sort(function(a,b){ return b.x-a.x; });
+    if(L.length<3) return;
+    var top=L.slice(0,3), B=await Promise.all(top.map(function(t){ return j(API+"ballenas/"+t.m); }));
+    top.forEach(function(t,i){ t.ops=B[i]&&B[i].ops||[]; t.av=B[i]&&B[i].avisos||[]; });
+    $("#smg").innerHTML=top.map(smFila).join("");
+    $("#smresto").hidden=L.length<4; $("#smresto").innerHTML="Next:"+" "+L.slice(3,8).map(function(t){ return "<a href='"+PE_BASE+"?token="+esc(t.m)+"'>"+esc(t.sym)+" <b>"+smX(t.x)+"</b></a>"; }).join("");
+    $("#smfuente").textContent="Last 24 h volume of the main pool (DexScreener) against its daily average over the previous 7 days (GeckoTerminal). Trades over $1,000 saved by SolFlag every 15 min.";
+    $("#semueven").hidden=$("#smseam").hidden=false;
+  }catch(e){}
+}
 async function loadEcoHome(){
   if(PE.run||PE.ok) return; PE.run=true;
   try{
@@ -5386,6 +5476,7 @@ async function loadEcoHome(){
     document.querySelectorAll("#pegrid .pe-t").forEach(function(t,n){ pePinta(t,0); var i=0;
       PE.timers.push(setInterval(function(){ if(document.visibilityState!=="visible"||!document.body.classList.contains("landing")) return;
         var a=t.querySelector(".pe-ej"); a.classList.add("fuera"); setTimeout(function(){ i++; pePinta(t,i); a.classList.remove("fuera"); },350); },4200+n*450)); });
+    seMueven(eco);
     PE.ok=true;
   }catch(e){ $("#pegrid").innerHTML="<p class='hint'>"+"Couldn't load the ecosystem. Try again in a moment."+"</p>"; }
   PE.run=false;

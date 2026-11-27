@@ -38,6 +38,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OUT_DIR: _pub/datos
         run: node tools/ecosistema/datos.mjs
+      # 27/11: lo que suele mover cada token de la portada («Los 3 que más se mueven hoy»); si falla, se queda el de ayer
+      - name: Volumen normal de la lista fija
+        env:
+          OUT_DIR: _pub/datos
+        run: node tools/ecosistema/normal.mjs || true
       - name: Subir a la rama datos
         id: pub
         working-directory: _pub
@@ -45,6 +50,7 @@ jobs:
           git add datos/ecosistema.json datos/ecosistema-historial.json
           [ -f datos/perfiles.json ] && git add datos/perfiles.json
           [ -f datos/acciones-lista.json ] && git add datos/acciones-lista.json
+          [ -f datos/normal.json ] && git add datos/normal.json
           git diff --cached --quiet && exit 0
           git config user.name "solflag-ecosistema"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
