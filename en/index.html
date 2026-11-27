@@ -637,6 +637,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 @media (max-width:620px){#hsummary{padding:20px}.htiles{grid-template-columns:repeat(2,minmax(0,1fr))}.htiles b{font-size:1.6rem}}
 
 
+.brand .tab.tbot{display:none}
 @media (max-width:860px){.botlink{display:none}}
 @media (max-width:700px){
   .brand{padding:12px 0}
@@ -649,6 +650,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
   .brand .tab[aria-selected="true"]{background:var(--accent);color:var(--accent-fg);box-shadow:none;border-radius:12px}
   .tab .ti{display:block}
   .tab span span{display:none}
+  .brand .tab.tbot{display:flex}
   .hero{padding-top:28px;gap:24px}
   .hero>.scan{padding:20px}
   .scan-t{font-size:1.5rem}
@@ -1512,7 +1514,7 @@ body{background:none!important;overflow-x:clip}
 .seam canvas{position:absolute;inset:0;width:100%;height:100%}
 
 /* cabecera fija con cristal (en el móvil las pestañas van abajo y el cristal las rompería: allí sin desenfoque) */
-.brand{position:sticky;top:0;z-index:40;background:#05040d;box-shadow:0 0 0 100vmax #05040d;clip-path:inset(0 -100vmax);border-bottom-color:var(--line);min-height:68px}
+.brand{position:sticky;top:0;z-index:40;background:#05040d;box-shadow:-50vw 0 #05040d,50vw 0 #05040d;border-bottom-color:var(--line);min-height:68px}
 @media (min-width:701px){ .brand{background:rgba(5,4,13,.6);box-shadow:0 0 0 100vmax rgba(5,4,13,.6);clip-path:inset(0 -100vmax);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)} .tnav{top:84px} }
 .brand .tab{font-weight:700;color:#d8d2f5}
 .brand .lang{width:40px;height:40px;padding:0;display:grid;place-items:center;border-radius:50%;border-color:var(--line2)}
@@ -1545,7 +1547,7 @@ body.landing .whale{display:flex;align-items:center;justify-content:space-betwee
 body.landing .safe{margin-top:18px;color:var(--mut2)}
 body.landing #adv{margin-top:10px}
 @media (max-width:960px){
-  body.landing .hero{flex-direction:column;flex-wrap:wrap;width:auto;min-height:0;gap:20px;padding:40px 0 50px}
+  body.landing .hero{flex-direction:column;flex-wrap:nowrap;align-self:stretch;width:auto;min-height:0;gap:20px;padding:40px 0 50px}
   body.landing .hero-txt{flex:none}
   body.landing .hero-txt h1{white-space:normal;width:auto;text-wrap:balance}
   body.landing .hero>.scan{flex:none;margin:0;padding:24px 0 0;border-left:0;border-top:1px solid var(--line2);align-self:stretch}
@@ -2507,6 +2509,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
       <button type="button" class="tab" id="tabN" role="tab" aria-selected="false" hidden><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg><span class="tl-lg">New tokens</span><span class="tl-sm">New</span></button>
       <button type="button" class="tab" id="tabL" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>My list <span id="lcount"></span></span></button>
       <button type="button" class="tab" id="tabC" role="tab" aria-selected="false"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg><span>Confluence <span id="ccount"></span></span></button>
+      <a class="tab tlink tbot" href="https://t.me/SolFlagBot" target="_blank" rel="noopener"><svg class="ti" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4 3 11l6 2 2 6 3-4 5 4z"/><path d="m9 13 12-9"/></svg><span>Bot</span></a>
     </div>
     <a class="botlink" href="https://t.me/SolFlagBot" target="_blank" rel="noopener">Telegram bot</a>
     <a class="lang" href="https://solflag.com/" hreflang="es" title="Versión en español">ES</a>

@@ -1,0 +1,18 @@
+/* Barra de secciones abajo en el móvil, igual que en la portada (27/11).
+   Para todas las páginas con menú .pnav. Se carga la última para ganar a sus reglas de 760 px. */
+@media (max-width:760px){
+  header{transform:none;margin-left:auto;margin-right:auto;clip-path:none;backdrop-filter:none;-webkit-backdrop-filter:none;background:#05040d;box-shadow:-50vw 0 #05040d,50vw 0 #05040d}
+  header .pnav.pnav{position:fixed;left:0;right:0;bottom:0;z-index:50;margin:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:8px 8px calc(10px + env(safe-area-inset-bottom));background:rgba(14,9,38,.97);border-top:1px solid rgba(196,181,253,.3);font-size:.68rem;font-weight:700}
+  header .pnav.pnav > a[href]{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:52px;padding:6px 2px;border-radius:12px;color:#e4dffa;text-align:center;line-height:1.15;box-shadow:none}
+  header .pnav.pnav > a[href]::before{content:"";width:22px;height:22px;background:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+  header .pnav.pnav > a[href][aria-current]{background:#7ab8c4;color:#140e31}
+  header .pnav.pnav > a.pbot{font-size:0}
+  header .pnav.pnav > a.pbot::after{content:"Bot";font-size:.68rem}
+  header .pnav > a[href*="v=escaner"]{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E")}
+  header .pnav > a[href*="ecosist"],header .pnav > a[href*="ecosystem"]{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cellipse cx='12' cy='12' rx='10' ry='4.5'/%3E%3Cpath d='M12 2v2M12 20v2'/%3E%3C/svg%3E")}
+  header .pnav > a[href*="v=lista"]{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01'/%3E%3C/svg%3E")}
+  header .pnav > a[href*="v=confluencia"]{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='12' r='6'/%3E%3Ccircle cx='15' cy='12' r='6'/%3E%3C/svg%3E")}
+  header .pnav > a.pbot{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 4 3 11l6 2 2 6 3-4 5 4z'/%3E%3Cpath d='m9 13 12-9'/%3E%3C/svg%3E")}
+  header .plang{margin-left:auto}
+  body{padding-bottom:96px}
+}
