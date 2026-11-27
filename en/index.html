@@ -1049,6 +1049,20 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
 .ml-hrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
 .ml-ts{font-size:.8rem;color:#9a91c9}
 .ml-alerts{display:grid;gap:8px;margin-top:14px}
+/* «Desde tu última visita» (27/11) */
+#llist .mlv-t{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:4px 14px;align-items:start;padding:14px 0;border-top:1px solid rgba(196,181,253,.14)}
+#llist .mlv .ml-hrow+.mlv-t{border-top:0}
+#llist .mlv-lg{position:relative;inset:auto;width:40px;height:40px;grid-row:span 2}
+#llist .mlv-nom{display:flex;align-items:baseline;gap:8px;color:var(--fg);text-decoration:none;font:700 1.08rem var(--f-display);min-width:0}
+#llist .mlv-nom small{font:500 .8rem var(--f-body);color:var(--muted)}#llist .mlv-nom:hover b{text-decoration:underline}
+#llist .mlv-ls{grid-column:2;list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+#llist .mlv-ls li{display:flex;flex-direction:column;gap:1px;padding-left:12px;border-left:2px solid rgba(196,181,253,.35);font-size:.92rem;color:#e6e0ff}
+#llist .mlv-ls li.dn{border-color:var(--alto)}#llist .mlv-ls li.wh{border-color:#c4b5fd}#llist .mlv-ls li.up{border-color:var(--bajo)}
+#llist .mlv-ls b{white-space:nowrap}#llist .mlv-ls li small{color:var(--mut2);font-size:.78rem}
+#llist .mlv-go{grid-column:3;grid-row:1}
+#llist .mlv-sin{margin:10px 0 0;padding-top:12px;border-top:1px solid rgba(196,181,253,.14);font-size:.84rem;color:var(--muted)}
+#llist .mlv-sin a{color:#d6cff2;text-decoration:none}#llist .mlv-sin a:hover{text-decoration:underline}
+@media (max-width:560px){#llist .mlv-t{grid-template-columns:36px minmax(0,1fr)}#llist .mlv-lg{width:34px;height:34px}#llist .mlv-ls{grid-column:1/-1}#llist .mlv-go{display:none}}
 .ml-al{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:var(--surface-2);border-left:4px solid var(--c)}
 .ml-al.red{--c:var(--alto)}.ml-al.yel{--c:var(--medio)}.ml-al.grn{--c:var(--bajo)}
 .ml-alogo{position:relative;width:40px;height:40px;flex:none}
@@ -2983,6 +2997,90 @@ function mlChanges(t){
   else if(now&&!now.cv&&t.liq>=1000&&now.liq<t.liq*0.5) out.push({k:"liq",pct:Math.round((1-now.liq/t.liq)*100),from:t.liq,to:now.liq});
   return out;
 }
+/* «Desde tu última visita» (27/11, maqueta aprobada maquetas/web/milista-cambios.html): lo que ha pasado en cada token
+   desde la última vez que abriste Mi lista, un token por fila. La referencia (hora y precio de entonces) se fija la
+   primera vez que se abre Mi lista en esta sesión del navegador y no cambia al recargar; luego se apunta la visita de
+   hoy para la próxima. Ballenas y operaciones grandes de /api/ballenas (solo tokens que sigue la recogida: los de
+   Mi lista que no sigue se le apuntan con /api/visto); volumen frente a lo normal de datos/normal.json; precio ±5 %. */
+var MLV=null, MLB={}, MLN=null, MLV_PX=5, MLV_FILAS=6;
+function mlvRef(){
+  if(MLV) return MLV;
+  try{ MLV=JSON.parse(sessionStorage.getItem("esc.mlv")||"null"); }catch(e){}
+  if(!MLV||!MLV.p){
+    MLV={d:lista.vis||0,p:{}};
+    Object.keys(lista.t).forEach(function(m){ var t=lista.t[m]; MLV.p[m]=t.pv?[t.pv,t.pvt||t.ts||0]:[t.price||0,t.ts||0]; });
+    try{ sessionStorage.setItem("esc.mlv",JSON.stringify(MLV)); }catch(e){}
+    lista.vis=Date.now(); saveList();
+  }
+  return MLV;
+}
+function mlvDesde(m){ var r=mlvRef(), p=r.p[m]; return r.d||(p&&p[1])||0; }
+function mlvPc(v,signo){ return (signo&&v>0?"+":"")+(Math.round(v*10)/10).toLocaleString(SM_LOC)+(SM_LOC==="en-US"?"%":" %"); }
+function mlvCuando(ts){
+  var d=new Date(ts), h=d.toLocaleTimeString(SM_LOC,{hour:"numeric",minute:"2-digit"}), hoy=new Date(), ay=new Date(Date.now()-864e5);
+  if(d.toDateString()===hoy.toDateString()) return "today, "+h;
+  if(d.toDateString()===ay.toDateString()) return "yesterday, "+h;
+  return d.toLocaleDateString(SM_LOC,{day:"numeric",month:"short"})+", "+h;
+}
+// lo que contar de un token: [clase, texto, detalle]; clases: dn (malo), up (bueno), wh (ballenas), px (neutro)
+function mlvLineas(t){
+  var m=t.mint, d=mlvDesde(m), out=[], b=MLB[m]||{}, now=llive.d[m];
+  mlChanges(t).forEach(function(c){
+    if(c.k==="lvl") out.push([c.worse?"dn":"up","Risk: now <b>"+esc(mlLvlLabel(t.lvl).toLowerCase())+"</b>","before "+esc(mlLvlLabel(c.from).toLowerCase())]);
+    else if(c.k==="liq") out.push(["dn","Liquidity down <b>"+c.pct+" %</b>","from "+usd(c.from)+" to "+usd(c.to)]);
+    else out.push(["dn","<b>No market any more</b>","DexScreener finds no pool"]);
+  });
+  (b.avisos||[]).filter(function(a){ return a[0]>d; }).slice(0,3).forEach(function(a){
+    var k=a[1], val=a[7]&&a[8]?"about "+peUsd(Math.abs(a[7])*a[8]):"", cu=mlvCuando(a[0]);
+    if(k==="entra") out.push(["wh","🐋 A new wallet comes into the top 20 with <b>"+mlvPc(a[4])+"</b>",cu+(val?" · "+val:"")]);
+    else if(k==="sube") out.push(["wh","🐋 A wallet went from <b>"+mlvPc(a[3])+"</b> to <b>"+mlvPc(a[4])+"</b>",cu+(val?" · in: "+val:"")]);
+    else if(k==="baja") out.push(["dn",a[4]!=null?"🐋 A top holder went from <b>"+mlvPc(a[3])+"</b> to <b>"+mlvPc(a[4])+"</b>":"🐋 A top holder (it had <b>"+mlvPc(a[3])+"</b>) left the top 20",cu+(val?" · out: "+val:"")]);
+    else if(k==="envio") out.push(["dn","🐋 A top holder sent tokens to <b>"+esc(a[6]||"an exchange")+"</b>",cu+(val?" · "+val:"")]);
+    else if(k==="exch") out.push(["px","🐋 Exchanges went from <b>"+mlvPc(a[3])+"</b> to <b>"+mlvPc(a[4])+"</b>",cu]);
+  });
+  var W=(b.ops||[]).filter(function(o){ return o[0]>d&&o[2]>=10000; });
+  if(W.length){
+    var com=W.filter(function(o){ return !o[1]; }).reduce(function(s,o){ return s+o[2]; },0), ven=W.filter(function(o){ return o[1]; }).reduce(function(s,o){ return s+o[2]; },0);
+    out.push([com>=ven?"up":"dn","🐋 Whales <b>"+(com>=ven?"buy {v} net":"sell {v} net").replace("{v}",peUsd(Math.abs(com-ven)))+"</b>",
+      "{c} bought · {v} sold · trades over $10k".replace("{c}",peUsd(com)).replace("{v}",peUsd(ven))]);
+  }
+  var n=MLN&&MLN.t&&MLN.t[m];
+  if(n&&now&&now.pair===n[2]&&now.vol>=50000&&n[3]>0&&now.vol/n[3]>=3)
+    out.push(["up","📈 Trading <b>"+smX(now.vol/n[3]).replace("×","")+" times</b> its usual volume","{v} in 24 h · usual: {n} a day".replace("{v}",peUsd(now.vol)).replace("{n}",peUsd(n[3]))]);
+  var p=mlvRef().p[m], ch=mlvCambio(t);
+  if(ch!=null&&Math.abs(ch)>=MLV_PX) out.push([ch>0?"up":"dn","Price <b>"+mlvPc(ch,true)+"</b>","from "+mlvPx(p[0])+" to "+mlvPx(now.price)]);
+  return out;
+}
+// precio con las cifras justas para que se vea el cambio (0,0509 $ → 0,0562 $)
+function mlvPx(n){ return n>=100?usd(n):n.toLocaleString(SM_LOC==="en-US"?"en-US":"en-US",{maximumSignificantDigits:3})+" $"; }
+function mlvCambio(t){ var p=mlvRef().p[t.mint], now=llive.d[t.mint]; return p&&p[0]>0&&now&&now.price>0?(now.price/p[0]-1)*100:null; }
+function mlvTiene(t){ return mlChanges(t).length>0||mlvLineas(t).length>0; }
+function mlvHtml(toks){
+  var r=mlvRef(), con=[], sin=[];
+  toks.forEach(function(t){ var l=mlvLineas(t); if(l.length) con.push([t,l]); else sin.push(t); });
+  // primero lo más serio: ventas y salidas, luego ballenas, luego lo bueno y el precio
+  var peso={dn:3,wh:2,up:1,px:1}; con.sort(function(x,y){ var f=function(l){ return l.reduce(function(s,i){ return s+(peso[i[0]]||1); },0); }; return f(y[1])-f(x[1]); });
+  var cab=r.d?"{h} · on {f} at {t}".replace("{h}",hace(r.d)).replace("{f}",new Date(r.d).toLocaleDateString(SM_LOC,{day:"numeric",month:"short"})).replace("{t}",new Date(r.d).toLocaleTimeString(SM_LOC,{hour:"numeric",minute:"2-digit"})):"since you saved them";
+  var filas=con.slice(0,MLV_FILAS).map(function(x){ var t=x[0];
+    return "<div class='mlv-t'>"+mlLogo(t,"ml-lg mlv-lg")+"<a class='mlv-nom' href='"+PE_BASE+"?token="+esc(t.mint)+"'><b>"+esc(t.sym)+"</b>"+(t.name&&t.name!==t.sym?"<small>"+esc(t.name)+"</small>":"")+"</a>"+
+      "<button class='btn small ghost ml-go mlv-go' type='button' data-analyze='"+esc(t.mint)+"'>"+"Analyse"+"</button>"+
+      "<ul class='mlv-ls'>"+x[1].map(function(l){ return "<li class='"+l[0]+"'><span>"+l[1]+"</span>"+(l[2]?"<small>"+l[2]+"</small>":"")+"</li>"; }).join("")+"</ul></div>";
+  }).join("");
+  var sinTxt=sin.slice(0,12).map(function(t){ var c=mlvCambio(t); return "<a href='"+PE_BASE+"?token="+esc(t.mint)+"'>"+esc(t.sym)+"</a>"+(c!=null?" "+mlvPc(c,true):""); }).join(" · ");
+  return "<section class='card ml-card mlv'><div class='ml-hrow'><h2>"+"Since your last visit"+"</h2><span class='ml-ts'>"+cab+"</span></div>"+
+    (filas||"<p class='hint'>"+"Nothing to report on your tokens since then."+"</p>")+
+    (con.length>MLV_FILAS?"<p class='hint'>"+"And {n} more tokens with changes: filter by «Changed».".replace("{n}",con.length-MLV_FILAS)+"</p>":"")+
+    (sin.length&&con.length?"<p class='mlv-sin'>"+"Nothing to report:"+" "+sinTxt+"</p>":"")+"</section>";
+}
+async function mlvCarga(ms){
+  var falta=ms.filter(function(m){ return !MLB[m]; }).slice(0,30);
+  if(!falta.length&&MLN) return;
+  var j=function(u){ return fetch(u).then(function(x){ return x.ok?x.json():null; }).catch(function(){ return null; }); };
+  var res=await Promise.all([MLN?Promise.resolve(MLN):j("/datos/normal.json")].concat(falta.map(function(m){ return j(API+"ballenas/"+m); })));
+  MLN=res[0]||{t:{}};
+  falta.forEach(function(m,i){ var b=res[i+1]; MLB[m]=b||{}; if(b&&!b.seguido) seenToken(m); });
+  if(state.mode==="L") renderLista(true);
+}
 function mlLogo(t,cls){
   var ini=String(t.sym||"?").replace(/^\$/,"").slice(0,2).toUpperCase();
   return "<span class='"+cls+"' style='background:"+cfCol(t.mint)+"' aria-hidden='true'>"+esc(ini)+
@@ -3000,7 +3098,7 @@ function mlAlert(t,c){
   }else if(c.k==="liq"){
     col="yel"; badge="▼";
     pill="<span class='pill ml-p-medio'>▼ Liquidity −"+c.pct+" %</span>";
-    small="From "+usd(c.from)+" a "+usd(c.to)+" since you checked it";
+    small="From "+usd(c.from)+" to "+usd(c.to)+" since you checked it";
   }else{
     col="network"; badge="✕";
     pill="<span class='pill ml-p-alto'>✕ No market</span>";
@@ -3052,13 +3150,14 @@ function mlWallet(e){
       "</div></details></div></div>";
 }
 function renderLista(noLive){
+  mlvRef();
   var ws=Object.keys(lista.w).map(function(k){ var e=lista.w[k]; e.addr=k; return e; });
   function byTs(a,b){ return (b.ts||0)-(a.ts||0); }
   var favs=ws.filter(function(e){return e.fav;}).sort(byTs);
   var hist=ws.filter(function(e){return !e.fav&&(e.ts||e.name);}).sort(byTs);
   var toks=Object.keys(lista.t).map(function(k){ var t=lista.t[k]; t.mint=k; return t; })
     .sort(function(a,b){ return lvPos(a.lvl)-lvPos(b.lvl)||(a.sym>b.sym?1:-1); });
-  var chg=toks.filter(function(t){ return mlChanges(t).length; });
+  var chg=toks.filter(mlvTiene);
   // los guardados con el nivel antiguo cuentan donde más se parecen hasta que se vuelvan a analizar
   var cnt={ROJO:0,NARANJA:0,AMARILLO:0,VERDE:0,DIAMANTE:0}, OLD5={ALTO:"ROJO",MEDIO:"AMARILLO",BAJO:"VERDE"};
   toks.forEach(function(t){ var k=OLD5[t.lvl]||t.lvl; if(cnt[k]!==undefined) cnt[k]++; });
@@ -3077,17 +3176,11 @@ function renderLista(noLive){
       "<div><span class='ml-ico'>◎</span><b>Follow a wallet</b><span>Analyse it and press Follow wallet, or use the ★ in Whales.</span></div>"+
       "<div><span class='ml-ico'>⇪</span><b>Coming from another device?</b><span>Import your backup below.</span></div></div></section>";
   }
-  // lo que ha cambiado, primero
-  if(chg.length){
-    var items=[]; chg.forEach(function(t){ mlChanges(t).forEach(function(c){ items.push(mlAlert(t,c)); }); });
-    h+="<section class='card ml-card'><div class='ml-hrow'><h2>Since last time</h2>"+
-      "<span class='ml-ts'>"+(llive.ts?"prices as of "+esc(ftime(llive.ts)):"")+"</span></div>"+
-      "<div class='ml-alerts'>"+items.slice(0,6).join("")+"</div>"+
-      (items.length>6?"<p class='hint'>Y "+(items.length-6)+" more changes: filter by Changed.</p>":"")+"</section>";
-  }
+  // lo que ha pasado desde la última visita, primero (27/11)
+  if(toks.length) h+=mlvHtml(toks);
   // tokens
   if(toks.length){
-    var shown=toks.filter(function(t){ return lf==="all"||(lf==="chg"?mlChanges(t).length:(OLD5[t.lvl]||t.lvl)===lf); });
+    var shown=toks.filter(function(t){ return lf==="all"||(lf==="chg"?mlvTiene(t):(OLD5[t.lvl]||t.lvl)===lf); });
     var vis=state.lallT?shown:shown.slice(0,ML_SHOW), re=state.lre;
     h+="<section class='card ml-card'><div class='ml-hrow'><h2>Tokens I follow <small>"+toks.length+"</small></h2><div class='ml-filters'>"+
       [["all","All",toks.length]].concat(TIERS5.filter(function(k){ return cnt[k]; }).map(function(k){ return [k,LEVELS[k].short,cnt[k]]; }),[["chg","Changed",chg.length]]).map(function(f){
@@ -3115,7 +3208,7 @@ function renderLista(noLive){
   h+="<details class='ml-fold'"+(!toks.length&&!favs.length?" open":"")+"><summary><span class='ml-ico'>⇪</span>Backup <small>· for another device or in case you clear the browser</small></summary>"+
     "<div class='in'>"+backupHtml()+"</div></details>";
   $("#llist").innerHTML=h;
-  if(!noLive) listaLive(toks);
+  if(!noLive){ listaLive(toks); mlvCarga(toks.map(function(t){ return t.mint; })); }
 }
 // Pone al día todos los tokens que sigues, uno detrás de otro (es lo mismo que analizarlos uno a uno)
 async function reanalyzeList(){
@@ -3150,7 +3243,7 @@ async function listaLive(toks){
       (Array.isArray(ps)?ps:[]).forEach(function(p){
         var m=p.baseToken&&p.baseToken.address, lq=(p.liquidity&&p.liquidity.usd)||0;
         var cv=/pump/i.test(p.dexId||"")&&!lq;
-        if(m in d&&(!d[m]||lq>d[m].liq||(d[m].cv&&!cv))) d[m]={price:Number(p.priceUsd||0),liq:lq,cv:cv,img:(p.info&&p.info.imageUrl)||(d[m]&&d[m].img)||""};
+        if(m in d&&(!d[m]||lq>d[m].liq||(d[m].cv&&!cv))) d[m]={price:Number(p.priceUsd||0),liq:lq,cv:cv,img:(p.info&&p.info.imageUrl)||(d[m]&&d[m].img)||"",pair:p.pairAddress||"",vol:(p.volume&&p.volume.h24)||0};
         else if(m in d&&d[m]&&!d[m].img&&p.info&&p.info.imageUrl) d[m].img=p.info.imageUrl;
       });
     }catch(e){ return; }
@@ -3159,6 +3252,8 @@ async function listaLive(toks){
   // los tokens guardados antes de que la lista apuntara el logo lo cogen ahora
   var got=false;
   toks.forEach(function(t){ var n=d[t.mint]; if(n&&n.img&&lista.t[t.mint]&&!lista.t[t.mint].img){ lista.t[t.mint].img=n.img; got=true; } });
+  // el precio de esta visita, para comparar en la próxima (27/11)
+  toks.forEach(function(t){ var n=d[t.mint], o=lista.t[t.mint]; if(n&&n.price>0&&o){ o.pv=n.price; o.pvt=Date.now(); got=true; } });
   if(got) saveList();
   if(state.mode==="L") renderLista(true);
 }
