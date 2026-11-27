@@ -41,6 +41,10 @@
 <meta name="twitter:site" content="@solflagTeam">
 <meta name="twitter:image" content="https://solflag.com/og.png?v=2">
 <link href="/fonts/fonts.css" rel="stylesheet">
+<!-- 27/11: se piden ya el motor y las dos fuentes del titular (antes salían al final del HTML o tras leer fonts.css) -->
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/solana-risk-engine@0.8.4/+esm" crossorigin>
+<link rel="preload" href="/fonts/fraunces-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/manrope-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 <!-- Estadísticas anónimas sin cookies (GoatCounter): visitas y cuántos análisis se hacen, nada personal.
      count.js es una copia revisada del script oficial (gc.zgo.at/count.js, licencia ISC), servida desde la propia web -->
 <script data-goatcounter="https://solflag.goatcounter.com/count" async src="/count.js"></script>
@@ -2502,6 +2506,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
 </style>
 </head>
 <body>
+<script>/* 27/11: la portada se ve desde el primer momento (antes, ~2 s en un móvil con la vista del escáner y el pie) */if(!/[?&](token|wallet|ballenas|map|v)=/.test(location.search))document.body.classList.add("landing");</script>
 <svg class="bgfx" hidden aria-hidden="true" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
   <defs>
     <radialGradient id="gL" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#a78bfa" stop-opacity=".08"/><stop offset="62%" stop-color="#a78bfa" stop-opacity=".22"/><stop offset="88%" stop-color="#c4b5fd" stop-opacity=".75"/><stop offset="100%" stop-color="#7c3aed" stop-opacity=".2"/></radialGradient>
@@ -5423,7 +5428,7 @@ function smFila(t,i){
   var av=(t.av||[]).filter(function(a){ return a[0]>dia; })[0], at="";
   if(av) at=av[1]==="entra"?"una wallet nueva entra con el {p}".replace("{p}",smPc(av[4])):av[1]==="sube"?"una sube del {a} al {p}".replace("{a}",smPc(av[3])).replace("{p}",smPc(av[4])):av[1]==="baja"?"una baja del {a} al {p}".replace("{a}",smPc(av[3])).replace("{p}",smPc(av[4])):av[1]==="exchange"?"una manda tokens a un exchange":"";
   if(at) li.push("<li><span>"+"Las 20 mayores"+"</span><b class='"+(av[1]==="baja"||av[1]==="exchange"?"sm-dn":"sm-up")+"'>"+at+"</b><small>"+smHora(av[0])+" · wallet "+esc(smCorta(av[2]))+"</small></li>");
-  return "<article class='sm-t'><header><span class='sm-n'>"+(i+1)+"</span><a class='sm-nom' href='"+u+"'>"+(t.logo?"<img src='"+esc(t.logo)+"' alt=''>":"<i class='sm-ini'>"+esc(t.sym.slice(0,2))+"</i>")+
+  return "<article class='sm-t'><header><span class='sm-n'>"+(i+1)+"</span><a class='sm-nom' href='"+u+"'>"+(t.logo?"<img src='"+esc(t.logo)+"' alt='' loading='lazy'>":"<i class='sm-ini'>"+esc(t.sym.slice(0,2))+"</i>")+
     "<div><b>"+esc(t.n)+"</b><span class='kick'>"+esc(SM_AP[t.ap]||"")+"</span></div></a></header>"+
     "<p class='sm-x'><b>"+smX(t.x)+"</b><span>"+"su volumen normal"+"</span></p>"+
     "<div class='sm-bar' aria-hidden='true'><i class='hoy'></i><i class='nor' style='width:"+Math.round(100/Math.max(t.x,1))+"%'></i></div>"+
@@ -5465,7 +5470,7 @@ async function loadEcoHome(){
        gt=c==null?"sin dato a 30 días":(c>0?"+":"−")+Math.abs(Math.round(c*100))+" % en 30 días";
       var vel=c==null?6:Math.max(1.4,5-Math.min(1,Math.abs(c))*3.6), fu=c==null?.18:.25+Math.min(1,Math.abs(c))*.55, pul=c==null?"196,181,253":c>0?"74,222,128":"255,107,107";
       var nota=a[0]==="meme"&&ud?"<p class='pe-nota'>"+"El {d} nacieron <b>{n}</b> tokens nuevos en Solana.".replace("{d}",fdate(Date.parse(ud))).replace("{n}",ix.days[ud].n.toLocaleString("de-DE"))+"</p>":"";
-      var lista=a[4]===1?"<ul class='pe-lista'>"+ej.map(function(e){ return "<li><a href='"+PE_BASE+"?token="+esc(e.mint)+"'>"+(e.logo?"<img src='"+esc(e.logo)+"' alt=''>":"<span></span>")+"<b>"+esc(e.n)+"</b><span>"+esc(e.dato)+"</span><small>"+(e.trad!=null?e.trad.toLocaleString("de-DE")+" traders":"")+"</small></a></li>"; }).join("")+"</ul>":"";
+      var lista=a[4]===1?"<ul class='pe-lista'>"+ej.map(function(e){ return "<li><a href='"+PE_BASE+"?token="+esc(e.mint)+"'>"+(e.logo?"<img src='"+esc(e.logo)+"' alt='' loading='lazy'>":"<span></span>")+"<b>"+esc(e.n)+"</b><span>"+esc(e.dato)+"</span><small>"+(e.trad!=null?e.trad.toLocaleString("de-DE")+" traders":"")+"</small></a></li>"; }).join("")+"</ul>":"";
       return "<article class='pe-t"+(a[4]===1?" pe-big":a[4]===2?" pe-an":"")+"' style='--vel:"+vel.toFixed(1)+"s;--pul:"+pul+";--fu:"+fu.toFixed(2)+"' data-ej='"+esc(JSON.stringify(ej))+"'>"+
         "<header><span class='kick'>"+esc(a[2])+"</span><span class='pe-g' style='color:"+(c==null?"var(--muted)":c>0?"var(--bajo)":"var(--alto)")+"'>"+esc(gt)+"</span></header>"+
         "<a class='pe-ej' href='"+PE_BASE+"?token="+esc(ej[0].mint)+"'></a><div class='pe-dots'>"+ej.map(function(_,i){ return "<i"+(i?"":" class='on'")+"></i>"; }).join("")+"</div>"+lista+nota+
@@ -5484,7 +5489,7 @@ async function loadEcoHome(){
 function pePinta(t,i){
   var ej=JSON.parse(t.getAttribute("data-ej")), e=ej[i%ej.length], a=t.querySelector(".pe-ej");
   a.setAttribute("href",PE_BASE+"?token="+e.mint);
-  a.innerHTML=(e.logo?"<img src='"+esc(e.logo)+"' alt=''>":"<span class='pe-ini'>"+esc(e.sym.slice(0,2))+"</span>")+"<b>"+esc(e.n)+"<small>$"+esc(e.sym)+"</small></b><span class='pe-dato'>"+esc(e.dato)+"</span>"+(e.sp||"")+
+  a.innerHTML=(e.logo?"<img src='"+esc(e.logo)+"' alt='' loading='lazy'>":"<span class='pe-ini'>"+esc(e.sym.slice(0,2))+"</span>")+"<b>"+esc(e.n)+"<small>$"+esc(e.sym)+"</small></b><span class='pe-dato'>"+esc(e.dato)+"</span>"+(e.sp||"")+
     "<span class='pe-vivo'><span>●</span> "+(e.trad!=null?e.trad.toLocaleString("de-DE")+" traders hoy":"")+(e.tit!=null?" · "+e.tit.toLocaleString("de-DE")+" titulares":"")+"</span>";
   t.querySelectorAll(".pe-dots i").forEach(function(d,k){ d.className=k===i%ej.length?"on":""; });
 }
@@ -8429,7 +8434,8 @@ document.addEventListener("click",function(ev){
 // La portada (texto, banderas, bot) solo se ve en el escáner y mientras no hay un análisis abierto
 function updateLanding(){
   var free=state.mode==="W"&&$("#results").hidden&&$("#progress").hidden, on=free&&!state.scan;
-  if(on&&!document.body.classList.contains("landing")) setTimeout(paintHome,0);
+  var prim=!updateLanding.hecha; updateLanding.hecha=true;
+  if(on&&(prim||!document.body.classList.contains("landing"))) setTimeout(paintHome,0);
   document.body.classList.toggle("landing",on);
   var sp=free&&state.scan;
   if(sp&&!document.body.classList.contains("scanp")) paintScanPage();
