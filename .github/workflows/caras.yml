@@ -46,7 +46,8 @@ jobs:
           PUB_DIR: _pub
           # tokens nuevos analizados con el motor por vuelta (12/11/2026: de 40 a 70, todos los que entran; Helius
           # iba por ~15.000 créditos al día de 1 M al mes. Si un ciclo entero se acerca al millón, bajarlo a 55)
-          REG_MAX: "70"
+          # 27/11: a 55 (reparto de Helius: el recolector se llevaba ~75 % del gasto; ~3.000 créditos menos al día)
+          REG_MAX: "55"
           # plano del dinero (tools/caras/plano.mjs): enlaces de cada lanzamiento a Cloudflare D1
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
@@ -57,8 +58,9 @@ jobs:
           # 27/11: el radar de lanzamientos (tools/caras/radar.mjs) se apaga: el canal t.me/SolFlagRadar lo lleva ahora
           # la recogida (tools/recogida/radar.mjs, avisos de los proyectos que seguimos). Sin el token, collect.mjs no publica.
         run: node tools/caras/collect.mjs
-      # Mapa del momento de la página Escáner (datos/momento.json): una vez por hora, con su propio motor. Si falla,
-      # se queda el anterior y el resto del recolector sigue igual
+      # Mapa del momento de la página Escáner (datos/momento.json), con su propio motor. Si falla, se queda el anterior y
+      # el resto del recolector sigue igual. 27/11: cada 3 h en vez de cada hora (~1.000 créditos de Helius menos al día):
+      # se rehace cuando el que hay tiene 2 h 50 min o más (así, si GitHub se salta una vuelta, lo rehace la siguiente)
       - name: Mapa del momento
         continue-on-error: true
         timeout-minutes: 8
@@ -66,6 +68,9 @@ jobs:
           SOLANA_RPC: ${{ secrets.SOLANA_RPC }}
           PUB_DIR: _pub
         run: |
+          if node -e 'const j=JSON.parse(require("fs").readFileSync("_pub/datos/momento.json","utf8")); process.exit(Date.now()-j.at<170*60e3?0:1)' 2>/dev/null; then
+            echo "Mapa del momento: el de ahora es reciente, toca cada 3 h"; exit 0
+          fi
           npm ci --prefix tools/momento --no-audit --no-fund
           node tools/momento/momento.mjs
       - uses: actions/cache/save@v6

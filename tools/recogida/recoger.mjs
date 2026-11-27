@@ -42,6 +42,23 @@ async function json(u, init, intentos = 3) {
 }
 const rpc = (method, params) => json(RPC, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) }).then((j) => j && j.result);
 
+// «Quién la tiene» con Helius a su ritmo (27/11; antes, todos los tokens cada 2 h y el 98 % de las fotos repetía lo
+// que ya sabíamos): cada token se mira cuando toca o cuando hay una señal gratis de movimiento (de DexScreener y
+// GeckoTerminal, que ya se piden cada 15 min). La cantidad total (supply) casi nunca cambia: una vez al día.
+export const FOTO_MOV = 2 * 3600e3, FOTO_QUIETO = 8 * 3600e3, FOTO_SENAL = 30 * 60e3, MOV_DIAS = 3, SUP_EDAD = 864e5, FOTOS_MAX = 70;
+// por qué toca foto ahora (o null): ult = última foto, mov = último cambio visto en sus 20 mayores (≥ 0,3 puntos),
+// dx = cifras de DexScreener de ahora, ops = operaciones grandes nuevas, liq0 = liquidez en la última foto
+export function motivoFoto(ult, mov, dx, ops, liq0, ahora) {
+  if (!ult) return "primera";
+  const desde = ahora - ult;
+  const v = dx && dx.vol, senal = (ops || []).some((o) => o.usd >= 10000) ||
+    !!(v && v.h1 >= 20000 && v.h24 > 0 && v.h1 > 3 * v.h24 / 24) || !!(dx && liq0 && dx.liq < liq0 * 0.8);
+  if (senal && desde >= FOTO_SENAL) return "señal";
+  if (mov && ahora - mov < MOV_DIAS * 864e5) return desde >= FOTO_MOV ? "se mueve" : null;
+  return desde >= FOTO_QUIETO ? "toca" : null;
+}
+// ¿han cambiado sus 20 mayores? (mayor wallet, 10 mayores, exchanges, del proyecto; en puntos de %)
+export const cambioQuien = (a, q) => !!(a && q) && Math.max(Math.abs(a[0] - q.mayor), Math.abs(a[1] - q.top10w), Math.abs(a[2] - q.exch), Math.abs(a[3] - (q.proy || 0))) >= 0.3;
 // el pool principal de cada token (el de más liquidez donde el token es la base) y sus cifras de DexScreener
 export function pools(pares, mints) {
   const out = {};
@@ -256,9 +273,10 @@ async function main() {
   const vh = (m) => (P[m] && P[m].vol && P[m].vol.h1) || 0;
   LISTA.sort((x, y) => vh(y[1]) - vh(x[1]));
   const finGT = Date.now() + 6 * 60000;
-  // 2) Helius cada 2 horas (la foto de los minutos 0–14 de las horas pares UTC)
-  const conHelius = !!RPC && new Date(ahora).getUTCHours() % 2 === 0 && new Date(ahora).getUTCMinutes() < 15;
-  const filas = [], porMint = {};
+  // 2) Helius a su ritmo (27/11): ver motivoFoto
+  est.foto = est.foto || {}; est.sup = est.sup || {}; est.mov = est.mov || {}; est.liq0 = est.liq0 || {}; est.qAnt = est.qAnt || {};
+  const filas = [], porMint = {}, motivos = {};
+  let nFotos = 0, nSup = 0;
   for (const [sym, m, ap] of LISTA) {
     const p = P[m] || null, f = { t: ahora, sym, m, ap, dx: p };
     if (p && p.pool && !quieto(p) && Date.now() < finGT) {
@@ -267,10 +285,15 @@ async function main() {
       if (j) { f.ops = ops; porMint[m] = ops; if (ops.length) est.ult[p.pool] = ops[ops.length - 1].t; else if (!est.ult[p.pool]) est.ult[p.pool] = ahora - 3600000; }
       await espera(2200);   // GeckoTerminal: 30 por minuto
     }
-    if (conHelius) {
-      const [big, sup] = await Promise.all([rpc("getTokenLargestAccounts", [m]), rpc("getTokenSupply", [m])]);
-      if (big && big.value) f.top = big.value.map((x) => [x.address, x.uiAmountString]);
-      if (sup && sup.value) f.supply = sup.value.uiAmountString;
+    const motivo = RPC && nFotos < FOTOS_MAX ? motivoFoto(est.foto[m], est.mov[m], p, f.ops, est.liq0[m], ahora) : null;
+    if (motivo) {
+      const supViejo = !est.sup[m] || ahora - est.sup[m].t > SUP_EDAD;
+      const [big, sup] = await Promise.all([rpc("getTokenLargestAccounts", [m]), supViejo ? rpc("getTokenSupply", [m]) : null]);
+      if (sup && sup.value) { est.sup[m] = { v: sup.value.uiAmountString, t: ahora }; nSup++; }
+      if (big && big.value && est.sup[m]) {
+        f.top = big.value.map((x) => [x.address, x.uiAmountString]); f.supply = est.sup[m].v;
+        est.foto[m] = ahora; if (p) est.liq0[m] = p.liq; nFotos++; motivos[motivo] = (motivos[motivo] || 0) + 1;
+      }
     }
     filas.push(f);
   }
@@ -284,7 +307,8 @@ async function main() {
   for (const f of filas) if (f.top) f.top = f.top.map(([c, n]) => [c, n, est.duenos[c] || null]);
   // 3b) qué es cada dueño: exchange conocido, wallet (cuenta del System Program) o programa; solo los que no sabíamos
   est.tipo = est.tipo || {};
-  const EXCH = conHelius ? await exchangesConocidos(est, ahora) : new Set();
+  const hayFoto = nFotos > 0;
+  const EXCH = hayFoto ? await exchangesConocidos(est, ahora) : new Set();
   const nuevosD = [...new Set(filas.flatMap((f) => (f.top || []).map((x) => x[2]).filter(Boolean)))].filter((d) => !(d in est.tipo));
   for (let i = 0; i < nuevosD.length; i += 100) {
     const lote = nuevosD.slice(i, i + 100), r = await rpc("getMultipleAccounts", [lote, { encoding: "base64", dataSlice: { offset: 0, length: 0 } }]);
@@ -295,10 +319,12 @@ async function main() {
   // del motor ya trae los exchanges nuevos (0.8.2: Gate, Binance, Robinhood, Bybit, Kraken, MEXC), se rehace el historial
   // de «quién la tiene» y sus avisos con los tipos buenos (el 26/11 salió un aviso de Gate moviendo a Gate).
   if (est.tipoV !== 2) { for (const [d, t] of Object.entries(est.tipo)) if (t === "w" && !isOnCurve(d)) est.tipo[d] = "p"; est.tipoV = 2; }
-  if (conHelius && est.histV !== 4 && EXCH.has("3RtJvxpkok13LGQsQ3Ye4QvCkbP3ioMpra7ccuf9XqsF")) { est.histD1 = null; est.rehacer = true; }   // 0.8.3 + «del proyecto» aparte: rehacer
+  if (hayFoto && est.histV !== 4 && EXCH.has("3RtJvxpkok13LGQsQ3Ye4QvCkbP3ioMpra7ccuf9XqsF")) { est.histD1 = null; est.rehacer = true; }   // 0.8.3 + «del proyecto» aparte: rehacer
   const PJT = (est.exch && est.exch.pj) || {};
   const tipo = {}; for (const [d, t] of Object.entries(est.tipo)) tipo[d] = EXCH.has(d) ? "x" : PJT[d] && t === "w" ? "j" : t;
   const quien = filas.map((f) => f.top && f.supply ? [f.m, quienDe(f.top, f.supply, tipo)] : null).filter((x) => x && x[1]);
+  // los que se mueven se miran más a menudo (cada 2 h durante MOV_DIAS días); los tranquilos, cada 8 h
+  for (const [m, q] of quien) { if (cambioQuien(est.qAnt[m], q)) est.mov[m] = ahora; est.qAnt[m] = [q.mayor, q.top10w, q.exch, q.proy || 0]; }
   for (const [k, t] of Object.entries(est.ult)) if (t < ahora - 7 * 864e5) delete est.ult[k];   // pools que ya no se miran
   // la primera vez, también lo que ya estaba en los .jsonl (desde el 24/11)
   if (D1 && !est.opsD1) for (const fi of fs.readdirSync(SALIDA).filter((x) => /^\d{4}-\d\d-\d\d\.jsonl$/.test(x)))
@@ -320,13 +346,13 @@ async function main() {
         params: l.flatMap(([m, q]) => [m, ahora, q.mayor, q.top10w, q.exch, q.pools, q.jo && PJ[q.jo] ? PJ[q.jo].join("|") : null, q.proy || 0]) }); }
   } catch (e) { console.log("quien:", e.message); }
   let hist = null;
-  if (D1 && conHelius) try { hist = await historial(est, filas, tipo, ahora); } catch (e) { console.log("historial:", e.message); }
+  if (D1 && hayFoto) try { hist = await historial(est, filas, tipo, ahora); } catch (e) { console.log("historial:", e.message); }
   try { await radar(est, ahora, eco, pares, hist ? hist[2] : [], tipo); } catch (e) { console.log("radar:", e.message); }
   const dia = new Date(ahora).toISOString().slice(0, 10);
   fs.appendFileSync(path.join(SALIDA, dia + ".jsonl"), filas.map((f) => JSON.stringify(f)).join("\n") + "\n");
   est.ultima = ahora;
   fs.writeFileSync(fEst, JSON.stringify(est));
-  console.log(`recogida: ${filas.length} tokens · ${filas.filter((f) => f.dx).length} con pool · ${filas.reduce((s, f) => s + (f.ops ? f.ops.length : 0), 0)} operaciones grandes nuevas · Helius ${conHelius ? "sí" : "no"} · ${fijos.length} fijos de la web (${nuevoFijo.size} nuevos) · ${enD1} operaciones a D1 · quién la tiene: ${quien.length}${hist ? ` · historial ${hist[0]} fotos, ${hist[1]} avisos` : ""}`);
+  console.log(`recogida: ${filas.length} tokens · ${filas.filter((f) => f.dx).length} con pool · ${filas.reduce((s, f) => s + (f.ops ? f.ops.length : 0), 0)} operaciones grandes nuevas · Helius: ${nFotos} fotos (${Object.entries(motivos).map(([k, n]) => k + " " + n).join(", ") || "ninguna"}), ${nSup} supply · ${fijos.length} fijos de la web (${nuevoFijo.size} nuevos) · ${enD1} operaciones a D1 · quién la tiene: ${quien.length}${hist ? ` · historial ${hist[0]} fotos, ${hist[1]} avisos` : ""}`);
 }
 // Radar del canal t.me/SolFlagRadar (27/11, radar.mjs): ballenas, volumen, uso real, novedades y resumen de las 21:00.
 // Sin RADAR_TELEGRAM_TOKEN no hace nada; con RADAR_PRUEBA=1 solo escribe en el log lo que mandaría.

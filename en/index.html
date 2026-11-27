@@ -5712,8 +5712,8 @@ async function loadMoment(){
 }
 function paintMoment(){
   var j=mom.j, card=$("#smmap"); if(!card) return;
-  // sin archivo, o de hace más de 3 horas (el recolector se ha parado): no se enseña
-  if(!j||!j.mint||!j.holders||!j.holders.length||Date.now()-j.at>3*3600000){ card.hidden=true; return; }
+  // sin archivo, o de hace más de 4 horas (el recolector se ha parado; desde el 27/11 se rehace cada 3 h): no se enseña
+  if(!j||!j.mint||!j.holders||!j.holders.length||Date.now()-j.at>4*3600000){ card.hidden=true; return; }
   card.hidden=false;
   $("#smtok").innerHTML=tokAv(j.img,j.sym)+"<span><b>$"+esc(j.sym)+"</b> · #"+j.rank+" trending · "+esc(haceMin(j.at))+"</span>";
   // el mismo On-chain Map de /mapa/ en miniatura (?mini): quieto, y se anima al pasar el ratón por encima.
