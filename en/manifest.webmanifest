@@ -1,0 +1,17 @@
+{
+  "id": "/en/",
+  "name": "SolFlag",
+  "short_name": "SolFlag",
+  "description": "Solana risk scanner: who is behind each token, whales and the ecosystem.",
+  "lang": "en",
+  "start_url": "/en/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#05040d",
+  "theme_color": "#05040d",
+  "icons": [
+    { "src": "/marca/app-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/marca/app-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/marca/app-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "/",
+  "name": "SolFlag",
+  "short_name": "SolFlag",
+  "description": "Escáner de riesgo de Solana: quién está detrás de cada token, ballenas y el ecosistema.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#05040d",
+  "theme_color": "#05040d",
+  "icons": [
+    { "src": "/marca/app-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/marca/app-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/marca/app-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

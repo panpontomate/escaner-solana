@@ -10,6 +10,9 @@
 // wallet, token, con, spam, hoy, cancelado, helius, sol, dex) are deliberately not here.
 
 export const CODE = [
+  // la app en el móvil (27/11): el manifest en inglés abre /en/
+  ['<b>«Instalar app»</b> o <b>«Añadir a pantalla de inicio»</b>', '<b>«Install app»</b> or <b>«Add to Home Screen»</b>'],
+  ['<link rel="manifest" href="/manifest.webmanifest">', '<link rel="manifest" href="/en/manifest.webmanifest">'],
   // apartados compactos del Escáner (21/11): números, dinero y grupos en inglés
   ['function sapN(x,d){ return x.toLocaleString("de-DE",', 'function sapN(x,d){ return x.toLocaleString("en-US",'],
   ['function sapM(n){ return n>=1e6?sapN(n/1e6,1)+" M$":n>=1e3?sapN(n/1e3,0)+" k$":sapN(n||0,0)+" $"; }', 'function sapM(n){ return n>=1e6?"$"+sapN(n/1e6,1)+"M":n>=1e3?"$"+sapN(n/1e3,0)+"k":"$"+sapN(n||0,0); }'],
@@ -256,6 +259,25 @@ export const TEXT = {
   " % en 30 días": "% in 30 days",
   "El {d} nacieron <b>{n}</b> tokens nuevos en Solana.": "On {d}, <b>{n}</b> new tokens were born on Solana.",
   "Ver {a} en el Ecosistema →": "See {a} in the Ecosystem →",
+  // la app en el móvil (27/11)
+  "SolFlag en tu móvil": "SolFlag on your phone",
+  "Se abre como una app, sin pasar por ninguna tienda.": "Opens like an app, no app store needed.",
+  "Instala SolFlag en tu móvil": "Install SolFlag on your phone",
+  "Safari no tiene botón de instalar: son dos toques.": "Safari has no install button: it takes two taps.",
+  "Pulsa": "Tap",
+  "Compartir": "Share",
+  ", abajo en Safari": ", at the bottom of Safari",
+  "Elige": "Choose",
+  "«Añadir a pantalla de inicio»": "«Add to Home Screen»",
+  "Listo: SolFlag sale con su icono, como una app": "Done: SolFlag shows up with its icon, like an app",
+  "Tu navegador no tiene botón de instalar aquí.": "Your browser has no install button here.",
+  "Abre el": "Open the",
+  "menú": "menu",
+  "del navegador": "of your browser",
+  "Entendido": "Got it",
+  "Instalar la app": "Install the app",
+  "Instalar": "Install",
+  "Cerrar": "Close",
   // «Desde tu última visita» en Mi lista (27/11)
   "Riesgo: ahora <b>": "Risk: now <b>",
   "antes ": "before ",
