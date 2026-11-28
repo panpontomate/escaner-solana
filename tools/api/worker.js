@@ -345,6 +345,12 @@ export function rpcValido(q) {
   if (q.method === "getMultipleAccounts") return Array.isArray(q.params[0]) && q.params[0].length <= 100 && q.params[0].every((a) => ADDR.test(a));
   return typeof q.params[0] === "string" && q.params[0].length <= 100;
 }
+// Rutas que gastan créditos de fuera (Helius, CoinGecko) sin límite propio: el de /api/top, 30 por minuto por conexión (28/11)
+async function limiteCaro(req, env) {
+  if (!env.TOP_LIMIT) return true;
+  const { success } = await env.TOP_LIMIT.limit({ key: req.headers.get("cf-connecting-ip") || "?" });
+  return success;
+}
 async function rpcPlanB(req, env) {
   if (!env.SOLANA_RPC) return fail(503, "rpc unavailable");
   if (env.RPC_LIMIT) {
@@ -361,6 +367,15 @@ async function rpcPlanB(req, env) {
   return new Response(await r.text(), { status: r.status, headers: Object.assign({}, HEAD, { "content-type": "application/json", "cache-control": "no-store" }) });
 }
 
+// La caché guarda por URL: con «?x=1», «?x=2»… cada petición se saltaba la caché y gastaba créditos (28/11).
+// Solo ventas, caída y marcas leen parámetros; en el resto se quitan para la clave de la caché.
+const CON_PARAMS = /^\/api\/(ventas|caida|marcas)\//;
+export function claveCache(req) {
+  const u = new URL(req.url);
+  if (!u.search || CON_PARAMS.test(u.pathname)) return req;
+  u.search = "";
+  return new Request(u.toString(), { method: "GET" });
+}
 export async function handle(req, env) {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: Object.assign({}, HEAD, { "access-control-allow-methods": "GET, POST", "access-control-allow-headers": "content-type", "access-control-max-age": "86400" }) });
   const p = new URL(req.url).pathname.replace(/\/+$/, "").split("/");
@@ -426,6 +441,7 @@ export async function handle(req, env) {
   }
   if (p.length === 4 && p[1] === "api" && p[2] === "logo") {
     if (!ADDR.test(p[3])) return fail(400, "not a Solana address");
+    if (!(await limiteCaro(req, env))) return fail(429, "too many requests");
     const img = await logo(env, p[3], fetch);
     if (img === undefined) return fail(503, "rpc unavailable");
     const res = json({ v: V, mint: p[3], img: img });
@@ -448,6 +464,7 @@ export async function handle(req, env) {
   }
   if (p.length === 3 && p[1] === "api" && p[2] === "apoya") {
     if (!env.SOLANA_RPC) return fail(503, "rpc unavailable");
+    if (!(await limiteCaro(req, env))) return fail(429, "too many requests");
     const a = await apoya(env, fetch);
     if (!a) return fail(503, "rpc unavailable");
     const res = json(a);
@@ -464,6 +481,7 @@ export async function handle(req, env) {
   }
   if (p.length === 4 && p[1] === "api" && p[2] === "cotiza") {
     if (!ADDR.test(p[3])) return fail(400, "not a Solana address");
+    if (!(await limiteCaro(req, env))) return fail(429, "too many requests");
     try {
       const c = await cotiza(env, p[3]), res = json(c);
       if (c.cex === null) res.headers.set("cache-control", "public, max-age=60");   // CoinGecko no contestó: reintentar pronto
@@ -510,13 +528,14 @@ export default {
   },
   async fetch(req, env, ctx) {
     const cache = typeof caches !== "undefined" ? caches.default : null;
+    const key = claveCache(req);
     if (cache && req.method === "GET") {
-      const hit = await cache.match(req);
+      const hit = await cache.match(key);
       if (hit) return hit;
     }
     // token.solflag.com: la ficha pública de cada token (ficha.js); el resto, la API
     const res = new URL(req.url).hostname === FICHA_HOST ? await ficha(req, env) : await handle(req, env);
-    if (cache && req.method === "GET" && res.status === 200) ctx.waitUntil(cache.put(req, res.clone()));
+    if (cache && req.method === "GET" && res.status === 200) ctx.waitUntil(cache.put(key, res.clone()));
     return res;
   }
 };

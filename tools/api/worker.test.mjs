@@ -356,3 +356,14 @@ test("recogida: lista de wallets con nombre del motor (exchanges, custodios y de
   assert.deepEqual(k.pj, { [C]: ["Raydium", "treasury"] });
   assert.equal(quienDe([["a", "60", C], ["b", "10", A]], "100", { [C]: "w", [A]: "x" }).mo, C);
 });
+
+// 28/11: la caché no se salta con parámetros inventados; ventas, caída y marcas sí los conservan
+import { claveCache } from "./worker.js";
+test("claveCache quita los parámetros salvo en las rutas que los usan", () => {
+  assert.equal(claveCache(new Request("https://api.solflag.com/api/apoya?x=123")).url, "https://api.solflag.com/api/apoya");
+  assert.equal(claveCache(new Request("https://api.solflag.com/api/logo/" + M1 + "?w=192")).url, "https://api.solflag.com/api/logo/" + M1);
+  assert.equal(claveCache(new Request("https://token.solflag.com/" + M1 + "?a=b")).url, "https://token.solflag.com/" + M1);
+  const v = "https://api.solflag.com/api/ventas/" + M1 + "?w=" + A + "&desde=1700000000";
+  assert.equal(claveCache(new Request(v)).url, v);
+  assert.equal(claveCache(new Request("https://api.solflag.com/api/marcas/" + M1 + "?desde=5")).url, "https://api.solflag.com/api/marcas/" + M1 + "?desde=5");
+});
