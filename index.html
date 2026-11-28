@@ -3060,7 +3060,9 @@ function mlChanges(t){
   if(t.prev&&t.prev.lvl&&t.prev.lvl!==t.lvl&&!(OLDPOS[t.prev.lvl]!==undefined&&TIERS5.indexOf(t.lvl)>=0)&&Date.now()-(t.prev.ts||0)<ML_DAYS*864e5)
     out.push({k:"lvl",worse:(ML_RANK[t.lvl]||0)>(ML_RANK[t.prev.lvl]||0),from:t.prev.lvl});
   if(now===null) out.push({k:"gone"});
-  else if(now&&!now.cv&&t.liq>=1000&&now.liq<t.liq*0.5) out.push({k:"liq",pct:Math.round((1-now.liq/t.liq)*100),from:t.liq,to:now.liq});
+  // solo con el MISMO pool (28/11): la lista pide 30 tokens a la vez y DexScreener da un pool por token, a menudo no el más
+  // líquido que guardó el Escáner (JUP: Orca 494 k$ frente a Meteora 1,6 M$ salía como «la liquidez cae un 70 %»)
+  else if(now&&!now.cv&&t.liq>=1000&&(!t.pair||!now.pair||now.pair===t.pair)&&now.liq<t.liq*0.5) out.push({k:"liq",pct:Math.round((1-now.liq/t.liq)*100),from:t.liq,to:now.liq});
   return out;
 }
 /* «Desde tu última visita» (27/11, maqueta aprobada maquetas/web/milista-cambios.html): lo que ha pasado en cada token

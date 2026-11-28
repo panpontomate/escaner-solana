@@ -493,7 +493,8 @@ export async function ficha(req, env, fetchJSON) {
   try { d = await datosBase(env.DB, m); } catch (e) { d = { lanz: null, consultas: 0, roles: [], buyers: [], others: [] }; }
   const day = d.lanz ? new Date(d.lanz.t).toISOString().slice(0, 10) : null;
   const [pairs, regDay] = await Promise.all([
-    get("https://api.dexscreener.com/tokens/v1/solana/" + m, 300),
+    // token-pairs (28/11): TODOS los pools; tokens/v1 da uno por token y no siempre el más líquido (JUP: Orca 494 k$ y no Meteora 1,6 M$)
+    get("https://api.dexscreener.com/token-pairs/v1/solana/" + m, 300),
     day && d.lanz.lvl ? get("https://solflag.com/datos/registro/" + day + ".json", 3600) : null
   ]);
   const mk = mercado(pairs, m), reg = regDay && regDay.tokens ? regDay.tokens[m] || null : null;
