@@ -4328,7 +4328,7 @@ function bandsOpen(){
   m.innerHTML="<div class='bm-caja' role='dialog' aria-modal='true' aria-label='Por qué sale así'><button type='button' class='bm-x' data-bclose='1' title='Cerrar'>✕</button>"+
     "<p class='kick'>"+esc(AP_NOM[r.perfil.ap]||"")+"</p><h3 class='tgt'>Por qué sale así</h3>"+
     "<div class='bm-cks'>"+cs.map(function(c){ var t=ckDet(c); return "<div><i style='background:"+CK_COL[c.col]+"'></i><b>"+esc(CK_NOM[c.k])+"</b>"+(t?"<span>"+esc(t)+"</span>":"")+"</div>"; }).join("")+"</div>"+
-    "<p class='kick bm-k'>Las 5 banderas de siempre</p>"+(state.bandLh||"")+
+    "<p class='kick bm-k'>Los controles de siempre</p>"+(state.bandLh||"")+
     "<p class='pc-nota'>El color resume lo que vemos en la cadena y en fuentes públicas (DefiLlama, Jupiter, GitHub, Streamflow). No es un consejo de inversión. <a href='"+LHOW+"#nivel' target='_blank' rel='noopener'>Cómo se decide el nivel →</a></p></div>";
   m.hidden=false; document.body.style.overflow="hidden";
 }
