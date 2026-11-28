@@ -4945,7 +4945,7 @@ function paintQuote(r,j,amt){
       (r.par||cex.length?"<span class='cq-amts'>"+[100,1000,10000].map(function(a){ return "<button type='button' data-cqamt='"+a+"' class='"+(a===amt?"on":"")+"'>"+(a===100?"100 $":usd(a))+"</button>"; }).join("")+"</span>":"")+"</div>"+
     "<div class='cq2-hero' id='cqbig'><span class='hint'>"+(r.par?"Calculando con Jupiter…":"Sin mercado en la cadena: no hay dónde comprar ni vender.")+"</span></div>"+
     "<p class='cq2-comp' id='cqcomp' hidden></p>"+
-    (risky?"<p class='cq-stop'><b>Riesgo alto:</b> no enlazamos sitios para comprarlo. Te enseñamos dónde se negocia y, sobre todo, lo que cuesta salir. Si aun así quieres comprarlo, «Comprar aquí» te enseña antes lo que vemos en rojo.</p>":"")+
+    (risky?"<p class='cq-stop'><b>Riesgo alto:</b> antes de comprar, mira lo que cuesta salir. Aquí tienes dónde se negocia y cuánto perderías al vender. Si aun así quieres comprarlo, «Comprar aquí» te enseña primero lo que vemos en rojo.</p>":"")+
     "<p class='kick cq2-k' id='cqrk'>Del más barato al más caro · ida y vuelta</p><div class='cq2-rank' id='cqrank'></div>"+
     (!j||j.cex===null?"<p class='hint'>No se pudieron consultar los exchanges ahora. Vuelve a probar en un rato.</p>":"")+
     (pools.length?"<p class='cq2-pools'>En la cadena: "+pools.slice(0,3).map(function(p){ return esc(p.dex)+" "+esc(p.par)+" ("+esc(usdShort(p.liq))+")"; }).join(" · ")+(pools.length>3?" y "+(pools.length-3)+" más":"")+". Jupiter reparte la compra entre todos.</p>":"")+
