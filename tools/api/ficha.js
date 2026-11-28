@@ -17,6 +17,8 @@
 //   GET /robots.txt
 //   GET /  ·  GET /en                índice de fichas: las mismas del sitemap, con enlaces (26/11)
 
+import { notaHTML, NOTA_TIT, NOTA_CSS, NOTA_JS, NOTA_MAX } from "./nota.js";
+
 export const HOST = "token.solflag.com";
 const ADDR = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 const DAY = 86400000;
@@ -170,7 +172,9 @@ const SUM = "COUNT(*) AS n, SUM(dead24 IS NOT NULL) AS resolved, SUM(dead24 = 1)
 export async function datosBase(db, m) {
   const r = (await all(db, "SELECT * FROM lanz WHERE m = ?1", [m]))[0] || null;
   const ped = (await all(db, "SELECT n FROM pedidos WHERE m = ?1", [m]).catch(() => []))[0];
-  const out = { lanz: r, consultas: ped ? ped.n : 0, roles: [], buyers: [], others: [] };
+  // 28/11: historial de la nota (tabla notas, la llena tools/notas una vez al día); si la tabla aún no existe, vacío
+  const notas = await all(db, "SELECT dia, pts, tier, ap, ck FROM notas WHERE m = ?1 ORDER BY dia DESC LIMIT " + NOTA_MAX, [m]).catch(() => []);
+  const out = { lanz: r, consultas: ped ? ped.n : 0, roles: [], buyers: [], others: [], notas };
   if (!r) return out;
   // quién está detrás: cada wallet una vez, con todos sus papeles en este token y su historial en el papel principal
   const seen = {};
@@ -225,7 +229,7 @@ function motivo(d, t, n) {
   return "";
 }
 
-const card = (n, title, body) => '<section class="card"><h2><span class="n">' + n + "</span> " + title + "</h2>" + body + "</section>";
+const card = (n, title, body, cls) => '<section class="card' + (cls ? " " + cls : "") + '"><h2><span class="n">' + n + "</span> " + title + "</h2>" + body + "</section>";
 const kv = (rows) => '<table class="kv">' + rows.map(([k, v, c]) => "<tr><td>" + k + '</td><td class="val ' + (c || "") + '">' + v + "</td></tr>").join("") + "</table>";
 const f = (k, v, c) => '<span class="f">' + k + "<b" + (c ? ' class="' + c + '"' : "") + ">" + v + "</b></span>";
 const na = (s) => '<span class="na">' + s + "</span>";
@@ -353,6 +357,9 @@ export function pagina(m, d, mk, reg, now, lang) {
   const hoy = F.fecha(now), S = t.secciones;
   const img = mk && mk.image ? mk.image : "https://solflag.com/" + (L === "en" ? "og-en.png" : "og.png") + "?v=2";
   const otroUrl = fichaUrl(m, L === "en" ? "es" : "en");
+  const nota = notaHTML(d.notas, L, t.como);
+  let nCard = 0;
+  const C = (title, body, cls) => card(String(++nCard).padStart(2, "0"), title, body, cls);
 
   return '<!doctype html><html lang="' + L + '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
     "<title>" + esc(title) + '</title><meta name="description" content="' + esc(desc) + '"><link rel="canonical" href="' + url + '">' +
@@ -362,20 +369,20 @@ export function pagina(m, d, mk, reg, now, lang) {
     '<meta name="twitter:card" content="' + (mk && mk.image ? "summary" : "summary_large_image") + '"><meta name="twitter:site" content="@solflagTeam">' +
     '<link rel="icon" href="https://solflag.com/marca/solflag-icono.svg?v=1" type="image/svg+xml"><link rel="apple-touch-icon" href="https://solflag.com/marca/apple-touch-icon.png"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
     '<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Manrope:wght@400;600;700&family=Barlow+Condensed:wght@600;700&family=Unbounded:wght@700&display=swap" rel="stylesheet">' +
-    "<style>" + CSS + "</style></head><body>" + cabecera(t, otroUrl) +
+    "<style>" + CSS + (nota ? NOTA_CSS : "") + "</style></head><body>" + cabecera(t, otroUrl) +
     '<div class="wrap"><header class="top"><span class="doc"><b>' + t.fichaTec + "</b> · " + t.historial + '</span><span class="num">' + HOST + "/" + t.path + esc(m) + '</span><span class="sp"></span>' +
     '<span class="doc">' + t.actualizada + " " + hoy + '</span><button class="btn" id="share" type="button">' + t.compartir + "</button>" +
     '<a class="btn" href="https://t.me/SolFlagBot">' + t.vigilar + '</a><a class="btn" href="' + scan + '">' + t.analizar + "</a></header>" + aviso +
-    '<div class="grid"><div class="col">' + card("01", S[0], ident) + card("02", S[1], veredicto) + card("03", S[2], ahora) +
-    '</div><div class="col">' + card("04", S[3], cifras) + card("05", S[4], '<div class="tl">' + evs.join("") + "</div>") +
-    '<div class="two">' + card("06", S[5], dijimos) + card("07", S[6], cotiza) + "</div>" +
-    '</div><div class="col">' + card("08", S[7], detras) + card("09", S[8], comp) + card("10", S[9], otros) + "</div></div>" +
+    '<div class="grid"><div class="col">' + C(S[0], ident) + C(S[1], veredicto) + C(S[2], ahora) +
+    '</div><div class="col">' + C(S[3], cifras) + (nota ? C(NOTA_TIT[L], '<div class="pad">' + nota + "</div>", "hn") : "") + C(S[4], '<div class="tl">' + evs.join("") + "</div>") +
+    '<div class="two">' + C(S[5], dijimos) + C(S[6], cotiza) + "</div>" +
+    '</div><div class="col">' + C(S[7], detras) + C(S[8], comp) + C(S[9], otros) + "</div></div>" +
     '<footer class="card"><div class="foot"><div><b>' + t.fuentes + "</b>" + t.fuentesTxt + " · " + hoy + "</div>" +
     "<div><b>" + t.citar + '</b><span class="mono">' + url + "</span> · " + t.datos + ' <a href="https://creativecommons.org/licenses/by-nc/4.0/' + t.cc + '">CC BY-NC 4.0</a></div>' +
     "<div><b>" + t.correccion + "</b>" + t.algunDato + ' <a href="mailto:solflag.team@gmail.com?subject=' + encodeURIComponent(t.asunto + m) + '">' + t.pide + "</a></div>" +
     "<div><b>" + t.nota + "</b>" + t.notaTxt + "</div></div></footer></div>" +
     '<script>document.getElementById("share").onclick=function(){var u=location.href,t=document.title;if(navigator.share)navigator.share({title:t,url:u}).catch(function(){});else if(navigator.clipboard)navigator.clipboard.writeText(u).then(function(){var b=document.getElementById("share");b.textContent=' + JSON.stringify(t.copiado) + ";setTimeout(function(){b.textContent=" + JSON.stringify(t.compartir) + "},1800)});};</script>" +
-    '<script src="https://solflag.com/fondo.js?v=20261111d" defer></script></body></html>';
+    (nota ? NOTA_JS : "") + '<script src="https://solflag.com/fondo.js?v=20261111d" defer></script></body></html>';
 }
 
 export function noEncontrado(m, lang, fallo) {

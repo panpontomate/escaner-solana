@@ -38,6 +38,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OUT_DIR: _pub/datos
         run: node tools/ecosistema/datos.mjs
+      # 28/11: historial de la nota (la nota de cada token de perfiles.json, a D1; la lee la ficha). ~4 llamadas a Helius por token
+      - name: Nota de cada token
+        env:
+          SOLANA_RPC: ${{ secrets.SOLANA_RPC }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_D1_ID: ${{ secrets.CF_D1_ID }}
+          OUT_DIR: _pub/datos
+        run: npm ci --prefix tools/notas --no-audit --no-fund && node tools/notas/notas.mjs || true
       # 27/11: lo que suele mover cada token de la portada («Los 3 que más se mueven hoy»); si falla, se queda el de ayer
       - name: Volumen normal de la lista fija
         env:

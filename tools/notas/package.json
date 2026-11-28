@@ -1,0 +1,9 @@
+{
+  "name": "solflag-notas",
+  "private": true,
+  "description": "Historial de la nota de SolFlag: la nota de cada token de perfiles.json, una vez al día, a D1",
+  "type": "module",
+  "dependencies": {
+    "solana-risk-engine": "0.8.4"
+  }
+}
