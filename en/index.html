@@ -4097,7 +4097,7 @@ function deskActions(r,fav){
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"b30"))+"'>📉 If it drops 30%</a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"m20"))+"'>↕️ Every time it moves 20%</a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,""))+"'>✏️ Another price (choose it in the bot)</a>":"";
-  return "<div class='actions tdesk'>"+(r.par?"<button class='btn small tbuy' type='button' data-buy='"+esc(r.mint)+"'><span class='ic'>⇄</span><span class='lb'>Comprar</span></button>":"")+(r.emisor?"":"<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Everything around this token, full screen'><span class='ic'>✦</span><span class='lb'>On-chain Map</span><span class='tmsub'> · everything around this token</span></button>")+
+  return "<div class='actions tdesk'>"+(r.par?"<button class='btn small tbuy' type='button' data-buy='"+esc(r.mint)+"'><span class='ic'>⇄</span><span class='lb'>Buy</span></button>":"")+(r.emisor?"":"<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Everything around this token, full screen'><span class='ic'>✦</span><span class='lb'>On-chain Map</span><span class='tmsub'> · everything around this token</span></button>")+
     (r.par?"<button class='btn small tfav' type='button' data-long='"+(esAccion(r)?"accion":"token")+"' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml(esAccion(r)?"accion":"token",fav)+"</button>":"")+
     (r.emisor?"":"<button class='btn small twh' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'><span class='dl'>Find whales</span><span class='ds'>Whales</span></span></button>")+
     "<a class='btn small tfic' href='"+esc(fichaLink(r.mint))+"' target='_blank' rel='noopener' title='Who launched it, who funded it, who bought first and what happened next'><span class='ic'>📄</span><span class='lb'>Full token file</span></a>"+
@@ -4378,13 +4378,13 @@ function buyOpen(mint){
       if(e.target.closest("[data-byok]")){ m.querySelector(".by-rojo").hidden=true; $("#jupw").classList.remove("wait"); } });
     document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&!m.hidden) buyClose(); }); }
   var jx="https://jup.ag/swap?sell=So11111111111111111111111111111111111111112&buy="+encodeURIComponent(r.mint);
-  m.innerHTML="<div class='bm-caja' role='dialog' aria-modal='true' aria-label='Comprar con Jupiter'><button type='button' class='bm-x' data-byclose='1' title='Cerrar'>✕</button>"+
+  m.innerHTML="<div class='bm-caja' role='dialog' aria-modal='true' aria-label='Buy with Jupiter'><button type='button' class='bm-x' data-byclose='1' title='Close'>✕</button>"+
     "<span class='by-k'>Buy with Jupiter</span><h3 class='tgt'>"+esc(r.sym||short(r.mint))+"</h3>"+
     "<p class='by-sub'>Desde tu wallet. SolFlag nunca toca tu dinero.</p>"+
     (rojos.length?"<div class='by-rojo'><b>Before you buy: "+(rojos.length===1?"1 check in red":rojos.length+" checks in red")+"</b><ul>"+
       rojos.map(function(x){ return "<li><i>"+esc(x[0])+"</i><span>"+esc(x[1])+"</span></li>"; }).join("")+"</ul>"+
       "<div class='by-bt'><button type='button' class='by-no' data-byclose='1'>Better not</button><button type='button' class='by-ok' data-byok='1'>I've read it, continue</button></div></div>":"")+
-    "<div id='jupw'"+(rojos.length?" class='wait'":"")+"><p class='hint'>Cargando Jupiter…</p></div>"+
+    "<div id='jupw'"+(rojos.length?" class='wait'":"")+"><p class='hint'>Loading Jupiter…</p></div>"+
     "<p class='by-pie'>Includes 0.5% for SolFlag."+(quoteRiesgo(r)?"":" Prefer no fee? <a href='"+esc(jx)+"' target='_blank' rel='noopener'>Buy it on jup.ag ↗</a>.")+" This is information, not a buy recommendation.</p></div>";
   m.hidden=false; document.body.style.overflow="hidden";
   track("buy");
@@ -4393,7 +4393,7 @@ function buyOpen(mint){
     var w=$("#jupw"); if(w) w.innerHTML="";
     window.Jupiter.init({displayMode:"integrated",integratedTargetId:"jupw",
       formProps:{initialInputMint:"So11111111111111111111111111111111111111112",initialOutputMint:r.mint,fixedMint:r.mint,referralAccount:JUP_REF,referralFee:JUP_FEE}});
-  },function(){ var w=$("#jupw"); if(w) w.innerHTML="<p class='hint'>No se pudo cargar Jupiter. <a href='"+esc(jx)+"' target='_blank' rel='noopener'>Open it on jup.ag ↗</a></p>"; });
+  },function(){ var w=$("#jupw"); if(w) w.innerHTML="<p class='hint'>Couldn't load Jupiter. <a href='"+esc(jx)+"' target='_blank' rel='noopener'>Open it on jup.ag ↗</a></p>"; });
 }
 function buyClose(){ var m=$("#buymodal"); if(m){ m.hidden=true; document.body.style.overflow=""; if(window.Jupiter&&window.Jupiter.close) try{ window.Jupiter.close(); }catch(e){} } }
 document.addEventListener("click",function(e){ var b=e.target.closest&&e.target.closest("[data-buy]"); if(b) buyOpen(b.getAttribute("data-buy")); });
