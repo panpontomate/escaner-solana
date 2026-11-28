@@ -4328,7 +4328,7 @@ function bandsOpen(){
   m.innerHTML="<div class='bm-caja' role='dialog' aria-modal='true' aria-label='Why it scores this way'><button type='button' class='bm-x' data-bclose='1' title='Close'>✕</button>"+
     "<p class='kick'>"+esc(AP_NOM[r.perfil.ap]||"")+"</p><h3 class='tgt'>Why it scores this way</h3>"+
     "<div class='bm-cks'>"+cs.map(function(c){ var t=ckDet(c); return "<div><i style='background:"+CK_COL[c.col]+"'></i><b>"+esc(CK_NOM[c.k])+"</b>"+(t?"<span>"+esc(t)+"</span>":"")+"</div>"; }).join("")+"</div>"+
-    "<p class='kick bm-k'>The usual checks</p>"+(state.bandLh||"")+
+    "<p class='kick bm-k'>The checks</p>"+(state.bandLh||"")+
     "<p class='pc-nota'>The colour sums up what we see on chain and in public sources (DefiLlama, Jupiter, GitHub, Streamflow). Not investment advice. <a href='"+LHOW+"#nivel' target='_blank' rel='noopener'>How the tier is decided →</a></p></div>";
   m.hidden=false; document.body.style.overflow="hidden";
 }
