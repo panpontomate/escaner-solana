@@ -479,7 +479,10 @@ async function lanzarWorkflow(env, wf) {
 
 export default {
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(lanzarWorkflow(env, event.cron === "7 * * * *" ? "caras.yml" : "recogida.yml"));
+    if (event.cron !== "7 * * * *") return ctx.waitUntil(lanzarWorkflow(env, "recogida.yml"));
+    const h = new Date(event.scheduledTime).getUTCHours();
+    // 28/11: ecosistema (con normal.json para «Los 3 que más se mueven») y emisores también se los saltaba GitHub: van en la vuelta de la hora
+    ctx.waitUntil(Promise.all([lanzarWorkflow(env, "caras.yml"), h === 6 ? lanzarWorkflow(env, "ecosistema.yml") : null, h === 7 ? lanzarWorkflow(env, "emisores.yml") : null]));
   },
   async fetch(req, env, ctx) {
     const cache = typeof caches !== "undefined" ? caches.default : null;
