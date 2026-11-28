@@ -226,8 +226,8 @@ test("ventas: token change of each wallet per transaction, SOL change and whethe
   const W = "WAL1111111111111111111111111111111", tx = (pre, post, solPre, solPost, err) => ({ blockTime: 1800000000, transaction: { signatures: ["sig"], message: { accountKeys: [{ pubkey: W }] } },
     meta: { err: err || null, preBalances: [solPre], postBalances: [solPost],
       preTokenBalances: pre === null ? [] : [{ mint: M1, owner: W, uiTokenAmount: { uiAmount: pre } }], postTokenBalances: [{ mint: M1, owner: W, uiTokenAmount: { uiAmount: post } }] } });
-  assert.deepEqual(cambio(tx(null, 1000, 5e9, 4e9), M1, W), { t: 1800000000, d: 1000, sol: -1, sig: "sig" });       // compra
-  assert.deepEqual(cambio(tx(1000, 400, 4e9, 4.5e9), M1, W), { t: 1800000000, d: -600, sol: 0.5, sig: "sig" });      // vende 600
+  assert.deepEqual(cambio(tx(null, 1000, 5e9, 4e9), M1, W), { t: 1800000000, d: 1000, pre: 0, sol: -1, sig: "sig" });       // compra
+  assert.deepEqual(cambio(tx(1000, 400, 4e9, 4.5e9), M1, W), { t: 1800000000, d: -600, pre: 1000, sol: 0.5, sig: "sig" });      // vende 600 de 1000
   assert.equal(cambio(tx(1000, 1000, 4e9, 4e9), M1, W), null);                                                        // no toca el token
   assert.equal(cambio(tx(1000, 0, 4e9, 5e9, { x: 1 }), M1, W), null);                                                 // fallida
   const env = { SOLANA_RPC: "https://rpc.example" };
@@ -236,6 +236,12 @@ test("ventas: token change of each wallet per transaction, SOL change and whethe
   assert.equal(v.wallets[W].ev.length, 2); assert.equal(v.wallets[W].full, true); assert.equal(v.wallets[A], null);
   assert.equal(v.desde, 1690000000);   // el nacimiento del token, si es anterior a lo que dice la web
   assert.equal((await handle(new Request("https://api.solflag.com/api/ventas/" + M1 + "?w=" + W), env)).status, 400);   // falta desde
+  // rec (Venden ahora): sin buscar el nacimiento, lo más nuevo primero y devuelto en orden de tiempo
+  const pedidos = [];
+  const r = await ventas(env, M1, [W], 1700000000, async (u, init) => { const q = JSON.parse(init.body).params; pedidos.push(q);
+    return { json: async () => ({ result: { data: [Object.assign(tx(1000, 400, 4e9, 4.5e9), { blockTime: 1800000100 }), tx(null, 1000, 5e9, 4e9)] } }) }; }, true);
+  assert.equal(pedidos.length, 1); assert.equal(pedidos[0][1].sortOrder, "desc"); assert.equal(r.rec, 1); assert.equal(r.desde, 1700000000);
+  assert.deepEqual(r.wallets[W].ev.map((e) => e.d), [1000, -600]);
 });
 
 test("top: mayores cuentas con Helius; sin respuesta o sin lista, undefined (la web vuelve al RPC público)", async () => {

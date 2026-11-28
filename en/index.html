@@ -1077,6 +1077,33 @@ details.pmenu.lmore>summary{background:var(--surface-2);color:var(--fg);border:1
 #llist .mlv-sin{margin:10px 0 0;padding-top:12px;border-top:1px solid rgba(196,181,253,.14);font-size:.84rem;color:var(--muted)}
 #llist .mlv-sin a{color:#d6cff2;text-decoration:none}#llist .mlv-sin a:hover{text-decoration:underline}
 @media (max-width:560px){#llist .mlv-t{grid-template-columns:36px minmax(0,1fr)}#llist .mlv-lg{width:34px;height:34px}#llist .mlv-ls{grid-column:1/-1}#llist .mlv-go{display:none}}
+/* «Venden ahora» (28/11, maqueta aprobada maquetas/estafa-en-directo): el creador o los del lanzamiento venden en la última hora */
+#venden{max-width:1320px;margin:0 auto 18px;border:1px solid rgba(255,107,107,.55);background:linear-gradient(180deg,rgba(255,107,107,.14),rgba(255,107,107,.04));border-radius:18px;padding:16px 18px}
+#venden .va-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.va-p{width:10px;height:10px;border-radius:50%;background:#ff6b6b;flex:none;animation:vaP 1.6s infinite}
+@keyframes vaP{0%{box-shadow:0 0 0 0 rgba(255,107,107,.7)}70%{box-shadow:0 0 0 10px rgba(255,107,107,0)}100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}}
+@media (prefers-reduced-motion:reduce){.va-p{animation:none}}
+.va-k{font:800 .74rem Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#ff6b6b}
+#venden .va-t{margin-left:auto;color:var(--muted);font-size:.82rem}
+#venden h3{margin:8px 0 4px;font:600 1.3rem/1.2 Fraunces,Georgia,serif;color:#f1eeff}
+#venden .va-f{margin:0 0 10px;color:#e6e0ff}
+#venden .va-c{display:flex;gap:22px;flex-wrap:wrap;margin:6px 0 12px}
+#venden .va-c span{display:block;color:var(--muted);font-size:.78rem}
+#venden .va-c b{font:600 1.35rem Fraunces,Georgia,serif;color:#f1eeff}
+#venden .va-c b.r{color:#ff6b6b}
+#venden .va-o{list-style:none;margin:0 0 12px;padding:0;border-top:1px solid rgba(255,107,107,.2)}
+#venden .va-o li{display:grid;grid-template-columns:86px 200px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(255,107,107,.12);font-size:.9rem;color:#f1eeff}
+#venden .va-o .h,#venden .va-o .w{font:12px "IBM Plex Mono",monospace;color:var(--muted);white-space:nowrap}
+#venden .va-o .w a{color:inherit}
+#venden .va-o .q{font-weight:700}
+#venden .va-o .u{font-weight:700;color:#ff6b6b;white-space:nowrap}
+#venden .va-b{display:flex;gap:8px;flex-wrap:wrap}
+#venden .va-n{font-size:.78rem;color:var(--muted);margin:10px 0 0}
+@media (max-width:640px){#venden{padding:14px;margin:0 0 16px}#venden .va-t{margin-left:0;flex-basis:100%}#venden .va-o li{grid-template-columns:74px minmax(0,1fr) auto}#venden .va-o .w{display:none}#venden .va-c{gap:14px}#venden .va-c div{min-width:40%}}
+#llist .mlv-t.va-ml{border:1px solid rgba(255,107,107,.5);border-radius:14px;padding:12px;background:rgba(255,107,107,.07);margin:6px 0 4px}
+#llist .va-ml .va-mk{grid-column:2;display:flex;align-items:center;gap:6px;margin:2px 0 0;font:800 .66rem Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#ff6b6b}
+#llist .mlv-ls li.va{border-color:#ff6b6b}#llist .mlv-ls li.va b{color:#ff6b6b}
+@media (max-width:560px){#llist .va-ml .va-mk{grid-column:2}}
 .ml-al{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:var(--surface-2);border-left:4px solid var(--c)}
 .ml-al.red{--c:var(--alto)}.ml-al.yel{--c:var(--medio)}.ml-al.grn{--c:var(--bajo)}
 .ml-alogo{position:relative;width:40px;height:40px;flex:none}
@@ -2681,6 +2708,7 @@ input[type=text],input[type=number],input[type=url],textarea,select{background:r
     <div class="track"><i id="pbar"></i></div>
   </section>
 
+  <div id="venden" role="alert" hidden></div>
   <section id="results" hidden>
     <canvas class="sky" id="sky" aria-hidden="true"></canvas>
     <canvas class="neb rneb" data-neb="head" aria-hidden="true"></canvas>
@@ -2977,7 +3005,8 @@ function toggleToken(mint){
 function snap(r){
   return {sym:r.sym,name:r.name,img:r.img||"",lvl:r.lvl,pts:r.pts,type:r.type||"",why:r.why.slice(0,3),
     price:Number((r.par&&r.par.priceUsd)||0),liq:(r.par&&r.par.liquidity&&r.par.liquidity.usd)||0,
-    pair:(r.par&&r.par.pairAddress)||"",ts:Date.now()};
+    pair:(r.par&&r.par.pairAddress)||"",ts:Date.now(),
+    team:(typeof MK!=="undefined"&&MK.data[r.mint]&&MK.data[r.mint].team)||(lista.t[r.mint]&&lista.t[r.mint].team)||undefined};
 }
 // Un token que sigues se queda con lo último que se vio de él: al analizarlo solo (no solo dentro de una
 // wallet) y cuando el lanzamiento le sube el nivel. Antes Mi lista seguía mostrando el veredicto antiguo.
@@ -3062,6 +3091,8 @@ function mlvCuando(ts){
 // lo que contar de un token: [clase, texto, detalle]; clases: dn (malo), up (bueno), wh (ballenas), px (neutro)
 function mlvLineas(t){
   var m=t.mint, d=mlvDesde(m), out=[], b=MLB[m]||{}, now=llive.d[m];
+  var va=MLVA[m]&&vaResumen(MLVA[m].ev,Date.now());
+  if(va) out.push(["va","<b>"+vaTitulo(va)+"</b>",(va.n===1?"One sale":"{n} sales".replace("{n}",va.n))+(va.usd>0?" · ≈ "+usd(va.usd):"")+" · "+"last"+" "+haceMin(va.last)]);
   mlChanges(t).forEach(function(c){
     if(c.k==="lvl") out.push([c.worse?"dn":"up","Risk: now <b>"+esc(mlLvlLabel(t.lvl).toLowerCase())+"</b>","before "+esc(mlLvlLabel(c.from).toLowerCase())]);
     else if(c.k==="liq") out.push(["dn","Liquidity down <b>"+c.pct+" %</b>","from "+usd(c.from)+" to "+usd(c.to)]);
@@ -3096,10 +3127,12 @@ function mlvHtml(toks){
   var r=mlvRef(), con=[], sin=[];
   toks.forEach(function(t){ var l=mlvLineas(t); if(l.length) con.push([t,l]); else sin.push(t); });
   // primero lo más serio: ventas y salidas, luego ballenas, luego lo bueno y el precio
-  var peso={dn:3,wh:2,up:1,px:1}; con.sort(function(x,y){ var f=function(l){ return l.reduce(function(s,i){ return s+(peso[i[0]]||1); },0); }; return f(y[1])-f(x[1]); });
+  var peso={va:50,dn:3,wh:2,up:1,px:1}; con.sort(function(x,y){ var f=function(l){ return l.reduce(function(s,i){ return s+(peso[i[0]]||1); },0); }; return f(y[1])-f(x[1]); });
   var cab=r.d?"{h} · on {f} at {t}".replace("{h}",hace(r.d)).replace("{f}",new Date(r.d).toLocaleDateString(SM_LOC,{day:"numeric",month:"short"})).replace("{t}",new Date(r.d).toLocaleTimeString(SM_LOC,{hour:"numeric",minute:"2-digit"})):"since you saved them";
   var filas=con.slice(0,MLV_FILAS).map(function(x){ var t=x[0];
-    return "<div class='mlv-t'>"+mlLogo(t,"ml-lg mlv-lg")+"<a class='mlv-nom' href='"+PE_BASE+"?token="+esc(t.mint)+"'><b>"+esc(t.sym)+"</b>"+(t.name&&t.name!==t.sym?"<small>"+esc(t.name)+"</small>":"")+"</a>"+
+    var va=x[1].some(function(l){ return l[0]==="va"; });
+    return "<div class='mlv-t"+(va?" va-ml":"")+"'>"+mlLogo(t,"ml-lg mlv-lg")+"<a class='mlv-nom' href='"+PE_BASE+"?token="+esc(t.mint)+"'><b>"+esc(t.sym)+"</b>"+(t.name&&t.name!==t.sym?"<small>"+esc(t.name)+"</small>":"")+"</a>"+
+      (va?"<span class='va-mk'><span class='va-p'></span>"+"Selling now"+"</span>":"")+
       "<button class='btn small ghost ml-go mlv-go' type='button' data-analyze='"+esc(t.mint)+"'>"+"Analyse"+"</button>"+
       "<ul class='mlv-ls'>"+x[1].map(function(l){ return "<li class='"+l[0]+"'><span>"+l[1]+"</span>"+(l[2]?"<small>"+l[2]+"</small>":"")+"</li>"; }).join("")+"</ul></div>";
   }).join("");
@@ -3110,6 +3143,7 @@ function mlvHtml(toks){
     (sin.length&&con.length?"<p class='mlv-sin'>"+"Nothing to report:"+" "+sinTxt+"</p>":"")+"</section>";
 }
 async function mlvCarga(ms){
+  vaCarga(ms).then(function(hay){ if(hay&&state.mode==="L") renderLista(true); });
   var falta=ms.filter(function(m){ return !MLB[m]; }).slice(0,30);
   if(!falta.length&&MLN) return;
   var j=function(u){ return fetch(u).then(function(x){ return x.ok?x.json():null; }).catch(function(){ return null; }); };
@@ -8185,6 +8219,7 @@ try{ var mk0=JSON.parse(localStorage.getItem("sf.mk")||"null"); if(mk0) Object.k
 function mkSave(){ try{ localStorage.setItem("sf.mk",JSON.stringify(MK.on)); }catch(e){} }
 async function mkWait(get,ms){ for(var t=0;t<ms;t+=400){ var v=get(); if(v!=="loading"&&v!==undefined) return v; await new Promise(function(res){ setTimeout(res,400); }); } return get(); }
 async function mkLoad(r){
+  vaPaint();
   var m=r.mint; if(!r.par||!r.par.pairAddress||MK.data[m]!==undefined) return;
   MK.data[m]="loading";
   try{
@@ -8253,10 +8288,14 @@ async function mkLoad(r){
     var cbs=await cbFind(r);
     if(cbs.length){ ev=ev.concat(cbs); ev.sort(function(a,b){ return a.ts-b.ts; }); }
     var laSold={}; ev.forEach(function(e){ if(e.k==="la") laSold[e.w]=1; });
+    // «Venden ahora»: quiénes vigilar desde Mi lista (creador y los del lanzamiento que más compraron; no en los grandes proyectos)
+    var laPct=function(w){ return bd&&bd.ws?(bd.ws.filter(function(x){ return x.w===w; })[0]||{}).pct||0:0; };
+    var team=r.tierBig?[]:Object.keys(cr).map(function(w){ return [w,"cr"]; }).concat(Object.keys(la).sort(function(a,b){ return laPct(b)-laPct(a); }).map(function(w){ return [w,"la"]; })).slice(0,5);
+    if(lista.t[m]&&team.length){ lista.t[m].team=team; saveList(); }
     var crW=Object.keys(cr).filter(function(w){ return bought[w]>0; })[0];
     MK.data[m]={ev:ev,from:gt0,n:nGT,nG:nG,gFrom:gd&&gd.desde||0,laTotal:Object.keys(la).length,laSold:Object.keys(laSold).length,
       crPct:crW?Math.min(100,Math.round((sold[crW]||0)/bought[crW]*100)):null,crSells:ev.filter(function(e){ return e.k==="cr"; }).length,big:big,
-      hel:hw.length,helCr:hw.some(function(w){ return cr[w]; })};
+      hel:hw.length,helCr:hw.some(function(w){ return cr[w]; }),team:team,big:!!r.tierBig};
   }catch(e){ if(e&&e.message==="cancelado"){ delete MK.data[m]; return; } MK.data[m]="err"; }
   if(state.token===r) mkPaint();
 }
@@ -8383,6 +8422,78 @@ function mkPaint(){
   if(state.lwcS) mkSet(state.lwcS.series,state.lwcS.times,r,state.lwcS.step,state.lwcS.tz);
   if(GX.ch&&GX.r===r) mkSet(GX.ch._main,GX.ch._T,r,GX.ch._step,new Date().getTimezoneOffset()*60);
   mkStory(r);
+  vaPaint();
+}
+/* «Venden ahora» (28/11, maqueta aprobada maquetas/estafa-en-directo/estafa-en-directo.html): si en la última hora
+   vendió el creador o vendieron 2 o más compradores del lanzamiento, un recuadro encima del resultado y la primera fila
+   de Mi lista. Solo hechos (quién, cuánto, cuándo); si no hay ventas, no sale nada. En el Escáner usa las mismas
+   ventas que las marcas de la gráfica (sin coste); en Mi lista, /api/ventas con rec=1 (la última hora de esas wallets).
+   No en los grandes proyectos revisados: ahí el «creador» es el equipo y sus movimientos van por Ballenas. */
+var VA_VENTANA=3600000, MLVA={};
+function vaResumen(ev,now){
+  var v=(ev||[]).filter(function(e){ return (e.k==="cr"||e.k==="la")&&e.sell&&e.ts>=now-VA_VENTANA&&(e.pct==null||e.pct>=5||(e.usd||0)>=100); });
+  var cr={}, la={}; v.forEach(function(e){ (e.k==="cr"?cr:la)[e.w]=1; });
+  var nCr=Object.keys(cr).length, nLa=Object.keys(la).length;
+  if(!nCr&&nLa<2) return null;
+  v.sort(function(a,b){ return b.ts-a.ts; });
+  return {cr:nCr,la:nLa,n:v.length,usd:v.reduce(function(s,e){ return s+(e.usd||0); },0),first:v[v.length-1].ts,last:v[0].ts,ev:v};
+}
+function vaTitulo(x){
+  if(x.cr&&x.la>1) return "The creator and {n} launch buyers are selling".replace("{n}",x.la);
+  if(x.cr&&x.la===1) return "The creator and one launch buyer are selling";
+  if(x.cr) return "The creator is selling";
+  return "{n} launch buyers are selling".replace("{n}",x.la);
+}
+// precio desde la primera de esas ventas: la vela de 1 min de entonces frente al precio de ahora
+function vaPrecio(r,x){
+  var c=charts[r.par.pairAddress+"|min"], now=Number(r.par.priceUsd)||0;
+  if(!Array.isArray(c)||!c.length||!now||c[0][0]>x.first) return null;
+  var k=c.length-1; while(k>0&&c[k][0]>x.first) k--;
+  return c[k][2]>0?(now/c[k][2]-1)*100:null;
+}
+function vaQuien(e){ return e.k==="cr"?"Creator":"Launch buyer"; }
+function vaPaint(){
+  var box=$("#venden"); if(!box) return;
+  var r=state.token, d=r&&MK.data[r.mint], x=d&&typeof d==="object"&&!d.big&&!$("#results").hidden?vaResumen(d.ev,Date.now()):null;
+  if(!x){ box.hidden=true; box.innerHTML=""; box.removeAttribute("data-m"); return; }
+  var pc=vaPrecio(r,x), min=Math.max(1,Math.round((x.last-x.first)/60000));
+  var frase=(x.n===1?"One sale":"{n} sales in {m} min".replace("{n}",x.n).replace("{m}",min))+
+    (d.crPct!=null&&x.cr?". "+"The creator has already sold {p}% of what they bought".replace("{p}",d.crPct):"")+
+    (pc!=null&&pc<0?". "+"The price is down {p}% since the first one".replace("{p}",Math.round(-pc)):"")+".";
+  var cif="<div><span>"+"Sales"+"</span><b>"+x.n+"</b></div>"+
+    (x.usd>0?"<div><span>"+"Taken out"+"</span><b class='r'>≈ "+usd(x.usd)+"</b></div>":"")+
+    (d.crPct!=null&&x.cr?"<div><span>"+"Creator has sold"+"</span><b class='r'>"+d.crPct+" %</b></div>":"")+
+    (pc!=null&&Math.round(pc)?"<div><span>"+"Price since the 1st sale"+"</span><b"+(pc<0?" class='r'":"")+">"+(pc>0?"+":"−")+Math.abs(Math.round(pc))+" %</b></div>":"");
+  var filas=x.ev.slice(0,6).map(function(e){
+    return "<li><span class='h'>"+haceMin(e.ts)+"</span><span class='q'>"+vaQuien(e)+"</span>"+
+      "<span class='w'><a href='https://solscan.io/tx/"+esc(e.tx||"")+"' target='_blank' rel='noopener'>"+esc(short(e.w))+"</a></span>"+
+      "<span class='u'>"+(e.usd?usd(e.usd):e.mv?"gets rid of it":"")+"</span></li>"; }).join("");
+  box.innerHTML="<div class='va-h'><span class='va-p'></span><span class='va-k'>"+"Selling now"+"</span><span class='va-t'>"+"last sale"+" "+haceMin(x.last)+"</span></div>"+
+    "<h3>"+vaTitulo(x)+"</h3><p class='va-f'>"+frase+"</p><div class='va-c'>"+cif+"</div><ul class='va-o'>"+filas+"</ul>"+
+    "<div class='va-b'><button class='btn small' type='button' data-vachart='1'>"+"See it on the chart"+"</button>"+
+    "<a class='btn small ghost' target='_blank' rel='noopener' href='"+esc(tgLink(r.mint))+"'>🔔 "+"Alert me on Telegram"+"</a></div>"+
+    "<p class='va-n'>"+"On-chain sales by the wallets that launched this token. Selling does not say why; it is a fact worth knowing before you buy."+"</p>";
+  box.setAttribute("data-m",r.mint); box.hidden=false;
+}
+// el recuadro sigue al resultado: si se esconde (Mi lista, Ecosistema…), se esconde con él
+(function(){ var res=document.getElementById("results"); if(res&&window.MutationObserver) new MutationObserver(function(){ vaPaint(); }).observe(res,{attributes:true,attributeFilter:["hidden"]}); })();
+document.addEventListener("click",function(e){
+  if(e.target.closest&&e.target.closest("[data-vachart]")){ var pc=$("#t-chart"); if(pc) pc.scrollIntoView({behavior:"smooth",block:"start"}); }
+});
+// Mi lista: la última hora de las wallets del equipo de cada token seguido (las guarda mkLoad al analizarlo)
+async function vaCarga(ms){
+  var f=ms.filter(function(m){ var t=lista.t[m]; return t&&t.team&&t.team.length&&MLVA[m]===undefined; }).slice(0,8);
+  if(!f.length) return false;
+  var desde=Math.floor((Date.now()-VA_VENTANA)/1000);
+  await Promise.all(f.map(function(m){ var t=lista.t[m]; MLVA[m]=null;
+    return fetch(API+"ventas/"+m+"?w="+t.team.map(function(x){ return x[0]; }).join(",")+"&desde="+desde+"&rec=1").then(function(q){ return q.ok?q.json():null; }).then(function(j){
+      if(!j||!j.wallets) return;
+      var px=(llive.d[m]&&llive.d[m].price)||t.price||0, ev=[];
+      t.team.forEach(function(x){ var w=x[0], h=j.wallets[w]; if(!h) return;
+        h.ev.forEach(function(c){ if(c.d>=0) return;
+          ev.push({ts:c.t*1000,k:x[1],w:w,sell:true,tx:c.sig,usd:px?-c.d*px:0,pct:c.pre>0?Math.min(100,Math.round(-c.d/c.pre*100)):null,mv:!(c.sol>0)}); }); });
+      MLVA[m]={ev:ev}; }).catch(function(){}); }));
+  return true;
 }
 document.addEventListener("click",function(e){
   var b=e.target.closest&&e.target.closest("[data-mk]");

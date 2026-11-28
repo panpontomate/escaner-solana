@@ -202,17 +202,30 @@ export function logoUrl(u) {
 export const VENTAS_MAX = 5;
 export function cambio(t, m, w) {
   if (!t || !t.meta || t.meta.err || !t.transaction) return null;
-  let d = 0;
-  const add = (b, sg) => { if (b && b.mint === m && b.owner === w) d += sg * (Number(b.uiTokenAmount && b.uiTokenAmount.uiAmount) || 0); };
+  let d = 0, pre = 0;
+  const add = (b, sg) => { if (b && b.mint === m && b.owner === w) { const n = Number(b.uiTokenAmount && b.uiTokenAmount.uiAmount) || 0; d += sg * n; if (sg < 0) pre += n; } };
   (t.meta.preTokenBalances || []).forEach((b) => add(b, -1));
   (t.meta.postTokenBalances || []).forEach((b) => add(b, 1));
   if (Math.abs(d) < 1e-9) return null;
   const keys = (t.transaction.message && t.transaction.message.accountKeys || []).map((k) => k.pubkey || k);
   const i = keys.indexOf(w), sol = i >= 0 ? ((t.meta.postBalances[i] || 0) - (t.meta.preBalances[i] || 0)) / 1e9 : 0;
-  return { t: t.blockTime, d: d, sol: Math.round(sol * 1e6) / 1e6, sig: t.transaction.signatures && t.transaction.signatures[0] };
+  return { t: t.blockTime, d: d, pre: pre, sol: Math.round(sol * 1e6) / 1e6, sig: t.transaction.signatures && t.transaction.signatures[0] };
 }
-export async function ventas(env, m, ws, desde, fetchFn) {
+// rec = true («Venden ahora», 28/11): solo desde «desde» hasta ahora, lo más nuevo primero (hasta 50 por wallet), sin
+// buscar el nacimiento: para saber si el creador o los del lanzamiento están vendiendo en la última hora
+export async function ventas(env, m, ws, desde, fetchFn, rec) {
   const out = {};
+  if (rec) {
+    for (const w of ws) {
+      const j = await fetchFn(env.SOLANA_RPC, { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getTransactionsForAddress", params: [w, { transactionDetails: "full", sortOrder: "desc", limit: 50,
+          encoding: "jsonParsed", maxSupportedTransactionVersion: 0, filters: { blockTime: { gte: desde }, status: "succeeded" } }] }) })
+        .then((r) => r.json()).catch(() => null);
+      const data = j && j.result && j.result.data;
+      out[w] = Array.isArray(data) ? { ev: data.map((t) => cambio(t, m, w)).filter(Boolean).reverse(), full: data.length < 50 } : null;
+    }
+    return { v: V, mint: m, desde: desde, rec: 1, wallets: out };
+  }
   // cuándo nació el token: su transacción más antigua (la web solo sabe la fecha del pool, que en un graduado es posterior)
   const f = await fetchFn(env.SOLANA_RPC, { method: "POST", headers: { "content-type": "application/json" },
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getTransactionsForAddress", params: [m, { transactionDetails: "signatures", sortOrder: "asc", limit: 1 }] }) })
@@ -368,10 +381,11 @@ export async function handle(req, env) {
       const { success } = await env.VENTAS_LIMIT.limit({ key: req.headers.get("cf-connecting-ip") || "?" });
       if (!success) return fail(429, "too many requests");
     }
-    const v = await ventas(env, p[3], ws, desde, fetch);
+    const rec = q.get("rec") === "1";
+    const v = await ventas(env, p[3], ws, desde, fetch, rec);
     const res = json(v);
-    // si alguna wallet no contestó, que no se quede media hora en la caché
-    res.headers.set("cache-control", "public, max-age=" + (Object.values(v.wallets).some((x) => !x) ? 60 : 1800));
+    // si alguna wallet no contestó, que no se quede media hora en la caché; lo reciente, 2 min
+    res.headers.set("cache-control", "public, max-age=" + (rec ? 120 : Object.values(v.wallets).some((x) => !x) ? 60 : 1800));
     return res;
   }
   if (p.length === 4 && p[1] === "api" && p[2] === "caida") {
