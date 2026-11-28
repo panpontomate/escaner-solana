@@ -49,7 +49,7 @@ export const CODE = [
   ['pt=(d24<h24&&pc>99.9?99.9:pc).toFixed(1).replace(".",",")', 'pt=(d24<h24&&pc>99.9?99.9:pc).toFixed(1)'],
   ["function omPct(x){ return x>0&&x<0.01?\"<0,01%\":x.toLocaleString(\"es-ES\",{maximumFractionDigits:x<1?2:1})+\"%\"; }", "function omPct(x){ return x>0&&x<0.01?\"<0.01%\":x.toLocaleString(\"en-US\",{maximumFractionDigits:x<1?2:1})+\"%\"; }"],
   // footer: privacy and terms pages in English
-  ["<p class=\"foot\">Contamos visitas y análisis de forma anónima, sin cookies ni datos personales. <a href=\"/privacidad/\">Privacidad</a> · <a href=\"/terminos/\">Términos de uso</a></p>", "<p class=\"foot\">We count visits and analyses anonymously, with no cookies and no personal data. <a href=\"/en/privacy/\">Privacy</a> · <a href=\"/en/terms/\">Terms of use</a></p>"],
+  ["<p class=\"foot\">Contamos visitas y análisis de forma anónima, sin cookies ni datos personales. <a href=\"/privacidad/\">Privacidad</a> · <a href=\"/terminos/\">Términos de uso</a> · <a href=\"/apoya/\" style=\"color:#ffb4c8\">♥ Apoya SolFlag</a></p>", "<p class=\"foot\">We count visits and analyses anonymously, with no cookies and no personal data. <a href=\"/en/privacy/\">Privacy</a> · <a href=\"/en/terms/\">Terms of use</a> · <a href=\"/en/support/\" style=\"color:#ffb4c8\">♥ Support SolFlag</a></p>"],
   // link previews (X, Telegram, WhatsApp): English image and address
   ['<meta property="og:url" content="https://solflag.com/">', '<meta property="og:url" content="https://solflag.com/en/">'],
   ['<link rel="canonical" href="https://solflag.com/">', '<link rel="canonical" href="https://solflag.com/en/">'],

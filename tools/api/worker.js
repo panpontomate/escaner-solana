@@ -12,6 +12,7 @@
 //                                  tokens soltaron (Helius); una semana en la caché si ya pasó
 //   GET  /api/logo/<mint>         el logo del token (getAsset de Helius), una semana en la caché
 //   GET  /api/lanzaderas          por plataforma: tokens que vimos nacer y cuántos murieron a las 24 h (registro)
+//   GET  /api/apoya               saldo y movimientos de la wallet de donaciones (apoya.js), 5 min en caché
 //   GET  /api/acciones            activos tokenizados (lista diaria) frente al precio real: prima, bolsa abierta, liquidez (acciones.js)
 //   GET  /api/cotiza/<mint>        dónde se negocia: pools de la cadena y exchanges con comisión, identidad y MiCA (cotiza.js)
 //   GET  /api/top/<mint>           mayores cuentas del token (Helius, 10 min en caché, 30/min por conexión)
@@ -30,6 +31,7 @@
 import { ficha, HOST as FICHA_HOST } from "./ficha.js";
 import { acciones } from "./acciones.js";
 import { cotiza } from "./cotiza.js";
+import { apoya } from "./apoya.js";
 
 export const V = 1;
 export const LIST = 25;            // lanzamientos y compras que se devuelven, los más recientes
@@ -442,6 +444,14 @@ export async function handle(req, env) {
     if (!r) return fail(503, "rpc unavailable");
     const res = json({ v: V, mint: p[3], result: r });
     res.headers.set("cache-control", "public, max-age=600");   // 10 min (23/11, antes 2): Helius tarda 3–7 s con tokens grandes y cada análisis lo esperaba; cada token nuevo, 1 crédito
+    return res;
+  }
+  if (p.length === 3 && p[1] === "api" && p[2] === "apoya") {
+    if (!env.SOLANA_RPC) return fail(503, "rpc unavailable");
+    const a = await apoya(env, fetch);
+    if (!a) return fail(503, "rpc unavailable");
+    const res = json(a);
+    res.headers.set("cache-control", "public, max-age=" + (a.mov && a.solUsd ? 300 : 60));
     return res;
   }
   if (p.length === 3 && p[1] === "api" && p[2] === "acciones") {
