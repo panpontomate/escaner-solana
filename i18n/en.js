@@ -892,6 +892,7 @@ export const TEXT = {
   "el RPC no devolvió datos de holders": "the RPC returned no holder data",
   "Para estimar el resultado hace falta tu URL de Helius en Ajustes (la que tiene tu clave).": "Estimating results needs your Helius URL in Settings (the one with your key).",
   "No se pudo obtener el precio de SOL para calcular el resultado. Prueba otra vez dentro de un rato.": "The SOL price was not available to compute the result. Try again in a while.",
+  "Este token tiene millones de cuentas (como SOL o USDC) y ningún RPC devuelve sus mayores holders de una vez, así que no se puede dibujar su mapa.": "This token has millions of accounts (like SOL or USDC) and no RPC returns its largest holders in one go, so its map cannot be drawn.",
   "No se pudo conectar con DexScreener. Revisa tu conexión a internet y prueba otra vez.": "Could not connect to DexScreener. Check your internet connection and try again.",
   "Los servicios gratuitos de Solana que usa el escáner no han respondido (a veces se saturan). Espera un minuto y prueba otra vez. ": "The free Solana services the scanner uses did not answer (they get busy sometimes). Wait a minute and try again. ",
   "Si te pasa a menudo, consigue tu propia URL gratis: mira «Cómo conseguir una URL de Helius» en Ajustes.": "If it happens often, get your own free URL: see “How to get a Helius URL” in Settings.",

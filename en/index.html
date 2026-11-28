@@ -3949,6 +3949,7 @@ function friendlyError(e){
   if(/^(only |could not read)/.test(m)) return esc(m.charAt(0).toUpperCase()+m.slice(1))+".";
   if(m==="helius") return "Estimating results needs your Helius URL in Settings (the one with your key).";
   if(m==="sol") return "The SOL price was not available to compute the result. Try again in a while.";
+  if(/Too many accounts requested/i.test(m)) return "This token has millions of accounts (like SOL or USDC) and no RPC returns its largest holders in one go, so its map cannot be drawn.";
   if(m==="dex") return "Could not connect to DexScreener. Check your internet connection and try again.";
   if(/Failed to fetch|NetworkError|Load failed|HTTP 4\d\d|HTTP 5\d\d|sin respuesta/i.test(m)){
     if(!ownRpc()) return "The free Solana services the scanner uses did not answer (they get busy sometimes). Wait a minute and try again. "+
