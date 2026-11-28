@@ -492,11 +492,14 @@ export async function ficha(req, env, fetchJSON) {
   let d;
   try { d = await datosBase(env.DB, m); } catch (e) { d = { lanz: null, consultas: 0, roles: [], buyers: [], others: [] }; }
   const day = d.lanz ? new Date(d.lanz.t).toISOString().slice(0, 10) : null;
-  const [pairs, regDay] = await Promise.all([
-    // token-pairs (28/11): TODOS los pools; tokens/v1 da uno por token y no siempre el más líquido (JUP: Orca 494 k$ y no Meteora 1,6 M$)
+  // pools: token-pairs da TODOS (28/11: tokens/v1 da uno por token y no siempre el más líquido; JUP salía con Orca 494 k$ y no
+  // Meteora 1,6 M$), pero desde el Worker a veces no contesta: entonces, tokens/v1 como antes
+  const [todos, uno, regDay] = await Promise.all([
     get("https://api.dexscreener.com/token-pairs/v1/solana/" + m, 300),
+    get("https://api.dexscreener.com/tokens/v1/solana/" + m, 300),
     day && d.lanz.lvl ? get("https://solflag.com/datos/registro/" + day + ".json", 3600) : null
   ]);
+  const pairs = Array.isArray(todos) && todos.length ? todos : uno;
   const mk = mercado(pairs, m), reg = regDay && regDay.tokens ? regDay.tokens[m] || null : null;
   if (!d.lanz && !mk) return pairs === null ? page(noEncontrado(m, lang, true), 503) : page(noEncontrado(m, lang), 404);   // 503: DexScreener no contestó, no es que no exista
   return page(pagina(m, d, mk, reg, Date.now(), lang), 200, 21600);   // 6 h en la caché de Cloudflare
