@@ -3212,8 +3212,8 @@ function mlWallet(e){
   var a=e.addr, on=inCart(a);
   return "<div class='ml-w' data-analyze='"+esc(a)+"' title='Abrir el análisis de esta wallet'><div class='ml-wtop'>"+cfAva(a)+"<span class='t'><a href='#' data-analyze='"+esc(a)+"' title='Abrir el análisis de esta wallet'>"+esc(e.name||short(a))+"</a>"+
       "<span>"+(e.name?esc(short(a)):"sin nombre")+"</span></span>"+cfPnlBadge(e.pnl&&e.pnl.st?e.pnl:null)+"</div>"+
-    (e.ts?"<div class='ml-wst'><div><b>"+usd(e.total||0)+"</b><span>en tokens</span></div><div><b>"+(e.n||0)+"</b><span>tokens</span></div>"+
-      "<div"+(e.alto?" class='r'":"")+"><b>"+(e.alto||0)+"</b><span>en rojo</span></div></div>":"<p class='hint' style='margin:0'>Todavía sin analizar</p>")+
+    (e.ts?"<div class='ml-wst'><div><b>"+usd(e.total||0)+"</b><span>en tokens</span></div><div><b>"+esc(e.n||0)+"</b><span>tokens</span></div>"+
+      "<div"+(e.alto?" class='r'":"")+"><b>"+esc(e.alto||0)+"</b><span>en rojo</span></div></div>":"<p class='hint' style='margin:0'>Todavía sin analizar</p>")+
     "<div class='ml-wact'><button class='btn small ghost ml-grow' type='button' data-analyze='"+esc(a)+"'>"+(e.ts?"Analizar · "+esc(hace(e.ts)):"Analizar")+"</button>"+
       "<button class='star' type='button' data-favw='"+esc(a)+"' aria-pressed='true' title='Dejar de seguir' aria-label='Dejar de seguir esta wallet'>★</button>"+
       "<details class='pmenu lmore'><summary class='btn small' aria-label='Más opciones'>⋯</summary><div class='pmenu-body'>"+
@@ -7308,8 +7308,25 @@ function backupObj(){
   return {app:"escaner-wallets",v:1,ts:Date.now(),lista:lista,
     conf:{cart:conf.cart,saved:conf.saved,pct:conf.pct,showAll:conf.showAll,pnl:conf.pnl,pf:conf.pf}};
 }
+/* 28/11: una copia importada puede venir de otra persona: se limpia antes de mezclarla. En los textos fuera < > " ' `
+   (ningún dato de la copia puede meter HTML aunque algún sitio lo pinte sin esc), claves raras fuera (también
+   __proto__) y solo entran wallets, tokens y direcciones de Confluencia que sean direcciones de Solana */
+var BK_ADDR=/^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+function bkLimpio(v,d){
+  if(d>8) return null;
+  if(typeof v==="string") return v.replace(/[<>"'`]/g,"").slice(0,500);
+  if(typeof v==="number") return isFinite(v)?v:0;
+  if(typeof v==="boolean"||v==null) return v;
+  if(Array.isArray(v)) return v.slice(0,2000).map(function(x){ return bkLimpio(x,d+1); });
+  if(typeof v==="object"){ var o={}; Object.keys(v).slice(0,2000).forEach(function(k){ if(/^[\w.-]{1,64}$/.test(k)&&k!=="__proto__"&&k!=="constructor"&&k!=="prototype") o[k]=bkLimpio(v[k],d+1); }); return o; }
+  return null;
+}
+function bkSoloDirs(o){ var r={}; Object.keys(o||{}).forEach(function(k){ if(BK_ADDR.test(k)&&o[k]&&typeof o[k]==="object") r[k]=o[k]; }); return r; }
 function mergeBackup(o){
+  o=bkLimpio(o,0);
   if(!o||o.app!=="escaner-wallets"||!o.lista||!o.conf) throw new Error("formato");
+  o.lista.w=bkSoloDirs(o.lista.w); o.lista.t=bkSoloDirs(o.lista.t);
+  o.conf.cart=(Array.isArray(o.conf.cart)?o.conf.cart:[]).filter(function(a){ return typeof a==="string"&&BK_ADDR.test(a); });
   var nw=0,nt=0,ng=0,L=o.lista;
   Object.keys(L.w||{}).forEach(function(a){
     var b=L.w[a], e=lista.w[a];

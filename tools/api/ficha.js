@@ -399,7 +399,7 @@ const page = (body, status, ttl) => new Response(body, { status: status, headers
 
 // Las fichas que valen la pena (26/11, SEO): Google conocía ~24.800 por el sitemap y no rastreaba casi ninguna (25/11
 // en Search Console: «Descubierta: actualmente sin indexar»). Ahora solo unos cientos: los tokens del Ecosistema en
-// Solana, los que sigue la recogida (tabla quien), los más analizados en la web (pedidos, 2 veces o más) y los
+// Solana, los que sigue la recogida (tabla quien), los más analizados en la web (pedidos, 5 veces o más en 2 días) y los
 // lanzamientos que pasaron de 100.000 $ a las 24 h. Las demás fichas siguen funcionando para quien llegue por un enlace.
 async function tryAll(db, sql, args) { try { return await all(db, sql, args); } catch (e) { return []; } }
 export async function fichasBuenas(db, get) {
@@ -407,7 +407,10 @@ export async function fichasBuenas(db, get) {
   return {
     eco: ((eco && eco.rows) || []).filter((r) => r && !r.cad && ADDR.test(r.mint || "")),
     quien: await tryAll(db, "SELECT m, t FROM quien", []),
-    ped: await tryAll(db, "SELECT m, n, t1 AS t FROM pedidos WHERE n >= 2 ORDER BY n DESC, t1 DESC LIMIT " + BUENAS_MAX, []),
+    // 28/11: con dos avisos (POST /api/visto) cualquiera colaba un token en el sitemap: ahora 5 o más, repartidos en
+    // 2 días como mínimo (la IP no se guarda, así que no se puede contar una por persona). Los de riesgo alto se quedan:
+    // su ficha avisa, y es justo la que conviene que encuentre quien lo busca
+    ped: await tryAll(db, "SELECT m, n, t1 AS t FROM pedidos WHERE n >= 5 AND t1 - t0 >= 86400000 ORDER BY n DESC, t1 DESC LIMIT " + BUENAS_MAX, []),
     lz: await tryAll(db, "SELECT m, t, mc24 FROM lanz WHERE mc24 >= 100000 ORDER BY t DESC LIMIT " + BUENAS_MAX, []),
   };
 }

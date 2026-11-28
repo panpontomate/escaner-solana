@@ -20,7 +20,7 @@ function d1() {
   ins.run(M3, T + 2000, "pump_fun", "pump-fun", A, A, null, 0, "HIGH", null, null, null, 1);
   const buy = db.prepare("INSERT INTO compras (m,w,d,sig) VALUES (?,?,?,?)");
   buy.run(M1, C, 0, "s1"); buy.run(M2, C, 1, "s2");
-  db.prepare("INSERT INTO pedidos (m,n,t0,t1,hecho) VALUES (?,?,?,?,?)").run(M1, 3, T, T, T);
+  db.prepare("INSERT INTO pedidos (m,n,t0,t1,hecho) VALUES (?,?,?,?,?)").run(M1, 5, T - 2 * 86400000, T, T);
   return { prepare: (sql) => ({ bind: (...args) => ({ all: async () => ({ results: db.prepare(sql).all(...args) }) }) }) };
 }
 const env = { DB: d1() };
@@ -45,7 +45,7 @@ test("ficha completa: quién está detrás (pagó y creó juntos), compradores, 
   assert.match(body, /Cara conocida/);
   assert.match(body, /seguía vivo|murió/);
   assert.match(body, /A los 7 días/);                                 // del registro publicado
-  assert.match(body, /Consultas en SolFlag<\/td><td class="val ">3/);
+  assert.match(body, /Consultas en SolFlag<\/td><td class="val ">5/);
   assert.match(body, /href="https:\/\/token\.solflag\.com\/Mint222222222222222222222222222222"/); // otro token del creador
   assert.match(body, /href="https:\/\/solflag\.com\/\?wallet=BUY1111111111111111111111111111111"/);
   assert.doesNotMatch(body, /Ficha parcial/);
@@ -85,7 +85,7 @@ test("no encontrado y dirección no válida: 404 sin indexar", async () => {
 test("sitemap, robots y la raíz", async () => {
   const s = await get("/sitemap.xml");
   assert.equal(s.status, 200);
-  // solo las que valen la pena: M1 (la pidió la gente 3 veces); M2 y M3 no; más el índice de fichas
+  // solo las que valen la pena: M1 (la pidió la gente 5 veces en 2 días); M2 y M3 no; más el índice de fichas
   assert.equal((s.body.match(/<loc>https:\/\/token\.solflag\.com\/Mint/g) || []).length, 1);
   assert.match(s.body, /<loc>https:\/\/token\.solflag\.com\/<\/loc>/);
   assert.match(s.body, /<loc>https:\/\/token\.solflag\.com\/Mint1111/);
@@ -97,7 +97,7 @@ test("sitemap, robots y la raíz", async () => {
   assert.equal(root.status, 200);
   const ix = await root.text();
   assert.match(ix, /<h1>Fichas de tokens de Solana<\/h1>/);
-  assert.match(ix, /href="https:\/\/token\.solflag\.com\/Mint1111[^"]*">Slignal Coin <small>SLIGNAL<\/small><\/a> <span class="ixn">3 análisis/);
+  assert.match(ix, /href="https:\/\/token\.solflag\.com\/Mint1111[^"]*">Slignal Coin <small>SLIGNAL<\/small><\/a> <span class="ixn">5 análisis/);
   assert.doesNotMatch(ix, /Mint3333/);
 });
 

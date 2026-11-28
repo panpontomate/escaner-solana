@@ -9,6 +9,8 @@ const qrgen = createRequire(import.meta.url)("./vendor/qrcode-generator.cjs");
 const DIR = "2DbYrSYgn3tdiEnWy6gU95JZYmhQ11cdLWsrM6H7kN16";
 const COSTES_MES = { "2026-11": 44, "2026-12": 93 };   // a partir del último, se repite el último
 const DESDE = "2026-11";
+// 28/11: lo que entra por debajo de esto no cuenta ni se lista (envíos de polvo para inflar la cifra o tapar las de verdad)
+const MINIMO = 0.5;
 
 // QR de verdad (solana:<dirección>), corrección alta por el logo del centro
 const q = qrgen(0, "H"); q.addData("solana:" + DIR); q.make();
@@ -107,7 +109,7 @@ for (const lang of ["es", "en"]) {
     .replace(`class="plang" href="${t.oldAlt}"`, `class="plang" href="${t.altHref}"`)
     .replace("</head>", `<link href="/apoya/apoya.css?v=1" rel="stylesheet">\n</head>`);
   const pie = src.slice(src.indexOf("<footer>"));
-  const J = Object.assign({}, t.js, { dir: DIR, costes: COSTES_MES, desde: DESDE, loc: t.loc, prev: t.prev, copiado: t.copiado, copiar: t.copiar });
+  const J = Object.assign({}, t.js, { minimo: MINIMO, dir: DIR, costes: COSTES_MES, desde: DESDE, loc: t.loc, prev: t.prev, copiado: t.copiado, copiar: t.copiar });
   const cuerpo = `<article>
 <div class="ap-hero">
   <p class="kick">${t.kick}</p>
@@ -201,7 +203,9 @@ function carga(){
     $("ap-tot").textContent=usd(a.sol*px+a.usdc);$("ap-sol").textContent=num(a.sol,3);$("ap-solu").textContent="≈ "+usd(a.sol*px);
     $("ap-usdc").textContent=num(a.usdc,2);$("ap-usdcu").textContent="≈ "+usd(a.usdc);
     var mov=a.mov||[],ult=[];
-    mov.forEach(function(x){var v=(x.sol>0?x.sol*px:0)+(x.usdc>0?x.usdc:0);if(v>0){var m=mesDe(x.t);don[m]=(don[m]||0)+v;if(m===hoy)n++}});
+    function val(x){return (x.sol>0?x.sol*px:0)+(x.usdc>0?x.usdc:0)}
+    mov=mov.filter(function(x){var e=x.sol>0||x.usdc>0;return !e||!px||val(x)>=L.minimo});
+    mov.forEach(function(x){var v=val(x);if(v>0){var m=mesDe(x.t);don[m]=(don[m]||0)+v;if(m===hoy)n++}});
     $("ap-mes").textContent=usd(don[hoy]||0);$("ap-mesn").textContent=n===0?L.ninguna:n===1?L.una:L.varias.replace("{n}",n);
     mov.slice(0,8).forEach(function(x){var ent=x.sol>0||x.usdc>0,q=x.usdc?num(Math.abs(x.usdc),2)+" USDC":num(Math.abs(x.sol),3)+" SOL";
       ult.push("<li><span class='h'>"+cuando(x.t)+"</span><span class='c"+(ent?"":" out")+"'>"+(ent?"+":"−")+q+"</span><span class='w'>"+(ent?(x.de?"<a href='https://solscan.io/account/"+x.de+"' target='_blank' rel='noopener'>"+corta(x.de)+"</a> · ":""):L.gasto+" · ")+"<a href='https://solscan.io/tx/"+x.sig+"' target='_blank' rel='noopener'>tx ↗</a>"+(x.sol&&!x.usdc&&px?" · ≈ "+usd(Math.abs(x.sol)*px):"")+"</span></li>")});

@@ -6,6 +6,9 @@ on:
     branches: [main]      # los datos del recolector van en la rama datos y no lo lanzan
   pull_request:
   workflow_dispatch:
+# 28/11: solo leer el repo (los tests no escriben nada)
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest

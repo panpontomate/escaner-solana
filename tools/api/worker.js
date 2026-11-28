@@ -20,7 +20,7 @@
 //   GET  /api/quien                quién tiene las memecoins (top 20) y ballenas de 24 h, de la recogida (5 min en caché)
 //   GET  /api/ballenas/<mint>      de un token que sigue la recogida: historial de «quién la tiene», avisos de las 20 mayores
 //                                  cuentas y operaciones grandes de 24 h (Escáner › Ballenas, 5 min en caché)
-//   POST /api/rpc                  plan B de RPC de la web (Helius; solo lectura, 120/min por conexión)
+//   POST /api/rpc                  plan B de RPC de la web (Helius; solo lectura, 60/min por conexión y tope diario)
 //   (por token.solflag.com, la ficha pública de cada token: ver ficha.js)
 //   POST /api/visto/<mint>         la web avisa de que alguien escaneó ese token: se apunta solo el token y cuántas
 //                                  veces (tabla pedidos), nada de quién. El recolector lo analiza después él mismo
@@ -345,6 +345,20 @@ export function rpcValido(q) {
   if (q.method === "getMultipleAccounts") return Array.isArray(q.params[0]) && q.params[0].length <= 100 && q.params[0].every((a) => ADDR.test(a));
   return typeof q.params[0] === "string" && q.params[0].length <= 100;
 }
+// Tope diario de créditos de Helius que se pueden gastar a través de la API (28/11): los límites por conexión se
+// esquivan cambiando de IP; este cuenta el total del día en D1 (tabla gasto) y al pasarlo esas rutas dan 429 hasta
+// el día siguiente (UTC). COSTE = créditos aproximados por petición. Si D1 falla, no se corta nada.
+export const TOPE_DIA = 10000;
+export const COSTE = { rpc: 1, top: 1, logo: 10, apoya: 12, ventas: 10, caida: 10 };
+export async function presupuesto(db, coste, ahora) {
+  if (!db) return true;
+  try {
+    const r = await db.prepare("INSERT INTO gasto (d, n) VALUES (?, ?) ON CONFLICT(d) DO UPDATE SET n = n + excluded.n RETURNING n")
+      .bind(new Date(ahora).toISOString().slice(0, 10), coste).first();
+    return !r || r.n <= TOPE_DIA;
+  } catch (e) { return true; }
+}
+const sinPresupuesto = () => fail(429, "daily budget reached, try again tomorrow");
 // Rutas que gastan créditos de fuera (Helius, CoinGecko) sin límite propio: el de /api/top, 30 por minuto por conexión (28/11)
 async function limiteCaro(req, env) {
   if (!env.TOP_LIMIT) return true;
@@ -361,6 +375,7 @@ async function rpcPlanB(req, env) {
   if (txt.length > 20000) return fail(413, "too large");
   let q; try { q = JSON.parse(txt); } catch (e) { return fail(400, "not JSON"); }
   if (!rpcValido(q)) return fail(400, "method not allowed");
+  if (!(await presupuesto(env.DB, COSTE.rpc, Date.now()))) return sinPresupuesto();
   const r = await fetch(env.SOLANA_RPC, { method: "POST", headers: { "content-type": "application/json" },
     body: JSON.stringify({ jsonrpc: "2.0", id: q.id ?? 1, method: q.method, params: q.params }) }).catch(() => null);
   if (!r) return fail(503, "rpc unavailable");
@@ -398,6 +413,7 @@ export async function handle(req, env) {
       const { success } = await env.VENTAS_LIMIT.limit({ key: req.headers.get("cf-connecting-ip") || "?" });
       if (!success) return fail(429, "too many requests");
     }
+    if (!(await presupuesto(env.DB, COSTE.ventas * ws.length, Date.now()))) return sinPresupuesto();
     const rec = q.get("rec") === "1";
     const v = await ventas(env, p[3], ws, desde, fetch, rec);
     const res = json(v);
@@ -414,6 +430,7 @@ export async function handle(req, env) {
       const { success } = await env.VENTAS_LIMIT.limit({ key: req.headers.get("cf-connecting-ip") || "?" });
       if (!success) return fail(429, "too many requests");
     }
+    if (!(await presupuesto(env.DB, COSTE.caida, Date.now()))) return sinPresupuesto();
     const c = await caida(env, p[3], m, desde, hasta, fetch);
     if (!c) return fail(503, "rpc unavailable");
     const res = json(c);
@@ -442,6 +459,7 @@ export async function handle(req, env) {
   if (p.length === 4 && p[1] === "api" && p[2] === "logo") {
     if (!ADDR.test(p[3])) return fail(400, "not a Solana address");
     if (!(await limiteCaro(req, env))) return fail(429, "too many requests");
+    if (!(await presupuesto(env.DB, COSTE.logo, Date.now()))) return sinPresupuesto();
     const img = await logo(env, p[3], fetch);
     if (img === undefined) return fail(503, "rpc unavailable");
     const res = json({ v: V, mint: p[3], img: img });
@@ -456,6 +474,7 @@ export async function handle(req, env) {
       const { success } = await env.TOP_LIMIT.limit({ key: req.headers.get("cf-connecting-ip") || "?" });
       if (!success) return fail(429, "too many requests");
     }
+    if (!(await presupuesto(env.DB, COSTE.top, Date.now()))) return sinPresupuesto();
     const r = await top(env, p[3], fetch);
     if (!r) return fail(503, "rpc unavailable");
     const res = json({ v: V, mint: p[3], result: r });
@@ -465,6 +484,7 @@ export async function handle(req, env) {
   if (p.length === 3 && p[1] === "api" && p[2] === "apoya") {
     if (!env.SOLANA_RPC) return fail(503, "rpc unavailable");
     if (!(await limiteCaro(req, env))) return fail(429, "too many requests");
+    if (!(await presupuesto(env.DB, COSTE.apoya, Date.now()))) return sinPresupuesto();
     const a = await apoya(env, fetch);
     if (!a) return fail(503, "rpc unavailable");
     const res = json(a);

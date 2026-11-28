@@ -367,3 +367,18 @@ test("claveCache quita los parámetros salvo en las rutas que los usan", () => {
   assert.equal(claveCache(new Request(v)).url, v);
   assert.equal(claveCache(new Request("https://api.solflag.com/api/marcas/" + M1 + "?desde=5")).url, "https://api.solflag.com/api/marcas/" + M1 + "?desde=5");
 });
+
+// 28/11: tope diario de créditos que la API puede gastar (tabla gasto)
+import { presupuesto, TOPE_DIA } from "./worker.js";
+test("presupuesto suma el gasto del día y corta al pasar el tope; sin D1 no corta", async () => {
+  const db = new DatabaseSync(":memory:");
+  db.exec("CREATE TABLE gasto (d TEXT PRIMARY KEY, n INTEGER)");
+  const D = { prepare: (sql) => ({ bind: (...a) => ({ first: async () => db.prepare(sql).get(...a) }) }) };
+  const t = Date.UTC(2026, 10, 28, 12);
+  assert.equal(await presupuesto(D, TOPE_DIA - 5, t), true);
+  assert.equal(await presupuesto(D, 5, t), true);
+  assert.equal(await presupuesto(D, 1, t), false);
+  assert.equal(await presupuesto(D, 1, t + 864e5), true);   // otro día, se empieza de cero
+  assert.equal(await presupuesto(null, 1, t), true);
+  assert.equal(await presupuesto({ prepare: () => { throw new Error("x"); } }, 1, t), true);
+});

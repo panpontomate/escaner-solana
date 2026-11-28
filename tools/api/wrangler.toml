@@ -44,4 +44,4 @@ simple = { limit = 30, period = 60 }
 [[ratelimits]]
 name = "RPC_LIMIT"
 namespace_id = "1004"
-simple = { limit = 120, period = 60 }
+simple = { limit = 60, period = 60 }
