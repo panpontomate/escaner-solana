@@ -1668,6 +1668,28 @@ body.landing #adv{margin-top:10px}
 .bp-ver{margin-top:12px}
 .bmodal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;background:rgba(5,4,13,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .bmodal[hidden]{display:none}
+/* Comprar con Jupiter (28/11): botón, fila de Jupiter en Dónde cotiza y ventana con el widget */
+.actions .tbuy{border-color:rgba(142,197,207,.55);color:#8ec5cf}
+.cq2-row .jbuy{display:flex;flex-direction:column;align-items:flex-end;gap:3px;white-space:nowrap}
+.cq2-row .jb{font:700 .8rem Manrope,sans-serif;color:#05040d;background:#8ec5cf;border:0;border-radius:999px;padding:5px 12px;cursor:pointer}
+.cq2-row .jb small{font-weight:600;opacity:.75;margin-left:2px}
+.cq2-row .jx{font-size:.7rem;color:var(--muted)}
+#buymodal .bm-caja{width:min(440px,100%)}
+#buymodal .by-k{font:700 .68rem/1 Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8ec5cf}
+#buymodal .by-sub{color:var(--muted);font-size:.88rem;margin:0 0 14px}
+#buymodal .by-rojo{border-top:1px solid rgba(255,107,107,.35);border-bottom:1px solid rgba(255,107,107,.35);padding:12px 0;margin:0 0 14px}
+#buymodal .by-rojo>b{display:block;color:#ff6b6b;font-size:.95rem;margin-bottom:8px}
+#buymodal .by-rojo ul{list-style:none;margin:0 0 12px;padding:0}
+#buymodal .by-rojo li{display:flex;gap:8px;align-items:baseline;font-size:.86rem;margin:6px 0}
+#buymodal .by-rojo li i{flex:none;font:700 .66rem Manrope,sans-serif;font-style:normal;letter-spacing:.06em;text-transform:uppercase;color:#ff6b6b;border:1px solid rgba(255,107,107,.5);border-radius:999px;padding:2px 7px}
+#buymodal .by-bt{display:flex;gap:8px;flex-wrap:wrap}
+#buymodal .by-bt button{font:700 .82rem Manrope,sans-serif;border-radius:999px;padding:7px 14px;cursor:pointer}
+#buymodal .by-no{background:#8ec5cf;color:#05040d;border:0}
+#buymodal .by-ok{background:none;color:inherit;border:1px solid rgba(255,107,107,.6)}
+#buymodal #jupw{min-height:350px;border-radius:14px;overflow:hidden}
+#buymodal #jupw.wait{opacity:.25;pointer-events:none;filter:grayscale(1)}
+#buymodal .by-pie{font-size:.74rem;color:var(--muted);margin:10px 0 0;line-height:1.45}
+@media(max-width:700px){#t-quote .cq2-row .jbuy{grid-area:ir;justify-self:end}}
 .bm-caja{position:relative;width:min(780px,100%);max-height:88vh;overflow:auto;background:#0c0920;border:1px solid var(--line2);border-radius:22px;padding:22px 22px 18px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
 .bm-x{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:10px;border:1px solid var(--line2);background:none;color:inherit;font-size:16px;cursor:pointer}
 .bm-cks{display:grid;grid-template-columns:1fr 1fr;gap:2px 18px;margin-top:10px}
@@ -4075,7 +4097,7 @@ function deskActions(r,fav){
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"b30"))+"'>📉 Si baja un 30%</a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,"m20"))+"'>↕️ Cada vez que se mueva un 20%</a>"+
     "<a target='_blank' rel='noopener' href='"+esc(tgPrice(r.mint,""))+"'>✏️ Otro precio (lo eliges en el bot)</a>":"";
-  return "<div class='actions tdesk'>"+(r.emisor?"":"<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span><span class='tmsub'> · todo lo que rodea a este token</span></button>")+
+  return "<div class='actions tdesk'>"+(r.par?"<button class='btn small tbuy' type='button' data-buy='"+esc(r.mint)+"'><span class='ic'>⇄</span><span class='lb'>Comprar</span></button>":"")+(r.emisor?"":"<button class='btn small tmap' type='button' data-map='"+esc(r.mint)+"' title='Todo lo que rodea a este token, a pantalla completa'><span class='ic'>✦</span><span class='lb'>On-chain Map</span><span class='tmsub'> · todo lo que rodea a este token</span></button>")+
     (r.par?"<button class='btn small tfav' type='button' data-long='"+(esAccion(r)?"accion":"token")+"' data-favt='"+esc(r.mint)+"' aria-pressed='"+fav+"'>"+starHtml(esAccion(r)?"accion":"token",fav)+"</button>":"")+
     (r.emisor?"":"<button class='btn small twh' type='button' data-hold='"+esc(r.mint)+"'><span class='ic'>🐳</span><span class='lb'><span class='dl'>Buscar ballenas</span><span class='ds'>Ballenas</span></span></button>")+
     "<a class='btn small tfic' href='"+esc(fichaLink(r.mint))+"' target='_blank' rel='noopener' title='Quién lo lanzó, quién lo financió, quién compró primero y qué pasó después'><span class='ic'>📄</span><span class='lb'>Ficha completa</span></a>"+
@@ -4334,6 +4356,47 @@ function bandsOpen(){
 }
 function bandsClose(){ var m=$("#bmodal"); if(m){ m.hidden=true; document.body.style.overflow=""; } }
 document.addEventListener("click",function(e){ if(e.target.closest&&e.target.closest("[data-bands]")) bandsOpen(); });
+// Comprar con Jupiter (28/11): widget oficial (plugin.jup.ag) dentro de SolFlag, con la wallet del usuario; SolFlag cobra
+// un 0,5 % con su cuenta de referidos (Jupiter se queda el 20 % de eso). Si hay controles en rojo o el nivel es de riesgo alto,
+// primero se enseñan y hay que confirmar
+var JUP_REF="AKLxWSaLEqJaGjDtBGWLyGyyCX3FBqpF5GNZViB1P8Cq", JUP_FEE=50, jupLib=null;
+function jupLoad(){
+  if(!jupLib) jupLib=new Promise(function(ok,ko){ var s=document.createElement("script"); s.src="https://plugin.jup.ag/plugin-v1.js"; s.onload=ok; s.onerror=function(){ jupLib=null; ko(); }; document.head.appendChild(s); });
+  return jupLib;
+}
+function buyRojos(r){
+  var l=(r.lights||[]).filter(function(x){ return x.s==="bad"; }).map(function(x){ return [LKEYS[x.k]||"",x.t||""]; });
+  if(r.launch&&r.launch.s==="bad") l.push(["Lanzamiento",r.launch.t||"Salió en rojo en nuestra revisión del lanzamiento"]);
+  if(!l.length&&quoteRiesgo(r)) l.push(["Nivel",(LEVELS[r.lvl]&&LEVELS[r.lvl].label)||"Riesgo alto"]);
+  return l;
+}
+function buyOpen(mint){
+  var r=state.token; if(!r||r.mint!==mint) return;
+  var rojos=buyRojos(r), m=$("#buymodal");
+  if(!m){ m=document.createElement("div"); m.id="buymodal"; m.className="bmodal"; m.hidden=true; document.body.appendChild(m);
+    m.addEventListener("click",function(e){ if(e.target===m||e.target.closest("[data-byclose]")) buyClose();
+      if(e.target.closest("[data-byok]")){ m.querySelector(".by-rojo").hidden=true; $("#jupw").classList.remove("wait"); } });
+    document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&!m.hidden) buyClose(); }); }
+  var jx="https://jup.ag/swap?sell=So11111111111111111111111111111111111111112&buy="+encodeURIComponent(r.mint);
+  m.innerHTML="<div class='bm-caja' role='dialog' aria-modal='true' aria-label='Comprar con Jupiter'><button type='button' class='bm-x' data-byclose='1' title='Cerrar'>✕</button>"+
+    "<span class='by-k'>Comprar con Jupiter</span><h3 class='tgt'>"+esc(r.sym||short(r.mint))+"</h3>"+
+    "<p class='by-sub'>Desde tu wallet. SolFlag nunca toca tu dinero.</p>"+
+    (rojos.length?"<div class='by-rojo'><b>Antes de comprar: "+(rojos.length===1?"1 control en rojo":rojos.length+" controles en rojo")+"</b><ul>"+
+      rojos.map(function(x){ return "<li><i>"+esc(x[0])+"</i><span>"+esc(x[1])+"</span></li>"; }).join("")+"</ul>"+
+      "<div class='by-bt'><button type='button' class='by-no' data-byclose='1'>Mejor no</button><button type='button' class='by-ok' data-byok='1'>Lo he leído, seguir</button></div></div>":"")+
+    "<div id='jupw'"+(rojos.length?" class='wait'":"")+"><p class='hint'>Cargando Jupiter…</p></div>"+
+    "<p class='by-pie'>Incluye un 0,5 % para SolFlag."+(quoteRiesgo(r)?"":" ¿Prefieres sin comisión? <a href='"+esc(jx)+"' target='_blank' rel='noopener'>Cómpralo en jup.ag ↗</a>.")+" Es información, no una recomendación de compra.</p></div>";
+  m.hidden=false; document.body.style.overflow="hidden";
+  track("buy");
+  jupLoad().then(function(){
+    if(m.hidden||!window.Jupiter) return;
+    var w=$("#jupw"); if(w) w.innerHTML="";
+    window.Jupiter.init({displayMode:"integrated",integratedTargetId:"jupw",
+      formProps:{initialInputMint:"So11111111111111111111111111111111111111112",initialOutputMint:r.mint,fixedMint:r.mint,referralAccount:JUP_REF,referralFee:JUP_FEE}});
+  },function(){ var w=$("#jupw"); if(w) w.innerHTML="<p class='hint'>No se pudo cargar Jupiter. <a href='"+esc(jx)+"' target='_blank' rel='noopener'>Ábrelo en jup.ag ↗</a></p>"; });
+}
+function buyClose(){ var m=$("#buymodal"); if(m){ m.hidden=true; document.body.style.overflow=""; if(window.Jupiter&&window.Jupiter.close) try{ window.Jupiter.close(); }catch(e){} } }
+document.addEventListener("click",function(e){ var b=e.target.closest&&e.target.closest("[data-buy]"); if(b) buyOpen(b.getAttribute("data-buy")); });
 function renderToken(noScroll){
   var r=state.token, L=LEVELS[r.lvl], fav=!!lista.t[r.mint];
   var tip=TOKEN_TIP[r.lvl]||"", rtags="";
@@ -4882,15 +4945,19 @@ function paintQuote(r,j,amt){
       (r.par||cex.length?"<span class='cq-amts'>"+[100,1000,10000].map(function(a){ return "<button type='button' data-cqamt='"+a+"' class='"+(a===amt?"on":"")+"'>"+(a===100?"100 $":usd(a))+"</button>"; }).join("")+"</span>":"")+"</div>"+
     "<div class='cq2-hero' id='cqbig'><span class='hint'>"+(r.par?"Calculando con Jupiter…":"Sin mercado en la cadena: no hay dónde comprar ni vender.")+"</span></div>"+
     "<p class='cq2-comp' id='cqcomp' hidden></p>"+
-    (risky?"<p class='cq-stop'><b>Riesgo alto:</b> no enlazamos sitios para comprarlo. Te enseñamos dónde se negocia y, sobre todo, lo que cuesta salir.</p>":"")+
+    (risky?"<p class='cq-stop'><b>Riesgo alto:</b> no enlazamos sitios para comprarlo. Te enseñamos dónde se negocia y, sobre todo, lo que cuesta salir. Si aun así quieres comprarlo, «Comprar aquí» te enseña antes lo que vemos en rojo.</p>":"")+
     "<p class='kick cq2-k' id='cqrk'>Del más barato al más caro · ida y vuelta</p><div class='cq2-rank' id='cqrank'></div>"+
     (!j||j.cex===null?"<p class='hint'>No se pudieron consultar los exchanges ahora. Vuelve a probar en un rato.</p>":"")+
     (pools.length?"<p class='cq2-pools'>En la cadena: "+pools.slice(0,3).map(function(p){ return esc(p.dex)+" "+esc(p.par)+" ("+esc(usdShort(p.liq))+")"; }).join(" · ")+(pools.length>3?" y "+(pools.length-3)+" más":"")+". Jupiter reparte la compra entre todos.</p>":"")+
     (pools.length+cex.length>3?"<a class='cq-all' href='"+esc(quoteAllLink(r))+"'>Ver "+(pools.length?pools.length+(pools.length>=30?"+ pools":" pools"):"")+(pools.length&&cex.length?" y ":"")+(cex.length?cex.length+" exchanges":"")+", con comisión, identidad y MiCA →</a>":"")+
     "<p class='wsrc'>La dirección buena termina en <b>…"+esc(r.mint.slice(-4))+"</b>: otro token con el mismo nombre es otro token. Coste en la cadena: cotización de Jupiter (ya incluye la comisión de los pools; no la de tu app). "+
-      "Exchanges: diferencia de precio + comisión al comprar y al vender, revisado a mano el "+(j?esc(j.revisado.split("-").reverse().join("/")):"")+". SolFlag no cobra de ningún sitio. Es información, no una recomendación de compra. "+
+      "Exchanges: diferencia de precio + comisión al comprar y al vender, revisado a mano el "+(j?esc(j.revisado.split("-").reverse().join("/")):"")+". Si compras desde SolFlag con «Comprar aquí», SolFlag se lleva un 0,5 % (Jupiter se queda una parte): así sigue siendo gratis. En jup.ag y en los exchanges no cobramos nada. Es información, no una recomendación de compra. "+
       "Pools: DexScreener · Exchanges: <a href='https://www.coingecko.com/' target='_blank' rel='noopener'>Powered by CoinGecko</a></p>";
   paintQuoteCost(r,null,amt,true);
+}
+function jupBuy(r,u,risky){
+  return "<span class='jbuy'><button type='button' class='jb' data-buy='"+esc(r.mint)+"'>Comprar aquí <small>+0,5 %</small></button>"+
+    (risky||!u?"":"<a class='jx' href='"+esc(u)+"' target='_blank' rel='noopener'>o en jup.ag sin comisión ↗</a>")+"</span>";
 }
 // El ranking: la ruta de Jupiter (si hay) y los exchanges revisados, ordenados por lo que cuesta comprar y vender al momento
 function paintQuoteCost(r,rt,amt,first){
@@ -4899,7 +4966,7 @@ function paintQuoteCost(r,rt,amt,first){
   var q=quoteData[r.mint]&&quoteData[r.mint].j, risky=quoteRiesgo(r), cex=q&&q.cex?q.cex:[];
   var go=function(u){ return risky||!u?"":"<a class='ir' href='"+esc(u)+"' target='_blank' rel='noopener'>Ir ↗</a>"; };
   var rows=[];
-  if(r.par) rows.push({n:"Mejor ruta de Jupiter",t:"cadena",sub:"reparte la compra entre todos los pools · no pide identidad",p:rt?(amt-rt.back)/amt*100:null,u:q&&q.ruta,wait:!rt&&first});
+  if(r.par) rows.push({n:"Mejor ruta de Jupiter",t:"cadena",sub:"reparte la compra entre pools · no pide identidad",p:rt?(amt-rt.back)/amt*100:null,u:q&&q.ruta,wait:!rt&&first,jup:1});
   cex.filter(function(x){ return x.g==="ok"&&x.id!=="?"; }).slice(0,5).forEach(function(x){ rows.push({n:x.n,t:"ex",sub:x.par+" · comisión "+(x.feeNote?"hasta ":"")+cqPct(x.fee),p:x.cost,u:x.url,tags:cqId(x)}); });
   rows.sort(function(a,b){ return (a.p==null?99:a.p)-(b.p==null?99:b.p); });
   var max=Math.max(1,Math.max.apply(null,rows.map(function(x){ return x.p||0; })));
@@ -4907,7 +4974,7 @@ function paintQuoteCost(r,rt,amt,first){
     return "<div class='cq2-row"+(i===0&&x.p!=null?" top":"")+"'><span class='cq2-pos'>"+(i+1)+"</span>"+
       "<div class='cq2-nm'><b>"+esc(x.n)+"</b><small><em class='"+(x.t==="ex"?"tx":"tc")+"'>"+(x.t==="ex"?"Exchange":"En la cadena")+"</em>"+esc(x.sub)+"</small>"+(x.tags?"<span class='cq2-tags'>"+x.tags+"</span>":"")+"</div>"+
       "<div class='cq2-br'><i style='width:"+(x.p==null?0:Math.max(3,x.p/max*100))+"%' class='"+(x.p==null?"":cqTone(x.p))+"'></i></div>"+
-      "<span class='cq2-cs "+(x.p==null?"":cqTone(x.p))+"'>"+(x.p==null?(x.wait?"…":"—"):(x.t==="ex"?"~":"")+cqPct(x.p))+"</span>"+go(x.u)+"</div>";
+      "<span class='cq2-cs "+(x.p==null?"":cqTone(x.p))+"'>"+(x.p==null?(x.wait?"…":"—"):(x.t==="ex"?"~":"")+cqPct(x.p))+"</span>"+(x.jup?jupBuy(r,x.u,risky):go(x.u))+"</div>";
   }).join(""):"<p class='hint'>No cotiza en ningún sitio que conozcamos.</p>";
   if(first) return;
   var mejor=rows.filter(function(x){ return x.p!=null; })[0], cad=rows.filter(function(x){ return x.t==="cadena"; })[0];
