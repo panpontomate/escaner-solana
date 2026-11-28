@@ -393,7 +393,8 @@ export function noEncontrado(m, lang, fallo) {
     '<a href="' + t.web + (m ? "?token=" + esc(m) : "") + '">' + t.nfBusca + '</a>.</p></div></section></div><script src="https://solflag.com/fondo.js?v=20261111d" defer></script></body></html>';
 }
 
-const HTML_HEAD = { "content-type": "text/html; charset=utf-8", "x-content-type-options": "nosniff", "referrer-policy": "strict-origin-when-cross-origin" };
+const HTML_HEAD = { "content-type": "text/html; charset=utf-8", "x-content-type-options": "nosniff", "referrer-policy": "strict-origin-when-cross-origin",
+  "x-frame-options": "DENY", "content-security-policy": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'" };   // 28/11: que otra web no pueda meter la ficha dentro de la suya
 const page = (body, status, ttl) => new Response(body, { status: status, headers: Object.assign({}, HTML_HEAD, { "cache-control": ttl ? "public, max-age=" + ttl : "no-store" }) });
 
 // Las fichas que valen la pena (26/11, SEO): Google conocía ~24.800 por el sitemap y no rastreaba casi ninguna (25/11

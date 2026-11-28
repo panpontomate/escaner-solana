@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>if(top!==self){try{if(top.location.host!==location.host)throw 0}catch(e){document.documentElement.style.display="none";try{top.location.replace(location.href)}catch(f){}}}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
 // Idioma: quien llega a la portada en español con el navegador en otro idioma va a la versión en inglés,
@@ -6051,7 +6052,7 @@ function loadLWC(){
   if(window.LightweightCharts) return Promise.resolve();
   if(!lwcP) lwcP=new Promise(function(res,rej){
     var sc=document.createElement("script");
-    sc.src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js";
+    sc.src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"; sc.integrity="sha384-OK7vELvjHdhUFi31JYioPIcRHTROLdcDa6ZsNWgvgLaKj+9JqhU0Ad8g4wz3CXjA"; sc.crossOrigin="anonymous";
     sc.onload=function(){ window.LightweightCharts?res():rej(new Error("lwc")); }; sc.onerror=function(){ lwcP=null; rej(new Error("lwc")); };
     document.head.appendChild(sc);
   });
